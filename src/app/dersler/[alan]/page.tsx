@@ -41,18 +41,19 @@ export default async function DersAlaniPage({ params }: { params: Promise<{ alan
       </nav>
 
       {/* Hero */}
-      <div className="bg-gradient-to-br from-primary-700 to-primary-500 rounded-3xl p-10 text-white mb-12">
-        <div className="text-6xl mb-4">{ders.emoji}</div>
-        <h1 className="text-4xl font-black mb-3">{ders.isim} YKS Hazırlık</h1>
-        <p className="text-blue-100 text-lg max-w-2xl mb-6">{ders.aciklama}</p>
-        <div className="flex flex-wrap gap-2 mb-8">
+      <div className="bg-gradient-to-br from-primary-600 via-primary-700 to-indigo-850 rounded-3xl p-10 text-white mb-12 shadow-premium relative overflow-hidden">
+        <div className="absolute top-[-50%] left-[-50%] w-full h-full bg-white/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="text-6xl mb-4 relative z-10">{ders.emoji}</div>
+        <h1 className="text-4xl font-black mb-3 relative z-10 tracking-tight">{ders.isim} YKS Hazırlık</h1>
+        <p className="text-primary-100 text-lg max-w-2xl mb-8 relative z-10 leading-relaxed">{ders.aciklama}</p>
+        <div className="flex flex-wrap gap-2 mb-8 relative z-10">
           {ders.yksTuru.map((t) => (
-            <span key={t} className="bg-white/20 text-white text-sm font-semibold px-3 py-1 rounded-full">{t}</span>
+            <span key={t} className="bg-white/10 border border-white/10 text-white text-xs font-semibold px-4 py-1.5 rounded-xl backdrop-blur-md">{t}</span>
           ))}
         </div>
         <a href={waLink(`Merhaba, ${ders.isim} dersi için YKS hazırlık hocası arıyorum.`)}
           target="_blank" rel="noopener noreferrer"
-          className="inline-block bg-white text-primary-700 font-bold px-8 py-3 rounded-xl hover:bg-blue-50 transition-colors">
+          className="inline-flex items-center justify-center bg-white text-primary-700 font-bold px-10 py-4 rounded-xl hover:bg-primary-50 hover:scale-105 transition-all relative z-10">
           WhatsApp ile Hoca Bul
         </a>
       </div>
