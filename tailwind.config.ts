@@ -6,26 +6,31 @@ const config: Config = {
     extend: {
       colors: {
         primary: {
-          50:  "#eff6ff",
-          100: "#dbeafe",
-          200: "#bfdbfe",
-          500: "#3b82f6",
-          600: "#1A56DB",
-          700: "#1d4ed8",
-          800: "#1e3a8a",
-          900: "#1e3a5f",
+          50:  "#f5f3ff",
+          100: "#ede9fe",
+          200: "#ddd6fe",
+          500: "#8b5cf6",
+          600: "#7c3aed",
+          700: "#6d28d9",
+          800: "#5b21b6",
+          900: "#4c1d95",
         },
-        green: {
-          600: "#057A55",
-          700: "#046c4e",
+        dark: {
+          900: "#090514",
+          800: "#120b24",
+          700: "#1a1235",
         },
-        orange: {
-          600: "#C2410C",
-        },
+        accent: {
+          glow: "rgba(124, 58, 237, 0.15)",
+        }
       },
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
       },
+      boxShadow: {
+        premium: "0 10px 40px -10px rgba(124, 58, 237, 0.12)",
+        glow: "0 0 20px rgba(16, 185, 129, 0.2)",
+      }
     },
   },
   plugins: [],

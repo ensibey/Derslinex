@@ -50,30 +50,34 @@ export default function HomePage() {
   return (
     <>
       {/* Hero */}
-      <section className="bg-gradient-to-br from-primary-900 via-primary-800 to-primary-600 text-white pt-20 pb-28 px-4">
-        <div className="max-w-7xl mx-auto text-center">
-          <span className="inline-block bg-white/10 text-blue-200 text-sm font-semibold px-4 py-1.5 rounded-full mb-6 backdrop-blur-sm">
-            YKS 2026 Hazırlığı Başlıyor 🎯
+      <section className="relative overflow-hidden bg-gradient-to-br from-dark-900 via-dark-800 to-primary-950 text-white pt-24 pb-36 px-4">
+        {/* Glow Effects */}
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary-600/10 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-emerald-500/5 blur-[150px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto text-center relative z-10">
+          <span className="inline-block bg-white/5 border border-white/10 text-primary-200 text-xs font-semibold px-4 py-2 rounded-full mb-8 backdrop-blur-md uppercase tracking-wider">
+            ⚡ YKS 2026 Hazırlığı Başlıyor
           </span>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight mb-6">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black leading-tight mb-8 tracking-tight">
             YKS'de Hedefine<br />
-            <span className="text-yellow-400">Uzman Hocayla</span> Ulaş
+            <span className="bg-gradient-to-r from-primary-400 via-violet-400 to-emerald-400 bg-clip-text text-transparent">Uzman Hocayla</span> Ulaş
           </h1>
-          <p className="text-lg sm:text-xl text-blue-100 max-w-2xl mx-auto mb-10 leading-relaxed">
-            TYT, AYT Sayısal, Sözel, EA ve Dil için deneyimli hocalar. Online veya yüz yüze ders seçeneği. WhatsApp ile anında başla.
+          <p className="text-base sm:text-xl text-gray-300 max-w-2xl mx-auto mb-12 leading-relaxed">
+            TYT, AYT Sayısal, Sözel, Eşit Ağırlık ve Dil derslerinde zirveye odaklanın. Türkiye'nin en iyi eğitmenleriyle birebir canlı dersler.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <a
               href={waLink()}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-400 text-white font-bold text-lg px-8 py-4 rounded-xl transition-colors shadow-lg"
+              className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-base sm:text-lg px-10 py-5 rounded-2xl transition-all duration-300 shadow-glow hover:scale-105"
             >
               <span>💬</span> WhatsApp ile Hemen Başla
             </a>
             <Link
               href="/hocalar"
-              className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold text-lg px-8 py-4 rounded-xl transition-colors backdrop-blur-sm"
+              className="inline-flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-base sm:text-lg px-10 py-5 rounded-2xl transition-all duration-300 backdrop-blur-sm"
             >
               Hocaları İncele →
             </Link>
@@ -82,51 +86,52 @@ export default function HomePage() {
       </section>
 
       {/* Stats */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12">
-        <div className="bg-white rounded-2xl shadow-xl p-6 grid grid-cols-2 sm:grid-cols-4 gap-6">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-20">
+        <div className="bg-dark-800/80 border border-white/5 rounded-3xl shadow-2xl p-8 backdrop-blur-md grid grid-cols-2 sm:grid-cols-4 gap-8">
           {stats.map((s) => (
             <div key={s.etiket} className="text-center">
-              <div className="text-3xl font-black text-primary-600">{s.rakam}</div>
-              <div className="text-sm text-gray-500 mt-1">{s.etiket}</div>
+              <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-primary-400 to-violet-300 bg-clip-text text-transparent">{s.rakam}</div>
+              <div className="text-xs sm:text-sm text-gray-400 font-medium mt-2 uppercase tracking-wider">{s.etiket}</div>
             </div>
           ))}
         </div>
       </section>
 
       {/* Ders Formatı */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-black text-gray-900">Sana Uygun Ders Formatı</h2>
-          <p className="text-gray-500 mt-3 max-w-xl mx-auto">Nerede olursan ol, ders almaya devam et.</p>
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-32">
+        <div className="text-center mb-16">
+          <span className="text-primary-500 text-xs font-bold uppercase tracking-widest">ÇALIŞMA MODELİ</span>
+          <h2 className="text-3xl sm:text-5xl font-black text-gray-900 mt-2">Sana Uygun Ders Formatı</h2>
+          <p className="text-gray-500 mt-4 max-w-xl mx-auto">Nerede olursan ol, kesintisiz öğrenmeye devam et.</p>
         </div>
-        <div className="grid sm:grid-cols-2 gap-6">
-          <div className="bg-gradient-to-br from-primary-50 to-blue-100 rounded-2xl p-8 border border-primary-100">
-            <div className="text-4xl mb-4">🏫</div>
-            <h3 className="text-xl font-bold text-primary-900 mb-3">Yüz Yüze Ders</h3>
-            <p className="text-gray-700 mb-6 leading-relaxed">
-              Belirli şehirlerdeki hocalarımızla birebir yüz yüze ders. Doğrudan etkileşim, anlık geri bildirim ve odaklanmış çalışma ortamı.
+        <div className="grid sm:grid-cols-2 gap-8">
+          <div className="bg-white rounded-3xl p-8 sm:p-10 border border-gray-100 shadow-premium hover:shadow-2xl transition-all duration-300 flex flex-col">
+            <div className="w-14 h-14 bg-primary-50 rounded-2xl flex items-center justify-center text-3xl mb-6">🏫</div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">Yüz Yüze Ders</h3>
+            <p className="text-gray-600 mb-8 leading-relaxed text-sm">
+              Belirlenen çalışma merkezlerinde veya evinizde eğitmenle birebir ders. Anlık geri bildirim ve yüksek odaklanma.
             </p>
-            <ul className="space-y-2 text-sm text-gray-700 mb-6">
-              {["Seçili şehirlerdeki hocalar", "Birebir yerinde çalışma", "Haftalık düzenli program", "Kişiselleştirilmiş materyaller"].map(i => (
-                <li key={i} className="flex items-center gap-2"><span className="text-green-600">✓</span>{i}</li>
+            <ul className="space-y-3.5 text-sm text-gray-600 mb-8 mt-auto">
+              {["Seçili şehirlerdeki uzman hocalar", "Birebir konforlu çalışma ortamı", "Haftalık hedeflere dayalı program", "Eğitmen rehberliğinde özel materyaller"].map(i => (
+                <li key={i} className="flex items-center gap-3"><span className="text-emerald-500 font-bold">✓</span>{i}</li>
               ))}
             </ul>
-            <Link href="/hocalar?format=yuz-yuze" className="inline-block bg-primary-600 hover:bg-primary-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors">
+            <Link href="/hocalar?format=yuz-yuze" className="inline-block text-center bg-primary-600 hover:bg-primary-700 text-white font-bold px-8 py-4 rounded-xl transition-all duration-200">
               Yüz Yüze Hocaları Gör
             </Link>
           </div>
-          <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl p-8 border border-green-100">
-            <div className="text-4xl mb-4">💻</div>
-            <h3 className="text-xl font-bold text-green-900 mb-3">Online Ders</h3>
-            <p className="text-gray-700 mb-6 leading-relaxed">
-              Türkiye'nin her yerinden Türkiye'nin en iyi hocalarına eriş. Evden, kütüphaneden — nerede olursan ol.
+          <div className="bg-white rounded-3xl p-8 sm:p-10 border border-gray-100 shadow-premium hover:shadow-2xl transition-all duration-300 flex flex-col">
+            <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-3xl mb-6">💻</div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">Online Ders</h3>
+            <p className="text-gray-600 mb-8 leading-relaxed text-sm">
+              Mesafe sınırı olmadan en iyi hocalara anında erişin. İnteraktif beyaz tahta ve video kayıt imkanıyla yüksek verim.
             </p>
-            <ul className="space-y-2 text-sm text-gray-700 mb-6">
-              {["Türkiye geneli hocalar", "Video konferans ile canlı ders", "Esnek saat seçeneği", "Ders kayıtları izlenebilir"].map(i => (
-                <li key={i} className="flex items-center gap-2"><span className="text-green-600">✓</span>{i}</li>
+            <ul className="space-y-3.5 text-sm text-gray-600 mb-8 mt-auto">
+              {["Tüm Türkiye genelinden seçkin hocalar", "Gelişmiş dijital eğitim araçları", "Kayıt imkanıyla dersi tekrar izleme", "Zaman ve mekan esnekliği"].map(i => (
+                <li key={i} className="flex items-center gap-3"><span className="text-emerald-500 font-bold">✓</span>{i}</li>
               ))}
             </ul>
-            <Link href="/hocalar?format=online" className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors">
+            <Link href="/hocalar?format=online" className="inline-block text-center bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-4 rounded-xl transition-all duration-200">
               Online Hocaları Gör
             </Link>
           </div>
