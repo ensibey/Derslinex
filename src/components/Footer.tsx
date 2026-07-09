@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { waLink } from "@/lib/utils";
 
 const dersLinks = [
@@ -17,7 +18,18 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Brand */}
           <div>
-            <div className="text-3xl font-black mb-3 tracking-tight">Derslinex</div>
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="relative w-9 h-9 rounded-lg overflow-hidden border border-white/10 shadow-md">
+                <Image
+                  src="/logo.png"
+                  alt="Derslinex Logo"
+                  fill
+                  className="object-cover"
+                  sizes="36px"
+                />
+              </div>
+              <div className="text-3xl font-black tracking-tight">Derslinex</div>
+            </div>
             <p className="text-sm text-blue-200 leading-relaxed">
               YKS'ye hazırlanan her öğrencinin yanında. Uzman hocalar, esnek ders formatı ve Türkiye geneli online eğitim altyapısı.
             </p>
