@@ -46,17 +46,18 @@ export default async function BlogYazisiPage({ params }: { params: Promise<{ slu
         <p className="text-xl text-gray-600 leading-relaxed mb-6">{yazi.ozet}</p>
         <p className="mb-4">{yazi.icerik}</p>
         <p className="mb-4">
-          Bu içerik Sadee Eğitim tarafından YKS hazırlık sürecinize destek olmak amacıyla hazırlanmıştır.
+          Bu içerik Derslinex tarafından YKS hazırlık sürecinize destek olmak amacıyla hazırlanmıştır.
           Daha fazla bilgi almak ve uzman bir hocayla çalışmak için WhatsApp üzerinden bize ulaşabilirsiniz.
         </p>
       </div>
 
       {/* CTA */}
-      <div className="mt-10 bg-gradient-to-r from-primary-600 to-primary-500 rounded-2xl p-6 text-white text-center">
-        <h3 className="text-xl font-bold mb-2">Uzman Hocayla Çalışmaya Hazır mısın?</h3>
-        <p className="text-blue-100 text-sm mb-4">WhatsApp\'tan bize ulaş, sana en uygun hocanı bulalım.</p>
+      <div className="mt-10 bg-gradient-to-r from-primary-600 to-indigo-600 rounded-3xl p-8 text-white text-center shadow-premium relative overflow-hidden">
+        <div className="absolute top-[-50%] left-[-50%] w-full h-full bg-white/5 rounded-full blur-3xl pointer-events-none" />
+        <h3 className="text-2xl font-black mb-2 relative z-10">Uzman Hocayla Çalışmaya Hazır mısın?</h3>
+        <p className="text-primary-100 text-sm mb-6 max-w-md mx-auto relative z-10">WhatsApp'tan bize ulaş, hedeflerine en uygun eğitmeni birlikte belirleyelim.</p>
         <a href={waLink()} target="_blank" rel="noopener noreferrer"
-          className="inline-block bg-white text-primary-700 font-bold px-8 py-3 rounded-xl hover:bg-blue-50 transition-colors">
+          className="inline-flex items-center justify-center bg-white text-primary-700 font-bold px-10 py-4 rounded-xl hover:bg-primary-50 hover:scale-105 transition-all relative z-10">
           Hemen Başla
         </a>
       </div>

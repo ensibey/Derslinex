@@ -64,7 +64,7 @@ export default function YksHazirlikPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="text-center mb-14">
         <span className="text-primary-500 text-xs font-bold uppercase tracking-widest">KÜTÜPHANE & ARAÇLAR</span>
-        <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-4 mt-2">YKS Hazırlık Merkezi</h1>
+        <h1 className="text-4xl sm:text-5xl font-black mb-4 mt-2 bg-gradient-to-r from-primary-600 to-indigo-650 bg-clip-text text-transparent">YKS Hazırlık Merkezi</h1>
         <p className="text-gray-500 text-lg max-w-2xl mx-auto">
           Sınav yolculuğunuzda ihtiyacınız olan tüm interaktif planlama, puan hesaplama ve analiz araçları tek bir yerde.
         </p>
