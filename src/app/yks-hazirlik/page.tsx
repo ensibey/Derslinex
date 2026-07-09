@@ -6,7 +6,7 @@ import { dersAlanlari } from "@/data/dersler";
 import { waLink } from "@/lib/utils";
 
 export default function YksHazirlikPage() {
-  const [activeTool, setActiveTool] = useState<"countdown" | "calculator" | "checklist" | null>("countdown");
+  const [activeTool, setActiveTool] = useState<"countdown" | "calculator" | null>("countdown");
 
   // Geri Sayım State ve Mantığı (Örn: 20 Haziran 2026)
   const [timeLeft, setTimeLeft] = useState({ gun: 0, saat: 0, dakika: 0 });
@@ -48,36 +48,23 @@ export default function YksHazirlikPage() {
     setScores({ tytScore: tyt, sayScore: say });
   };
 
-  // Konu Kontrol Listesi
-  const [checklist, setChecklist] = useState<Record<string, boolean>>({
-    "Temel Kavramlar": true,
-    "Sözcükte Anlam": false,
-    "Paragrafta Yapı": false,
-    "Fonksiyonlar": false,
-    "Vektörler": false,
-  });
-  const toggleItem = (name: string) => {
-    setChecklist((prev) => ({ ...prev, [name]: !prev[name] }));
-  };
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="text-center mb-14">
         <span className="text-primary-500 text-xs font-bold uppercase tracking-widest">KÜTÜPHANE & ARAÇLAR</span>
         <h1 className="text-4xl sm:text-5xl font-black mb-4 mt-2 bg-gradient-to-r from-primary-600 to-indigo-650 bg-clip-text text-transparent">YKS Hazırlık Merkezi</h1>
         <p className="text-gray-500 text-lg max-w-2xl mx-auto">
-          Sınav yolculuğunuzda ihtiyacınız olan tüm interaktif planlama, puan hesaplama ve analiz araçları tek bir yerde.
+          Sınav yolculuğunuzda ihtiyacınız olan tüm interaktif planlama ve analiz araçları tek bir yerde.
         </p>
       </div>
 
       {/* Hızlı Araçlar Navigasyonu */}
       <section className="mb-12">
         <h2 className="text-2xl font-black text-gray-900 mb-6">Hızlı Araçlar</h2>
-        <div className="grid sm:grid-cols-3 gap-5">
+        <div className="grid sm:grid-cols-2 gap-5">
           {[
             { id: "countdown", emoji: "⏰", title: "Sınava Geri Sayım", desc: "YKS 2026'ya kalan süre" },
             { id: "calculator", emoji: "🧮", title: "Puan Hesaplama", desc: "Net sayılarına göre tahmini puan" },
-            { id: "checklist", emoji: "📋", title: "Konu Kontrol Listesi", desc: "Hangi konuları bitirdiğini takip et" },
           ].map((t) => (
             <button
               key={t.id}
@@ -160,23 +147,6 @@ export default function YksHazirlikPage() {
           </div>
         )}
 
-        {activeTool === "checklist" && (
-          <div>
-            <h3 className="text-xl font-bold text-gray-800 mb-6 text-center">📋 YKS Müfredatı Konu Takibi</h3>
-            <div className="max-w-md mx-auto space-y-3">
-              {Object.keys(checklist).map((name) => (
-                <button
-                  key={name}
-                  onClick={() => toggleItem(name)}
-                  className={`flex items-center justify-between w-full p-4 border rounded-2xl text-left transition-all ${checklist[name] ? "bg-emerald-50/30 border-emerald-100 text-emerald-800" : "bg-white border-gray-150 text-gray-700 hover:bg-gray-50"}`}
-                >
-                  <span className="font-semibold text-sm">{name}</span>
-                  <span className="text-lg">{checklist[name] ? "✅ Completed" : "⬜ Study"}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </section>
 
       {/* Sınav Türleri */}
