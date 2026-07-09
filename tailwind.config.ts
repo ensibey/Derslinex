@@ -17,7 +17,7 @@ const config: Config = {
         },
         dark: {
           900: "#090514",
-          805: "#120b24",
+          800: "#120b24",
           700: "#1a1235",
         },
         accent: {
@@ -28,18 +28,8 @@ const config: Config = {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        premium: "0 15px 50px -15px rgba(124, 58, 237, 0.06)",
-        glow: "0 0 25px rgba(16, 185, 129, 0.15)",
-      },
-      animation: {
-        'float-slow': 'float 8s ease-in-out infinite',
-        'float-delayed': 'float 8s ease-in-out infinite 3s',
-      },
-      keyframes: {
-        float: {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-12px)' },
-        }
+        premium: "0 10px 40px -10px rgba(124, 58, 237, 0.12)",
+        glow: "0 0 20px rgba(16, 185, 129, 0.2)",
       }
     },
   },
