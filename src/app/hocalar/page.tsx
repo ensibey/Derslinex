@@ -5,6 +5,8 @@ import TeacherCard from "@/components/TeacherCard";
 import { waLink } from "@/lib/utils";
 import React, { Suspense } from "react";
 
+import Link from "next/link";
+
 function HocalarContent() {
   const searchParams = useSearchParams();
   const alan = searchParams.get("alan") || undefined;
@@ -29,56 +31,57 @@ function HocalarContent() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header */}
       <div className="mb-10">
-        <h1 className="text-4xl font-black text-gray-900">Hocalarımız</h1>
-        <p className="text-gray-500 mt-2 text-lg">
+        <span className="text-primary-500 text-xs font-bold uppercase tracking-widest font-sans">EĞİTMEN KADROMUZ</span>
+        <h1 className="text-4xl sm:text-5xl font-black mb-2 mt-2 bg-gradient-to-r from-primary-600 to-indigo-650 bg-clip-text text-transparent">Uzman Hocalarımız</h1>
+        <p className="text-gray-500 text-lg">
           YKS'nin her alanı için deneyimli uzman hocalar. WhatsApp ile anında iletişim.
         </p>
       </div>
 
       {/* Filtreler */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-5 mb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="bg-white rounded-3xl border border-gray-100 p-6 sm:p-8 shadow-premium mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-gray-400 mb-3 uppercase tracking-wider">
               Ders Alanı
             </label>
-            <a href="/hocalar" className={`block w-full text-sm px-3 py-2 rounded-lg border cursor-pointer text-center mb-1 ${!alan || alan === "tumu" ? "bg-primary-600 text-white border-primary-600" : "bg-white text-gray-700 border-gray-200 hover:border-primary-300"}`}>
+            <Link href="/hocalar" className={`block w-full text-xs font-bold py-2.5 rounded-xl border text-center transition-all duration-200 mb-2 ${!alan || alan === "tumu" ? "bg-primary-600 text-white border-primary-600 shadow-premium" : "bg-white text-gray-600 border-gray-100 hover:border-primary-300"}`}>
               Tümü
-            </a>
-            <div className="flex flex-wrap gap-1.5 mt-1">
+            </Link>
+            <div className="flex flex-wrap gap-1.5 mt-2">
               {["Matematik", "Fizik", "Kimya", "Türkçe", "Tarih", "İngilizce"].map((a) => (
-                <a key={a} href={`/hocalar?alan=${a}${format ? `&format=${format}` : ""}${yks ? `&yks=${yks}` : ""}`}
-                  className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${alan === a ? "bg-primary-600 text-white border-primary-600" : "bg-white text-gray-600 border-gray-200 hover:border-primary-300"}`}>
+                <Link key={a} href={`/hocalar?alan=${a}${format ? `&format=${format}` : ""}${yks ? `&yks=${yks}` : ""}`}
+                  className={`text-[11px] font-bold px-3 py-1.5 rounded-xl border transition-all duration-200 ${alan === a ? "bg-primary-600 text-white border-primary-600 shadow-premium" : "bg-white text-gray-600 border-gray-100 hover:border-primary-300"}`}>
                   {a}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-gray-400 mb-3 uppercase tracking-wider">
               Ders Formatı
             </label>
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-2">
               {[
                 { value: "tumu", label: "Tümü" },
                 { value: "yuz-yuze", label: "Yüz Yüze" },
                 { value: "online", label: "Online" },
               ].map((f) => (
-                <a key={f.value}
+                <Link key={f.value}
                   href={`/hocalar?${alan ? `alan=${alan}&` : ""}format=${f.value}${yks ? `&yks=${yks}` : ""}`}
-                  className={`text-sm px-3 py-2 rounded-lg border text-center transition-colors ${format === f.value || (!format && f.value === "tumu") ? "bg-primary-600 text-white border-primary-600" : "bg-white text-gray-700 border-gray-200 hover:border-primary-300"}`}>
+                  className={`text-xs font-bold py-2.5 rounded-xl border text-center transition-all duration-200 ${format === f.value || (!format && f.value === "tumu") ? "bg-primary-600 text-white border-primary-600 shadow-premium" : "bg-white text-gray-600 border-gray-100 hover:border-primary-300"}`}>
                   {f.label}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">
-              YKS Türü
+            <label className="block text-xs font-bold text-gray-400 mb-3 uppercase tracking-wider">
+              YKS Sınav Türü
             </label>
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-2">
               {[
                 { value: "tumu", label: "Tümü" },
                 { value: "TYT", label: "TYT" },
@@ -87,11 +90,11 @@ function HocalarContent() {
                 { value: "AYT EA", label: "AYT Eşit Ağırlık" },
                 { value: "AYT Dil", label: "AYT Dil" },
               ].map((y) => (
-                <a key={y.value}
+                <Link key={y.value}
                   href={`/hocalar?${alan ? `alan=${alan}&` : ""}${format ? `format=${format}&` : ""}yks=${y.value}`}
-                  className={`text-sm px-3 py-2 rounded-lg border text-center transition-colors ${yks === y.value || (!yks && y.value === "tumu") ? "bg-primary-600 text-white border-primary-600" : "bg-white text-gray-700 border-gray-200 hover:border-primary-300"}`}>
+                  className={`text-xs font-bold py-2.5 rounded-xl border text-center transition-all duration-200 ${yks === y.value || (!yks && y.value === "tumu") ? "bg-primary-600 text-white border-primary-600 shadow-premium" : "bg-white text-gray-600 border-gray-100 hover:border-primary-300"}`}>
                   {y.label}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -99,8 +102,8 @@ function HocalarContent() {
       </div>
 
       {/* Sonuç sayısı */}
-      <p className="text-sm text-gray-500 mb-6">
-        <span className="font-semibold text-gray-900">{filtrelenmis.length}</span> hoca bulundu
+      <p className="text-sm text-gray-500 mb-6 bg-gray-50 border border-gray-100/50 py-2 px-4 rounded-xl inline-block">
+        🚀 Toplam <span className="font-bold text-gray-900">{filtrelenmis.length}</span> uzman eğitmen listeleniyor
       </p>
 
       {/* Grid */}
