@@ -77,36 +77,36 @@ export default function IletisimPage() {
 
         <div className="space-y-5">
           <a href={waLink()} target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-5 bg-green-50 border border-green-200 rounded-2xl p-6 hover:bg-green-100 transition-colors group">
-            <div className="w-14 h-14 bg-green-500 rounded-2xl flex items-center justify-center text-white text-2xl flex-shrink-0">💬</div>
+            className="flex items-center gap-5 bg-emerald-50 border border-emerald-200 rounded-3xl p-6 hover:bg-emerald-100 transition-all shadow-premium group">
+            <div className="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl flex-shrink-0">💬</div>
             <div>
               <p className="font-bold text-gray-900">WhatsApp</p>
-              <p className="text-green-700 font-semibold">+90 555 000 00 00</p>
+              <p className="text-emerald-700 font-semibold">+90 555 000 00 00</p>
               <p className="text-xs text-gray-500 mt-1">En hızlı yanıt — genellikle 1 saat içinde</p>
             </div>
           </a>
-          <div className="flex items-center gap-5 bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center gap-5 bg-white border border-gray-100 rounded-3xl p-6 shadow-premium">
             <div className="w-14 h-14 bg-primary-100 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0">✉️</div>
             <div>
               <p className="font-bold text-gray-900">E-posta</p>
-              <p className="text-primary-600">info@sadee.com.tr</p>
+              <p className="text-primary-600 font-semibold">info@derslinex.com</p>
               <p className="text-xs text-gray-500 mt-1">İş birliği ve hoca başvuruları için</p>
             </div>
           </div>
-          <div className="flex items-center gap-5 bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-            <div className="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0">📍</div>
+          <div className="flex items-center gap-5 bg-white border border-gray-100 rounded-3xl p-6 shadow-premium">
+            <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0">📍</div>
             <div>
               <p className="font-bold text-gray-900">Yüz Yüze Dersler</p>
-              <p className="text-gray-700">İstanbul (Kadıköy, Beşiktaş, Üsküdar)</p>
+              <p className="text-gray-700">Anlaşmalı Şehirler & Ortak Çalışma Alanları</p>
               <p className="text-xs text-gray-500 mt-1">Online dersler Türkiye geneli</p>
             </div>
           </div>
-          <div className="bg-primary-50 rounded-2xl border border-primary-100 p-6">
+          <div className="bg-primary-50/50 rounded-3xl border border-primary-100/50 p-6">
             <h3 className="font-bold text-gray-900 mb-3">Yanıt Süreleri</h3>
             <ul className="space-y-2 text-sm text-gray-700">
-              <li className="flex items-center gap-2"><span className="text-green-500">●</span> WhatsApp: &lt;1 saat (09:00–22:00)</li>
-              <li className="flex items-center gap-2"><span className="text-yellow-500">●</span> E-posta: 1 iş günü</li>
-              <li className="flex items-center gap-2"><span className="text-blue-500">●</span> Form: 1 iş günü</li>
+              <li className="flex items-center gap-2"><span className="text-emerald-500">●</span> WhatsApp: &lt;1 saat (09:00–22:00)</li>
+              <li className="flex items-center gap-2"><span className="text-amber-500">●</span> E-posta: 1 iş günü</li>
+              <li className="flex items-center gap-2"><span className="text-primary-500">●</span> Form: 1 iş günü</li>
             </ul>
           </div>
         </div>
