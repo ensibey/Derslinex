@@ -6,16 +6,17 @@ import { waLink } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "YKS Hazırlık Merkezi — Konu Rehberleri, Çalışma Planları",
-  description: "YKS hazırlığı için kapsamlı rehber. TYT ve AYT konuları, çalışma planları, puan hesaplama ve daha fazlası. Sadee Eğitim YKS bilgi merkezi.",
+  description: "YKS hazırlığı için kapsamlı rehber. TYT ve AYT konuları, çalışma planları, puan hesaplama ve daha fazlası. Derslinex YKS bilgi merkezi.",
 };
 
 export default function YksHazirlikPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="text-center mb-14">
-        <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-4">YKS Hazırlık Merkezi</h1>
+        <span className="text-primary-500 text-xs font-bold uppercase tracking-widest">KÜTÜPHANE</span>
+        <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-4 mt-2">YKS Hazırlık Merkezi</h1>
         <p className="text-gray-500 text-lg max-w-2xl mx-auto">
-          TYT\'den AYT\'ye tüm sınav türleri için rehber içerikler, çalışma planları ve uzman ipuçları.
+          TYT'den AYT'ye tüm sınav türleri için rehber içerikler, çalışma planları ve uzman ipuçları.
         </p>
       </div>
 
@@ -24,12 +25,12 @@ export default function YksHazirlikPage() {
         <h2 className="text-2xl font-black text-gray-900 mb-6">Hızlı Araçlar</h2>
         <div className="grid sm:grid-cols-3 gap-5">
           {[
-            { emoji: "⏰", title: "Sınava Geri Sayım", desc: "YKS 2026\'ya kalan gün, saat ve dakika", bg: "bg-blue-50 border-blue-200" },
-            { emoji: "🧮", title: "Puan Hesaplama", desc: "Net sayılarından tahmini puan hesapla", bg: "bg-green-50 border-green-200" },
-            { emoji: "📋", title: "Konu Kontrol Listesi", desc: "Hangi YKS konularını çalıştığını takip et", bg: "bg-purple-50 border-purple-200" },
+            { emoji: "⏰", title: "Sınava Geri Sayım", desc: "YKS 2026'ya kalan gün, saat ve dakika", bg: "bg-primary-50/50 border-primary-100/50 hover:border-primary-300" },
+            { emoji: "🧮", title: "Puan Hesaplama", desc: "Net sayılarından tahmini puan hesapla", bg: "bg-emerald-50/50 border-emerald-100/50 hover:border-emerald-300" },
+            { emoji: "📋", title: "Konu Kontrol Listesi", desc: "Hangi YKS konularını çalıştığını takip et", bg: "bg-violet-50/50 border-violet-100/50 hover:border-violet-300" },
           ].map((t) => (
             <a key={t.title} href={waLink(`${t.title} hakkında bilgi almak istiyorum.`)} target="_blank" rel="noopener noreferrer"
-              className={`flex items-start gap-4 ${t.bg} border rounded-2xl p-6 hover:shadow-md transition-shadow cursor-pointer`}>
+              className={`flex items-start gap-4 ${t.bg} border rounded-3xl p-6 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer`}>
               <span className="text-3xl">{t.emoji}</span>
               <div>
                 <p className="font-bold text-gray-900">{t.title}</p>
@@ -45,16 +46,16 @@ export default function YksHazirlikPage() {
         <h2 className="text-2xl font-black text-gray-900 mb-6">Sınav Türleri</h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {[
-            { tur: "TYT", renk: "from-blue-600 to-blue-400", aciklama: "135 dakika, 120 soru. Türkçe, Sosyal, Matematik, Fen alanlarından oluşur. Tüm puan türlerinin temeli.", dersler: "Türkçe, Matematik, Fen Bilimleri, Sosyal Bilimler" },
-            { tur: "AYT Sayısal", renk: "from-purple-600 to-purple-400", aciklama: "180 dakika, 80 soru. Matematik, Fizik, Kimya ve Biyoloji soruları.", dersler: "Matematik, Fizik, Kimya, Biyoloji" },
-            { tur: "AYT Sözel", renk: "from-red-600 to-red-400", aciklama: "180 dakika, 80 soru. Edebiyat, Tarih, Coğrafya, Felsefe grup soruları.", dersler: "Edebiyat, Tarih 1-2, Coğrafya 1-2, Felsefe" },
-            { tur: "AYT Eşit Ağırlık", renk: "from-amber-600 to-amber-400", aciklama: "Matematik ve Türkçe-Sosyal derslerinin birleşimi. EA bölümleri için.", dersler: "Matematik, Edebiyat, Tarih 1, Coğrafya 1" },
-            { tur: "AYT Dil", renk: "from-sky-600 to-sky-400", aciklama: "80 soru. İngilizce, Almanca, Fransızca gibi yabancı dil seçenekleri.", dersler: "İngilizce / Almanca / Fransızca" },
+            { tur: "TYT", renk: "from-primary-600 via-primary-700 to-indigo-800", aciklama: "135 dakika, 120 soru. Türkçe, Sosyal, Matematik, Fen alanlarından oluşur. Tüm puan türlerinin temeli.", dersler: "Türkçe, Matematik, Fen Bilimleri, Sosyal Bilimler" },
+            { tur: "AYT Sayısal", renk: "from-violet-600 via-violet-700 to-primary-800", aciklama: "180 dakika, 80 soru. Matematik, Fizik, Kimya ve Biyoloji soruları.", dersler: "Matematik, Fizik, Kimya, Biyoloji" },
+            { tur: "AYT Sözel", renk: "from-rose-600 to-rose-500", aciklama: "180 dakika, 80 soru. Edebiyat, Tarih, Coğrafya, Felsefe grup soruları.", dersler: "Edebiyat, Tarih 1-2, Coğrafya 1-2, Felsefe" },
+            { tur: "AYT Eşit Ağırlık", renk: "from-amber-600 to-amber-500", aciklama: "Matematik ve Türkçe-Sosyal derslerinin birleşimi. EA bölümleri için.", dersler: "Matematik, Edebiyat, Tarih 1, Coğrafya 1" },
+            { tur: "AYT Dil", renk: "from-emerald-600 to-emerald-500", aciklama: "80 soru. İngilizce, Almanca, Fransızca gibi yabancı dil seçenekleri.", dersler: "İngilizce / YDT" },
           ].map((s) => (
-            <div key={s.tur} className={`bg-gradient-to-br ${s.renk} rounded-2xl p-6 text-white`}>
-              <h3 className="text-xl font-black mb-2">{s.tur}</h3>
-              <p className="text-white/80 text-sm mb-4 leading-relaxed">{s.aciklama}</p>
-              <p className="text-xs font-semibold bg-white/20 rounded-lg px-3 py-2">{s.dersler}</p>
+            <div key={s.tur} className={`bg-gradient-to-br ${s.renk} rounded-3xl p-8 text-white shadow-premium hover:shadow-2xl transition-all duration-300`}>
+              <h3 className="text-xl font-black mb-3">{s.tur}</h3>
+              <p className="text-white/85 text-xs mb-6 leading-relaxed">{s.aciklama}</p>
+              <span className="text-[10px] font-bold bg-white/20 rounded-lg px-3 py-1.5 backdrop-blur-sm inline-block tracking-wide">{s.dersler}</span>
             </div>
           ))}
         </div>
