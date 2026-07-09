@@ -10,8 +10,9 @@ export async function generateStaticParams() {
   return hocalar.map((h) => ({ slug: h.slug }));
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const hoca = getHocaBySlug(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const resolvedParams = await params;
+  const hoca = getHocaBySlug(resolvedParams.slug);
   if (!hoca) return {};
   return {
     title: `${hoca.isim} — ${hoca.dersler.join(", ")} Öğretmeni`,
@@ -25,8 +26,9 @@ const formatLabel: Record<string, string> = {
   "her-ikisi": "Yüz Yüze & Online",
 };
 
-export default function HocaProfilPage({ params }: { params: { slug: string } }) {
-  const hoca = getHocaBySlug(params.slug);
+export default async function HocaProfilPage({ params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = await params;
+  const hoca = getHocaBySlug(resolvedParams.slug);
   if (!hoca) notFound();
 
   const waUrl = waLinkHoca(hoca.isim, hoca.dersler[0]);

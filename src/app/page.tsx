@@ -232,13 +232,4 @@ export default function HomePage() {
       </section>
     </>
   );
-}r noreferrer"
-            className="inline-flex items-center gap-2 bg-white text-primary-700 font-bold text-lg px-10 py-4 rounded-xl hover:bg-blue-50 transition-colors"
-          >
-            💬 Bize Danış — Ücretsiz
-          </a>
-        </div>
-      </section>
-    </>
-  );
 }

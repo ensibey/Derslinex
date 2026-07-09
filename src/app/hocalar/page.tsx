@@ -1,20 +1,15 @@
-import type { Metadata } from "next";
+"use client";
+import { useSearchParams } from "next/navigation";
 import { hocalar } from "@/data/hocalar";
 import TeacherCard from "@/components/TeacherCard";
 import { waLink } from "@/lib/utils";
+import React, { Suspense } from "react";
 
-export const metadata: Metadata = {
-  title: "YKS Hocaları — Tüm Uzman Öğretmenler",
-  description:
-    "Sadee Eğitim'deki tüm YKS hocaları. Matematik, Fizik, Kimya, Türkçe ve daha fazlası için online veya yüz yüze ders. WhatsApp ile hemen iletişime geç.",
-};
-
-export default function HocalarPage({
-  searchParams,
-}: {
-  searchParams: { alan?: string; format?: string; yks?: string };
-}) {
-  const { alan, format, yks } = searchParams;
+function HocalarContent() {
+  const searchParams = useSearchParams();
+  const alan = searchParams.get("alan") || undefined;
+  const format = searchParams.get("format") || undefined;
+  const yks = searchParams.get("yks") || undefined;
 
   const filtrelenmis = hocalar.filter((h) => {
     if (!h.aktif) return false;
@@ -126,5 +121,17 @@ export default function HocalarPage({
         </div>
       )}
     </div>
+  );
+}
+
+export default function HocalarPage() {
+  return (
+    <Suspense fallback={
+      <div className="max-w-7xl mx-auto px-4 py-20 text-center text-gray-500">
+        Yükleniyor...
+      </div>
+    }>
+      <HocalarContent />
+    </Suspense>
   );
 }

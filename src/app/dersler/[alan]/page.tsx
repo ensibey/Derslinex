@@ -10,17 +10,19 @@ export async function generateStaticParams() {
   return dersAlanlari.map((d) => ({ alan: d.slug }));
 }
 
-export async function generateMetadata({ params }: { params: { alan: string } }): Promise<Metadata> {
-  const ders = getDersAlaniBySlug(params.alan);
+export async function generateMetadata({ params }: { params: Promise<{ alan: string }> }): Promise<Metadata> {
+  const resolvedParams = await params;
+  const ders = getDersAlaniBySlug(resolvedParams.alan);
   if (!ders) return {};
   return {
     title: `${ders.isim} YKS Hazırlık — Uzman ${ders.isim} Hocaları`,
-    description: `${ders.isim} dersinde YKS\'ye hazırlanın. ${ders.yksTuru.join(", ")} için deneyimli hocalar, online ve yüz yüze ders seçenekleri. WhatsApp ile hemen başlayın.`,
+    description: `${ders.isim} dersinde YKS'ye hazırlanın. ${ders.yksTuru.join(", ")} için deneyimli hocalar, online ve yüz yüze ders seçenekleri. WhatsApp ile hemen başlayın.`,
   };
 }
 
-export default function DersAlaniPage({ params }: { params: { alan: string } }) {
-  const ders = getDersAlaniBySlug(params.alan);
+export default async function DersAlaniPage({ params }: { params: Promise<{ alan: string }> }) {
+  const resolvedParams = await params;
+  const ders = getDersAlaniBySlug(resolvedParams.alan);
   if (!ders) notFound();
 
   const ilgiliHocalar = hocalar.filter(

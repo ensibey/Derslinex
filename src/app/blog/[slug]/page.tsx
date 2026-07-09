@@ -8,14 +8,16 @@ export async function generateStaticParams() {
   return blogYazilari.map((b) => ({ slug: b.slug }));
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const yazi = getBlogBySlug(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const resolvedParams = await params;
+  const yazi = getBlogBySlug(resolvedParams.slug);
   if (!yazi) return {};
   return { title: yazi.baslik, description: yazi.ozet };
 }
 
-export default function BlogYazisiPage({ params }: { params: { slug: string } }) {
-  const yazi = getBlogBySlug(params.slug);
+export default async function BlogYazisiPage({ params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = await params;
+  const yazi = getBlogBySlug(resolvedParams.slug);
   if (!yazi) notFound();
 
   const diger = blogYazilari.filter((b) => b.slug !== yazi.slug).slice(0, 3);
