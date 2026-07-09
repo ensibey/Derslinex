@@ -11,10 +11,10 @@ export default function TeacherCard({ hoca }: { hoca: Hoca }) {
   };
 
   return (
-    <div className="bg-white rounded-3xl shadow-premium border border-gray-100 hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 overflow-hidden group">
+    <div className="bg-[#120b24]/90 rounded-3xl shadow-2xl border border-white/5 hover:border-primary-500/30 hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 overflow-hidden group">
       <div className="p-6">
         <div className="flex items-start gap-4">
-          <div className="relative w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0 ring-4 ring-primary-100/50">
+          <div className="relative w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0 ring-4 ring-primary-500/10">
             <Image
               src={hoca.fotograf}
               alt={hoca.isim}
@@ -24,13 +24,13 @@ export default function TeacherCard({ hoca }: { hoca: Hoca }) {
             />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-gray-900 text-lg group-hover:text-primary-600 transition-colors truncate">
+            <h3 className="font-bold text-white text-lg group-hover:text-primary-400 transition-colors truncate">
               {hoca.unvan === "Dr." ? `Dr. ${hoca.isim}` : hoca.isim}
             </h3>
-            <p className="text-xs text-gray-500 mt-0.5 truncate">{hoca.egitim}</p>
+            <p className="text-xs text-gray-400 mt-0.5 truncate">{hoca.egitim}</p>
             <div className="flex items-center gap-1.5 mt-1.5">
               <span className="text-amber-400 text-sm">★</span>
-              <span className="text-sm font-bold text-gray-800">{hoca.puan}</span>
+              <span className="text-sm font-bold text-gray-200">{hoca.puan}</span>
               <span className="text-xs text-gray-400">({hoca.ogrenciSayisi}+ Öğrenci)</span>
             </div>
           </div>
@@ -39,19 +39,19 @@ export default function TeacherCard({ hoca }: { hoca: Hoca }) {
         {/* Dersler */}
         <div className="mt-4 flex flex-wrap gap-1.5">
           {hoca.dersler.slice(0, 3).map((d) => (
-            <span key={d} className="text-xs bg-primary-50 text-primary-600 font-semibold px-3 py-1 rounded-xl">
+            <span key={d} className="text-xs bg-primary-950/40 text-primary-400 font-semibold px-3 py-1 rounded-xl border border-primary-500/10">
               {d}
             </span>
           ))}
           {hoca.dersler.length > 3 && (
-            <span className="text-xs bg-gray-50 text-gray-500 px-3 py-1 rounded-xl font-medium">
+            <span className="text-xs bg-white/5 text-gray-400 px-3 py-1 rounded-xl font-medium">
               +{hoca.dersler.length - 3}
             </span>
           )}
         </div>
 
         {/* Info */}
-        <div className="mt-4 pt-4 border-t border-gray-50 grid grid-cols-2 gap-3 text-xs text-gray-600">
+        <div className="mt-4 pt-4 border-t border-white/5 grid grid-cols-2 gap-3 text-xs text-gray-400">
           <div className="flex items-center gap-1.5">
             <span>📍</span>
             <span className="font-medium truncate">{hoca.konum.split(",")[0]}</span>
@@ -60,7 +60,7 @@ export default function TeacherCard({ hoca }: { hoca: Hoca }) {
             <span>🎓</span>
             <span className="font-medium">{hoca.deneyimYili} Yıl Deneyim</span>
           </div>
-          <div className="flex items-center gap-1.5 col-span-2 text-primary-600 font-semibold bg-primary-50/50 py-1.5 px-2.5 rounded-xl">
+          <div className="flex items-center gap-1.5 col-span-2 text-primary-400 font-semibold bg-primary-950/20 py-1.5 px-2.5 rounded-xl border border-primary-500/10">
             <span>💻</span>
             <span>{formatLabel[hoca.format]}</span>
           </div>
@@ -69,7 +69,7 @@ export default function TeacherCard({ hoca }: { hoca: Hoca }) {
         {/* YKS tags */}
         <div className="mt-4 flex flex-wrap gap-1">
           {hoca.yksTuru.map((t) => (
-            <span key={t} className="text-[10px] bg-gray-50 text-gray-500 font-semibold px-2 py-1 rounded-lg border border-gray-100/50 uppercase tracking-wider">
+            <span key={t} className="text-[10px] bg-white/5 text-gray-450 font-semibold px-2 py-1 rounded-lg border border-white/5 uppercase tracking-wider">
               {t}
             </span>
           ))}
@@ -80,7 +80,7 @@ export default function TeacherCard({ hoca }: { hoca: Hoca }) {
       <div className="px-6 pb-6 flex gap-2">
         <Link
           href={`/hocalar/${hoca.slug}`}
-          className="flex-1 text-center text-xs font-bold text-primary-600 border border-primary-100 hover:bg-primary-50 hover:border-primary-200 py-3 rounded-xl transition-all duration-200"
+          className="flex-1 text-center text-xs font-bold text-primary-400 border border-primary-500/20 hover:bg-primary-950/30 hover:border-primary-500/40 py-3 rounded-xl transition-all duration-200"
         >
           Profili Gör
         </Link>
