@@ -25,10 +25,10 @@ export const metadata: Metadata = {
   verification: { google: "google5716913a2e6e8126" },
   icons: {
     icon: [
-      { url: "/favicon.ico" },
-      { url: "/logo.png", type: "image/png" }
+      { url: "/favicon.ico?v=5" },
+      { url: "/logo.png?v=5", type: "image/png" }
     ],
-    apple: "/logo.png",
+    apple: "/logo.png?v=5",
   },
   openGraph: {
     type: "website",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     description: "YKS hazırlığında Türkiye'nin en iyi hocalarıyla çalışın. Online ve yüz yüze özel ders.",
     images: [
       {
-        url: "/logo.png",
+        url: "/logo.png?v=5",
         width: 800,
         height: 600,
         alt: "Derslinex Logo",
