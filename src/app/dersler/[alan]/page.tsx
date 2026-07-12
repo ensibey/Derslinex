@@ -66,7 +66,7 @@ export default async function DersAlaniPage({ params }: { params: Promise<{ alan
             <Image
               src={
                 ders.slug === "fizik-yks"
-                  ? "/fizik.svg"
+                  ? "/fizik.png"
                   : ders.slug === "matematik-yks"
                   ? "/matematik.svg"
                   : ders.slug === "kimya-yks"
