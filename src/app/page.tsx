@@ -50,20 +50,20 @@ export default function HomePage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-dark-900 via-dark-800 to-primary-950 text-white pt-24 pb-36 px-4">
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-violet-50 text-gray-900 pt-24 pb-36 px-4">
         {/* Glow Effects */}
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary-600/10 blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-emerald-500/5 blur-[150px] pointer-events-none" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary-200/20 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-emerald-200/10 blur-[150px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto text-center relative z-10">
-          <span className="inline-block bg-white/5 border border-white/10 text-primary-200 text-xs font-semibold px-4 py-2 rounded-full mb-8 backdrop-blur-md uppercase tracking-wider">
+          <span className="inline-block bg-primary-50 border border-primary-100/50 text-primary-700 text-xs font-bold px-4 py-2 rounded-full mb-8 uppercase tracking-wider">
             ⚡ YKS 2026 Hazırlığı Başlıyor
           </span>
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black leading-tight mb-8 tracking-tight">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black leading-tight mb-8 tracking-tight text-gray-900">
             YKS'de Hedefine<br />
-            <span className="bg-gradient-to-r from-primary-400 via-violet-400 to-emerald-400 bg-clip-text text-transparent">Uzman Hocayla</span> Ulaş
+            <span className="bg-gradient-to-r from-primary-650 via-indigo-600 to-emerald-600 bg-clip-text text-transparent">Uzman Hocayla</span> Ulaş
           </h1>
-          <p className="text-base sm:text-xl text-gray-300 max-w-2xl mx-auto mb-12 leading-relaxed">
+          <p className="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto mb-12 leading-relaxed">
             TYT, AYT Sayısal, Sözel, Eşit Ağırlık ve Dil derslerinde zirveye odaklanın. Türkiye'nin en iyi eğitmenleriyle birebir canlı dersler.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -71,13 +71,13 @@ export default function HomePage() {
               href={waLink()}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-base sm:text-lg px-10 py-5 rounded-2xl transition-all duration-300 shadow-glow hover:scale-105"
+              className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-base sm:text-lg px-10 py-5 rounded-2xl transition-all duration-300 shadow-md hover:scale-105"
             >
               <span>💬</span> WhatsApp ile Hemen Başla
             </a>
             <Link
               href="/hocalar"
-              className="inline-flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-base sm:text-lg px-10 py-5 rounded-2xl transition-all duration-300 backdrop-blur-sm"
+              className="inline-flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-800 font-bold text-base sm:text-lg px-10 py-5 rounded-2xl transition-all duration-300"
             >
               Hocaları İncele →
             </Link>
@@ -87,11 +87,11 @@ export default function HomePage() {
 
       {/* Stats */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-20">
-        <div className="bg-dark-800/80 border border-white/5 rounded-3xl shadow-2xl p-8 backdrop-blur-md grid grid-cols-2 sm:grid-cols-4 gap-8">
+        <div className="bg-white border border-gray-100 rounded-3xl shadow-xl p-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
           {stats.map((s) => (
             <div key={s.etiket} className="text-center">
-              <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-primary-400 to-violet-300 bg-clip-text text-transparent">{s.rakam}</div>
-              <div className="text-xs sm:text-sm text-gray-400 font-medium mt-2 uppercase tracking-wider">{s.etiket}</div>
+              <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-primary-600 to-indigo-650 bg-clip-text text-transparent">{s.rakam}</div>
+              <div className="text-xs sm:text-sm text-gray-500 font-bold mt-2 uppercase tracking-wider">{s.etiket}</div>
             </div>
           ))}
         </div>
@@ -176,10 +176,10 @@ export default function HomePage() {
       </section>
 
       {/* Nasıl Çalışır */}
-      <section className="bg-[#120b24]/40 border-t border-b border-white/5 mt-20 py-20 backdrop-blur-md">
+      <section className="bg-white border-t border-b border-gray-100 mt-20 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-black text-white">3 Adımda Ders Al</h2>
+            <h2 className="text-3xl font-black text-gray-900">3 Adımda Ders Al</h2>
           </div>
           <div className="grid sm:grid-cols-3 gap-8">
             {[
@@ -188,12 +188,12 @@ export default function HomePage() {
               { step: "3", title: "Derse Başla", desc: "Anlaştıktan sonra online veya yüz yüze derse başla. Hedef puanına odaklan!", emoji: "🚀" },
             ].map((s) => (
               <div key={s.step} className="text-center">
-                <div className="w-16 h-16 bg-primary-600 text-white rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-4 border border-primary-500/10">
+                <div className="w-16 h-16 bg-primary-50 text-primary-700 border border-primary-100 rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-4">
                   {s.step}
                 </div>
                 <div className="text-3xl mb-3">{s.emoji}</div>
-                <h3 className="text-xl font-bold text-white mb-2">{s.title}</h3>
-                <p className="text-gray-350 text-sm leading-relaxed">{s.desc}</p>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{s.title}</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">{s.desc}</p>
               </div>
             ))}
           </div>
@@ -202,7 +202,7 @@ export default function HomePage() {
               href={waLink()}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-lg px-10 py-4 rounded-xl transition-all shadow-glow"
+              className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-lg px-10 py-4 rounded-xl transition-all shadow-md"
             >
               Hemen Başla — WhatsApp
             </a>
@@ -213,24 +213,24 @@ export default function HomePage() {
       {/* SSS */}
       <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-black text-white">Sıkça Sorulan Sorular</h2>
+          <h2 className="text-3xl font-black text-gray-900">Sıkça Sorulan Sorular</h2>
         </div>
         <FAQ items={faqItems} />
       </section>
 
       {/* CTA Banner */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20 mb-4">
-        <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-800 rounded-3xl p-10 sm:p-14 text-center text-white shadow-premium relative overflow-hidden">
+        <div className="bg-gradient-to-r from-primary-600 to-indigo-600 rounded-3xl p-10 sm:p-14 text-center text-white shadow-xl relative overflow-hidden">
           <div className="absolute top-[-50%] left-[-50%] w-full h-full bg-white/5 rounded-full blur-3xl pointer-events-none" />
           <h2 className="text-3xl sm:text-4xl font-black mb-4 relative z-10">Hâlâ kararsız mısın?</h2>
-          <p className="text-emerald-100 text-lg mb-8 max-w-xl mx-auto relative z-10">
+          <p className="text-primary-100 text-lg mb-8 max-w-xl mx-auto relative z-10">
             WhatsApp'tan bize ulaş, ihtiyacına en uygun hocanı birlikte bulalım. Yanıt süresi: &lt; 1 saat.
           </p>
           <a
             href={waLink("Merhaba, hangi hoca bana uygun olur konusunda yardım almak istiyorum.")}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-white text-emerald-700 font-bold text-lg px-10 py-4 rounded-xl hover:bg-emerald-50 transition-all hover:scale-105 relative z-10"
+            className="inline-flex items-center gap-2 bg-white text-primary-700 font-bold text-lg px-10 py-4 rounded-xl hover:bg-blue-50 transition-all hover:scale-105 relative z-10"
           >
             💬 Bize Danış — Ücretsiz
           </a>

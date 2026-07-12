@@ -28,31 +28,31 @@ function HocalarContent() {
   });
 
   return (
-    <div className="bg-[#090514] min-h-screen text-white">
+    <div className="bg-gray-50 min-h-screen text-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="mb-10">
-          <span className="text-primary-400 text-xs font-bold uppercase tracking-widest font-sans">EĞİTMEN KADROMUZ</span>
-          <h1 className="text-4xl sm:text-5xl font-black mb-2 mt-2 bg-gradient-to-r from-primary-400 via-violet-400 to-emerald-400 bg-clip-text text-transparent">Uzman Hocalarımız</h1>
-          <p className="text-gray-400 text-lg">
+          <span className="text-primary-650 text-xs font-bold uppercase tracking-widest font-sans">EĞİTMEN KADROMUZ</span>
+          <h1 className="text-4xl sm:text-5xl font-black mb-2 mt-2 bg-gradient-to-r from-primary-600 to-indigo-650 bg-clip-text text-transparent">Uzman Hocalarımız</h1>
+          <p className="text-gray-600 text-lg">
             YKS'nin her alanı için deneyimli uzman hocalar. WhatsApp ile anında iletişim.
           </p>
         </div>
 
         {/* Filtreler */}
-        <div className="bg-[#120b24]/90 rounded-3xl border border-white/5 p-6 sm:p-8 shadow-2xl backdrop-blur-md mb-10">
+        <div className="bg-white rounded-3xl border border-gray-100 p-6 sm:p-8 shadow-xl mb-10">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div>
-              <label className="block text-xs font-bold text-gray-400 mb-3 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-gray-500 mb-3 uppercase tracking-wider">
                 Ders Alanı
               </label>
-              <Link href="/hocalar" className={`block w-full text-xs font-bold py-2.5 rounded-xl border text-center transition-all duration-200 mb-2 ${!alan || alan === "tumu" ? "bg-primary-600 text-white border-primary-600 shadow-premium" : "bg-[#1a1235]/40 text-gray-300 border-white/5 hover:border-primary-500/30"}`}>
+              <Link href="/hocalar" className={`block w-full text-xs font-bold py-2.5 rounded-xl border text-center transition-all duration-200 mb-2 ${!alan || alan === "tumu" ? "bg-primary-600 text-white border-primary-600 shadow-md" : "bg-gray-50 text-gray-700 border-gray-200 hover:border-primary-300"}`}>
                 Tümü
               </Link>
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {["Matematik", "Fizik", "Kimya", "Türkçe", "Tarih", "İngilizce"].map((a) => (
                   <Link key={a} href={`/hocalar?alan=${a}${format ? `&format=${format}` : ""}${yks ? `&yks=${yks}` : ""}`}
-                    className={`text-[11px] font-bold px-3 py-1.5 rounded-xl border transition-all duration-200 ${alan === a ? "bg-primary-600 text-white border-primary-600 shadow-premium" : "bg-[#1a1235]/40 text-gray-300 border-white/5 hover:border-primary-500/30"}`}>
+                    className={`text-[11px] font-bold px-3 py-1.5 rounded-xl border transition-all duration-200 ${alan === a ? "bg-primary-600 text-white border-primary-600 shadow-md" : "bg-gray-50 text-gray-700 border-gray-200 hover:border-primary-300"}`}>
                     {a}
                   </Link>
                 ))}
@@ -60,7 +60,7 @@ function HocalarContent() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-gray-400 mb-3 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-gray-500 mb-3 uppercase tracking-wider">
                 Ders Formatı
               </label>
               <div className="flex flex-col gap-2">
@@ -71,7 +71,7 @@ function HocalarContent() {
                 ].map((f) => (
                   <Link key={f.value}
                     href={`/hocalar?${alan ? `alan=${alan}&` : ""}format=${f.value}${yks ? `&yks=${yks}` : ""}`}
-                    className={`text-xs font-bold py-2.5 rounded-xl border text-center transition-all duration-200 ${format === f.value || (!format && f.value === "tumu") ? "bg-primary-600 text-white border-primary-600 shadow-premium" : "bg-[#1a1235]/40 text-gray-300 border-white/5 hover:border-primary-500/30"}`}>
+                    className={`text-xs font-bold py-2.5 rounded-xl border text-center transition-all duration-200 ${format === f.value || (!format && f.value === "tumu") ? "bg-primary-600 text-white border-primary-600 shadow-md" : "bg-gray-50 text-gray-700 border-gray-200 hover:border-primary-300"}`}>
                     {f.label}
                   </Link>
                 ))}
@@ -79,7 +79,7 @@ function HocalarContent() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-gray-400 mb-3 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-gray-500 mb-3 uppercase tracking-wider">
                 YKS Sınav Türü
               </label>
               <div className="flex flex-col gap-2">
@@ -93,7 +93,7 @@ function HocalarContent() {
                 ].map((y) => (
                   <Link key={y.value}
                     href={`/hocalar?${alan ? `alan=${alan}&` : ""}${format ? `format=${format}&` : ""}yks=${y.value}`}
-                    className={`text-xs font-bold py-2.5 rounded-xl border text-center transition-all duration-200 ${yks === y.value || (!yks && y.value === "tumu") ? "bg-primary-600 text-white border-primary-600 shadow-premium" : "bg-[#1a1235]/40 text-gray-300 border-white/5 hover:border-primary-500/30"}`}>
+                    className={`text-xs font-bold py-2.5 rounded-xl border text-center transition-all duration-200 ${yks === y.value || (!yks && y.value === "tumu") ? "bg-primary-600 text-white border-primary-600 shadow-md" : "bg-gray-50 text-gray-700 border-gray-200 hover:border-primary-300"}`}>
                     {y.label}
                   </Link>
                 ))}
