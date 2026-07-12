@@ -83,7 +83,7 @@ export default function IletisimPage() {
               <div className="w-14 h-14 bg-emerald-600 rounded-2xl flex items-center justify-center text-white text-2xl flex-shrink-0">💬</div>
               <div>
                 <p className="font-bold text-gray-900">WhatsApp</p>
-                <p className="text-emerald-600 font-bold">+90 555 000 00 00</p>
+                <p className="text-emerald-600 font-bold">+90 554 383 18 28</p>
                 <p className="text-xs text-gray-500 mt-1 font-semibold">En hızlı yanıt — genellikle 1 saat içinde</p>
               </div>
             </a>
