@@ -23,20 +23,13 @@ export const metadata: Metadata = {
   ],
   robots: { index: true, follow: true },
   verification: { google: "google5716913a2e6e8126" },
-  icons: {
-    icon: [
-      { url: "/favicon.ico?v=5" },
-      { url: "/logo.png?v=5", type: "image/png" }
-    ],
-    apple: "/logo.png?v=5",
-  },
   openGraph: {
     type: "website",
     title: "Derslinex | YKS Hazırlık",
     description: "YKS hazırlığında Türkiye'nin en iyi hocalarıyla çalışın. Online ve yüz yüze özel ders.",
     images: [
       {
-        url: "/logo.png?v=5",
+        url: "/logo.png?v=7",
         width: 800,
         height: 600,
         alt: "Derslinex Logo",
@@ -45,7 +38,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    images: ["/logo.png"],
+    images: ["/logo.png?v=7"],
   },
   other: {
     "og:locale": "tr_TR",
@@ -55,6 +48,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="tr" className={inter.variable}>
+      <head>
+        <link rel="icon" href="/favicon.ico?v=7" />
+        <link rel="shortcut icon" href="/favicon.ico?v=7" />
+        <link rel="apple-touch-icon" href="/logo.png?v=7" />
+      </head>
       <body className="bg-gray-50 text-gray-900 antialiased">
         <Header />
         <main>{children}</main>
