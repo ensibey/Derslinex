@@ -68,10 +68,10 @@ export default async function DersAlaniPage({ params }: { params: Promise<{ alan
                 ders.slug === "fizik-yks"
                   ? "/fizik.png"
                   : ders.slug === "matematik-yks"
-                  ? "/matematik.svg"
+                  ? "/matematik.png"
                   : ders.slug === "kimya-yks"
-                  ? "/kimya.svg"
-                  : "/biyoloji.svg"
+                  ? "/kimya.png"
+                  : "/biyoloji.png"
               }
               alt={`${ders.isim} Dersi YKS`}
               fill
