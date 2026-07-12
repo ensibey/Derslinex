@@ -6,6 +6,7 @@ import { dersAlanlari } from "@/data/dersler";
 import TeacherCard from "@/components/TeacherCard";
 import SubjectCard from "@/components/SubjectCard";
 import FAQ from "@/components/FAQ";
+import AdvantageSlider from "@/components/AdvantageSlider";
 import { waLink } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -85,9 +86,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats */}
+      {/* Stats & Advantage Slider */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-20">
-        <div className="bg-white border border-gray-100 rounded-3xl shadow-xl p-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
+        <div className="bg-white border border-gray-100 rounded-3xl shadow-xl p-8 grid grid-cols-2 sm:grid-cols-4 gap-8 mb-12">
           {stats.map((s) => (
             <div key={s.etiket} className="text-center">
               <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-primary-600 to-indigo-650 bg-clip-text text-transparent">{s.rakam}</div>
@@ -95,6 +96,8 @@ export default function HomePage() {
             </div>
           ))}
         </div>
+        
+        <AdvantageSlider />
       </section>
 
       {/* Ders Formatı */}
