@@ -9,10 +9,10 @@ export const metadata: Metadata = {
 
 const yksGruplari = [
   { id: "TYT", label: "TYT", renk: "bg-gradient-to-r from-primary-600 to-indigo-700", desc: "Temel Yeterlilik Testi" },
-  { id: "AYT Sayısal", label: "AYT Sayısal", renk: "bg-gradient-to-r from-violet-600 to-primary-700", desc: "Matematik, Fizik, Kimya, Biyoloji" },
-  { id: "AYT Sözel", label: "AYT Sözel", renk: "bg-gradient-to-r from-rose-600 to-rose-500", desc: "Edebiyat, Tarih, Coğrafya, Felsefe" },
-  { id: "AYT EA", label: "AYT Eşit Ağırlık", renk: "bg-gradient-to-r from-amber-600 to-amber-500", desc: "Matematik, Edebiyat, Tarih, Coğrafya" },
-  { id: "AYT Dil", label: "AYT Dil", renk: "bg-gradient-to-r from-emerald-600 to-emerald-500", desc: "İngilizce, Almanca, Fransızca" },
+  { id: "AYT Sayısal", label: "AYT Sayısal", renk: "bg-gradient-to-r from-violet-550 via-violet-650 to-primary-750", desc: "Matematik, Fizik, Kimya, Biyoloji" },
+  { id: "AYT Sözel", label: "AYT Sözel", renk: "bg-gradient-to-r from-rose-600 to-rose-700", desc: "Edebiyat, Tarih, Coğrafya, Felsefe" },
+  { id: "AYT EA", label: "AYT Eşit Ağırlık", renk: "bg-gradient-to-r from-amber-600 to-amber-700", desc: "Matematik, Edebiyat, Tarih, Coğrafya" },
+  { id: "AYT Dil", label: "AYT Dil", renk: "bg-gradient-to-r from-emerald-600 to-emerald-700", desc: "İngilizce, Almanca, Fransızca" },
 ];
 
 export default function DerslerPage() {
