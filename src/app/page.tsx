@@ -61,7 +61,7 @@ export default function HomePage() {
           </span>
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black leading-tight mb-8 tracking-tight text-gray-900">
             YKS'de Hedefine<br />
-            <span className="bg-gradient-to-r from-primary-650 via-indigo-600 to-emerald-600 bg-clip-text text-transparent">Uzman Hocayla</span> Ulaş
+            <span className="bg-gradient-to-r from-primary-800 via-indigo-650 to-emerald-600 bg-clip-text text-transparent">Uzman Hocayla</span> Ulaş
           </h1>
           <p className="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto mb-12 leading-relaxed">
             TYT, AYT Sayısal, Sözel, Eşit Ağırlık ve Dil derslerinde zirveye odaklanın. Türkiye'nin en iyi eğitmenleriyle birebir canlı dersler.
