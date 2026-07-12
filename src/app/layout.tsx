@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     "matematik yks", "fizik yks", "derslinex eğitim",
   ],
   robots: { index: true, follow: true },
-  verification: { google: "GOOGLE_SITE_VERIFICATION_CODE_HERE" },
+  verification: { google: "google5716913a2e6e8126" },
   other: {
     "og:locale": "tr_TR",
   },
