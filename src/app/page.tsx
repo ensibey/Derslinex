@@ -100,38 +100,38 @@ export default function HomePage() {
       {/* Ders Formatı */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-32">
         <div className="text-center mb-16">
-          <span className="text-primary-400 text-xs font-bold uppercase tracking-widest">ÇALIŞMA MODELİ</span>
-          <h2 className="text-3xl sm:text-5xl font-black text-white mt-2">Sana Uygun Ders Formatı</h2>
-          <p className="text-gray-400 mt-4 max-w-xl mx-auto">Nerede olursan ol, kesintisiz öğrenmeye devam et.</p>
+          <span className="text-primary-600 text-xs font-bold uppercase tracking-widest">ÇALIŞMA MODELİ</span>
+          <h2 className="text-3xl sm:text-5xl font-black text-gray-900 mt-2">Sana Uygun Ders Formatı</h2>
+          <p className="text-gray-600 mt-4 max-w-xl mx-auto">Nerede olursan ol, kesintisiz öğrenmeye devam et.</p>
         </div>
         <div className="grid sm:grid-cols-2 gap-8">
-          <div className="bg-[#120b24]/90 rounded-3xl p-8 sm:p-10 border border-white/5 shadow-2xl backdrop-blur-md flex flex-col">
-            <div className="w-14 h-14 bg-primary-950/40 border border-primary-500/10 rounded-2xl flex items-center justify-center text-3xl mb-6">🏫</div>
-            <h3 className="text-2xl font-bold text-white mb-4">Yüz Yüze Ders</h3>
-            <p className="text-gray-300 mb-8 leading-relaxed text-sm">
+          <div className="bg-white rounded-3xl p-8 sm:p-10 border border-gray-100 shadow-sm flex flex-col hover:shadow-xl transition-all duration-300">
+            <div className="w-14 h-14 bg-primary-50 rounded-2xl flex items-center justify-center text-3xl mb-6">🏫</div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">Yüz Yüze Ders</h3>
+            <p className="text-gray-600 mb-8 leading-relaxed text-sm">
               Belirlenen çalışma merkezlerinde veya evinizde eğitmenle birebir ders. Anlık geri bildirim ve yüksek odaklanma.
             </p>
-            <ul className="space-y-3.5 text-sm text-gray-300 mb-8 mt-auto">
+            <ul className="space-y-3.5 text-sm text-gray-600 mb-8 mt-auto">
               {["Seçili şehirlerdeki uzman hocalar", "Birebir konforlu çalışma ortamı", "Haftalık hedeflere dayalı program", "Eğitmen rehberliğinde özel materyaller"].map(i => (
-                <li key={i} className="flex items-center gap-3"><span className="text-emerald-400 font-bold">✓</span>{i}</li>
+                <li key={i} className="flex items-center gap-3"><span className="text-emerald-500 font-bold">✓</span>{i}</li>
               ))}
             </ul>
-            <Link href="/hocalar?format=yuz-yuze" className="inline-block text-center bg-primary-600 hover:bg-primary-500 text-white font-bold px-8 py-4 rounded-xl transition-all duration-200">
+            <Link href="/hocalar?format=yuz-yuze" className="inline-block text-center bg-primary-600 hover:bg-primary-700 text-white font-bold px-8 py-4 rounded-xl transition-all duration-200">
               Yüz Yüze Hocaları Gör
             </Link>
           </div>
-          <div className="bg-[#120b24]/90 rounded-3xl p-8 sm:p-10 border border-white/5 shadow-2xl backdrop-blur-md flex flex-col">
-            <div className="w-14 h-14 bg-emerald-950/40 border border-emerald-500/10 rounded-2xl flex items-center justify-center text-3xl mb-6">💻</div>
-            <h3 className="text-2xl font-bold text-white mb-4">Online Ders</h3>
-            <p className="text-gray-300 mb-8 leading-relaxed text-sm">
+          <div className="bg-white rounded-3xl p-8 sm:p-10 border border-gray-100 shadow-sm flex flex-col hover:shadow-xl transition-all duration-300">
+            <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-3xl mb-6">💻</div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">Online Ders</h3>
+            <p className="text-gray-600 mb-8 leading-relaxed text-sm">
               Mesafe sınırı olmadan en iyi hocalara anında erişin. İnteraktif beyaz tahta ve video kayıt imkanıyla yüksek verim.
             </p>
-            <ul className="space-y-3.5 text-sm text-gray-300 mb-8 mt-auto">
+            <ul className="space-y-3.5 text-sm text-gray-600 mb-8 mt-auto">
               {["Tüm Türkiye genelinden seçkin hocalar", "Gelişmiş dijital eğitim araçları", "Kayıt imkanıyla dersi tekrar izleme", "Zaman ve mekan esnekliği"].map(i => (
-                <li key={i} className="flex items-center gap-3"><span className="text-emerald-400 font-bold">✓</span>{i}</li>
+                <li key={i} className="flex items-center gap-3"><span className="text-emerald-500 font-bold">✓</span>{i}</li>
               ))}
             </ul>
-            <Link href="/hocalar?format=online" className="inline-block text-center bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-8 py-4 rounded-xl transition-all duration-200">
+            <Link href="/hocalar?format=online" className="inline-block text-center bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-4 rounded-xl transition-all duration-200">
               Online Hocaları Gör
             </Link>
           </div>
@@ -142,10 +142,10 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-3xl font-black text-white">Öne Çıkan Hocalar</h2>
-            <p className="text-gray-400 mt-1">En yüksek puanlı, deneyimli hocalarımız</p>
+            <h2 className="text-3xl font-black text-gray-900">Öne Çıkan Hocalar</h2>
+            <p className="text-gray-600 mt-1">En yüksek puanlı, deneyimli hocalarımız</p>
           </div>
-          <Link href="/hocalar" className="hidden sm:inline-flex items-center gap-1 text-primary-400 font-semibold hover:underline">
+          <Link href="/hocalar" className="hidden sm:inline-flex items-center gap-1 text-primary-650 font-semibold hover:underline">
             Tümünü Gör →
           </Link>
         </div>
@@ -153,7 +153,7 @@ export default function HomePage() {
           {oneHocalar.map((h) => <TeacherCard key={h.id} hoca={h} />)}
         </div>
         <div className="text-center mt-8">
-          <Link href="/hocalar" className="inline-block border-2 border-primary-500 text-primary-400 hover:bg-primary-600 hover:text-white font-semibold px-8 py-3 rounded-xl transition-all">
+          <Link href="/hocalar" className="inline-block border-2 border-primary-500 text-primary-650 hover:bg-primary-600 hover:text-white font-semibold px-8 py-3 rounded-xl transition-all">
             Tüm Hocaları Gör ({hocalar.length} hoca)
           </Link>
         </div>
@@ -162,14 +162,14 @@ export default function HomePage() {
       {/* Ders Alanları */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-black text-white">YKS Ders Alanları</h2>
-          <p className="text-gray-400 mt-2">TYT'den AYT'ye tüm alanlar için uzman hocalar</p>
+          <h2 className="text-3xl font-black text-gray-900">YKS Ders Alanları</h2>
+          <p className="text-gray-600 mt-2">TYT'den AYT'ye tüm alanlar için uzman hocalar</p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {dersAlanlari.slice(0, 8).map((d) => <SubjectCard key={d.id} ders={d} />)}
         </div>
         <div className="text-center mt-6">
-          <Link href="/dersler" className="text-primary-400 font-semibold hover:underline">
+          <Link href="/dersler" className="text-primary-650 font-semibold hover:underline">
             Tüm ders alanlarını gör →
           </Link>
         </div>
