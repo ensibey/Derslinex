@@ -88,9 +88,9 @@ export default function TeacherCard({ hoca }: { hoca: Hoca }) {
           href={waLinkHoca(hoca.isim, hoca.dersler[0])}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 text-center text-xs font-black bg-[#D97706] hover:bg-[#B45309] text-white py-3 rounded-xl transition-all duration-200"
+          className="flex-1 text-center text-xs font-black bg-[#D97706] hover:bg-[#B45309] text-white py-3 rounded-xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md hover:shadow-[#D97706]/20 flex items-center justify-center gap-1"
         >
-          WhatsApp
+          💬 Şimdi Ders Al
         </a>
       </div>
     </div>

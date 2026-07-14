@@ -117,11 +117,11 @@ export default function HomePage() {
 
       {/* Stats & Advantage Slider */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-20">
-        <div className="bg-white border border-[#EFECE6] rounded-3xl shadow-sm p-8 grid grid-cols-2 sm:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mb-12">
           {stats.map((s) => (
-            <div key={s.etiket} className="text-center">
+            <div key={s.etiket} className="bg-white border border-[#EFECE6] rounded-2xl shadow-sm p-6 text-center hover:-translate-y-1 transition-all duration-300">
               <div className="text-3xl sm:text-4xl font-black text-[#1E3A8A]">{s.rakam}</div>
-              <div className="text-xs sm:text-sm text-gray-500 font-black mt-2 uppercase tracking-wider">{s.etiket}</div>
+              <div className="text-xs sm:text-sm text-gray-500 font-black mt-2 uppercase tracking-widest">{s.etiket}</div>
             </div>
           ))}
         </div>
