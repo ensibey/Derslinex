@@ -8,37 +8,44 @@ export const metadata: Metadata = {
 };
 
 const yksGruplari = [
-  { id: "TYT", label: "TYT", renk: "bg-gradient-to-r from-primary-600 to-indigo-700", desc: "Temel Yeterlilik Testi" },
-  { id: "AYT Sayısal", label: "AYT Sayısal", renk: "bg-gradient-to-r from-violet-550 via-violet-650 to-primary-750", desc: "Matematik, Fizik, Kimya, Biyoloji" },
-  { id: "AYT Sözel", label: "AYT Sözel", renk: "bg-gradient-to-r from-rose-600 to-rose-700", desc: "Edebiyat, Tarih, Coğrafya, Felsefe" },
-  { id: "AYT EA", label: "AYT Eşit Ağırlık", renk: "bg-gradient-to-r from-amber-600 to-amber-700", desc: "Matematik, Edebiyat, Tarih, Coğrafya" },
-  { id: "AYT Dil", label: "AYT Dil", renk: "bg-gradient-to-r from-emerald-600 to-emerald-700", desc: "İngilizce, Almanca, Fransızca" },
+  { id: "TYT", label: "TYT", renk: "bg-white border border-[#EFECE6] text-[#1E3A8A]", desc: "Temel Yeterlilik Testi" },
+  { id: "AYT Sayısal", label: "AYT Sayısal", renk: "bg-white border border-[#EFECE6] text-[#1E3A8A]", desc: "Matematik, Fizik, Kimya, Biyoloji" },
+  { id: "AYT Sözel", label: "AYT Sözel", renk: "bg-white border border-[#EFECE6] text-[#1E3A8A]", desc: "Edebiyat, Tarih, Coğrafya, Felsefe" },
+  { id: "AYT EA", label: "AYT Eşit Ağırlık", renk: "bg-white border border-[#EFECE6] text-[#1E3A8A]", desc: "Matematik, Edebiyat, Tarih, Coğrafya" },
+  { id: "AYT Dil", label: "AYT Dil", renk: "bg-white border border-[#EFECE6] text-[#1E3A8A]", desc: "İngilizce, Almanca, Fransızca" },
 ];
 
 export default function DerslerPage() {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="mb-10">
-        <span className="text-primary-500 text-xs font-bold uppercase tracking-widest">SINAV KATEGORİLERİ</span>
-        <h1 className="text-4xl sm:text-5xl font-black mb-2 mt-2 bg-gradient-to-r from-primary-600 to-indigo-650 bg-clip-text text-transparent">Ders Alanları</h1>
-        <p className="text-gray-500 text-lg">YKS'nin tüm sınav türleri ve dersleri için uzman hoca desteği</p>
-      </div>
+    <div className="bg-[#FAF8F5] min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="mb-10">
+          <span className="text-[#D97706] text-xs font-black uppercase tracking-widest">SINAV KATEGORİLERİ</span>
+          <h1 className="text-4xl sm:text-5xl font-black mb-2 mt-2 text-[#1E3A8A]">Ders Alanları</h1>
+          <p className="text-gray-650 text-lg font-medium">YKS'nin tüm sınav türleri ve dersleri için uzman hoca desteği</p>
+        </div>
 
-      {yksGruplari.map((grup) => {
-        const alandakiDersler = dersAlanlari.filter((d) => d.yksTuru.includes(grup.id as any));
-        if (alandakiDersler.length === 0) return null;
-        return (
-          <section key={grup.id} className="mb-14">
-            <div className={`inline-flex items-center gap-3 ${grup.renk} text-white px-5 py-3 rounded-2xl mb-6 shadow-premium`}>
-              <span className="font-black text-lg">{grup.label}</span>
-              <span className="text-white/80 text-xs font-medium border-l border-white/20 pl-3">{grup.desc}</span>
+        {/* YKS Sınav Grupları */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-16">
+          {yksGruplari.map((g) => (
+            <div key={g.id} className={`${g.renk} rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group`}>
+              <div className="absolute top-0 right-0 w-16 h-16 bg-[#FAF0E3]/60 rounded-bl-full -z-10" />
+              <div className="font-black text-[#1E3A8A] text-lg mb-1 group-hover:text-[#D97706] transition-colors">{g.label}</div>
+              <div className="text-xs text-gray-500 font-bold leading-relaxed">{g.desc}</div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {alandakiDersler.map((d) => <SubjectCard key={d.id} ders={d} />)}
-            </div>
-          </section>
-        );
-      })}
+          ))}
+        </div>
+
+        {/* Grid Ders Kartları */}
+        <div>
+          <h2 className="text-2xl font-black text-[#1E3A8A] mb-8">Tüm YKS Dersleri</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {dersAlanlari.map((d) => (
+              <SubjectCard key={d.id} ders={d} />
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
