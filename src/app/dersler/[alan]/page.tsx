@@ -68,14 +68,14 @@ export default async function DersAlaniPage({ params }: { params: Promise<{ alan
                 ders.slug === "fizik-yks"
                   ? "/fizik.png"
                   : ders.slug === "matematik-yks"
-                  ? "/matematik.png"
+                  ? "/matematik.jpg"
                   : ders.slug === "kimya-yks"
                   ? "/kimya.png"
                   : "/biyoloji.png"
               }
               alt={`${ders.isim} Dersi YKS`}
               fill
-              className="object-contain drop-shadow-2xl"
+              className="object-cover rounded-2xl shadow-md"
               sizes="280px"
               priority
             />
