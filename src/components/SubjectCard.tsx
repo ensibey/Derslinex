@@ -30,6 +30,7 @@ export default function SubjectCard({ ders }: { ders: DersAlani }) {
             fill
             className="object-cover"
             sizes="56px"
+            priority
           />
         ) : (
           <span className="text-3xl">{ders.emoji}</span>
