@@ -52,22 +52,27 @@ export default function HomePage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-[#FAF8F5] pt-16 pb-28 px-4 border-b border-[#EFECE6]">
-        {/* Glow Effects */}
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-[#D97706]/5 blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[#1E3A8A]/5 blur-[150px] pointer-events-none" />
+      <section className="relative overflow-hidden bg-[#FAF8F5] pt-20 pb-28 px-4 border-b border-[#EFECE6]">
+        {/* Glow & Academic Pattern Mockups */}
+        <div className="absolute top-[-10%] left-[-10%] w-[45%] h-[45%] rounded-full bg-[#D97706]/5 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[55%] h-[55%] rounded-full bg-[#1E3A8A]/5 blur-[150px] pointer-events-none" />
+        <div className="absolute top-10 right-[15%] w-72 h-72 border border-[#EFECE6]/40 rounded-full pointer-events-none" />
+        <div className="absolute top-20 right-[18%] w-56 h-56 border border-[#D97706]/5 rounded-full pointer-events-none" />
 
         <div className="max-w-7xl mx-auto grid lg:grid-cols-12 gap-12 items-center relative z-10">
           {/* Left Column: Info & Action */}
           <div className="lg:col-span-7 text-left">
-            <span className="inline-block bg-[#FAF0E3] border border-[#F5D0A9] text-[#B45309] text-xs font-black px-4 py-2 rounded-full mb-6 uppercase tracking-widest">
-              ⚡ YKS 2026 AKADEMİK DÖNEMİ
-            </span>
+            <div className="inline-flex items-center gap-2 bg-[#FAF0E3] border border-[#F5D0A9] text-[#B45309] text-xs font-black px-4 py-2 rounded-full mb-6 uppercase tracking-widest shadow-sm">
+              <span>🎓</span> YKS 2026 AKADEMİK DÖNEMİ
+            </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight mb-6 tracking-tight text-[#1E3A8A]">
               YKS'de Hedeflediğin <br />
-              <span className="text-[#D97706]">Bölümü Şansa Bırakma!</span>
+              <span className="text-[#D97706] relative">
+                Bölümü Şansa Bırakma!
+                <span className="absolute bottom-1 left-0 w-full h-[4px] bg-[#FAF0E3] -z-10 rounded-full" />
+              </span>
             </h1>
-            <p className="text-base sm:text-lg text-gray-600 mb-8 leading-relaxed max-w-xl">
+            <p className="text-base sm:text-lg text-gray-600 mb-8 leading-relaxed max-w-xl font-medium">
               Türkiye'nin en seçkin YKS dereceli hocalarından TYT, AYT Sayısal, Sözel, EA ve Dil dersleri. Haftalık ders takipleriyle hedefinize emin adımlarla ilerleyin.
             </p>
 
@@ -77,28 +82,30 @@ export default function HomePage() {
 
           {/* Right Column: Visual Academic Dashboard Card */}
           <div className="lg:col-span-5 hidden lg:block">
-            <div className="bg-white border border-[#EFECE6] rounded-3xl p-8 shadow-premium relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-[#FAF0E3] rounded-bl-full -z-10" />
+            <div className="bg-white border border-[#EFECE6] rounded-3xl p-8 shadow-md hover:shadow-lg transition-all duration-300 relative overflow-hidden group hover:-translate-y-1">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#FAF0E3]/60 rounded-bl-full -z-10" />
               
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-xl bg-[#1E3A8A]/10 flex items-center justify-center text-xl text-[#1E3A8A] font-bold">🏫</div>
+              <div className="flex items-center gap-3.5 mb-6 pb-4 border-b border-[#FAF8F5]">
+                <div className="w-12 h-12 rounded-xl bg-[#1E3A8A]/10 flex items-center justify-center text-xl text-[#1E3A8A] font-bold shadow-sm">🏫</div>
                 <div>
                   <h4 className="text-base font-black text-[#1E3A8A]">Derslinex Modeli</h4>
-                  <p className="text-xs text-gray-500 font-medium">Birebir YKS Koçluğu & Takip</p>
+                  <p className="text-xs text-gray-500 font-bold">Birebir YKS Koçluğu & Takip</p>
                 </div>
               </div>
 
               <div className="space-y-4">
                 {[
-                  { title: "Kişiye Özel Haftalık Program", desc: "Seviyenize ve hedeflerinize uygun haftalık ders saatleri", icon: "📅" },
-                  { title: "Zirvedeki Öğretmenler", desc: "Derece yapanları yetiştirmiş uzman hoca kadrosu", icon: "🏆" },
-                  { title: "Anlık WhatsApp İletişimi", desc: "Hocalarınızla 7/24 kesintisiz iletişim kanalları", icon: "💬" }
+                  { title: "Kişiye Özel Haftalık Program", desc: "Seviyenize ve hedeflerinize uygun haftalık ders saatleri", icon: "📅", color: "bg-[#FAF0E3]/70 text-[#B45309]" },
+                  { title: "Zirvedeki Öğretmenler", desc: "Derece yapanları yetiştirmiş uzman hoca kadrosu", icon: "🏆", color: "bg-[#1E3A8A]/5 text-[#1E3A8A]" },
+                  { title: "Anlık WhatsApp İletişimi", desc: "Hocalarınızla 7/24 kesintisiz iletişim kanalları", icon: "💬", color: "bg-[#E8F5E9] text-[#2E7D32]" }
                 ].map((item, idx) => (
-                  <div key={idx} className="flex gap-4 p-3 rounded-xl hover:bg-[#FAF8F5] transition-colors border border-transparent hover:border-[#EFECE6]">
-                    <div className="text-xl">{item.icon}</div>
+                  <div key={idx} className="flex gap-4 p-3 rounded-2xl hover:bg-[#FAF8F5] transition-colors border border-transparent hover:border-[#EFECE6]">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${item.color} flex-shrink-0 shadow-sm`}>
+                      {item.icon}
+                    </div>
                     <div>
                       <h5 className="text-sm font-black text-[#1E3A8A]">{item.title}</h5>
-                      <p className="text-xs text-gray-500 font-bold">{item.desc}</p>
+                      <p className="text-xs text-gray-500 font-bold mt-0.5">{item.desc}</p>
                     </div>
                   </div>
                 ))}
