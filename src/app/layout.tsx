@@ -53,7 +53,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="shortcut icon" href="/favicon.ico?v=7" />
         <link rel="apple-touch-icon" href="/logo.png?v=7" />
       </head>
-      <body className="bg-gray-50 text-gray-900 antialiased">
+      <body className="bg-[#FAF8F5] text-gray-900 antialiased">
         <Header />
         <main>{children}</main>
         <Footer />

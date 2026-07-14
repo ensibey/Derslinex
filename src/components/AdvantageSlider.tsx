@@ -33,16 +33,16 @@ export default function AdvantageSlider() {
   }, []);
 
   return (
-    <div className="bg-white border border-gray-100 rounded-3xl p-6 sm:p-10 shadow-xl">
+    <div className="bg-white border border-[#EFECE6] rounded-3xl p-6 sm:p-10 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex flex-wrap gap-2 mb-8 justify-center sm:justify-start">
         {avantajlar.map((av, idx) => (
           <button
             key={idx}
             onClick={() => setActiveTab(idx)}
-            className={`text-xs font-bold px-4 py-2.5 rounded-full transition-all duration-300 ${
+            className={`text-xs font-black px-4 py-2.5 rounded-full transition-all duration-300 ${
               activeTab === idx
-                ? "bg-primary-600 text-white shadow-md"
-                : "bg-gray-50 text-gray-500 hover:bg-gray-100 border border-gray-200"
+                ? "bg-[#1E3A8A] text-white shadow-sm"
+                : "bg-[#FAF8F5] text-gray-500 hover:bg-[#FAF0E3] hover:text-[#B45309] border border-[#EFECE6]"
             }`}
           >
             {av.badge}
@@ -52,15 +52,15 @@ export default function AdvantageSlider() {
 
       <div className="min-h-[160px] flex flex-col justify-between transition-all duration-500">
         <div>
-          <h3 className="text-xl sm:text-2xl font-black text-gray-900 mb-3 animate-fade-in">
+          <h3 className="text-xl sm:text-2xl font-black text-[#1E3A8A] mb-3">
             {avantajlar[activeTab].title}
           </h3>
-          <p className="text-sm sm:text-base text-gray-600 leading-relaxed max-w-3xl">
+          <p className="text-sm sm:text-base text-gray-600 leading-relaxed max-w-3xl font-medium">
             {avantajlar[activeTab].desc}
           </p>
         </div>
-        <div className="mt-6 pt-6 border-t border-gray-100 flex items-center justify-between">
-          <span className="text-xs sm:text-sm font-black text-primary-600 bg-primary-50 px-3 py-1.5 rounded-lg">
+        <div className="mt-6 pt-6 border-t border-[#EFECE6] flex items-center justify-between">
+          <span className="text-xs sm:text-sm font-black text-[#B45309] bg-[#FAF0E3] px-3 py-1.5 rounded-lg">
             {avantajlar[activeTab].stats}
           </span>
           <div className="flex gap-1.5">
@@ -68,7 +68,7 @@ export default function AdvantageSlider() {
               <span
                 key={idx}
                 className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  activeTab === idx ? "w-6 bg-primary-600" : "bg-gray-250"
+                  activeTab === idx ? "w-6 bg-[#D97706]" : "bg-[#EFECE6]"
                 }`}
               />
             ))}
