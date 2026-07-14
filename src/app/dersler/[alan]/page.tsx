@@ -61,17 +61,26 @@ export default async function DersAlaniPage({ params }: { params: Promise<{ alan
           </a>
         </div>
 
-        {["fizik-yks", "matematik-yks", "kimya-yks", "biyoloji-yks"].includes(ders.slug) && (
+        {[
+          "fizik-yks", "matematik-yks", "kimya-yks", "biyoloji-yks",
+          "turkce-yks", "turk-dili-edebiyati-yks", "tarih-yks"
+        ].includes(ders.slug) && (
           <div className="relative w-full max-w-[280px] h-[220px] md:h-[260px] flex-shrink-0 z-10 hidden sm:block">
             <Image
               src={
                 ders.slug === "fizik-yks"
-                  ? "/fizik.png"
+                  ? "/fizik.jpg"
                   : ders.slug === "matematik-yks"
                   ? "/matematik.jpg"
                   : ders.slug === "kimya-yks"
-                  ? "/kimya.png"
-                  : "/biyoloji.png"
+                  ? "/kimya.jpg"
+                  : ders.slug === "biyoloji-yks"
+                  ? "/biyoloji.jpg"
+                  : ders.slug === "turkce-yks"
+                  ? "/turkce.jpg"
+                  : ders.slug === "turk-dili-edebiyati-yks"
+                  ? "/edebiyat.jpg"
+                  : "/tarih.jpg"
               }
               alt={`${ders.isim} Dersi YKS`}
               fill
