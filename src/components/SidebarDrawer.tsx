@@ -5,9 +5,16 @@ import { waLink } from "@/lib/utils";
 
 export default function SidebarDrawer() {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Sayfa kaymasını engelle & window eventi dinle
   useEffect(() => {
+    if (!mounted) return;
+
     if (isOpen) {
       document.body.style.overflow = "hidden";
     } else {
@@ -21,7 +28,7 @@ export default function SidebarDrawer() {
       document.body.style.overflow = "unset";
       window.removeEventListener("open-sidebar-drawer", handleToggle);
     };
-  }, [isOpen]);
+  }, [isOpen, mounted]);
 
   const quickLinks = [
     { href: "/yks-hazirlik", label: "🧮 YKS Puan Hesaplama & Sayaç" },
@@ -32,6 +39,8 @@ export default function SidebarDrawer() {
     { href: "/blog/tyt-ayt-farki-nedir", label: "❓ TYT ve AYT Farkı Nedir? (Blog)" },
     { href: "/blog/yks-calisma-programi-nasil-yapilir", label: "🗓️ Günlük Çalışma Programı Hazırlama (Blog)" }
   ];
+
+  if (!mounted) return null;
 
   return (
     <>

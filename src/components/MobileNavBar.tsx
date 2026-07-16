@@ -1,13 +1,22 @@
 "use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { waLink } from "@/lib/utils";
 
 export default function MobileNavBar() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const triggerSidebar = () => {
     // Custom window event fırlatarak SidebarDrawer'ı aç
     const event = new CustomEvent("open-sidebar-drawer");
     window.dispatchEvent(event);
   };
+
+  if (!mounted) return null;
 
   return (
     <div className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#FAF8F5]/95 backdrop-blur-md border-t border-[#EFECE6] z-50 flex items-center justify-around px-2 shadow-2xl">
