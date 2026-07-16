@@ -113,22 +113,30 @@ export default function LgsHazirlikPage() {
                     { key: "ink", label: "İnkılap Tarihi Neti (Max: 10)", max: 10 },
                     { key: "din", label: "Din Kültürü Neti (Max: 10)", max: 10 },
                     { key: "ing", label: "Yabancı Dil Neti (Max: 10)", max: 10 },
-                  ].map((d) => (
-                    <div key={d.key} className="flex justify-between items-center gap-4">
-                      <label className="text-xs font-bold text-gray-700">{d.label}</label>
-                      <input
-                        type="number"
-                        min={0}
-                        max={d.max}
-                        value={(nets as any)[d.key] || 0}
-                        onChange={(e) => {
-                          const val = Math.min(d.max, Math.max(0, parseFloat(e.target.value) || 0));
-                          setNets({ ...nets, [d.key]: val });
-                        }}
-                        className="w-20 bg-[#FAF8F5] border border-[#EFECE6] rounded-xl px-3 py-2 text-sm text-right focus:border-[#D97706] outline-none font-bold text-[#1E3A8A]"
-                      />
-                    </div>
-                  ))}
+                  ].map((d) => {
+                    const isInvalid = (nets as any)[d.key] > d.max || (nets as any)[d.key] < 0;
+                    return (
+                      <div key={d.key} className="flex flex-col gap-1 border-b border-[#FAF8F5] pb-2">
+                        <div className="flex justify-between items-center gap-4">
+                          <label className="text-xs font-bold text-gray-700">{d.label}</label>
+                          <input
+                            type="number"
+                            min={0}
+                            max={d.max}
+                            value={(nets as any)[d.key] || 0}
+                            onChange={(e) => {
+                              const val = parseFloat(e.target.value) || 0;
+                              setNets({ ...nets, [d.key]: val });
+                            }}
+                            className={`w-20 bg-[#FAF8F5] border rounded-xl px-3 py-2 text-sm text-right focus:border-[#D97706] outline-none font-bold text-[#1E3A8A] ${isInvalid ? "border-red-500" : "border-[#EFECE6]"}`}
+                          />
+                        </div>
+                        {isInvalid && (
+                          <span className="text-[10px] text-red-500 font-bold text-right">Maksimum net {d.max} olabilir.</span>
+                        )}
+                      </div>
+                    );
+                  })}
                   <button
                     onClick={calculateScore}
                     className="w-full bg-[#D97706] hover:bg-[#B45309] text-white font-black py-3 rounded-xl transition-all shadow-sm mt-4"

@@ -108,25 +108,65 @@ export default function YksHazirlikPage() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 mb-1">TYT Matematik Neti</label>
-                      <input type="number" value={nets.tytMat} onChange={(e) => setNets({ ...nets, tytMat: Number(e.target.value) })} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary-500" />
+                      <label className="block text-xs font-bold text-gray-500 mb-1">TYT Matematik Neti (Max: 40)</label>
+                      <input 
+                        type="number" 
+                        value={nets.tytMat} 
+                        onChange={(e) => setNets({ ...nets, tytMat: parseFloat(e.target.value) || 0 })} 
+                        className={`w-full bg-gray-50 border rounded-xl px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary-500 ${nets.tytMat > 40 || nets.tytMat < 0 ? "border-red-500" : "border-gray-200"}`} 
+                      />
+                      {(nets.tytMat > 40 || nets.tytMat < 0) && (
+                        <span className="text-[10px] text-red-500 font-bold block mt-1">Soru sayısı 0-40 arası olmalıdır.</span>
+                      )}
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 mb-1">TYT Türkçe Neti</label>
-                      <input type="number" value={nets.tytTur} onChange={(e) => setNets({ ...nets, tytTur: Number(e.target.value) })} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary-500" />
+                      <label className="block text-xs font-bold text-gray-500 mb-1">TYT Türkçe Neti (Max: 40)</label>
+                      <input 
+                        type="number" 
+                        value={nets.tytTur} 
+                        onChange={(e) => setNets({ ...nets, tytTur: parseFloat(e.target.value) || 0 })} 
+                        className={`w-full bg-gray-50 border rounded-xl px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary-500 ${nets.tytTur > 40 || nets.tytTur < 0 ? "border-red-500" : "border-gray-200"}`} 
+                      />
+                      {(nets.tytTur > 40 || nets.tytTur < 0) && (
+                        <span className="text-[10px] text-red-500 font-bold block mt-1">Soru sayısı 0-40 arası olmalıdır.</span>
+                      )}
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 mb-1">TYT Sosyal Neti</label>
-                      <input type="number" value={nets.tytSos} onChange={(e) => setNets({ ...nets, tytSos: Number(e.target.value) })} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary-500" />
+                      <label className="block text-xs font-bold text-gray-500 mb-1">TYT Sosyal Neti (Max: 20)</label>
+                      <input 
+                        type="number" 
+                        value={nets.tytSos} 
+                        onChange={(e) => setNets({ ...nets, tytSos: parseFloat(e.target.value) || 0 })} 
+                        className={`w-full bg-gray-50 border rounded-xl px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary-500 ${nets.tytSos > 20 || nets.tytSos < 0 ? "border-red-500" : "border-gray-200"}`} 
+                      />
+                      {(nets.tytSos > 20 || nets.tytSos < 0) && (
+                        <span className="text-[10px] text-red-500 font-bold block mt-1">Soru sayısı 0-20 arası olmalıdır.</span>
+                      )}
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 mb-1">TYT Fen Neti</label>
-                      <input type="number" value={nets.tytFen} onChange={(e) => setNets({ ...nets, tytFen: Number(e.target.value) })} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary-500" />
+                      <label className="block text-xs font-bold text-gray-500 mb-1">TYT Fen Neti (Max: 20)</label>
+                      <input 
+                        type="number" 
+                        value={nets.tytFen} 
+                        onChange={(e) => setNets({ ...nets, tytFen: parseFloat(e.target.value) || 0 })} 
+                        className={`w-full bg-gray-50 border rounded-xl px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary-500 ${nets.tytFen > 20 || nets.tytFen < 0 ? "border-red-500" : "border-gray-200"}`} 
+                      />
+                      {(nets.tytFen > 20 || nets.tytFen < 0) && (
+                        <span className="text-[10px] text-red-500 font-bold block mt-1">Soru sayısı 0-20 arası olmalıdır.</span>
+                      )}
                     </div>
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-gray-500 mb-1">Diploma Notu (OBP) [50 - 100]</label>
-                    <input type="number" value={nets.obp} onChange={(e) => setNets({ ...nets, obp: Number(e.target.value) })} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary-500" />
+                    <input 
+                      type="number" 
+                      value={nets.obp} 
+                      onChange={(e) => setNets({ ...nets, obp: parseFloat(e.target.value) || 0 })} 
+                      className={`w-full bg-gray-50 border rounded-xl px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary-500 ${nets.obp > 100 || nets.obp < 50 ? "border-red-500" : "border-gray-200"}`} 
+                    />
+                    {(nets.obp > 100 || nets.obp < 50) && (
+                      <span className="text-[10px] text-red-500 font-bold block mt-1">OBP 50-100 arasında olmalıdır.</span>
+                    )}
                   </div>
                   <button onClick={calculateScores} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl transition-colors">Hesapla</button>
                 </div>

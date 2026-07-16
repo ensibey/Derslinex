@@ -15,6 +15,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return { title: yazi.baslik, description: yazi.ozet };
 }
 
+import ShareButtons from "@/components/ShareButtons";
+
 export default async function BlogYazisiPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
   const yazi = getBlogBySlug(resolvedParams.slug);
@@ -35,9 +37,12 @@ export default async function BlogYazisiPage({ params }: { params: Promise<{ slu
       <span className="text-xs font-black text-[#B45309] bg-[#FAF0E3] px-3 py-1 rounded-full uppercase tracking-wider">{yazi.kategori}</span>
       <h1 className="text-3xl sm:text-4xl font-black text-[#1E3A8A] mt-4 mb-4 leading-snug tracking-tight">{yazi.baslik}</h1>
 
-      <div className="flex items-center gap-4 text-xs text-gray-500 mb-8 pb-6 border-b border-[#EFECE6] font-bold">
-        <span>📅 {new Date(yazi.tarih).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })}</span>
-        <span>⏱ {yazi.okumaSuresi} dk okuma</span>
+      <div className="flex items-center justify-between gap-4 pb-6 border-b border-[#EFECE6] mb-8 flex-wrap">
+        <div className="flex items-center gap-4 text-xs text-gray-500 font-bold">
+          <span>📅 {new Date(yazi.tarih).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })}</span>
+          <span>⏱ {yazi.okumaSuresi} dk okuma</span>
+        </div>
+        <ShareButtons title={yazi.baslik} />
       </div>
 
       {/* İçerik — rahat okuma düzeni */}

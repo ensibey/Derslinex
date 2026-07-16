@@ -26,6 +26,8 @@ const formatLabel: Record<string, string> = {
   "her-ikisi": "Yüz Yüze & Online",
 };
 
+import ShareButtons from "@/components/ShareButtons";
+
 export default async function HocaProfilPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
   const hoca = getHocaBySlug(resolvedParams.slug);
@@ -36,14 +38,17 @@ export default async function HocaProfilPage({ params }: { params: Promise<{ slu
   return (
     <div className="bg-gray-50 min-h-screen text-gray-900">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Breadcrumb */}
-        <nav className="text-sm text-gray-500 mb-8 flex items-center gap-2">
-          <Link href="/" className="hover:text-primary-600">Ana Sayfa</Link>
-          <span>/</span>
-          <Link href="/hocalar" className="hover:text-primary-600">Hocalar</Link>
-          <span>/</span>
-          <span className="text-gray-900 font-medium">{hoca.isim}</span>
-        </nav>
+        {/* Breadcrumb & Share */}
+        <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">
+          <nav className="text-sm text-gray-500 flex items-center gap-2 font-bold">
+            <Link href="/" className="hover:text-primary-600">Ana Sayfa</Link>
+            <span>/</span>
+            <Link href="/hocalar" className="hover:text-primary-600">Hocalar</Link>
+            <span>/</span>
+            <span className="text-gray-900 font-black">{hoca.isim}</span>
+          </nav>
+          <ShareButtons title={`${hoca.isim} — ${hoca.dersler.join(", ")} Özel Ders`} />
+        </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Sol Kolon — Profil Kartı */}
