@@ -66,75 +66,157 @@ Hazırlık sürecinin ilk yarısında (genellikle eylül-aralık ayları arasın
   },
   {
     id: "4",
-    slug: "ayt-sayisal-puan-hesaplama",
-    baslik: "AYT Sayısal Puan Nasıl Hesaplanır? 2026 Güncel",
-    ozet: "Fizik, kimya, biyoloji ve matematik net sayılarından AYT Sayısal puanı nasıl hesaplanır? Örnek hesaplamalar ile anlıyoruz.",
-    icerik: `AYT Sayısal puanı, öğrencilerin mühendislik, tıp, mimarlık ve diğer sayısal lisans programlarına yerleşebilmesi için temel kriterdir. Sayısal puanı hesaplanırken TYT sınavının tamamı ile AYT sınavındaki iki spesifik test dikkate alınır.
+    slug: "yks-son-3-ay-kala-derece-yapilir-mi",
+    baslik: "YKS Son 3 Ay Kala Sıfırdan Derece Yapılır mı? (Yol Haritası)",
+    ozet: "Sınava az süre kala panikleyen öğrencilerin en çok arattığı kelime grubudur. Netleri hızla artıracak son aylar stratejisi.",
+    icerik: `Sınava son 3 ay kala sıfırdan derece yapmak, tamamen disiplin, strateji ve zamanı en verimli şekilde kullanma becerisine bağlıdır. Bu dönemde klasik çalışma yöntemlerini bir kenara bırakıp tamamen 'hedef odaklı' bir yol haritası çizmelisiniz.
 
-Sayısal Puanı Oluşturan Testlerin Ağırlıkları:
-- TYT (Toplam Etki %40): Türkçe, Temel Matematik, Sosyal Bilimler ve Fen Bilimleri testlerinden elde edilen toplam netler standart puan katsayılarıyla çarpılarak %40 ağırlıkla eklenir.
-- AYT Matematik (Etki %30): AYT sınavındaki 40 soruluk Matematik testi sayısal puanın en ağırlıklı dersidir. Her bir matematik neti sayısal puanınızı doğrudan yükseltir.
-- AYT Fen Bilimleri (Etki %30): 40 sorudan oluşan Fen Bilimleri testinin alt ders ağırlıkları şu şekildedir:
-  * Fizik (14 Soru): %10 etki
-  * Kimya (13 Soru): %10 etki
-  * Biyoloji (13 Soru): %10 etki
-
-Hesaplama Sürecinde Dikkat Edilmesi Gerekenler:
-1. OBP (Ortaöğretim Başarı Puanı) Etkisi: Lise diploma notunuz 5 ile çarpılarak OBP puanınız elde edilir. Bu puan da yerleştirme puanınıza 30 ile 60 puan arasında ek bir katkı sağlar. Diploma notunun yüksek olması, yığılmanın yoğun olduğu sıralamalarda binlerce adayın önüne geçmenize yardımcı olur.
-2. Netlerin Hesaplanması: Her testte 4 yanlış cevap 1 doğru cevabı götürür. Bu nedenle emin olmadığınız, hiçbir fikrinizin olmadığı soruları boş bırakmak netlerinizin korunması açısından daha mantıklıdır.`,
+Son 3 ayda netlerinizi patlatacak adımlar:
+1. Konu Eleme Stratejisi: Tüm müfredatı baştan sona çalışmaya çalışmak bu aşamada büyük bir hatadır. ÖSYM'nin son 10 yılda her sene kesinlikle sorduğu garanti konuları listelemelisiniz. Örneğin matematikten Problemler, Fonksiyonlar, Trigonometri ve Logaritma gibi her yıl yüksek soru getiren konulara odaklanmalısınız.
+2. Çıkmış Sorular Analizi: Son 5 yılın TYT ve AYT çıkmış sorularını mutlaka süre tutarak çözmelisiniz. ÖSYM'nin dilini anlamak, denemelerdeki gereksiz zor sorularda vakit kaybetmenizi önler.
+3. Bölüm Denemelerine Ağırlık Vermek: Genel denemelerin yanı sıra eksik olduğunuz alanlarda (örneğin sadece TYT Sosyal veya sadece AYT Matematik) her gün bölüm denemeleri çözmelisiniz. Analizlerin ardından yanlış yaptığınız konuları hemen o gün tekrar etmelisiniz.`,
     yazar: "Derslinex Editörü",
-    tarih: "2026-04-20",
-    kategori: "YKS Bilgi",
-    okumaSuresi: 5,
-    resim: "/blog/puan-hesap.jpg",
+    tarih: "2026-04-25",
+    kategori: "Çalışma Rehberleri",
+    okumaSuresi: 8,
+    resim: "/blog/matematik-rehber.jpg",
   },
   {
     id: "5",
-    slug: "online-ders-yuz-yuze-ders-karsilastirma",
-    baslik: "Online Ders mi Yüz Yüze Ders mi? Hangisi Daha Verimli?",
-    ozet: "YKS hazırlığında online ve yüz yüze dersin avantajları ve dezavantajları. Kendi öğrenme stilinize göre doğru tercihi yapın.",
-    icerik: `Eğitim teknolojilerinin gelişmesiyle birlikte online dersler, geleneksel yüz yüze derslerin en büyük alternatifi haline gelmiştir. YKS ve LGS gibi zorlu sınav süreçlerinde hangi formatın tercih edilmesi gerektiği öğrencinin çalışma disiplinine ve alışkanlıklarına göre değişir.
+    slug: "lgs-yeni-nesil-matematik-sorulari-nasil-cozulur",
+    baslik: "LGS Yeni Nesil Matematik Soruları Nasıl Çözülür? (Taktikler)",
+    ozet: "LGS hazırlığındaki öğrencilerin ve velilerin en büyük korkusu olan yeni nesil matematik sorularını çözmenin ipuçları.",
+    icerik: `LGS Matematik testindeki yeni nesil sorular, sadece formül bilmeyi değil, aynı zamanda okuduğunu anlama, görsel analiz ve mantıksal çıkarım yapma becerilerini de ölçer.
 
-Online Dersin Avantajları:
-- Zaman Tasarrufu: Yolda geçen süre, trafik stresi ve hazırlık aşamaları tamamen ortadan kalkar. Öğrenci dersten hemen önce masasına geçerek çalışmaya başlayabilir.
-- Türkiye Geneli Eğitmen Seçeneği: Coğrafi sınırları aşarak sadece kendi şehrinizdeki değil, Türkiye genelindeki en başarılı ve alanında marka olmuş öğretmenlerden ders alabilirsiniz.
-- Ders Kayıtları: Anlaşmalı online platformlarda yapılan dersler kaydedilerek öğrencinin konuyu tekrar etmek istediğinde istediği an yeniden izlemesine olanak tanır.
-
-Yüz Yüze Dersin Avantajları:
-- Yüksek Odaklanma: Öğretmen ile fiziksel olarak aynı ortamda bulunmak, dikkat dağınıklığını minimuma indirir. Öğrencinin dersten kopması veya telefona yönelmesi çok zordur.
-- Anlık Geri Bildirim: Soru çözerken yapılan hatalar, kalem oynatma tarzı ve işlem basamakları öğretmen tarafından anında fark edilerek düzeltilebilir.
-
-Hangisini Seçmeli?
-Kendi kendini motive edebilen, bilgisayar başında odaklanma sorunu yaşamayan ve zamandan tasarruf etmek isteyen öğrenciler için Online Ders biçilmiş kaftandır. Ancak dışsal bir disipline ihtiyaç duyan, ekran karşısında dikkati çabuk dağılan öğrencilerin yüz yüze dersleri tercih etmesi daha verimli sonuçlar doğurabilir.`,
+Yeni nesil sorularda başarıyı getiren teknikler:
+1. Soruyu Küçük Parçalara Bölün: Karşınızda upuzun, yarım sayfalık bir soru olduğunda panik yapmayın. Soruyu cümle cümle okuyun ve her cümleden elde ettiğiniz matematiksel bilgiyi yan tarafa küçük notlar halinde yazın.
+2. Görselleri ve Grafikleri İyi İnceleyin: Yeni nesil soruların çoğunda şema, tablo veya grafik bulunur. Çoğu zaman sorunun cevabı metinden ziyade bu görsellerin içinde gizlidir.
+3. Denklem Kurma Altyapısını Geliştirin: Problemi çözebilmek için metindeki sözel ifadeleri cebirsel ifadelere dönüştürmeyi öğrenmelisiniz. 'Hangi sayının 3 katının 5 fazlası' gibi temel kalıpları çok iyi kavramış olmalısınız.`,
     yazar: "Derslinex Editörü",
-    tarih: "2026-04-10",
-    kategori: "Ders Seçimi",
-    okumaSuresi: 7,
-    resim: "/blog/online-yuzyuze.jpg",
-  },
-  {
-    id: "6",
-    slug: "yks-turkce-soru-tipleri",
-    baslik: "TYT Türkçe Soru Tipleri ve Çözüm Stratejileri",
-    ozet: "Paragraf, dil bilgisi, ses bilgisi ve anlam bilgisi sorularının çözümünde uygulanabilecek pratik stratejiler.",
-    icerik: `TYT Türkçe testi 40 sorudan oluşur ve sınavın en önemli belirleyicilerinden biridir. Sadece Türkçe netlerini artırmakla kalmaz, aynı zamanda hızlı okuma ve anlama becerisi kazandırdığı için Matematik ve Sosyal Bilimler testlerindeki başarıyı da doğrudan etkiler.
-
-Türkçe Testindeki Temel Soru Dağılımı ve Stratejiler:
-
-1. Paragrafta Anlam ve Yardımcı Düşünce (Yaklaşık 26-30 Soru):
-Sınavın en büyük bölümünü okuduğunu anlama soruları oluşturur. Paragraf sorularını çözerken önce soru kökünü okuyarak sizden ne istendiğini netleştirin, ardından paragrafı okumaya başlayın. Şıkları elerken kendi yorumunuzu katmamaya, sadece metinde verilen bilgilere bağlı kalmaya özen gösterin.
-
-2. Dil Bilgisi (Yaklaşık 6-8 Soru):
-Sözcük türleri (isim, sıfat, fiil vb.), cümlenin ögeleri, yazım kuralları ve noktalama işaretleri gibi konulardan oluşur. Dil bilgisi tamamen kurala dayalıdır ve net bilgi gerektirir. Yazım kuralları ve noktalama işaretleri konularından her yıl kesinlikle 2'şer soru çıkmaktadır; bu konuları ihmal etmemelisiniz.
-
-3. Sözcükte ve Cümlede Anlam (Yaklaşık 4-6 Soru):
-Boşluk doldurma, altı çizili söz öbeğinin anlamını bulma ve kesin yargı çıkarma soru tiplerini barındırır. Bu sorularda sözcüklerin mecaz anlamlarına ve cümlenin bağlamına dikkat etmek gerekir. Altı çizili söz öbeklerini değerlendirirken cümlenin tamamını okumak, kelimenin o cümlede kazandığı anlamı bulmak açısından kritiktir.`,
-    yazar: "Derslinex Editörü",
-    tarih: "2026-03-25",
-    kategori: "Ders Rehberleri",
+    tarih: "2026-04-18",
+    kategori: "LGS Rehberliği",
     okumaSuresi: 9,
     resim: "/blog/turkce.jpg",
   },
+  {
+    id: "6",
+    slug: "yks-netlerim-neden-artmiyor",
+    baslik: "YKS Netlerim Neden Artmıyor? (Net Platosunu Aşmak)",
+    ozet: "Özellikle 60-70 TYT net bandında tıkanan öğrencilerin düştüğü motivasyon kaybı ve çözüm yolları.",
+    icerik: `Çalıştığınız halde netlerinizin belli bir seviyede çakılı kalması (Net Platosu) YKS hazırlık sürecinde her öğrencinin başına gelebilecek doğal bir durumdur. Bu eşiği aşmak için çalışma tarzınızda köklü değişiklikler yapmanız gerekir.
+
+Net tıkanıklığını aşmak için şu yöntemleri deneyin:
+1. Detaylı Yanlış Defteri Tutun: Son 5 denemenizi masaya yatırın. Yanlış yaptığınız veya boş bıraktığınız soruların hangi konulardan geldiğini tek tek yazın. Eğer sürekli aynı konulardan (örneğin Türkçe Anlatım Bozukluğu veya Matematik Olasılık) yanlış yapıyorsanız, o konuyu henüz öğrenmemişsiniz demektir.
+2. Süre Yönetimi Analizi: Netlerinizin artmamasının sebebi bilgi eksikliği değil, süre yetiştirememe sorunu olabilir. Sınavda hangi derse kaç dakika harcadığınızı deneme esnasında kronometre ile ölçün.
+3. Zorluk Seviyesini Değiştirin: Sürekli kolay veya orta seviye kaynaklardan soru çözmek gelişiminizi durdurur. Haftada en az bir adet zor seviye branş denemesi çözerek sınırlarınızı zorlayın.`,
+    yazar: "Derslinex Editörü",
+    tarih: "2026-04-12",
+    kategori: "Çalışma Teknikleri",
+    okumaSuresi: 7,
+    resim: "/blog/program.jpg",
+  },
+  {
+    id: "7",
+    slug: "ayt-esit-agirlikta-ilk-10-bin-icin-ders-siralamasi",
+    baslik: "AYT Eşit Ağırlıkta İlk 10 Bin İçin Ders Çalışma Sıralaması",
+    ozet: "Hukuk, psikoloji ve işletme hedefleyen eşit ağırlık öğrencileri için ders dağılımı ve haftalık deneme sıklığı.",
+    icerik: `AYT Eşit Ağırlık alanında ilk 10 bin dereceyi hedefleyen bir öğrencinin başarısı, Matematik ile Edebiyat-Sosyal-1 testleri arasındaki kusursuz dengeye bağlıdır.
+
+Derece getiren ders çalışma hiyerarşisi:
+- Matematik Sizi Öne Geçirir: Eşit ağırlıkçılar arasında fark yaratan ders her zaman AYT Matematiktir. Edebiyatı herkes bir şekilde halledebilirken, matematikte 30+ net yapan öğrenciler doğrudan ilk 5 bine girmektedir.
+- Edebiyat ve Tarih Çalışma Sırası: Edebiyat ezber gerektirdiği için hazırlık sürecinin başından sonuna kadar düzenli tekrarlarla götürülmelidir. Cumhuriyet Dönemi ve Divan Edebiyatı gibi yüksek soru getiren dönemlere özel kartlar hazırlayarak çalışmalısınız.
+- Haftalık Plan: Haftada en az 3 gün AYT Matematik, 2 gün Edebiyat ve Tarih-Coğrafya çalışması yapmalısınız. Son 2 ay kala ise her gün 1 adet Eşit Ağırlık denemesi çözülmelidir.`,
+    yazar: "Derslinex Editörü",
+    tarih: "2026-04-05",
+    kategori: "Çalışma Rehberleri",
+    okumaSuresi: 8,
+    resim: "/blog/puan-hesap.jpg",
+  },
+  {
+    id: "8",
+    slug: "lgs-sozel-bolumde-full-yapmanin-yollari",
+    baslik: "LGS Sözel Bölümde Full Yapmanın Yolları: Türkçe ve İnkılap",
+    ozet: "LGS sözel testlerinde Türkçe, İnkılap Tarihi, Din Kültürü ve İngilizce derslerinden sıfır hata yapmanın ipuçları.",
+    icerik: `LGS'de yüksek puanlı fen liselerini hedefleyen adaylar için sözel bölümü tam (full) netle tamamlamak çok büyük bir avantaj sağlar. Sözel derslerin katsayısı sayısal kadar yüksek görünmese de, standart sapma ve toplam puana etkisi yadsınamaz.
+
+Sözel bölümü sıfır hata ile bitirmenin yolları:
+1. Türkçe Sözel Mantık Soruları: Her yıl Türkçe testinde 2-3 adet sözel mantık ve muhakeme sorusu çıkar. Bu soruları çözmek için mutlaka tablo çizme tekniğini öğrenmeli ve verileri tabloya doğru yerleştirmelisiniz.
+2. İnkılap Tarihinde Kavram Bilgisi: İnkılap Tarihi soruları sadece bilgi ezberi değil, aynı zamanda paragraf yorumlamadır. 'Milli egemenlik', 'milli bağımsızlık', 'mandacılık' gibi temel kavramları adınız gibi bilmelisiniz.
+3. İngilizce Kelime Defteri: LGS İngilizce soruları tamamen kelime bilgisine dayalıdır. Her ünitedeki önemli kelimeleri küçük kartlara yazıp oda duvarınıza asarak her gün tekrar edebilirsiniz.`,
+    yazar: "Derslinex Editörü",
+    tarih: "2026-03-29",
+    kategori: "LGS Rehberliği",
+    okumaSuresi: 7,
+    resim: "/blog/turkce.jpg",
+  },
+  {
+    id: "9",
+    slug: "lgs-sayisal-bolum-suresi-nasil-verimli-kullanilir",
+    baslik: "LGS Sayısal Bölüm Süresi Nasıl Verimli Kullanılır? (80 Dakika)",
+    ozet: "LGS sayısal oturumundaki 80 dakikada matematik ve fen sorularını yetiştirme ve zamanı yönetme kılavuzu.",
+    icerik: `LGS'nin sayısal oturumunda öğrencilere Matematik (20 soru) ve Fen Bilimleri (20 soru) için toplam 80 dakika süre verilir. Soru başına 2 dakika düşse de, yeni nesil matematik sorularının uzunluğu nedeniyle çoğu öğrenci süreyi yetiştiremez.
+
+Zaman yönetimi için altın kurallar:
+1. Fen Bilimleri Testinden Başlayın: Fen Bilimleri soruları matematiğe göre genellikle daha hızlı çözülür. İlk 20-25 dakikada Fen Bilimleri testini bitirip cebinize 20 net koyarak sınava başlamak, üzerinizdeki stresi azaltır ve matematiğe daha fazla süre kalmasını sağlar.
+2. Turlama Tekniğini Uygulayın: İlk okumada karmaşık gelen, uzun hesaplama gerektiren matematik sorularıyla inatlaşmayın. Soruya yıldız koyup hemen bir sonraki soruya geçin. Kolay soruları bitirdikten sonra kalan sürede zor sorulara geri dönebilirsiniz.
+3. Saat Kontrolü: Her 5 soruda bir optik forma işaretleme yaparken saate göz atın. Sürenin gerisinde kaldıysanız hızınızı ayarlayın.`,
+    yazar: "Derslinex Editörü",
+    tarih: "2026-03-22",
+    kategori: "LGS Rehberliği",
+    okumaSuresi: 6,
+    resim: "/blog/online-yuzyuze.jpg",
+  },
+  {
+    id: "10",
+    slug: "mezuna-kalmak-2-yilda-yks-nasil-kazanilir",
+    baslik: "Mezuna Kalmak: 2. Yılda YKS Nasıl Kazanılır? (Mezun Rehberi)",
+    ozet: "Sınav hedefine ulaşamayıp mezuna kalmaya karar veren adaylar için psikolojik ve teknik destek yazısı.",
+    icerik: `Mezuna kalmak dünyanın sonu değil, tam aksine hatalarınızdan ders çıkararak hayalinizdeki üniversite ve bölüme yerleşmek için verilmiş ikinci bir şanstır. Ancak mezun yılında başarılı olmanın yolu, ilk sene yapılan hataları tekrarlamamaktan geçer.
+
+Mezun yılında izlenmesi gereken stratejiler:
+1. Dürüst Bir Öz eleştiri Yapın: İlk yıl neden başarısız olduğunuzu analiz edin. Yeterince ders çalışmadınız mı? Süre yönetimini mi yapamadınız? Yoksa bazı dersleri (örneğin Geometri veya Kimya) tamamen elediniz mi? Bu eksikleri netleştirip çalışma planınızı buna göre şekillendirin.
+2. Konu Eksiğiniz Olmadığı Yanılgısından Kurtulun: Mezun öğrencilerin en büyük hatası 'ben bu konuyu biliyorum' diyerek konu anlatımlarını atlayıp sadece soru çözmeye çalışmaktır. Unuttuğunuz detaylar olabileceğini unutmayın, özellikle AYT konularını sıfırdan olmasa da hızlı bir konu tekrarıyla gözden geçirmelisiniz.
+3. Sosyal Medya ve Çevre Detoksu: Mezun yılında arkadaşlarınızın üniversiteye gitmiş olması üzerinizde psikolojik baskı yaratabilir. Bu süreçte sosyal medyadan uzak durmak ve odağınızı sadece hedefinize kilitlemek ruh sağlığınız için en iyisidir.`,
+    yazar: "Derslinex Editörü",
+    tarih: "2026-03-15",
+    kategori: "Çalışma Teknikleri",
+    okumaSuresi: 9,
+    resim: "/blog/program.jpg",
+  },
+  {
+    id: "11",
+    slug: "lgs-calisma-programi-nasil-hazirlanir-ortaokul",
+    baslik: "LGS Çalışma Programı Nasıl Hazırlanır? (8. Sınıf Özel)",
+    ozet: "LGS adayları için okul dersleri, ödevler ve sınav hazırlığını dengede tutacak haftalık ders çalışma şablonu.",
+    icerik: `LGS hazırlığı yürüten 8. sınıf öğrencilerinin en büyük zorluğu, okul yazılı sınavları, ev ödevleri ve LGS hazırlığını aynı anda yürütmektir. Planlı bir program olmadan bu yoğun tempoyu kaldırmak zordur.
+
+Verimli bir LGS programının temel özellikleri:
+1. Okul Sonrası Dinlenme Payı: Okuldan eve geldikten sonra hemen masaya oturmak yerine en az 1-1.5 saat dinlenmeli ve zihninizi boşaltmalısınız.
+2. Günlük Soru Hedefleri: Sayısal derslerden (Matematik-Fen) günlük en az 30-40, sözel derslerden ise 40-50 soru çözmeyi hedefleyin. Soru sayısından ziyade, çözemediğiniz soruların doğru cevaplarını öğrenmek daha önemlidir.
+3. Düzenli Paragraf Rutini: LGS Türkçe testinin neredeyse tamamı okuduğunu anlamadır. Programınızda her gün istisnasız 15-20 paragraf sorusu yer almalıdır.`,
+    yazar: "Derslinex Editörü",
+    tarih: "2026-03-08",
+    kategori: "LGS Rehberliği",
+    okumaSuresi: 8,
+    resim: "/blog/turkce.jpg",
+  },
+  {
+    id: "12",
+    slug: "lgs-velilerine-tavsiyeler-kaygi-yonetimi",
+    baslik: "LGS Velilerine Tavsiyeler: Sınav Kaygısı ve Aile İçi İletişim",
+    ozet: "LGS sürecinde anne ve babaların yapması gerekenler. Çocukları strese sokmadan destek olmanın yolları.",
+    icerik: `LGS, sadece 8. sınıf öğrencileri için değil, tüm aile için stresli bir süreçtir. Anne ve babaların sınav sürecindeki tutumları, öğrencilerin başarısını ve psikolojisini doğrudan etkiler.
+
+LGS velilerinin dikkat etmesi gereken önemli kurallar:
+1. Kıyaslamalardan Uzak Durun: Çocuğunuzun deneme sonuçlarını komşunun, akrabanın veya sınıf arkadaşlarının netleriyle kıyaslamak çocukta değersizlik ve yetersizlik hissi yaratır. Kıyaslamayı sadece kendi geçmiş netleriyle yapmalısınız.
+2. Sınavı Hayatın Merkezine Koymayın: Evdeki tüm sohbetlerin, planların ve günlük rutinlerin sadece LGS etrafında dönmesi çocuğun kaygı seviyesini tavan yaptırır. Sınav dışı konulara da evde yer açın.
+3. Destekleyici Olun: Çocuğunuza sınav sonucu ne olursa olsun onu sevmeye devam edeceğinizi ve onun çabasının sizin için en değerli şey olduğunu hissettirin. Güven duygusu, sınav kaygısını en çok azaltan faktördür.`,
+    yazar: "Derslinex Editörü",
+    tarih: "2026-03-01",
+    kategori: "LGS Rehberliği",
+    okumaSuresi: 7,
+    resim: "/blog/online-yuzyuze.jpg",
+  }
 ];
 
 export function getBlogBySlug(slug: string): BlogYazisi | undefined {
