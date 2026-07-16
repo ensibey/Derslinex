@@ -51,8 +51,34 @@ const stats = [
 export default function HomePage() {
   const oneHocalar = hocalar.filter((h) => h.aktif).slice(0, 3);
 
+  // Google SEO Starter Guide: Structured Data (JSON-LD) for LocalBusiness & EducationOrganization
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "EducationalOrganization",
+    "name": "Derslinex",
+    "url": "https://derslinex.com",
+    "logo": "https://derslinex.com/logo.png",
+    "description": "YKS ve LGS sınav hazırlığı için Türkiye'nin en iyi hocalarından online özel ders ve birebir ders alın.",
+    "telephone": "+905342407519",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "TR",
+      "addressLocality": "Istanbul"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "reviewCount": "120"
+    }
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       {/* Hero */}
       <section className="relative overflow-hidden bg-[#FAF8F5] pt-20 pb-28 px-4 border-b border-[#EFECE6]">
         {/* Glow & Academic Pattern Mockups */}
