@@ -6,7 +6,6 @@ import { waLink } from "@/lib/utils";
 export default function SidebarDrawer() {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [tavsiyeIdx, setTavsiyeIdx] = useState(0);
   const [wizardStep, setWizardStep] = useState<"category" | "subject">("category");
   const [selectedCategory, setSelectedCategory] = useState<"YKS" | "LGS" | "">("");
   const [selectedSubject, setSelectedSubject] = useState("");
@@ -89,112 +88,6 @@ export default function SidebarDrawer() {
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto min-h-0 p-6 space-y-6 scrollbar-thin">
-          {/* Sınav Geri Sayım Progress Barları */}
-          <div className="bg-white border border-[#EFECE6] rounded-2xl p-4 space-y-4">
-            <span className="text-[10px] font-black text-[#D97706] uppercase tracking-widest block">
-              ⏳ 2026 SINAV SAYAÇLARI
-            </span>
-            
-            {/* YKS Progress */}
-            <div>
-              <div className="flex justify-between items-center text-xs font-bold mb-1.5">
-                <span className="text-[#1E3A8A]">YKS 2026 (20 Haziran)</span>
-                <span className="text-gray-500">
-                  {(() => {
-                    const target = new Date("June 20, 2026 10:00:00").getTime();
-                    const start = new Date("September 1, 2025").getTime();
-                    const now = new Date().getTime();
-                    const total = target - start;
-                    const elapsed = now - start;
-                    const pct = Math.min(100, Math.max(0, Math.floor((elapsed / total) * 100)));
-                    const days = Math.max(0, Math.floor((target - now) / (1000 * 60 * 60 * 24)));
-                    return `%${pct} tamamlandı (${days} gün kaldı)`;
-                  })()}
-                </span>
-              </div>
-              <div className="w-full h-2.5 bg-[#FAF8F5] border border-[#EFECE6] rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-[#D97706] to-amber-500 rounded-full transition-all duration-1000"
-                  style={{
-                    width: (() => {
-                      const target = new Date("June 20, 2026 10:00:00").getTime();
-                      const start = new Date("September 1, 2025").getTime();
-                      const now = new Date().getTime();
-                      return `${Math.min(100, Math.max(0, Math.floor(((now - start) / (target - start)) * 100)))}%`;
-                    })()
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* LGS Progress */}
-            <div>
-              <div className="flex justify-between items-center text-xs font-bold mb-1.5">
-                <span className="text-[#1E3A8A]">LGS 2026 (7 Haziran)</span>
-                <span className="text-gray-500">
-                  {(() => {
-                    const target = new Date("June 7, 2026 09:30:00").getTime();
-                    const start = new Date("September 1, 2025").getTime();
-                    const now = new Date().getTime();
-                    const total = target - start;
-                    const elapsed = now - start;
-                    const pct = Math.min(100, Math.max(0, Math.floor((elapsed / total) * 100)));
-                    const days = Math.max(0, Math.floor((target - now) / (1000 * 60 * 60 * 24)));
-                    return `%${pct} tamamlandı (${days} gün kaldı)`;
-                  })()}
-                </span>
-              </div>
-              <div className="w-full h-2.5 bg-[#FAF8F5] border border-[#EFECE6] rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-1000"
-                  style={{
-                    width: (() => {
-                      const target = new Date("June 7, 2026 09:30:00").getTime();
-                      const start = new Date("September 1, 2025").getTime();
-                      const now = new Date().getTime();
-                      return `${Math.min(100, Math.max(0, Math.floor(((now - start) / (target - start)) * 100)))}%`;
-                    })()
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Tavsiye Motoru */}
-          <div className="bg-[#FAF0E3] border border-[#F5D0A9] rounded-2xl p-4 flex flex-col">
-            <span className="text-[10px] font-black text-[#B45309] uppercase tracking-widest block mb-2">
-              🎯 GÜNÜN TAVSİYESİ & MOTİVASYONU
-            </span>
-            <div className="bg-white/80 rounded-xl p-3.5 border border-[#FAF0E3] min-h-[90px] flex items-center justify-center text-center transition-all duration-300">
-              <p className="text-xs font-bold text-gray-700 leading-relaxed">
-                {(() => {
-                  const tavsiyeler = [
-                    "TYT Matematik netlerini artırmak için her gün mutlaka 20 problem çözmelisin! 📐",
-                    "Uykunu düzene sokmak sınav sabahı odaklanmanı %30 artırır! ⏰",
-                    "Paragraf sorularını süre tutarak çözmek sınavda sana fazladan 20 dakika kazandırır! 📚",
-                    "Yanlış yaptığın soruların çözümünü öğrenmeden asla başka konuya geçme! 🔍",
-                    "Haftada bir gün tam TYT denemesi çözmek sınav provası için hayati önem taşır! ⏳",
-                    "Formülleri ezberlemek yerine ispatını ve mantığını öğrenmeye çalış! 🧪",
-                    "LGS'de yeni nesil soruları çözebilmek için kitap okuma alışkanlığını sakın aksatma! 📖",
-                    "Masadan kalkmadan önce son 10 dakika sadece yaptığın hataları gözden geçir! ✍️",
-                    "AYT sayısalda başarılı olmanın sırrı bol bol pratik ve limit-türev-integral üçlüsüdür! 📐",
-                    "Kendine inan! Sınav hazırlığı bir sprint değil, disiplinli bir maratondur. 🏃‍♂️"
-                  ];
-                  // State tanımlayarak tıklama ile güncelleme mekanizması
-                  return tavsiyeler[tavsiyeIdx];
-                })()}
-              </p>
-            </div>
-            <button
-              onClick={() => {
-                setTavsiyeIdx((prev) => (prev + 1) % 10);
-              }}
-              className="mt-3 bg-white hover:bg-amber-50 text-[#B45309] border border-[#F5D0A9] text-xs font-black py-2 rounded-xl transition-all shadow-sm active:scale-95 text-center block"
-            >
-              🔄 Başka Bir Tavsiye Gör
-            </button>
-          </div>
-
           {/* 3 Saniyede Hoca Sihirbazı */}
           <div className="bg-white border border-[#EFECE6] rounded-2xl p-4 flex flex-col space-y-3.5 shadow-sm">
             <div className="flex justify-between items-center">
