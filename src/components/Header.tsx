@@ -5,11 +5,12 @@ import { useState, useEffect } from "react";
 import { waLink } from "@/lib/utils";
 
 const navLinks = [
-  { href: "/hocalar", label: "Hocalar" },
+  { href: "/hakkimizda", label: "Hakkımızda" },
+  { href: "/hocalar", label: "Öğretmenlerimiz" },
   { href: "/dersler", label: "Dersler" },
   { href: "/yks-hazirlik", label: "YKS Hazırlık" },
+  { href: "/lgs-hazirlik", label: "LGS Hazırlık" },
   { href: "/blog", label: "Blog" },
-  { href: "/hakkimizda", label: "Hakkımızda" },
   { href: "/iletisim", label: "İletişim" },
 ];
 

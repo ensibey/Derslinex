@@ -10,6 +10,8 @@ import AdvantageSlider from "@/components/AdvantageSlider";
 import SubjectSearchWidget from "@/components/SubjectSearchWidget";
 import { waLink } from "@/lib/utils";
 
+import MiniCountdown from "@/components/MiniCountdown";
+
 export const metadata: Metadata = {
   title: "Derslinex | YKS Hazırlık — Uzman Hocalar, Online & Yüz Yüze Ders",
   description:
@@ -62,9 +64,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto grid lg:grid-cols-12 gap-12 items-center relative z-10">
           {/* Left Column: Info & Action */}
           <div className="lg:col-span-7 text-left">
-            <div className="inline-flex items-center gap-2 bg-[#FAF0E3] border border-[#F5D0A9] text-[#B45309] text-xs font-black px-4 py-2 rounded-full mb-6 uppercase tracking-widest shadow-sm">
-              <span>🎓</span> YKS 2026 AKADEMİK DÖNEMİ
-            </div>
+            <MiniCountdown />
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight mb-6 tracking-tight text-[#1E3A8A]">
               YKS'de Hedeflediğin <br />
               <span className="text-[#D97706] relative">
