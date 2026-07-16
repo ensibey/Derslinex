@@ -11,9 +11,9 @@ const dersLinks = [
   { href: "/dersler/ingilizce-yks", label: "İngilizce (YDT)" },
 ];
 
-export default function Footer() {
+export default function Footer({ className }: { className?: string }) {
   return (
-    <footer className="bg-[#1E3A8A] text-white mt-20">
+    <footer className={`bg-[#1E3A8A] text-white mt-20 ${className || ""}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Brand */}
