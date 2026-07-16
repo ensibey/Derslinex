@@ -6,6 +6,7 @@ import { waLink } from "@/lib/utils";
 export default function SidebarDrawer() {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [tavsiyeIdx, setTavsiyeIdx] = useState(0);
 
   useEffect(() => {
     setMounted(true);
@@ -154,6 +155,41 @@ export default function SidebarDrawer() {
                 />
               </div>
             </div>
+          </div>
+
+          {/* Tavsiye Motoru */}
+          <div className="bg-[#FAF0E3] border border-[#F5D0A9] rounded-2xl p-4 flex flex-col">
+            <span className="text-[10px] font-black text-[#B45309] uppercase tracking-widest block mb-2">
+              🎯 GÜNÜN TAVSİYESİ & MOTİVASYONU
+            </span>
+            <div className="bg-white/80 rounded-xl p-3.5 border border-[#FAF0E3] min-h-[90px] flex items-center justify-center text-center transition-all duration-300">
+              <p className="text-xs font-bold text-gray-700 leading-relaxed">
+                {(() => {
+                  const tavsiyeler = [
+                    "TYT Matematik netlerini artırmak için her gün mutlaka 20 problem çözmelisin! 📐",
+                    "Uykunu düzene sokmak sınav sabahı odaklanmanı %30 artırır! ⏰",
+                    "Paragraf sorularını süre tutarak çözmek sınavda sana fazladan 20 dakika kazandırır! 📚",
+                    "Yanlış yaptığın soruların çözümünü öğrenmeden asla başka konuya geçme! 🔍",
+                    "Haftada bir gün tam TYT denemesi çözmek sınav provası için hayati önem taşır! ⏳",
+                    "Formülleri ezberlemek yerine ispatını ve mantığını öğrenmeye çalış! 🧪",
+                    "LGS'de yeni nesil soruları çözebilmek için kitap okuma alışkanlığını sakın aksatma! 📖",
+                    "Masadan kalkmadan önce son 10 dakika sadece yaptığın hataları gözden geçir! ✍️",
+                    "AYT sayısalda başarılı olmanın sırrı bol bol pratik ve limit-türev-integral üçlüsüdür! 📐",
+                    "Kendine inan! Sınav hazırlığı bir sprint değil, disiplinli bir maratondur. 🏃‍♂️"
+                  ];
+                  // State tanımlayarak tıklama ile güncelleme mekanizması
+                  return tavsiyeler[tavsiyeIdx];
+                })()}
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                setTavsiyeIdx((prev) => (prev + 1) % 10);
+              }}
+              className="mt-3 bg-white hover:bg-amber-50 text-[#B45309] border border-[#F5D0A9] text-xs font-black py-2 rounded-xl transition-all shadow-sm active:scale-95 text-center block"
+            >
+              🔄 Başka Bir Tavsiye Gör
+            </button>
           </div>
 
           {/* Quick Links Section */}
