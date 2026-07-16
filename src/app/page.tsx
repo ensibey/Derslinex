@@ -13,9 +13,9 @@ import { waLink } from "@/lib/utils";
 import MiniCountdown from "@/components/MiniCountdown";
 
 export const metadata: Metadata = {
-  title: "Derslinex | YKS Hazırlık — Uzman Hocalar, Online & Yüz Yüze Ders",
+  title: "Derslinex | Online Özel Ders & Birebir YKS LGS Hazırlık",
   description:
-    "YKS hazırlığında uzman hocalarla çalışın. TYT, AYT Sayısal, Sözel, EA ve Dil için online veya yüz yüze özel ders. WhatsApp ile hemen başlayın.",
+    "YKS ve LGS sınav hazırlığı için Türkiye'nin en iyi hocalarından online özel ders ve birebir ders alın. TYT, AYT, LGS Matematik, Fizik, Türkçe ve Kimya online eğitim.",
 };
 
 const faqItems = [

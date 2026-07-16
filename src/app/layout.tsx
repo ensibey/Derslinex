@@ -11,22 +11,23 @@ const inter = Inter({ subsets: ["latin", "latin-ext"], variable: "--font-inter" 
 export const metadata: Metadata = {
   metadataBase: new URL("https://derslinex.com"),
   title: {
-    default: "Derslinex | YKS Hazırlık — Uzman Hocalar, Online & Yüz Yüze Ders",
+    default: "Derslinex | Online Özel Ders & Birebir YKS LGS Hazırlık",
     template: "%s | Derslinex",
   },
   description:
-    "YKS hazırlığında Türkiye'nin en iyi hocalarıyla çalışın. TYT, AYT Sayısal, Sözel, EA ve Dil için online ve yüz yüze özel ders platformu. WhatsApp ile hemen başlayın.",
+    "YKS ve LGS hazırlığında Türkiye'nin en iyi hocalarından online özel ders ve birebir ders alın. Matematik, Fizik, Türkçe ve Kimya derslerinde online birebir eğitim. WhatsApp ile hemen başlayın.",
   keywords: [
-    "yks hazırlık", "yks özel ders", "tyt hazırlık", "ayt sayısal",
-    "online yks dersi", "yüz yüze yks dersi", "derslinex",
-    "matematik yks", "fizik yks", "derslinex eğitim",
+    "online özel ders", "online ders", "birebir özel ders", "yks hazırlık", 
+    "yks özel ders", "lgs özel ders", "lgs online ders", "birebir ders", 
+    "tyt hazırlık", "ayt sayısal özel ders", "matematik online özel ders", 
+    "fizik online ders", "derslinex online eğitim", "özel ders fiyatları"
   ],
   robots: { index: true, follow: true },
   verification: { google: "google5716913a2e6e8126" },
   openGraph: {
     type: "website",
-    title: "Derslinex | YKS Hazırlık",
-    description: "YKS hazırlığında Türkiye'nin en iyi hocalarıyla çalışın. Online ve yüz yüze özel ders.",
+    title: "Derslinex | Online Özel Ders & Birebir YKS LGS Hazırlık",
+    description: "Türkiye'nin en iyi hocalarından online özel ders ve birebir ders alın. Online birebir eğitim.",
     images: [
       {
         url: "/logo.png?v=7",
