@@ -53,18 +53,9 @@ export default function Header() {
               <Link
                 key={l.href}
                 href={l.href}
-                className="text-sm font-bold text-[#1E3A8A]/80 hover:text-[#D97706] transition-colors flex items-center gap-1.5"
+                className="text-sm font-bold text-[#1E3A8A]/80 hover:text-[#D97706] transition-colors"
               >
                 {l.label}
-                {l.href === "/yks-hazirlik" && (
-                  <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-[9px] font-black px-1.5 py-0.5 rounded-full border border-emerald-200">
-                    <span className="relative flex h-1.5 w-1.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-                    </span>
-                    CANLI
-                  </span>
-                )}
               </Link>
             ))}
           </nav>
