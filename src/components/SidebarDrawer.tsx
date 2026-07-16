@@ -85,6 +85,77 @@ export default function SidebarDrawer() {
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto min-h-0 p-6 space-y-6 scrollbar-thin">
+          {/* Sınav Geri Sayım Progress Barları */}
+          <div className="bg-white border border-[#EFECE6] rounded-2xl p-4 space-y-4">
+            <span className="text-[10px] font-black text-[#D97706] uppercase tracking-widest block">
+              ⏳ 2026 SINAV SAYAÇLARI
+            </span>
+            
+            {/* YKS Progress */}
+            <div>
+              <div className="flex justify-between items-center text-xs font-bold mb-1.5">
+                <span className="text-[#1E3A8A]">YKS 2026 (20 Haziran)</span>
+                <span className="text-gray-500">
+                  {(() => {
+                    const target = new Date("June 20, 2026 10:00:00").getTime();
+                    const start = new Date("September 1, 2025").getTime();
+                    const now = new Date().getTime();
+                    const total = target - start;
+                    const elapsed = now - start;
+                    const pct = Math.min(100, Math.max(0, Math.floor((elapsed / total) * 100)));
+                    const days = Math.max(0, Math.floor((target - now) / (1000 * 60 * 60 * 24)));
+                    return `%${pct} tamamlandı (${days} gün kaldı)`;
+                  })()}
+                </span>
+              </div>
+              <div className="w-full h-2.5 bg-[#FAF8F5] border border-[#EFECE6] rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-[#D97706] to-amber-500 rounded-full transition-all duration-1000"
+                  style={{
+                    width: (() => {
+                      const target = new Date("June 20, 2026 10:00:00").getTime();
+                      const start = new Date("September 1, 2025").getTime();
+                      const now = new Date().getTime();
+                      return `${Math.min(100, Math.max(0, Math.floor(((now - start) / (target - start)) * 100)))}%`;
+                    })()
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* LGS Progress */}
+            <div>
+              <div className="flex justify-between items-center text-xs font-bold mb-1.5">
+                <span className="text-[#1E3A8A]">LGS 2026 (7 Haziran)</span>
+                <span className="text-gray-500">
+                  {(() => {
+                    const target = new Date("June 7, 2026 09:30:00").getTime();
+                    const start = new Date("September 1, 2025").getTime();
+                    const now = new Date().getTime();
+                    const total = target - start;
+                    const elapsed = now - start;
+                    const pct = Math.min(100, Math.max(0, Math.floor((elapsed / total) * 100)));
+                    const days = Math.max(0, Math.floor((target - now) / (1000 * 60 * 60 * 24)));
+                    return `%${pct} tamamlandı (${days} gün kaldı)`;
+                  })()}
+                </span>
+              </div>
+              <div className="w-full h-2.5 bg-[#FAF8F5] border border-[#EFECE6] rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-1000"
+                  style={{
+                    width: (() => {
+                      const target = new Date("June 7, 2026 09:30:00").getTime();
+                      const start = new Date("September 1, 2025").getTime();
+                      const now = new Date().getTime();
+                      return `${Math.min(100, Math.max(0, Math.floor(((now - start) / (target - start)) * 100)))}%`;
+                    })()
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Quick Links Section */}
           <div className="flex flex-col">
             <span className="text-[10px] font-black text-[#D97706] uppercase tracking-widest block mb-3">
