@@ -1,14 +1,45 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { waLink } from "@/lib/utils";
+
+// Soru dağılım verisi
+const soruDagilimlari = {
+  YKS: [
+    { ders: "Türkçe", soru: 40, detay: "Paragraf, Dil Bilgisi" },
+    { ders: "Temel Matematik", soru: 40, detay: "Sayılar, Problemler, Geometri" },
+    { ders: "Sosyal Bilimler", soru: 20, detay: "Tarih, Coğ, Fel, Din" },
+    { ders: "Fen Bilimleri", soru: 20, detay: "Fizik, Kimya, Biyoloji" },
+    { ders: "AYT Matematik", soru: 40, detay: "Matematik & Geometri" },
+    { ders: "AYT Fen", soru: 40, detay: "Fizik (14), Kimya (13), Biyo (13)" }
+  ],
+  LGS: [
+    { ders: "Türkçe", soru: 20, detay: "Okuduğunu Anlama, Dil Bilgisi" },
+    { ders: "Matematik", soru: 20, detay: "Sayısal Akıl Yürütme, Yeni Nesil" },
+    { ders: "Fen Bilimleri", soru: 20, detay: "Deney & Çıkarım Soruları" },
+    { ders: "T.C. İnkılap Tarihi", soru: 10, detay: "Atatürkçülük ve İnkılap" },
+    { ders: "Din Kültürü", soru: 10, detay: "Temel Ahlaki Kavramlar" },
+    { ders: "Yabancı Dil (İng)", soru: 10, detay: "Kelime Bilgisi, Okuma" }
+  ]
+};
 
 export default function SidebarDrawer() {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  
+  // Sihirbaz Eyaletleri
   const [wizardStep, setWizardStep] = useState<"category" | "subject">("category");
   const [selectedCategory, setSelectedCategory] = useState<"YKS" | "LGS" | "">("");
   const [selectedSubject, setSelectedSubject] = useState("");
+
+  // Soru Dağılımları Sekmesi Eyaletleri
+  const [openSoruAlan, setOpenSoruAlan] = useState<"YKS" | "LGS" | null>(null);
+
+  // Pomodoro Eyaletleri
+  const [pomoTime, setPomoTime] = useState(1500); // 25 dakika = 1500 saniye
+  const [pomoActive, setPomoActive] = useState(false);
+  const [pomoMode, setPomoMode] = useState<"work" | "break">("work");
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -33,6 +64,49 @@ export default function SidebarDrawer() {
     };
   }, [isOpen, mounted]);
 
+  // Pomodoro Timer Mantığı
+  useEffect(() => {
+    if (pomoActive) {
+      timerRef.current = setInterval(() => {
+        setPomoTime((prev) => {
+          if (prev <= 1) {
+            clearInterval(timerRef.current!);
+            setPomoActive(false);
+            // Mod değiştir
+            if (pomoMode === "work") {
+              alert("Tebrikler! Çalışma seansı bitti. Şimdi 5 dakika mola zamanı. 🎉");
+              setPomoMode("break");
+              return 300; // 5 dk mola
+            } else {
+              alert("Mola bitti! Yeni çalışma seansını başlatabilirsin. 💪");
+              setPomoMode("work");
+              return 1500; // 25 dk çalışma
+            }
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else {
+      if (timerRef.current) clearInterval(timerRef.current);
+    }
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [pomoActive, pomoMode]);
+
+  const handlePomoReset = () => {
+    setPomoActive(false);
+    setPomoMode("work");
+    setPomoTime(1500);
+  };
+
+  const formatPomoTime = () => {
+    const mins = Math.floor(pomoTime / 60);
+    const secs = pomoTime % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
   const quickLinks = [
     { href: "/yks-hazirlik", label: "🧮 YKS Puan Hesaplama & Sayaç" },
     { href: "/lgs-hazirlik", label: "⏰ LGS Puan Hesaplama & Geri Sayım" },
@@ -47,7 +121,7 @@ export default function SidebarDrawer() {
 
   return (
     <>
-      {/* Drawer Hamburgers (3 Lines SVG) Button */}
+      {/* Drawer Hamburgers Button */}
       <button
         onClick={() => setIsOpen(true)}
         className="w-11 h-11 bg-white hover:bg-[#FAF8F5] border border-[#EFECE6] rounded-xl flex items-center justify-center transition-all shadow-sm text-[#1E3A8A] active:scale-95"
@@ -88,6 +162,47 @@ export default function SidebarDrawer() {
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto min-h-0 p-6 space-y-6 scrollbar-thin">
+          
+          {/* MÜKEMMEL POMODORO SAYACI */}
+          <div className="bg-gradient-to-br from-[#1E3A8A] to-[#1e2a52] text-white rounded-3xl p-5 flex flex-col space-y-4 shadow-md relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-bl-full pointer-events-none" />
+            
+            <div className="flex justify-between items-center">
+              <span className="text-[10px] font-black text-[#F5D0A9] uppercase tracking-widest block">
+                ⏱️ DERS ÇALIŞMA SAYACI (POMODORO)
+              </span>
+              <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${pomoMode === "work" ? "bg-amber-600/50" : "bg-emerald-600/50"}`}>
+                {pomoMode === "work" ? "Çalışma" : "Mola"}
+              </span>
+            </div>
+
+            <div className="text-center py-2 relative">
+              <div className="text-4xl font-black tracking-widest font-mono text-white drop-shadow">
+                {formatPomoTime()}
+              </div>
+              <p className="text-[10px] text-primary-200 mt-1 font-bold">25 Dk Çalışma / 5 Dk Mola</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5">
+              <button
+                onClick={() => setPomoActive(!pomoActive)}
+                className={`py-2 px-3 rounded-xl text-xs font-black text-center transition-all ${
+                  pomoActive 
+                    ? "bg-amber-500 hover:bg-amber-600 text-white" 
+                    : "bg-white text-[#1E3A8A] hover:bg-gray-150"
+                }`}
+              >
+                {pomoActive ? "⏸ Duraklat" : "▶ Başlat"}
+              </button>
+              <button
+                onClick={handlePomoReset}
+                className="bg-white/10 hover:bg-white/20 text-white py-2 px-3 rounded-xl text-xs font-black text-center transition-all"
+              >
+                🔄 Sıfırla
+              </button>
+            </div>
+          </div>
+
           {/* 3 Saniyede Hoca Sihirbazı */}
           <div className="bg-white border border-[#EFECE6] rounded-3xl p-5 flex flex-col space-y-4 shadow-sm">
             <div className="flex justify-between items-center">
@@ -170,6 +285,64 @@ export default function SidebarDrawer() {
                 )}
               </div>
             )}
+          </div>
+
+          {/* DERS SORU DAĞILIMLARI KARTI */}
+          <div className="bg-white border border-[#EFECE6] rounded-3xl p-5 flex flex-col space-y-3 shadow-sm">
+            <span className="text-[10px] font-black text-[#D97706] uppercase tracking-widest block">
+              📊 DERS SORU DAĞILIMLARI
+            </span>
+            <p className="text-xs font-bold text-gray-550 mb-1 leading-relaxed">Hangi sınavda hangi dersten kaç soru soruluyor?</p>
+
+            <div className="space-y-2">
+              {/* YKS Soru Dağılımı */}
+              <div className="border border-[#EFECE6] rounded-2xl overflow-hidden">
+                <button
+                  onClick={() => setOpenSoruAlan(openSoruAlan === "YKS" ? null : "YKS")}
+                  className="w-full px-4 py-3 bg-[#FAF8F5] flex justify-between items-center text-xs font-black text-[#1E3A8A] outline-none"
+                >
+                  <span>🎓 YKS Soru Dağılımı</span>
+                  <span className={`text-gray-400 transition-transform ${openSoruAlan === "YKS" ? "rotate-180" : ""}`}>▼</span>
+                </button>
+                {openSoruAlan === "YKS" && (
+                  <div className="p-3 bg-white space-y-2 border-t border-[#EFECE6]">
+                    {soruDagilimlari.YKS.map((item) => (
+                      <div key={item.ders} className="flex justify-between items-start text-xs border-b border-[#FAF8F5] pb-1.5 last:border-0 last:pb-0">
+                        <div>
+                          <div className="font-bold text-gray-800">{item.ders}</div>
+                          <div className="text-[10px] text-gray-400 font-semibold">{item.detay}</div>
+                        </div>
+                        <div className="font-black text-[#D97706] bg-[#FAF0E3] px-2 py-0.5 rounded-lg flex-shrink-0">{item.soru} Soru</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* LGS Soru Dağılımı */}
+              <div className="border border-[#EFECE6] rounded-2xl overflow-hidden">
+                <button
+                  onClick={() => setOpenSoruAlan(openSoruAlan === "LGS" ? null : "LGS")}
+                  className="w-full px-4 py-3 bg-[#FAF8F5] flex justify-between items-center text-xs font-black text-[#1E3A8A] outline-none"
+                >
+                  <span>🏫 LGS Soru Dağılımı</span>
+                  <span className={`text-gray-400 transition-transform ${openSoruAlan === "LGS" ? "rotate-180" : ""}`}>▼</span>
+                </button>
+                {openSoruAlan === "LGS" && (
+                  <div className="p-3 bg-white space-y-2 border-t border-[#EFECE6]">
+                    {soruDagilimlari.LGS.map((item) => (
+                      <div key={item.ders} className="flex justify-between items-start text-xs border-b border-[#FAF8F5] pb-1.5 last:border-0 last:pb-0">
+                        <div>
+                          <div className="font-bold text-gray-800">{item.ders}</div>
+                          <div className="text-[10px] text-gray-400 font-semibold">{item.detay}</div>
+                        </div>
+                        <div className="font-black text-[#D97706] bg-[#FAF0E3] px-2 py-0.5 rounded-lg flex-shrink-0">{item.soru} Soru</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Quick Links Section */}
