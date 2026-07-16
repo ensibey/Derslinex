@@ -24,6 +24,18 @@ export const metadata: Metadata = {
   ],
   robots: { index: true, follow: true },
   verification: { google: "google5716913a2e6e8126" },
+  icons: {
+    icon: [
+      { url: "/logo.png?v=7", sizes: "192x192", type: "image/png" },
+      { url: "/logo.png?v=7", sizes: "96x96", type: "image/png" },
+      { url: "/logo.png?v=7", sizes: "48x48", type: "image/png" },
+      { url: "/favicon.ico?v=7", sizes: "any" }
+    ],
+    shortcut: "/favicon.ico?v=7",
+    apple: [
+      { url: "/logo.png?v=7", sizes: "180x180", type: "image/png" }
+    ]
+  },
   openGraph: {
     type: "website",
     title: "Derslinex | Online Özel Ders & Birebir YKS LGS Hazırlık",
@@ -52,9 +64,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="tr" className={inter.variable}>
       <head>
-        <link rel="icon" href="/favicon.ico?v=7" />
+        <link rel="icon" href="/logo.png?v=7" sizes="192x192" type="image/png" />
+        <link rel="icon" href="/logo.png?v=7" sizes="96x96" type="image/png" />
+        <link rel="icon" href="/logo.png?v=7" sizes="48x48" type="image/png" />
+        <link rel="icon" href="/favicon.ico?v=7" sizes="any" />
         <link rel="shortcut icon" href="/favicon.ico?v=7" />
-        <link rel="apple-touch-icon" href="/logo.png?v=7" />
+        <link rel="apple-touch-icon" href="/logo.png?v=7" sizes="180x180" />
       </head>
       <body className="bg-[#FAF8F5] text-gray-900 antialiased">
         <Header />
