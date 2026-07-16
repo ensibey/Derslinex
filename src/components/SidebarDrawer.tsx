@@ -7,6 +7,9 @@ export default function SidebarDrawer() {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [tavsiyeIdx, setTavsiyeIdx] = useState(0);
+  const [wizardStep, setWizardStep] = useState<"category" | "subject">("category");
+  const [selectedCategory, setSelectedCategory] = useState<"YKS" | "LGS" | "">("");
+  const [selectedSubject, setSelectedSubject] = useState("");
 
   useEffect(() => {
     setMounted(true);
@@ -190,6 +193,90 @@ export default function SidebarDrawer() {
             >
               🔄 Başka Bir Tavsiye Gör
             </button>
+          </div>
+
+          {/* 3 Saniyede Hoca Sihirbazı */}
+          <div className="bg-white border border-[#EFECE6] rounded-2xl p-4 flex flex-col space-y-3.5 shadow-sm">
+            <div className="flex justify-between items-center">
+              <span className="text-[10px] font-black text-[#D97706] uppercase tracking-widest block">
+                ⚡ 3 SANİYEDE ÖZEL DERS AL
+              </span>
+              {wizardStep === "subject" && (
+                <button 
+                  onClick={() => {
+                    setWizardStep("category");
+                    setSelectedCategory("");
+                    setSelectedSubject("");
+                  }}
+                  className="text-[10px] font-black text-gray-400 hover:text-gray-600 transition-colors uppercase tracking-wider"
+                >
+                  ◀ Geri Dön
+                </button>
+              )}
+            </div>
+
+            {wizardStep === "category" ? (
+              <div className="space-y-2">
+                <p className="text-xs font-bold text-gray-500">Ders almak istediğiniz sınav alanını seçin:</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => {
+                      setSelectedCategory("YKS");
+                      setWizardStep("subject");
+                    }}
+                    className="bg-[#FAF8F5] hover:bg-[#FAF0E3] hover:border-[#F5D0A9] border border-[#EFECE6] rounded-xl py-3 px-2 text-center text-xs font-black text-[#1E3A8A] transition-all"
+                  >
+                    🎓 YKS Hazırlık
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedCategory("LGS");
+                      setWizardStep("subject");
+                    }}
+                    className="bg-[#FAF8F5] hover:bg-[#FAF0E3] hover:border-[#F5D0A9] border border-[#EFECE6] rounded-xl py-3 px-2 text-center text-xs font-black text-[#1E3A8A] transition-all"
+                  >
+                    🏫 LGS Hazırlık
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-xs font-bold text-gray-500">
+                  <span className="text-[#D97706] font-black">{selectedCategory}</span> için ders seçin:
+                </p>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {(selectedCategory === "YKS"
+                    ? ["Matematik", "Fizik", "Kimya", "Türkçe/Edebiyat", "Geometri"]
+                    : ["Matematik", "Fen Bilimleri", "Türkçe", "Tarih/İnkılap"]
+                  ).map((subject) => (
+                    <button
+                      key={subject}
+                      onClick={() => setSelectedSubject(subject)}
+                      className={`border rounded-xl py-2 px-1 text-center text-[11px] font-black transition-all ${
+                        selectedSubject === subject
+                          ? "bg-[#D97706] text-white border-[#D97706] shadow-sm"
+                          : "bg-[#FAF8F5] hover:bg-[#FAF0E3] border-[#EFECE6] text-gray-700"
+                      }`}
+                    >
+                      {subject}
+                    </button>
+                  ))}
+                </div>
+
+                {selectedSubject && (
+                  <div className="pt-2">
+                    <a
+                      href={waLink(`Merhaba, ${selectedCategory} sınavı için ${selectedSubject} dersi hakkında birebir özel ders bilgisi almak istiyorum.`)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full bg-[#1E3A8A] hover:bg-[#152a60] text-white font-black py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 text-xs text-center active:scale-95"
+                    >
+                      ⚡ {selectedSubject} Dersi Al
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Quick Links Section */}
