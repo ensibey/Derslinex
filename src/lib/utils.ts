@@ -1,6 +1,6 @@
 export const SITE_NAME = "Derslinex";
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://derslinex.com";
-export const WA_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "905543831828";
+export const WA_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "905405512020";
 
 export function waLink(mesaj?: string): string {
   const text = mesaj ? encodeURIComponent(mesaj) : encodeURIComponent("Merhaba, YKS hazırlık dersleri hakkında bilgi almak istiyorum.");
