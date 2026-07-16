@@ -14,6 +14,8 @@ const navLinks = [
   { href: "/iletisim", label: "İletişim" },
 ];
 
+import SidebarDrawer from "@/components/SidebarDrawer";
+
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -32,20 +34,23 @@ export default function Header() {
     <header className="sticky top-0 z-50 bg-[#FAF8F5]/90 backdrop-blur-md shadow-sm border-b border-[#EFECE6]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="relative w-12 h-12 group-hover:scale-105 transition-transform flex items-center justify-center">
-              <Image
-                src="/logo.png?v=7"
-                alt="Derslinex Logo"
-                fill
-                className="object-contain"
-                sizes="48px"
-                priority
-              />
-            </div>
-            <span className="text-2xl font-black text-[#1E3A8A] tracking-tight group-hover:text-[#D97706] transition-colors">Derslinex</span>
-          </Link>
+          {/* Logo & Sidebar Drawer */}
+          <div className="flex items-center gap-3.5">
+            <SidebarDrawer />
+            <Link href="/" className="flex items-center gap-2 group">
+              <div className="relative w-12 h-12 group-hover:scale-105 transition-transform flex items-center justify-center">
+                <Image
+                  src="/logo.png?v=7"
+                  alt="Derslinex Logo"
+                  fill
+                  className="object-contain"
+                  sizes="48px"
+                  priority
+                />
+              </div>
+              <span className="text-2xl font-black text-[#1E3A8A] tracking-tight group-hover:text-[#D97706] transition-colors">Derslinex</span>
+            </Link>
+          </div>
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-6">
