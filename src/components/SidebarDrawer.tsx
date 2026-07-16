@@ -6,15 +6,20 @@ import { waLink } from "@/lib/utils";
 export default function SidebarDrawer() {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Sayfa kaymasını engelle
+  // Sayfa kaymasını engelle & window eventi dinle
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
     }
+
+    const handleToggle = () => setIsOpen(true);
+    window.addEventListener("open-sidebar-drawer", handleToggle);
+
     return () => {
       document.body.style.overflow = "unset";
+      window.removeEventListener("open-sidebar-drawer", handleToggle);
     };
   }, [isOpen]);
 
@@ -30,30 +35,28 @@ export default function SidebarDrawer() {
 
   return (
     <>
-      {/* Drawer Hamburgers / Spark Button */}
+      {/* Drawer Hamburgers (3 Lines SVG) Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 bg-[#FAF0E3] hover:bg-[#F5D0A9] border border-[#F5D0A9] text-[#B45309] text-xs font-black px-3.5 py-2.5 rounded-xl transition-all shadow-sm group"
+        className="w-11 h-11 bg-white hover:bg-[#FAF8F5] border border-[#EFECE6] rounded-xl flex items-center justify-center transition-all shadow-sm text-[#1E3A8A] active:scale-95"
         aria-label="Hızlı Araçlar Menüsü"
       >
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-        </span>
-        <span>Hızlı Menü ⚡</span>
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
       </button>
 
       {/* Backdrop */}
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] transition-opacity duration-300"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9998] transition-opacity duration-300"
         />
       )}
 
       {/* Drawer Panel */}
       <div
-        className={`fixed top-0 left-0 h-full w-full max-w-[340px] bg-[#FAF8F5] border-r border-[#EFECE6] shadow-2xl z-[101] transition-transform duration-300 transform flex flex-col ${
+        className={`fixed top-0 left-0 h-full w-full max-w-[340px] bg-[#FAF8F5] border-r border-[#EFECE6] shadow-2xl z-[9999] transition-transform duration-300 transform flex flex-col ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >

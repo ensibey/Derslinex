@@ -45,6 +45,8 @@ export const metadata: Metadata = {
   },
 };
 
+import MobileNavBar from "@/components/MobileNavBar";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="tr" className={inter.variable}>
@@ -55,8 +57,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="bg-[#FAF8F5] text-gray-900 antialiased">
         <Header />
-        <main>{children}</main>
-        <Footer />
+        <main className="pb-16 lg:pb-0">{children}</main>
+        <Footer className="pb-24 lg:pb-14" />
+        <MobileNavBar />
         <WhatsAppButton />
         <KeepAlive />
       </body>
