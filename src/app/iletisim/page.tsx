@@ -98,9 +98,9 @@ export default function IletisimPage() {
             <div className="flex items-center gap-5 bg-white border border-[#EFECE6] rounded-3xl p-6 shadow-sm">
               <div className="w-14 h-14 bg-[#FAF0E3] rounded-2xl flex items-center justify-center text-[#B45309] text-2xl flex-shrink-0">📍</div>
               <div>
-                <p className="font-black text-[#1E3A8A]">Yüz Yüze Dersler</p>
-                <p className="text-gray-700 font-bold">Anlaşmalı Şehirler & Ortak Çalışma Alanları</p>
-                <p className="text-xs text-gray-500 mt-1 font-bold">Online dersler Türkiye geneli</p>
+                <p className="font-black text-[#1E3A8A]">Adres</p>
+                <p className="text-gray-700 font-bold text-sm">15 Mayıs Mah. 794 Sok. No : 17 Pamukkale / DENİZLİ</p>
+                <p className="text-xs text-gray-500 mt-1 font-bold">Merkez Ofis & Yüz Yüze Çalışma Alanı</p>
               </div>
             </div>
             <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 shadow-sm">

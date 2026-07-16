@@ -92,7 +92,7 @@ export default function Footer() {
               </li>
               <li className="flex items-start gap-2">
                 <span>📍</span>
-                <span>Tüm Türkiye (Online ders)<br />Seçili şehirler (Yüz yüze)</span>
+                <span>15 Mayıs Mah. 794 Sok. No : 17 Pamukkale / DENİZLİ</span>
               </li>
             </ul>
             <div className="mt-5 flex gap-3">
