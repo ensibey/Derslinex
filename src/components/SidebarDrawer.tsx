@@ -65,12 +65,12 @@ export default function SidebarDrawer() {
 
       {/* Drawer Panel */}
       <div
-        className={`fixed top-0 left-0 h-full w-full max-w-[340px] bg-[#FAF8F5] border-r border-[#EFECE6] shadow-2xl z-[9999] transition-transform duration-300 transform flex flex-col ${
+        className={`fixed top-0 left-0 h-screen h-[100dvh] w-full max-w-[340px] bg-[#FAF8F5] border-r border-[#EFECE6] shadow-2xl z-[9999] transition-transform duration-300 transform flex flex-col overflow-hidden ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Header */}
-        <div className="p-6 border-b border-[#EFECE6] flex justify-between items-center bg-white">
+        <div className="p-6 border-b border-[#EFECE6] flex justify-between items-center bg-white flex-shrink-0">
           <div>
             <h3 className="font-black text-[#1E3A8A] text-lg">Derslinex Hızlı Menü</h3>
             <p className="text-xs text-gray-500 font-bold mt-0.5">En Çok Ziyaret Edilenler</p>
