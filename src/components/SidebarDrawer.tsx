@@ -75,10 +75,10 @@ export default function SidebarDrawer() {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto min-h-0 p-6 space-y-6 scrollbar-thin">
           {/* Quick Links Section */}
-          <div>
-            <span className="text-[10px] font-black text-[#D97706] uppercase tracking-widest block mb-4">
+          <div className="flex flex-col">
+            <span className="text-[10px] font-black text-[#D97706] uppercase tracking-widest block mb-3">
               POPÜLER ARAÇLAR & DERSLER
             </span>
             <div className="space-y-2">
@@ -96,8 +96,8 @@ export default function SidebarDrawer() {
           </div>
 
           {/* Popular Blog Section */}
-          <div>
-            <span className="text-[10px] font-black text-[#D97706] uppercase tracking-widest block mb-4">
+          <div className="flex flex-col">
+            <span className="text-[10px] font-black text-[#D97706] uppercase tracking-widest block mb-3">
               OKUNMASI GEREKEN REHBERLER
             </span>
             <div className="space-y-2">
@@ -116,7 +116,7 @@ export default function SidebarDrawer() {
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-[#EFECE6] bg-white">
+        <div className="p-6 border-t border-[#EFECE6] bg-white flex-shrink-0">
           <a
             href={waLink("Merhaba, YKS / LGS özel derslerimiz hakkında bilgi almak istiyorum.")}
             target="_blank"
