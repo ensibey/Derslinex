@@ -12,6 +12,8 @@ export default function sitemap() {
     "/dersler",
     "/yks-hazirlik",
     "/blog",
+    "/blog/bilgi-kartlari",
+    "/blog/gunun-sorusu",
     "/hakkimizda",
     "/iletisim",
     "/gizlilik",

@@ -3,26 +3,6 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { waLink } from "@/lib/utils";
 
-// Soru dağılım verisi
-const soruDagilimlari = {
-  YKS: [
-    { ders: "Türkçe", soru: 40, detay: "Paragraf, Dil Bilgisi" },
-    { ders: "Temel Matematik", soru: 40, detay: "Sayılar, Problemler, Geometri" },
-    { ders: "Sosyal Bilimler", soru: 20, detay: "Tarih, Coğ, Fel, Din" },
-    { ders: "Fen Bilimleri", soru: 20, detay: "Fizik, Kimya, Biyoloji" },
-    { ders: "AYT Matematik", soru: 40, detay: "Matematik & Geometri" },
-    { ders: "AYT Fen", soru: 40, detay: "Fizik (14), Kimya (13), Biyo (13)" }
-  ],
-  LGS: [
-    { ders: "Türkçe", soru: 20, detay: "Okuduğunu Anlama, Dil Bilgisi" },
-    { ders: "Matematik", soru: 20, detay: "Sayısal Akıl Yürütme, Yeni Nesil" },
-    { ders: "Fen Bilimleri", soru: 20, detay: "Deney & Çıkarım Soruları" },
-    { ders: "T.C. İnkılap Tarihi", soru: 10, detay: "Atatürkçülük ve İnkılap" },
-    { ders: "Din Kültürü", soru: 10, detay: "Temel Ahlaki Kavramlar" },
-    { ders: "Yabancı Dil (İng)", soru: 10, detay: "Kelime Bilgisi, Okuma" }
-  ]
-};
-
 export default function SidebarDrawer() {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -31,9 +11,6 @@ export default function SidebarDrawer() {
   const [wizardStep, setWizardStep] = useState<"category" | "subject">("category");
   const [selectedCategory, setSelectedCategory] = useState<"YKS" | "LGS" | "">("");
   const [selectedSubject, setSelectedSubject] = useState("");
-
-  // Soru Dağılımları Sekmesi Eyaletleri
-  const [openSoruAlan, setOpenSoruAlan] = useState<"YKS" | "LGS" | null>(null);
 
   // Pomodoro Eyaletleri
   const [pomoTime, setPomoTime] = useState(1500); // 25 dakika = 1500 saniye
@@ -110,6 +87,8 @@ export default function SidebarDrawer() {
   const quickLinks = [
     { href: "/yks-hazirlik", label: "🧮 YKS Puan Hesaplama & Sayaç" },
     { href: "/lgs-hazirlik", label: "⏰ LGS Puan Hesaplama & Geri Sayım" },
+    { href: "/blog/bilgi-kartlari", label: "🃏 Sınav Hap Bilgileri (Yeni!)" },
+    { href: "/blog/gunun-sorusu", label: "🎮 Günün Özel Sorusu (Yeni!)" },
     { href: "/hocalar?alan=Matematik", label: "📐 Matematik Özel Ders" },
     { href: "/hocalar?alan=Fizik", label: "⚡ Fizik Özel Ders" },
     { href: "/blog/yks-matematik-hazirlik-rehberi", label: "📚 YKS Matematik Çalışma Planı (Blog)" },
@@ -150,7 +129,7 @@ export default function SidebarDrawer() {
         <div className="p-6 border-b border-[#EFECE6] flex justify-between items-center bg-white flex-shrink-0">
           <div>
             <h3 className="font-black text-[#1E3A8A] text-lg">Derslinex Hızlı Menü</h3>
-            <p className="text-xs text-gray-500 font-bold mt-0.5">En Çok Ziyaret Edilenler</p>
+            <p className="text-xs text-gray-550 font-bold mt-0.5">En Çok Ziyaret Edilenler</p>
           </div>
           <button
             onClick={() => setIsOpen(false)}
@@ -287,64 +266,6 @@ export default function SidebarDrawer() {
             )}
           </div>
 
-          {/* DERS SORU DAĞILIMLARI KARTI */}
-          <div className="bg-white border border-[#EFECE6] rounded-3xl p-5 flex flex-col space-y-3 shadow-sm">
-            <span className="text-[10px] font-black text-[#D97706] uppercase tracking-widest block">
-              📊 DERS SORU DAĞILIMLARI
-            </span>
-            <p className="text-xs font-bold text-gray-550 mb-1 leading-relaxed">Hangi sınavda hangi dersten kaç soru soruluyor?</p>
-
-            <div className="space-y-2">
-              {/* YKS Soru Dağılımı */}
-              <div className="border border-[#EFECE6] rounded-2xl overflow-hidden">
-                <button
-                  onClick={() => setOpenSoruAlan(openSoruAlan === "YKS" ? null : "YKS")}
-                  className="w-full px-4 py-3 bg-[#FAF8F5] flex justify-between items-center text-xs font-black text-[#1E3A8A] outline-none"
-                >
-                  <span>🎓 YKS Soru Dağılımı</span>
-                  <span className={`text-gray-400 transition-transform ${openSoruAlan === "YKS" ? "rotate-180" : ""}`}>▼</span>
-                </button>
-                {openSoruAlan === "YKS" && (
-                  <div className="p-3 bg-white space-y-2 border-t border-[#EFECE6]">
-                    {soruDagilimlari.YKS.map((item) => (
-                      <div key={item.ders} className="flex justify-between items-start text-xs border-b border-[#FAF8F5] pb-1.5 last:border-0 last:pb-0">
-                        <div>
-                          <div className="font-bold text-gray-800">{item.ders}</div>
-                          <div className="text-[10px] text-gray-400 font-semibold">{item.detay}</div>
-                        </div>
-                        <div className="font-black text-[#D97706] bg-[#FAF0E3] px-2 py-0.5 rounded-lg flex-shrink-0">{item.soru} Soru</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* LGS Soru Dağılımı */}
-              <div className="border border-[#EFECE6] rounded-2xl overflow-hidden">
-                <button
-                  onClick={() => setOpenSoruAlan(openSoruAlan === "LGS" ? null : "LGS")}
-                  className="w-full px-4 py-3 bg-[#FAF8F5] flex justify-between items-center text-xs font-black text-[#1E3A8A] outline-none"
-                >
-                  <span>🏫 LGS Soru Dağılımı</span>
-                  <span className={`text-gray-400 transition-transform ${openSoruAlan === "LGS" ? "rotate-180" : ""}`}>▼</span>
-                </button>
-                {openSoruAlan === "LGS" && (
-                  <div className="p-3 bg-white space-y-2 border-t border-[#EFECE6]">
-                    {soruDagilimlari.LGS.map((item) => (
-                      <div key={item.ders} className="flex justify-between items-start text-xs border-b border-[#FAF8F5] pb-1.5 last:border-0 last:pb-0">
-                        <div>
-                          <div className="font-bold text-gray-800">{item.ders}</div>
-                          <div className="text-[10px] text-gray-400 font-semibold">{item.detay}</div>
-                        </div>
-                        <div className="font-black text-[#D97706] bg-[#FAF0E3] px-2 py-0.5 rounded-lg flex-shrink-0">{item.soru} Soru</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
           {/* Quick Links Section */}
           <div className="flex flex-col">
             <span className="text-[10px] font-black text-[#D97706] uppercase tracking-widest block mb-3">
@@ -375,7 +296,7 @@ export default function SidebarDrawer() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setIsOpen(false)}
-                  className="block bg-white border border-[#EFECE6] rounded-2xl p-4 text-xs font-bold text-gray-600 hover:border-[#D97706] hover:text-[#1E3A8A] hover:shadow-sm transition-all leading-relaxed"
+                  className="block bg-white border border-[#EFECE6] rounded-2xl p-4 text-xs font-bold text-gray-650 hover:border-[#D97706] hover:text-[#1E3A8A] hover:shadow-sm transition-all leading-relaxed"
                 >
                   {link.label}
                 </Link>
