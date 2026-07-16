@@ -16,7 +16,11 @@ Verimli bir hazırlık süreci için şu adımları izlemelisiniz:
 
 3. AYT Fonksiyon Temelini Sağlam Tutmak: AYT Matematik sınavının en önemli konusu hiç şüphesiz Fonksiyonlar'dır. Logaritma, Diziler, Limit, Türev ve İntegral konularının tamamı fonksiyon altyapısı üzerine inşa edilir. Fonksiyonların grafiklerini okumayı, tanım ve değer kümelerini analiz etmeyi öğrenmeden AYT çalışmalarına başlamak vakit kaybı olacaktır.
 
-4. Geometriyi İhmal Etmemek: Hem TYT hem de AYT Matematik testlerinin içerisinde 10'ar adet Geometri sorusu yer almaktadır. Geometri, formülden ziyade görme becerisine dayalıdır. Üçgenler konusunu (açılar, benzerlik, alan) tam anlamıyla kavramadan çokgenler, çember veya analitik geometri konularına geçmemelisiniz. Geometride başarılı olmak için her gün en az 10 soru çözmeye özen göstermelisiniz.`,
+4. Geometriyi İhmal Etmemek: Hem TYT hem de AYT Matematik testlerinin içerisinde 10'ar adet Geometri sorusu yer almaktadır. Geometri, formülden ziyade görme becerisine dayalıdır. Üçgenler konusunu (açılar, benzerlik, alan) tam anlamıyla kavramadan çokgenler, çember veya analitik geometri konularına geçmemelisiniz. Geometride başarılı olmak için her gün en az 10 soru çözmeye özen göstermelisiniz.
+
+5. Deneme Çözme Rutini Oluşturmak: Son 3 aya girildiğinde haftada en az bir genel TYT, iki haftada bir genel AYT denemesi çözülmelidir. Deneme sonrasında yapılan detaylı analizler, konu eksikliklerinizi saptamak için en güvenilir pusuladır. Yanlış yapılan soruların çözümleri mutlaka öğrenilmeli ve özel bir defterde saklanmalıdır.
+
+6. Kaynak Çeşitliliği ve Soru Tipleri: Tek bir kaynağa bağlı kalmak gelişiminizi kısıtlar. Kolay, orta ve zor olmak üzere en az 3 farklı yayından soru tiplerini görmelisiniz. Özellikle son dönemlerde ÖSYM'nin sorduğu yeni nesil, görsel yorumlama ve akıl yürütme sorularına yönelik özel soru bankaları çözülmelidir.`,
     yazar: "Derslinex Editörü",
     tarih: "2026-05-15",
     kategori: "Çalışma Rehberleri",
@@ -37,7 +41,10 @@ AYT (Alan Yeterlilik Testi):
 YKS'nin ikinci oturumudur ve adayın yerleşmek istediği lisans programına göre çözmesi gereken testlerden oluşur. Toplam 160 soru yer alır ancak aday sadece kendi alanına uygun olan 80 sorudan sorumludur (Örneğin Sayısal öğrencisi Matematik ve Fen Bilimleri testlerini çözer). Süre 180 dakikadır. AYT'de zaman sıkıntısı neredeyse hiç yaşanmaz çünkü bu sınav tamamen derin akademik bilgiyi, formülleri ve teoriyi ölçer. Bilmiyorsanız soruyu çözmeniz imkansızdır.
 
 Çalışma Stratejisi Nasıl Olmalıdır?
-Hazırlık sürecinin ilk yarısında (genellikle eylül-aralık ayları arasında) çalışmaların ağırlığı TYT konularına verilmelidir. Ancak bu dönemde dahi AYT'nin temeli olan fonksiyonlar, çarpanlara ayırma gibi konular paralel götürülmelidir. Ocak ayından itibaren ise çalışma süresinin en az %70-80'i AYT konularına ayrılmalıdır. Unutulmamalıdır ki yerleştirme puanının hesaplanmasında AYT'nin etkisi %60, TYT'nin etkisi ise %40'tır. Dolayısıyla AYT'yi ihmal eden bir öğrencinin hedeflediği yüksek puanlı bölümlere yerleşmesi çok zordur.`,
+Hazırlık sürecinin ilk yarısında (genellikle eylül-aralık ayları arasında) çalışmaların ağırlığı TYT konularına verilmelidir. Ancak bu dönemde dahi AYT'nin temeli olan fonksiyonlar, çarpanlara ayırma gibi konular paralel götürülmelidir. Ocak ayından itibaren ise çalışma süresinin en az %70-80'i AYT konularına ayrılmalıdır. Unutulmamalıdır ki yerleştirme puanının hesaplanmasında AYT'nin etkisi %60, TYT'nin etkisi ise %40'tır. Dolayısıyla AYT'yi ihmal eden bir öğrencinin hedeflediği yüksek puanlı bölümlere yerleşmesi çok zordur.
+
+Puan Türlerinin Dağılımı ve Etkileri:
+Adaylar TYT puanı ile sadece ön lisans (2 yıllık) programlarını ve özel yetenek bölümlerini tercih edebilirler. Mühendislik, Tıp, Hukuk, Mimarlık, Öğretmenlik gibi 4 yıllık lisans programlarına yerleşebilmek için ilgili AYT puan türünde (Sayısal, Eşit Ağırlık, Sözel veya Dil) barajı aşarak yüksek puan almak şarttır. Bu doğrultuda çalışma planınızı kendi alanınızın katsayı ağırlıklarına göre dizayn etmelisiniz.`,
     yazar: "Derslinex Editörü",
     tarih: "2026-05-10",
     kategori: "YKS Bilgi",
@@ -57,7 +64,9 @@ Hazırlık sürecinin ilk yarısında (genellikle eylül-aralık ayları arasın
 
 3. Haftalık ve Aylık Değerlendirmeler: Her pazar günü o hafta çözdüğünüz soru sayılarını, bitirdiğiniz konuları ve girdiğiniz deneme sonuçlarını analiz edin. Eksik kaldığınız konuları belirleyip bir sonraki haftanın programına bu eksikleri kapatacak çalışma saatleri ekleyin.
 
-4. Ders Dağılımını Dengeli Yapın: Aynı gün içinde sadece tek bir derse saatlerce yoğunlaşmak yerine, zihinsel yorgunluğu önlemek için sayısal ve sözel dersleri dengeli bir şekilde dağıtın. Örneğin sabah saatlerinde zihniniz en açıkken Matematik çalıştıysanız, öğleden sonra Coğrafya veya Türkçe Paragraf çalışmalarıyla programı çeşitlendirin.`,
+4. Ders Dağılımını Dengeli Yapın: Aynı gün içinde sadece tek bir derse saatlerce yoğunlaşmak yerine, zihinsel yorgunluğu önlemek için sayısal ve sözel dersleri dengeli bir şekilde dağıtın. Örneğin sabah saatlerinde zihniniz en açıkken Matematik çalıştıysanız, öğleden sonra Coğrafya veya Türkçe Paragraf çalışmalarıyla programı çeşitlendirin.
+
+5. Uyku ve Dinlenme Düzeni: Beynin gün boyu öğrenilen bilgileri uzun süreli hafızaya kaydedebilmesi için günde ortalama 7-8 saat kaliteli uyku uyumak şarttır. Gece geç saatlere kadar ders çalışıp uyku düzenini bozmak, ertesi günkü odaklanma becerinizi %30 oranında düşürecektir. Hafta sonlarında kendinize yarım gün tamamen serbest zaman ayırarak zihinsel deşarj sağlayın.`,
     yazar: "Derslinex Editörü",
     tarih: "2026-04-28",
     kategori: "Çalışma Teknikleri",
@@ -74,7 +83,8 @@ Hazırlık sürecinin ilk yarısında (genellikle eylül-aralık ayları arasın
 Son 3 ayda netlerinizi patlatacak adımlar:
 1. Konu Eleme Stratejisi: Tüm müfredatı baştan sona çalışmaya çalışmak bu aşamada büyük bir hatadır. ÖSYM'nin son 10 yılda her sene kesinlikle sorduğu garanti konuları listelemelisiniz. Örneğin matematikten Problemler, Fonksiyonlar, Trigonometri ve Logaritma gibi her yıl yüksek soru getiren konulara odaklanmalısınız.
 2. Çıkmış Sorular Analizi: Son 5 yılın TYT ve AYT çıkmış sorularını mutlaka süre tutarak çözmelisiniz. ÖSYM'nin dilini anlamak, denemelerdeki gereksiz zor sorularda vakit kaybetmenizi önler.
-3. Bölüm Denemelerine Ağırlık Vermek: Genel denemelerin yanı sıra eksik olduğunuz alanlarda (örneğin sadece TYT Sosyal veya sadece AYT Matematik) her gün bölüm denemeleri çözmelisiniz. Analizlerin ardından yanlış yaptığınız konuları hemen o gün tekrar etmelisiniz.`,
+3. Bölüm Denemelerine Ağırlık Vermek: Genel denemelerin yanı sıra eksik olduğunuz alanlarda (örneğin sadece TYT Sosyal veya sadece AYT Matematik) her gün bölüm denemeleri çözmelisiniz. Analizlerin ardından yanlış yaptığınız konuları hemen o gün tekrar etmelisiniz.
+4. Yanlış Analizi ve Nokta Atışı Tekrarlar: Çözdüğünüz her denemenin ardından yanlış yaptığınız 3 konuyu tespit edip, ertesi gün bu konuların kısa özetlerini okuyup 20'şer adet pekiştirme sorusu çözün. Bu taktikle netleriniz son 90 günde haftalık 3-4 net oranında düzenli artış gösterecektir.`,
     yazar: "Derslinex Editörü",
     tarih: "2026-04-25",
     kategori: "Çalışma Rehberleri",
@@ -91,7 +101,9 @@ Son 3 ayda netlerinizi patlatacak adımlar:
 Yeni nesil sorularda başarıyı getiren teknikler:
 1. Soruyu Küçük Parçalara Bölün: Karşınızda upuzun, yarım sayfalık bir soru olduğunda panik yapmayın. Soruyu cümle cümle okuyun ve her cümleden elde ettiğiniz matematiksel bilgiyi yan tarafa küçük notlar halinde yazın.
 2. Görselleri ve Grafikleri İyi İnceleyin: Yeni nesil soruların çoğunda şema, tablo veya grafik bulunur. Çoğu zaman sorunun cevabı metinden ziyade bu görsellerin içinde gizlidir.
-3. Denklem Kurma Altyapısını Geliştirin: Problemi çözebilmek için metindeki sözel ifadeleri cebirsel ifadelere dönüştürmeyi öğrenmelisiniz. 'Hangi sayının 3 katının 5 fazlası' gibi temel kalıpları çok iyi kavramış olmalısınız.`,
+3. Denklem Kurma Altyapısını Geliştirin: Problemi çözebilmek için metindeki sözel ifadeleri cebirsel ifadelere dönüştürmeyi öğrenmelisiniz. 'Hangi sayının 3 katının 5 fazlası' gibi temel kalıpları çok iyi kavramış olmalısınız.
+4. Şıklardan Gitme ve Eleme Yöntemi: Yeni nesil sorularda işlemler çok karmaşıklaştığında veya çıkmaza girdiğinizde seçenekleri analiz edin. Bazı sorularda şıkları denklemde yerine koymak veya mantıksal sınırlar dahilinde eleme yapmak cevaba 30 saniyede ulaşmanızı sağlar.
+5. Her Gün En Az 15 Yeni Nesil Soru Rutini: Yeni nesil soru çözme becerisi bir gecede kazanılmaz. Her gün düzenli olarak çözemediğiniz soruların video çözümlerini izleyip mantığını kavrayarak pratik yapmalısınız.`,
     yazar: "Derslinex Editörü",
     tarih: "2026-04-18",
     kategori: "LGS Rehberliği",
@@ -108,7 +120,8 @@ Yeni nesil sorularda başarıyı getiren teknikler:
 Net tıkanıklığını aşmak için şu yöntemleri deneyin:
 1. Detaylı Yanlış Defteri Tutun: Son 5 denemenizi masaya yatırın. Yanlış yaptığınız veya boş bıraktığınız soruların hangi konulardan geldiğini tek tek yazın. Eğer sürekli aynı konulardan (örneğin Türkçe Anlatım Bozukluğu veya Matematik Olasılık) yanlış yapıyorsanız, o konuyu henüz öğrenmemişsiniz demektir.
 2. Süre Yönetimi Analizi: Netlerinizin artmamasının sebebi bilgi eksikliği değil, süre yetiştirememe sorunu olabilir. Sınavda hangi derse kaç dakika harcadığınızı deneme esnasında kronometre ile ölçün.
-3. Zorluk Seviyesini Değiştirin: Sürekli kolay veya orta seviye kaynaklardan soru çözmek gelişiminizi durdurur. Haftada en az bir adet zor seviye branş denemesi çözerek sınırlarınızı zorlayın.`,
+3. Zorluk Seviyesini Değiştirin: Sürekli kolay veya orta seviye kaynaklardan soru çözmek gelişiminizi durdurur. Haftada en az bir adet zor seviye branş denemesi çözerek sınırlarınızı zorlayın.
+4. Odaklanma Hatalarını Ayıklamak: Sınav esnasında yaptığınız basit işlem ve dikkat hataları genellikle yorgunluk ve odaklanma eksikliğindendir. Sınavın ilk 30 dakikası ile son 30 dakikası arasındaki yanlış oranınızı kıyaslayın. Eğer son dakikalarda yanlışlarınız artıyorsa kondisyon denemeleri çözmelisiniz.`,
     yazar: "Derslinex Editörü",
     tarih: "2026-04-12",
     kategori: "Çalışma Teknikleri",
@@ -119,13 +132,14 @@ Net tıkanıklığını aşmak için şu yöntemleri deneyin:
     id: "7",
     slug: "ayt-esit-agirlikta-ilk-10-bin-icin-ders-siralamasi",
     baslik: "AYT Eşit Ağırlıkta İlk 10 Bin İçin Ders Çalışma Sıralaması",
-    ozet: "Hukuk, psikoloji ve işletme hedefleyen eşit ağırlık öğrencileri için ders dağılımı ve haftalık deneme sıklığı.",
+    ozet: "Hukuk, psikoloji ve işletme hedefleyen eşit ağırlık öğrencileri için ders dağılumı ve haftalık deneme sıklığı.",
     icerik: `AYT Eşit Ağırlık alanında ilk 10 bin dereceyi hedefleyen bir öğrencinin başarısı, Matematik ile Edebiyat-Sosyal-1 testleri arasındaki kusursuz dengeye bağlıdır.
 
 Derece getiren ders çalışma hiyerarşisi:
 - Matematik Sizi Öne Geçirir: Eşit ağırlıkçılar arasında fark yaratan ders her zaman AYT Matematiktir. Edebiyatı herkes bir şekilde halledebilirken, matematikte 30+ net yapan öğrenciler doğrudan ilk 5 bine girmektedir.
 - Edebiyat ve Tarih Çalışma Sırası: Edebiyat ezber gerektirdiği için hazırlık sürecinin başından sonuna kadar düzenli tekrarlarla götürülmelidir. Cumhuriyet Dönemi ve Divan Edebiyatı gibi yüksek soru getiren dönemlere özel kartlar hazırlayarak çalışmalısınız.
-- Haftalık Plan: Haftada en az 3 gün AYT Matematik, 2 gün Edebiyat ve Tarih-Coğrafya çalışması yapmalısınız. Son 2 ay kala ise her gün 1 adet Eşit Ağırlık denemesi çözülmelidir.`,
+- Haftalık Plan: Haftada en az 3 gün AYT Matematik, 2 gün Edebiyat ve Tarih-Coğrafya çalışması yapmalısınız. Son 2 ay kala ise her gün 1 adet Eşit Ağırlık denemesi çözülmelidir.
+- Coğrafya-1 ve Tarih-1 Katsayı Avantajı: Sosyal bilimler testinde çıkacak 10 Tarih ve 6 Coğrafya sorusu yüksek standart sapmaya sahiptir. Bu soruları kaçırmamak adına harita okuma ve kronoloji alıştırmaları yapmayı ihmal etmeyin.`,
     yazar: "Derslinex Editörü",
     tarih: "2026-04-05",
     kategori: "Çalışma Rehberleri",
@@ -142,7 +156,8 @@ Derece getiren ders çalışma hiyerarşisi:
 Sözel bölümü sıfır hata ile bitirmenin yolları:
 1. Türkçe Sözel Mantık Soruları: Her yıl Türkçe testinde 2-3 adet sözel mantık ve muhakeme sorusu çıkar. Bu soruları çözmek için mutlaka tablo çizme tekniğini öğrenmeli ve verileri tabloya doğru yerleştirmelisiniz.
 2. İnkılap Tarihinde Kavram Bilgisi: İnkılap Tarihi soruları sadece bilgi ezberi değil, aynı zamanda paragraf yorumlamadır. 'Milli egemenlik', 'milli bağımsızlık', 'mandacılık' gibi temel kavramları adınız gibi bilmelisiniz.
-3. İngilizce Kelime Defteri: LGS İngilizce soruları tamamen kelime bilgisine dayalıdır. Her ünitedeki önemli kelimeleri küçük kartlara yazıp oda duvarınıza asarak her gün tekrar edebilirsiniz.`,
+3. İngilizce Kelime Defteri: LGS İngilizce soruları tamamen kelime bilgisine dayalıdır. Her ünitedeki önemli kelimeleri küçük kartlara yazıp oda duvarınıza asarak her gün tekrar edebilirsiniz.
+4. Okuma Alışkanlığı ve Dikkat Kontrolü: LGS sözel soruları oldukça uzun metinlerden oluşur. Sınav esnasında dikkatin dağılmasını önlemek amacıyla her gün en az 30 sayfa kitap okumayı alışkanlık haline getirmeli ve uzun paragrafları tek okumada anlamaya çalışmalısınız.`,
     yazar: "Derslinex Editörü",
     tarih: "2026-03-29",
     kategori: "LGS Rehberliği",
@@ -159,7 +174,8 @@ Sözel bölümü sıfır hata ile bitirmenin yolları:
 Zaman yönetimi için altın kurallar:
 1. Fen Bilimleri Testinden Başlayın: Fen Bilimleri soruları matematiğe göre genellikle daha hızlı çözülür. İlk 20-25 dakikada Fen Bilimleri testini bitirip cebinize 20 net koyarak sınava başlamak, üzerinizdeki stresi azaltır ve matematiğe daha fazla süre kalmasını sağlar.
 2. Turlama Tekniğini Uygulayın: İlk okumada karmaşık gelen, uzun hesaplama gerektiren matematik sorularıyla inatlaşmayın. Soruya yıldız koyup hemen bir sonraki soruya geçin. Kolay soruları bitirdikten sonra kalan sürede zor sorulara geri dönebilirsiniz.
-3. Saat Kontrolü: Her 5 soruda bir optik forma işaretleme yaparken saate göz atın. Sürenin gerisinde kaldıysanız hızınızı ayarlayın.`,
+3. Saat Kontrolü: Her 5 soruda bir optik forma işaretleme yaparken saate göz atın. Sürenin gerisinde kaldıysanız hızınızı ayarlayın.
+4. Optik İşaretleme Stratejisi: Soruları tek tek kodlamak yerine sayfa sayfa kodlamayı tercih edin. Bu yöntem hem dikkat dağılmasını engeller hem de zamandan tasarruf sağlar. Asla tüm kodlamaları sınavın son 5 dakikasına bırakmayın.`,
     yazar: "Derslinex Editörü",
     tarih: "2026-03-22",
     kategori: "LGS Rehberliği",
@@ -176,7 +192,8 @@ Zaman yönetimi için altın kurallar:
 Mezun yılında izlenmesi gereken stratejiler:
 1. Dürüst Bir Öz eleştiri Yapın: İlk yıl neden başarısız olduğunuzu analiz edin. Yeterince ders çalışmadınız mı? Süre yönetimini mi yapamadınız? Yoksa bazı dersleri (örneğin Geometri veya Kimya) tamamen elediniz mi? Bu eksikleri netleştirip çalışma planınızı buna göre şekillendirin.
 2. Konu Eksiğiniz Olmadığı Yanılgısından Kurtulun: Mezun öğrencilerin en büyük hatası 'ben bu konuyu biliyorum' diyerek konu anlatımlarını atlayıp sadece soru çözmeye çalışmaktır. Unuttuğunuz detaylar olabileceğini unutmayın, özellikle AYT konularını sıfırdan olmasa da hızlı bir konu tekrarıyla gözden geçirmelisiniz.
-3. Sosyal Medya ve Çevre Detoksu: Mezun yılında arkadaşlarınızın üniversiteye gitmiş olması üzerinizde psikolojik baskı yaratabilir. Bu süreçte sosyal medyadan uzak durmak ve odağınızı sadece hedefinize kilitlemek ruh sağlığınız için en iyisidir.`,
+3. Sosyal Medya ve Çevre Detoksu: Mezun yılında arkadaşlarınızın üniversiteye gitmiş olması üzerinizde psikolojik baskı yaratabilir. Bu süreçte sosyal medyadan uzak durmak ve odağınızı sadece hedefinize kilitlemek ruh sağlığınız için en iyisidir.
+4. Haftalık Deneme Takvimi Kurmak: Mezun öğrenciler için en büyük avantaj tüm günün onlara ait olmasıdır. Eylül ayından itibaren haftada 1, ocak ayından itibaren haftada 2, nisan ayından itibaren ise her gün deneme çözerek pratik eksikliğinizi tamamen kapatmalısınız.`,
     yazar: "Derslinex Editörü",
     tarih: "2026-03-15",
     kategori: "Çalışma Teknikleri",
@@ -193,7 +210,8 @@ Mezun yılında izlenmesi gereken stratejiler:
 Verimli bir LGS programının temel özellikleri:
 1. Okul Sonrası Dinlenme Payı: Okuldan eve geldikten sonra hemen masaya oturmak yerine en az 1-1.5 saat dinlenmeli ve zihninizi boşaltmalısınız.
 2. Günlük Soru Hedefleri: Sayısal derslerden (Matematik-Fen) günlük en az 30-40, sözel derslerden ise 40-50 soru çözmeyi hedefleyin. Soru sayısından ziyade, çözemediğiniz soruların doğru cevaplarını öğrenmek daha önemlidir.
-3. Düzenli Paragraf Rutini: LGS Türkçe testinin neredeyse tamamı okuduğunu anlamadır. Programınızda her gün istisnasız 15-20 paragraf sorusu yer almalıdır.`,
+3. Düzenli Paragraf Rutini: LGS Türkçe testinin neredeyse tamamı okuduğunu anlamadır. Programınızda her gün istisnasız 15-20 paragraf sorusu yer almalıdır.
+4. Yazılı Sınav Dönemlerinde Esneklik: Okul yazılılarının olduğu haftalarda LGS soru hedeflerinizi yarıya indirerek okul derslerinize odaklanın. Okul not ortalamasının da LGS yerleştirmelerinde kritik durumlarda belirleyici olduğunu unutmayın.`,
     yazar: "Derslinex Editörü",
     tarih: "2026-03-08",
     kategori: "LGS Rehberliği",
@@ -210,7 +228,8 @@ Verimli bir LGS programının temel özellikleri:
 LGS velilerinin dikkat etmesi gereken önemli kurallar:
 1. Kıyaslamalardan Uzak Durun: Çocuğunuzun deneme sonuçlarını komşunun, akrabanın veya sınıf arkadaşlarının netleriyle kıyaslamak çocukta değersizlik ve yetersizlik hissi yaratır. Kıyaslamayı sadece kendi geçmiş netleriyle yapmalısınız.
 2. Sınavı Hayatın Merkezine Koymayın: Evdeki tüm sohbetlerin, planların ve günlük rutinlerin sadece LGS etrafında dönmesi çocuğun kaygı seviyesini tavan yaptırır. Sınav dışı konulara da evde yer açın.
-3. Destekleyici Olun: Çocuğunuza sınav sonucu ne olursa olsun onu sevmeye devam edeceğinizi ve onun çabasının sizin için en değerli şey olduğunu hissettirin. Güven duygusu, sınav kaygısını en çok azaltan faktördür.`,
+3. Destekleyici Olun: Çocuğunuza sınav sonucu ne olursa olsun onu sevmeye devam edeceğinizi ve onun çabasının sizin için en değerli şey olduğunu hissettirin. Güven duygusu, sınav kaygısını en çok azaltan faktördür.
+4. Profesyonel Yardım Almaktan Çekinmeyin: Eğer sınav kaygısı çocuğunuzun uykusunu, beslenmesini ve günlük yaşam aktivitelerini bozacak düzeye geldiyse bir rehber öğretmen veya psikologdan yardım almayı ihmal etmeyin.`,
     yazar: "Derslinex Editörü",
     tarih: "2026-03-01",
     kategori: "LGS Rehberliği",
