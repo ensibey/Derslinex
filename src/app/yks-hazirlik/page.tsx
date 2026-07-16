@@ -8,10 +8,10 @@ import { waLink } from "@/lib/utils";
 export default function YksHazirlikPage() {
   const [activeTool, setActiveTool] = useState<"countdown" | "calculator" | null>("countdown");
 
-  // Geri Sayım State ve Mantığı (Örn: 20 Haziran 2026)
+  // Geri Sayım State ve Mantığı (Örn: 19 Haziran 2027)
   const [timeLeft, setTimeLeft] = useState({ gun: 0, saat: 0, dakika: 0 });
   useEffect(() => {
-    const targetDate = new Date("June 20, 2026 10:00:00").getTime();
+    const targetDate = new Date("June 19, 2027 10:00:00").getTime();
     const interval = setInterval(() => {
       const now = new Date().getTime();
       const difference = targetDate - now;
@@ -63,7 +63,7 @@ export default function YksHazirlikPage() {
           <h2 className="text-2xl font-black text-gray-900 mb-6">Hızlı Araçlar</h2>
           <div className="grid sm:grid-cols-2 gap-5">
             {[
-              { id: "countdown", emoji: "⏰", title: "Sınava Geri Sayım", desc: "YKS 2026'ya kalan süre" },
+              { id: "countdown", emoji: "⏰", title: "Sınava Geri Sayım", desc: "YKS 2027'ye kalan süre" },
               { id: "calculator", emoji: "🧮", title: "Puan Hesaplama", desc: "Net sayılarına göre tahmini puan" },
             ].map((t) => (
               <button
@@ -85,7 +85,7 @@ export default function YksHazirlikPage() {
         <section className="mb-16 bg-white border border-gray-100 rounded-3xl p-8 shadow-sm">
           {activeTool === "countdown" && (
             <div className="text-center py-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">🗓️ YKS 2026 Geri Sayım Sayacı</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-6">🗓️ YKS 2027 Geri Sayım Sayacı</h3>
               <div className="flex justify-center gap-4 sm:gap-8">
                 {[
                   { label: "Gün", value: timeLeft.gun },

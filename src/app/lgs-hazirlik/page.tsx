@@ -6,10 +6,10 @@ import { waLink } from "@/lib/utils";
 export default function LgsHazirlikPage() {
   const [activeTool, setActiveTool] = useState<"countdown" | "calculator" | null>("countdown");
 
-  // Geri Sayım State ve Mantığı (Örn: LGS Haziran 2026)
+  // Geri Sayım State ve Mantığı (Örn: LGS Haziran 2027)
   const [timeLeft, setTimeLeft] = useState({ gun: 0, saat: 0, dakika: 0 });
   useEffect(() => {
-    const targetDate = new Date("June 07, 2026 09:30:00").getTime();
+    const targetDate = new Date("June 06, 2027 09:30:00").getTime();
     const interval = setInterval(() => {
       const now = new Date().getTime();
       const difference = targetDate - now;
@@ -63,7 +63,7 @@ export default function LgsHazirlikPage() {
           <h2 className="text-2xl font-black text-[#1E3A8A] mb-6">Hızlı Araçlar</h2>
           <div className="grid sm:grid-cols-2 gap-5">
             {[
-              { id: "countdown", emoji: "⏰", title: "Sınava Geri Sayım", desc: "LGS 2026'ya kalan süre" },
+              { id: "countdown", emoji: "⏰", title: "Sınava Geri Sayım", desc: "LGS 2027'ye kalan süre" },
               { id: "calculator", emoji: "🧮", title: "LGS Puan Hesaplama", desc: "LGS ders netlerine göre tahmini puan" },
             ].map((t) => (
               <button
@@ -85,7 +85,7 @@ export default function LgsHazirlikPage() {
         <section className="mb-16 bg-white border border-[#EFECE6] rounded-3xl p-8 shadow-sm">
           {activeTool === "countdown" && (
             <div className="text-center py-6">
-              <h3 className="text-xl font-bold text-[#1E3A8A] mb-6">🗓️ LGS 2026 Geri Sayım Sayacı</h3>
+              <h3 className="text-xl font-bold text-[#1E3A8A] mb-6">🗓️ LGS 2027 Geri Sayım Sayacı</h3>
               <div className="flex justify-center gap-4 sm:gap-8">
                 {[
                   { label: "Gün", value: timeLeft.gun },
