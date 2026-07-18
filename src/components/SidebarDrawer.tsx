@@ -36,6 +36,9 @@ export default function SidebarDrawer() {
     { href: "/blog/obp-siralamaya-etkisi", label: "⚖️ OBP Sıralama Etki Robotu" },
     { href: "/blog/soru-dagilimlari", label: "📊 YKS & LGS Soru Dağılımları" },
     { href: "/blog/yks-net-siralama-karsilastirma", label: "📈 YKS Net - Sıralama Kıyaslama" },
+    { href: "/blog/konu-takip-cetelesi", label: "📋 Konu Takip Çetelesi" },
+    { href: "/blog/lise-taban-puanlari", label: "🏫 Lise Taban Puan & Net Analizi" },
+    { href: "/blog/meslek-net-atlası", label: "💼 Hangi Meslek Kaç Net İstiyor?" },
     { href: "/wiki", label: "📚 Ders Konuları Sözlüğü (Wiki)" },
     { href: "/blog/bilgi-kartlari", label: "🃏 Sınav Hap Bilgileri" },
     { href: "/blog/gunun-sorusu", label: "🎮 Günün Özel Sorusu" },
@@ -97,7 +100,7 @@ export default function SidebarDrawer() {
               POPÜLER ARAÇLAR & DERSLER
             </span>
             <div className="space-y-2">
-              {quickLinks.slice(0, 10).map((link) => (
+              {quickLinks.slice(0, 13).map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
@@ -116,7 +119,7 @@ export default function SidebarDrawer() {
               OKUNMASI GEREKEN REHBERLER
             </span>
             <div className="space-y-2">
-              {quickLinks.slice(10).map((link) => (
+              {quickLinks.slice(13).map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
