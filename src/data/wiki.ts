@@ -97,6 +97,134 @@ Karyokinezi (çekirdek bölünmesi) tamamlandıktan sonra sitokinez (sitoplazma 
 Cumhuriyet Edebiyatı çalışırken sadece yazar-eser ezberlemeyin; romanların başkahramanlarını (Örn: Yaban romanındaki Ahmet Celal, Huzur romanındaki Mümtaz ve Nuran) mutlaka bir kenara not edin. ÖSYM son yıllarda doğrudan roman kahramanları üzerinden soru sormaktadır.`,
     hocaSlug: "elif-demir-turkce-edebiyat",
     hocaAd: "Elif Demir"
+  },
+  // YENİ EKLENEN WİKİ KONULARI
+  {
+    id: "4",
+    slug: "trigonometri-formulleri-ve-birim-cember",
+    baslik: "Trigonometri Formülleri, Birim Çember ve ÖSYM Çıkmış Soru Çözüm Taktikleri",
+    ders: "Matematik",
+    kategori: "YKS",
+    ozet: "AYT Matematik sınavının en ağır konularından olan Trigonometri için birim çember özellikleri, toplam-fark ve yarım açı formülleri ile sadeleştirme taktikleri.",
+    icerik: `Trigonometri, hem AYT Matematik hem de Geometri kısmında her yıl toplamda 4-5 soru barındıran kritik bir konudur. Trigonometrinin temelini birim çember ve dik üçgendeki oranlar oluşturur.
+
+📐 Birim Çember Özellikleri:
+- Merkezi orijin (0,0) ve yarıçapı 1 birim olan çembere birim çember denir.
+- Birim çemberin denklemi: x² + y² = 1 formülüyle ifade edilir.
+- Yatay eksen (x ekseni) kosinüs eksenini, dikey eksen (y ekseni) ise sinüs eksenini temsil eder. Dolayısıyla cos²θ + sin²θ = 1 kuralı buradan gelir.
+
+🔄 Toplam - Fark Formülleri:
+- sin(a + b) = sin(a) * cos(b) + cos(a) * sin(b)
+- cos(a + b) = cos(a) * cos(b) - sin(a) * sin(b)
+- tan(a + b) = [tan(a) + tan(b)] / [1 - tan(a) * tan(b)]
+
+⚡ Yarım Açı Formülleri (ÖSYM Her Yıl Sorar):
+- sin(2a) = 2 * sin(a) * cos(a)
+- cos(2a) = cos²(a) - sin²(a) = 2cos²(a) - 1 = 1 - 2sin²(a)
+- tan(2a) = 2tan(a) / [1 - tan²(a)]
+
+💡 Derece Yaptıran Çözüm Taktikleri:
+Trigonometrik sadeleştirme sorularında ifadeleri olabildiğince sinüs ve kosinüs cinsinden yazmaya çalışın (Örn: tanx yerine sinx/cosx, cotx yerine cosx/sinx yazarak başlayın). Ayrıca payda eşitleme yaptıktan sonra yarım açı formüllerinin gizlenip gizlenmediğini kontrol edin.`,
+    hocaSlug: "ahmet-yilmaz-matematik",
+    hocaAd: "Ahmet Yılmaz"
+  },
+  {
+    id: "5",
+    slug: "newtonin-hareket-yasalari-ve-surtunme-kuvveti",
+    baslik: "Newton'ın Hareket Yasaları, Sürtünme Kuvveti ve Eğik Düzlem Analizi",
+    ders: "Fizik",
+    kategori: "YKS",
+    ozet: "Fizik dersinin omurgasını oluşturan Newton'ın 3 temel hareket yasası, serbest cisim diyagramı çizimi ve sürtünmeli eğik düzlem soru tipleri.",
+    icerik: `Newton'ın Hareket Yasaları, klasik mekaniğin temelidir ve hem TYT hem de AYT Fizik testlerinde doğrudan veya diğer konuların (enerji, atışlar vb.) içinde dolaylı olarak mutlaka sorgulanır.
+
+🏎️ Newton'ın 3 Altın Yasası:
+1. Eylemsizlik Yasası: Bir cismin üzerine etki eden net kuvvet sıfırsa (Fnet = 0), cisim duruyorsa durmaya devam eder, hareket halindeyse sabit hızlı hareketini sürdürür.
+2. Dinamiğin Temel Prensibi (F = m * a): Bir cisme net bir kuvvet etki ediyorsa, cisim bu kuvvet yönünde ivmeli hareket yapar. Kuvvet ile ivme doğru orantılıdır.
+3. Etki - Tepki Yasası: Her etki kuvvetine karşı eşit büyüklükte ve zıt yönde bir tepki kuvveti oluşur (F_etki = -F_tepki). Tepki kuvveti daima temas yüzeyine diktir.
+
+⛰️ Sürtünme Kuvveti ve Eğik Düzlem Soruları:
+Sürtünme kuvveti (Fs), cismin hareket yönüne (veya hareket eğilimine) zıt yönde oluşur ve Fs = k * N formülüyle hesaplanır. Burada k sürtünme katsayısı, N ise yüzeye etki eden dik kuvvettir.
+Eğik düzlemde ağırlığın (G = m * g) iki bileşeni vardır:
+- Eğik düzleme paralel olan ve cismi aşağı çekmek isteyen kuvvet: G * sinθ
+- Eğik düzleme dik olan ve tepki kuvvetini (N) dengeleyen kuvvet: G * cosθ
+
+💡 Sınav Taktikleri:
+Newton sorularını çözerken hata yapmamak için ilk yapmanız gereken şey cisimlerin üzerine etki eden tüm kuvvetleri gösteren "Serbest Cisim Diyagramı" çizmek olmalıdır. Kuvvetleri çizmeden denkleme geçmek hata olasılığını %80 artırır.`,
+    hocaSlug: "mehmet-celik-fizik",
+    hocaAd: "Mehmet Çelik"
+  },
+  {
+    id: "6",
+    slug: "kimyasal-tepkime-turleri-ve-hesaplamalar",
+    baslik: "Kimyasal Tepkime Türleri, Denkleştirme ve Hesaplama Yöntemleri",
+    ders: "Kimya",
+    kategori: "YKS",
+    ozet: "TYT Kimya konularından kimyasal tepkime türleri (yanma, asit-baz, sentez, analiz, çökelme) ve denkleştirme ile mol hesaplama formülleri.",
+    icerik: `Kimyasal tepkimeler ve denklemler, kimya dersinin en temel konusudur. Maddelerin kimyasal değişimlerini ifade eden denklemleri denkleştirebilmek ve miktar geçişleri (mol hesaplamaları) yapabilmek sınavda net kazanmanın anahtarıdır.
+
+🧪 En Çok Sorulan Kimyasal Tepkime Türleri:
+1. Yanma Tepkimeleri: Maddelerin oksijen gazı (O₂) ile reaksiyona girmesidir. Organik bileşikler yandığında daima CO₂ ve H₂O açığa çıkar. Azotun yanması hariç tüm yanma olayları ekzotermiktir (ısı verir).
+2. Asit - Baz (Nötrleşme) Tepkimeleri: Asit ile bazın tepkimeye girerek tuz ve su oluşturmasıdır. Net iyon denklemi suyun oluşumuna göre yazılır: H⁺ + OH⁻ -> H₂O.
+3. Sentez (Birleşme) & Analiz (Ayrışma): İki veya daha fazla maddenin birleşerek tek bir madde oluşturmasına sentez; tek bir bileşiğin ısı veya elektrikle daha küçük maddelere parçalanmasına analiz denir.
+4. Çözünme - Çökelme Tepkimeleri: İki sulu çözelti karıştırıldığında suda çözünmeyen bir katının (çökelti) oluşmasıdır.
+
+🧮 Tepkime Hesaplama Adımları:
+1. Adım: Verilen tepkime denkleminin denk olup olmadığını kontrol edin, denk değilse en küçük tamsayılarla denkleştirin.
+2. Adım: Miktarı verilen maddeleri mutlaka 'Mol' (n = m / MA) birimine çevirin.
+3. Adım: Tepkime katsayılarını kullanarak sorulan maddenin mol sayısına geçiş yapın. Katsayılar molekül geçiş oranlarını gösterir.`,
+    hocaSlug: "mehmet-celik-fizik",
+    hocaAd: "Mehmet Çelik"
+  },
+  {
+    id: "7",
+    slug: "lgs-carpanlar-ve-katlar-ebob-ekok",
+    baslik: "LGS Çarpanlar ve Katlar: EBOB-EKOK Yeni Nesil Soru Çözümleri",
+    ders: "Matematik",
+    kategori: "LGS",
+    ozet: "LGS Matematik sınavının ilk ünitesi olan çarpanlar ve katlar, asal sayılar, EBOB ve EKOK kavramları ile yeni nesil mantık muhakeme soru taktikleri.",
+    icerik: `LGS Matematik testinin ilk ve en kritik konularından biri Çarpanlar ve Katlar ünitesidir. Sınavda her yıl bu üniteden doğrudan 2 veya 3 adet yeni nesil (hikayeleştirilmiş) soru sorulmaktadır.
+
+🔢 Temel Kavramlar:
+- Çarpan (Bölen): Her pozitif tam sayı, iki pozitif tam sayının çarpımı olarak yazılabilir. Bu sayılara o sayının çarpanları denir.
+- Asal Sayılar: Sadece 1'e ve kendisine bölünebilen, 1'den büyük doğal sayılardır (2, 3, 5, 7, 11, 13...). En küçük ve tek çift asal sayı 2'dir.
+- Aralarında Asal Sayılar: 1'den başka ortak böleni olmayan pozitif tam sayılardır (Örn: 8 ile 15). Aralarında asal sayıların EBOB'u daima 1'e, EKOK'u ise bu sayıların çarpımına eşittir.
+
+📐 EBOB ve EKOK Yeni Nesil Soru Ayrımı:
+Öğrencilerin en çok zorlandığı nokta hangi soruda EBOB, hangisinde EKOK kullanacağını belirlemektir:
+- EBOB (En Büyük Ortak Bölen): Büyük parçalardan küçük parçalar elde ediliyorsa, bölme, paylaştırma, eşit aralıklarla ağaç dikme veya kutulara doldurma varsa EBOB kullanılır.
+- EKOK (En Küçük Ortak Kat): Küçük parçalar birleştirilerek daha büyük yapılar oluşturuluyorsa, zillerin birlikte çalması, nöbetleşe işler, cevizlerin veya bilyelerin sayılması varsa EKOK kullanılır.
+
+💡 LGS Yeni Nesil Soru Taktikleri:
+Yeni nesil sorularda şekilleri ve uzun paragrafları okurken hemen panik yapmayın. Önce verilen sayıların EBOB'unu mu yoksa EKOK'unu mu bulmanız gerektiğini belirleyip kenara yazın. Sorunun sonundaki 'en az' veya 'en fazla' ifadelerine çok dikkat edin.`,
+    hocaSlug: "ahmet-yilmaz-matematik",
+    hocaAd: "Ahmet Yılmaz"
+  },
+  {
+    id: "8",
+    slug: "lgs-dna-ve-genetik-kod-kalitim",
+    baslik: "LGS DNA ve Genetik Kod, Mutasyon-Modifikasyon ve Kalıtım Kuralları",
+    ders: "Fen Bilimleri",
+    kategori: "LGS",
+    ozet: "LGS Fen Bilimleri dersinin en çok soru getiren ünitesi DNA ve Genetik Kod yapısı, nükleotid eşleşmeleri, çaprazlamalar ve Mendel kalıtım kuralları.",
+    icerik: `LGS Fen Bilimleri sınavında en yüksek soru ağırlığına sahip ünitelerin başında DNA ve Genetik Kod gelmektedir. Bu üniteyi anlamak kalıtım, adaptasyon ve biyoteknoloji konularının da kapısını açar.
+
+🧬 DNA'nın Yapısı ve Nükleotidler:
+- DNA (Deoksiribonükleik Asit), hücrenin yönetici molekülüdür ve çift iplikli sarmal yapıdadır.
+- Temel yapı birimleri Nükleotidlerdir. Bir nükleotid; Fosfat + Deoksiriboz Şekeri + Organik Baz birleşimiyle oluşur.
+- Organik bazlar 4 çeşittir: Adenin (A), Timin (T), Guanin (G) ve Sitozin (C). Eşleşme kuralına göre Adenin karşısına daima Timin (A=T), Guanin karşısına ise daima Sitozin (G≡C) gelir.
+- DNA molekülünde toplam Fosfat sayısı = Şeker sayısı = Toplam Nükleotid sayısı = Toplam Organik Baz sayısıdır.
+
+🧬 Kalıtım ve Çaprazlamalar (Mendel Yasaları):
+- Karakterlerin anne ve babadan yavrulara aktarılmasına kalıtım denir.
+- Baskın Gen (Dominant): Etkisini daima gösteren gendir, büyük harfle yazılır (A).
+- Çekinik Gen (Resesif): Etkisini sadece saf döl durumunda gösterebilen gendir, küçük harfle yazılır (a).
+- Saf Döl (Homozigot): Genotipin aynı özellikte olmasıdır (AA veya aa).
+- Melez Döl (Heterozigot): Genotipin farklı özelliklerde olmasıdır (Aa).
+
+💡 Sınav Sorusu Yakalama Taktikleri:
+LGS'de çaprazlama sorularında sizden fenotip (dış görünüş) ve genotip (gen yapısı) oranları istenir. Heterozigot iki bezelyeyi çaprazladığınızda (Aa x Aa) oluşacak yavruların %75 baskın fenotipte, %25 ise çekinik fenotipte olacağını adınız gibi ezberleyin. Çekinik fenotipte bir yavru oluşuyorsa, anne ve babanın genotipinde kesinlikle en az bir tane çekinik gen (a) bulunmak zorundadır.`,
+    hocaSlug: "mehmet-celik-fizik",
+    hocaAd: "Mehmet Çelik"
   }
 ];
 
