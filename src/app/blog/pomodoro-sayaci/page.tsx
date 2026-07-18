@@ -7,6 +7,8 @@ export default function PomodoroPage() {
   const [pomoMode, setPomoMode] = useState<"work" | "break">("work");
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+
   useEffect(() => {
     if (pomoActive) {
       timerRef.current = setInterval(() => {
@@ -15,11 +17,11 @@ export default function PomodoroPage() {
             clearInterval(timerRef.current!);
             setPomoActive(false);
             if (pomoMode === "work") {
-              alert("Tebrikler! Çalışma seansı bitti. Şimdi 5 dakika mola zamanı. 🎉");
+              setStatusMessage("Tebrikler! Çalışma seansı bitti. Şimdi mola zamanı. 🎉");
               setPomoMode("break");
               return 300; // 5 dk mola
             } else {
-              alert("Mola bitti! Yeni çalışma seansını başlatabilirsin. 💪");
+              setStatusMessage("Mola bitti! Yeni çalışma seansını başlatabilirsin. 💪");
               setPomoMode("work");
               return 1500; // 25 dk çalışma
             }
@@ -77,9 +79,24 @@ export default function PomodoroPage() {
             <p className="text-xs text-primary-200 mt-2 font-bold opacity-80">25 Dk Çalışma / 5 Dk Mola</p>
           </div>
 
+          {statusMessage && (
+            <div className="w-full mt-6 bg-[#FAF0E3] border border-[#F5D0A9] text-[#B45309] text-xs font-bold p-4 rounded-2xl text-center relative">
+              <button 
+                onClick={() => setStatusMessage(null)}
+                className="absolute top-2 right-2.5 text-gray-500 font-bold"
+              >
+                ✕
+              </button>
+              {statusMessage}
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-4 w-full mt-6">
             <button
-              onClick={() => setPomoActive(!pomoActive)}
+              onClick={() => {
+                setStatusMessage(null);
+                setPomoActive(!pomoActive);
+              }}
               className={`py-3.5 px-4 rounded-2xl text-sm font-black text-center transition-all active:scale-95 shadow ${
                 pomoActive 
                   ? "bg-amber-500 hover:bg-amber-600 text-white" 
@@ -89,7 +106,10 @@ export default function PomodoroPage() {
               {pomoActive ? "⏸ Duraklat" : "▶ Başlat"}
             </button>
             <button
-              onClick={handlePomoReset}
+              onClick={() => {
+                handlePomoReset();
+                setStatusMessage(null);
+              }}
               className="bg-white/10 hover:bg-white/20 text-white py-3.5 px-4 rounded-2xl text-sm font-black text-center transition-all active:scale-95"
             >
               🔄 Sıfırla
