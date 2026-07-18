@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { tumTurkiyeLiseleri } from "@/data/liseler";
+import { getLiseVerisiBySearch } from "@/data/liseler_helper";
 import { waLink } from "@/lib/utils";
 
 export default function LiseTabanPuanlariPage() {
@@ -9,20 +10,14 @@ export default function LiseTabanPuanlariPage() {
   const [sehirFilter, setSehirFilter] = useState("Tümü");
   const [targetSchool, setTargetSchool] = useState<typeof tumTurkiyeLiseleri[0] | null>(null);
 
-  // Benzersiz şehir listesini al
-  const sehirler = ["Tümü", ...Array.from(new Set(tumTurkiyeLiseleri.map((l) => l.sehir)))];
+  // Benzersiz şehir listesini al (81 ili kapsar)
+  const sehirler = ["Tümü", ...Array.from(new Set(tumTurkiyeLiseleri.map((l) => l.sehir)))].sort();
 
-  // Arama ve Şehir filtreleme mantığı
-  const filteredLiseler = tumTurkiyeLiseleri.filter((l) => {
-    const matchesSearch = l.ad.toLowerCase().includes(searchTerm.toLowerCase()) || l.sehir.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesSehir = sehirFilter === "Tümü" || l.sehir === sehirFilter;
-    return matchesSearch && matchesSehir;
-  });
+  // Arama ve Şehir filtreleme mantığını dinamik helper ile çalıştır
+  const filteredLiseler = getLiseVerisiBySearch(searchTerm, sehirFilter);
 
   // Seçilen lisenin net hedeflerini dinamik hesaplayan algoritma
   const calculateNetHedefleri = (puan: number) => {
-    // LGS puanı 500 üzerinden hesaplanır
-    // Puan yükseldikçe gerekli ders netleri dinamik olarak değişir
     let matNet = 10;
     let fenNet = 10;
     let turNet = 12;
@@ -66,7 +61,7 @@ export default function LiseTabanPuanlariPage() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Örn: Galatasaray, Atatürk Fen..."
+              placeholder="Örn: Galatasaray, Kars Fen, Rize TOBB..."
               className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl py-3 px-4 text-sm font-bold text-gray-800 outline-none focus:border-[#D97706] transition-colors"
             />
           </div>
@@ -103,7 +98,7 @@ export default function LiseTabanPuanlariPage() {
                 >
                   <div>
                     <h3 className="font-black text-gray-800 text-sm sm:text-base">{lise.ad}</h3>
-                    <p className="text-xs text-gray-550 font-bold mt-1">📍 {lise.sehir} | Yüzdelik Dilim: %{lise.dilim}</p>
+                    <p className="text-xs text-gray-555 font-bold mt-1">📍 {lise.sehir} | Yüzdelik Dilim: %{lise.dilim}</p>
                   </div>
                   <div className="bg-[#FAF8F5] border border-[#EFECE6] text-[#1E3A8A] font-black px-4 py-2.5 rounded-xl text-xs flex-shrink-0">
                     {lise.puan} Puan
@@ -137,7 +132,7 @@ export default function LiseTabanPuanlariPage() {
               </div>
 
               <div>
-                <p className="text-xs font-black text-gray-450 uppercase tracking-widest mb-3">Bu Liseyi Kazanmak İçin Hedef Netler:</p>
+                <p className="text-xs font-black text-gray-455 uppercase tracking-widest mb-3">Bu Liseyi Kazanmak İçin Hedef Netler:</p>
                 <div className="grid grid-cols-3 gap-3">
                   <div className="bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl p-3.5 text-center">
                     <p className="text-[10px] font-bold text-gray-400 uppercase">Matematik</p>
