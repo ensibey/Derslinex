@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { waLink } from "@/lib/utils";
 
 export default function SidebarDrawer() {
   const [isOpen, setIsOpen] = useState(false);
@@ -136,7 +137,7 @@ export default function SidebarDrawer() {
         {/* Footer */}
         <div className="p-6 border-t border-[#EFECE6] bg-white flex-shrink-0">
           <a
-            href="https://wa.me/905436315802?text=Merhaba,%20YKS%20/%20LGS%20özel%20derslerimiz%20hakkında%20bilgi%20almak%20istiyorum."
+            href={waLink("Merhaba, Derslinex hızlı menüsünden ulaşıyorum. YKS / LGS özel derslerimiz hakkında bilgi alabilir miyim?")}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full bg-[#D97706] hover:bg-[#B45309] text-white font-black py-3.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 text-sm"
