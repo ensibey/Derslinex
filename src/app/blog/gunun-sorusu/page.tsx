@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { waLink } from "@/lib/utils";
 
 const sorular = [
   {
@@ -13,7 +14,8 @@ const sorular = [
       { key: "D", text: "Cenap Şahabettin" }
     ],
     dogru: "C",
-    cozum: "Hüseyin Rahmi Gürpınar ve Ahmet Rasim, Servet-i Fünun döneminde yaşamalarına rağmen topluluğa dahil olmayıp bağımsız kalmışlardır."
+    cozum: "Hüseyin Rahmi Gürpınar ve Ahmet Rasim, Servet-i Fünun döneminde yaşamalarına rağmen topluluğa dahil olmayıp bağımsız kalmışlardır.",
+    hocaAd: "Elif Demir (Türkçe/Edebiyat)"
   },
   {
     id: 2,
@@ -26,7 +28,8 @@ const sorular = [
       { key: "D", text: "41" }
     ],
     dogru: "A",
-    cozum: "Aritmetik dizi genel terim formülü: an = a₁ + (n-1)*d. Buradan a₁₀ = 5 + (10-1)*3 = 5 + 27 = 32 bulunur."
+    cozum: "Aritmetik dizi genel terim formülü: an = a₁ + (n-1)*d. Buradan a₁₀ = 5 + (10-1)*3 = 5 + 27 = 32 bulunur.",
+    hocaAd: "Ahmet Yılmaz (Matematik)"
   },
   {
     id: 3,
@@ -39,7 +42,107 @@ const sorular = [
       { key: "D", text: "Enerji" }
     ],
     dogru: "C",
-    cozum: "Kısa Muz (Kütle, Işık şiddeti, Sıcaklık, Akım şiddeti, Madde miktarı, Uzunluk, Zaman) temel büyüklüklerdir. Diğerleri türetilmiştir."
+    cozum: "Kısa Muz (Kütle, Işık şiddeti, Sıcaklık, Akım şiddeti, Madde miktarı, Uzunluk, Zaman) temel büyüklüklerdir. Diğerleri türetilmiştir.",
+    hocaAd: "Mehmet Çelik (Fizik)"
+  },
+  // YENİ SORULAR (10 SORUYA TAMAMLAMA)
+  {
+    id: 4,
+    ders: "🧪 Kimya",
+    soru: "Aşağıdaki kimyasal tür etkileşimlerinden hangisi güçlü etkileşim (kimyasal bağ) sınıfına girer?",
+    secenekler: [
+      { key: "A", text: "Hidrojen Bağı" },
+      { key: "B", text: "Kovalent Bağ" },
+      { key: "C", text: "Dipol-Dipol Etkileşimi" },
+      { key: "D", text: "London Kuvvetleri" }
+    ],
+    dogru: "B",
+    cozum: "Kovalent bağ, iyonik bağ ve metalik bağ güçlü etkileşimlerdir. Hidrojen bağı ve Van der Waals (dipol-dipol, London vb.) ise zayıf etkileşimlerdir.",
+    hocaAd: "Mehmet Çelik (Kimya)"
+  },
+  {
+    id: 5,
+    ders: "🧬 Biyoloji",
+    soru: "Sağlıklı bir insanda çizgili kasların kasılması sırasında aşağıdaki niceliklerden hangisinin azalması beklenir?",
+    secenekler: [
+      { key: "A", text: "Kreatin miktarı" },
+      { key: "B", text: "Isı miktarı" },
+      { key: "C", text: "Glikojen miktarı" },
+      { key: "D", text: "Karbondioksit miktarı" }
+    ],
+    dogru: "C",
+    cozum: "Kas kasılması sırasında enerji tüketimi için glikoz ve glikojen depoları parçalanarak tüketilir, dolayısıyla glikojen miktarı azalır. Kreatin fosfat kullanımıyla kreatin artar, CO₂ ve ısı ise açığa çıkarak artış gösterir.",
+    hocaAd: "Ahmet Yılmaz (Biyoloji)"
+  },
+  {
+    id: 6,
+    ders: "📚 Türkçe",
+    soru: "Aşağıdaki cümlelerin hangisinde bir yazım hatası yapılmıştır?",
+    secenekler: [
+      { key: "A", text: "Bugün her şey yolunda gitti." },
+      { key: "B", text: "Hiç bir insan yalnız kalmak istemez." },
+      { key: "C", text: "Birtakım sorunlar yaşadık." },
+      { key: "D", text: "Pek çok konuda anlaştık." }
+    ],
+    dogru: "B",
+    cozum: "'Hiçbir' sözcüğü belgisiz sıfat rolündeyken daima bitişik yazılmalıdır. Cümlede 'Hiç bir' şeklinde ayrı yazılarak hata yapılmıştır.",
+    hocaAd: "Elif Demir (Türkçe)"
+  },
+  {
+    id: 7,
+    ders: "📐 Geometri",
+    soru: "İç açılarının toplamı dış açılarının toplamının 3 katı olan düzgün çokgen kaç kenarlıdır?",
+    secenekler: [
+      { key: "A", text: "6" },
+      { key: "B", text: "8" },
+      { key: "C", text: "10" },
+      { key: "D", text: "12" }
+    ],
+    dogru: "B",
+    cozum: "Dış açılar toplamı her çokgende 360 derecedir. İç açılar toplamı (n-2)*180 formülüyle bulunur. (n-2)*180 = 360*3 => (n-2)*180 = 1080 => n-2 = 6 => n = 8 (Sekizgen).",
+    hocaAd: "Ahmet Yılmaz (Geometri)"
+  },
+  {
+    id: 8,
+    ders: "⏳ Tarih",
+    soru: "Mustafa Kemal Atatürk'ün 'Ordular, ilk hedefiniz Akdeniz'dir, ileri!' emrini verdiği savaş aşağıdakilerden hangisidir?",
+    secenekler: [
+      { key: "A", text: "I. İnönü Savaşı" },
+      { key: "B", text: "Sakarya Meydan Muharebesi" },
+      { key: "C", text: "Büyük Taarruz (Başkomutanlık Meydan Muharebesi)" },
+      { key: "D", text: "II. İnönü Savaşı" }
+    ],
+    dogru: "C",
+    cozum: "Mustafa Kemal Atatürk, kurtuluş mücadelesinin son safhası olan Büyük Taarruz sırasında Yunan ordusunu takip etmek üzere ordularına bu tarihi emri vermiştir.",
+    hocaAd: "Elif Demir (Tarih)"
+  },
+  {
+    id: 9,
+    ders: "🧲 Fen (LGS)",
+    soru: "DNA molekülünün kendini eşlemesi sırasında sitoplazmadan çekirdeğe giren maddelerin miktarıyla ilgili hangisi doğrudur?",
+    secenekler: [
+      { key: "A", text: "Nükleotid miktarı artar" },
+      { key: "B", text: "Fosfat ve şeker miktarı azalır" },
+      { key: "C", text: "Sitoplazmadaki serbest nükleotid miktarı azalır" },
+      { key: "D", text: "Çekirdekteki DNA sayısı yarıya iner" }
+    ],
+    dogru: "C",
+    cozum: "DNA eşlenirken sitoplazmadaki serbest organik baz, şeker ve fosfatlar çekirdeğe girerek yeni ipliklerin yapımında kullanılır. Dolayısıyla sitoplazmadaki serbest nükleotid miktarı azalır.",
+    hocaAd: "Mehmet Çelik (Fen)"
+  },
+  {
+    id: 10,
+    ders: "🎒 Matematik (LGS)",
+    soru: "Alanı 144 cm² olan kare şeklindeki bir kartonun çevresi kaç santimetredir?",
+    secenekler: [
+      { key: "A", text: "36" },
+      { key: "B", text: "48" },
+      { key: "C", text: "60" },
+      { key: "D", text: "72" }
+    ],
+    dogru: "B",
+    cozum: "Karenin alanı a² = 144 ise bir kenarı a = √144 = 12 cm'dir. Çevresi ise 4*a = 4*12 = 48 cm olarak bulunur.",
+    hocaAd: "Ahmet Yılmaz (Matematik)"
   }
 ];
 
@@ -66,6 +169,8 @@ export default function GunlukQuizPage() {
     setSelectedIdx((prev) => (prev + 1) % sorular.length);
   };
 
+  const isWrong = userChoice && userChoice !== current.dogru;
+
   return (
     <div className="bg-[#FAF8F5] min-h-screen text-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-xl mx-auto">
@@ -79,7 +184,7 @@ export default function GunlukQuizPage() {
         <div className="bg-white border border-[#EFECE6] rounded-3xl p-6 sm:p-8 shadow-md flex flex-col space-y-6">
           <div className="flex justify-between items-center pb-4 border-b border-[#FAF8F5]">
             <span className="text-xs font-black text-[#D97706] bg-[#FAF0E3] px-3 py-1 rounded-xl">{current.ders}</span>
-            <span className="text-xs text-gray-400 font-bold">Soru {current.id}</span>
+            <span className="text-xs text-gray-400 font-bold">Soru {current.id} / {sorular.length}</span>
           </div>
 
           <p className="text-base sm:text-lg font-black text-gray-800 leading-relaxed">
@@ -142,6 +247,25 @@ export default function GunlukQuizPage() {
                 <p className="font-black mb-1">💡 ÇÖZÜM:</p>
                 {current.cozum}
               </div>
+
+              {/* Satış Yönlendirme Alanı */}
+              {isWrong && (
+                <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-xs font-semibold text-blue-900 leading-relaxed">
+                  <p className="font-black mb-1">💡 UZMAN DERSLİNEX REHBERLİK NOTU:</p>
+                  Üzülme! Bu konuda eksiklerin varsa, konuyu tam kavrayabilmen için <span className="font-black">{current.hocaAd}</span> ile hemen 15 dakikalık ücretsiz tanışma seansı başlatabilirsin.
+                  <div className="mt-2.5">
+                    <a
+                      href={waLink(`Merhaba, günün sorusu sayfasındaki ${current.ders} sorusunda takıldım, ${current.hocaAd} hocamızdan ücretsiz tanışma dersi almak istiyorum.`)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block bg-[#1E3A8A] text-white font-black px-4 py-2 rounded-lg text-[10px] hover:bg-[#152a60] transition-colors"
+                    >
+                      ⚡ Ücretsiz Tanışma Dersi Al
+                    </a>
+                  </div>
+                </div>
+              )}
+
               <button
                 onClick={handleNext}
                 className="w-full bg-[#1E3A8A] hover:bg-[#152a60] text-white font-black py-4 rounded-2xl transition-all active:scale-95 shadow-sm text-sm"
