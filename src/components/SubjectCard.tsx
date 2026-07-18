@@ -29,7 +29,8 @@ export default function SubjectCard({ ders }: { ders: DersAlani }) {
             alt={ders.isim}
             fill
             className="object-cover"
-            sizes="56px"
+            sizes="96px"
+            quality={75}
             priority
           />
         ) : (

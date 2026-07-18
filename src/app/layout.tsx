@@ -66,8 +66,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://www.google-analytics.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://ui-avatars.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+        <link rel="dns-prefetch" href="https://ui-avatars.com" />
         <link rel="icon" href="/logo.png?v=7" sizes="192x192" type="image/png" />
         <link rel="icon" href="/logo.png?v=7" sizes="96x96" type="image/png" />
         <link rel="icon" href="/logo.png?v=7" sizes="48x48" type="image/png" />
