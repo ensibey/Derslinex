@@ -1,6 +1,7 @@
 import { blogYazilari } from "@/data/blog";
 import { dersAlanlari } from "@/data/dersler";
 import { hocalar } from "@/data/hocalar";
+import { wikiKonulari } from "@/data/wiki";
 
 export default function sitemap() {
   const baseUrl = "https://derslinex.com";
@@ -18,6 +19,8 @@ export default function sitemap() {
     "/blog/ders-sihirbazi",
     "/blog/obp-siralamaya-etkisi",
     "/blog/soru-dagilimlari",
+    "/blog/yks-net-siralama-karsilastirma",
+    "/wiki",
     "/hakkimizda",
     "/iletisim",
     "/gizlilik",
@@ -55,5 +58,13 @@ export default function sitemap() {
     priority: 0.5,
   }));
 
-  return [...statikSayfalar, ...hocaSayfalari, ...dersSayfalari, ...blogSayfalari];
+  // Dinamik Wiki Konuları
+  const wikiSayfalari = wikiKonulari.map((w) => ({
+    url: `${baseUrl}/wiki/${w.slug}`,
+    lastModified: new Date().toISOString().split("T")[0],
+    changeFrequency: "monthly",
+    priority: 0.5,
+  }));
+
+  return [...statikSayfalar, ...hocaSayfalari, ...dersSayfalari, ...blogSayfalari, ...wikiSayfalari];
 }
