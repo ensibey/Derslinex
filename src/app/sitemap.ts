@@ -14,6 +14,8 @@ export default function sitemap() {
     "/blog",
     "/blog/bilgi-kartlari",
     "/blog/gunun-sorusu",
+    "/blog/pomodoro-sayaci",
+    "/blog/ders-sihirbazi",
     "/hakkimizda",
     "/iletisim",
     "/gizlilik",

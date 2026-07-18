@@ -1,0 +1,102 @@
+"use client";
+import { useState, useEffect, useRef } from "react";
+
+export default function PomodoroPage() {
+  const [pomoTime, setPomoTime] = useState(1500); // 25 dakika = 1500 saniye
+  const [pomoActive, setPomoActive] = useState(false);
+  const [pomoMode, setPomoMode] = useState<"work" | "break">("work");
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (pomoActive) {
+      timerRef.current = setInterval(() => {
+        setPomoTime((prev) => {
+          if (prev <= 1) {
+            clearInterval(timerRef.current!);
+            setPomoActive(false);
+            if (pomoMode === "work") {
+              alert("Tebrikler! Çalışma seansı bitti. Şimdi 5 dakika mola zamanı. 🎉");
+              setPomoMode("break");
+              return 300; // 5 dk mola
+            } else {
+              alert("Mola bitti! Yeni çalışma seansını başlatabilirsin. 💪");
+              setPomoMode("work");
+              return 1500; // 25 dk çalışma
+            }
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else {
+      if (timerRef.current) clearInterval(timerRef.current);
+    }
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [pomoActive, pomoMode]);
+
+  const handlePomoReset = () => {
+    setPomoActive(false);
+    setPomoMode("work");
+    setPomoTime(1500);
+  };
+
+  const formatPomoTime = () => {
+    const mins = Math.floor(pomoTime / 60);
+    const secs = pomoTime % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  return (
+    <div className="bg-[#FAF8F5] min-h-screen text-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-xl mx-auto text-center">
+        <span className="text-[#D97706] text-xs font-black uppercase tracking-widest">ÇALIŞMA KONDİSYONU</span>
+        <h1 className="text-3xl sm:text-4xl font-black text-[#1E3A8A] mt-2 mb-4">Pomodoro Çalışma Sayacı</h1>
+        <p className="text-gray-550 text-sm font-semibold mb-10 leading-relaxed">
+          25 dakika odaklanmış ders çalışması ve ardından gelen 5 dakikalık zihinsel molalarla sınav veriminizi katlayın.
+        </p>
+
+        {/* Premium Pomodoro Clock */}
+        <div className="bg-gradient-to-br from-[#1E3A8A] to-[#1e2a52] text-white rounded-3xl p-8 sm:p-10 shadow-lg relative overflow-hidden flex flex-col items-center">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-full pointer-events-none" />
+          
+          <div className="flex justify-between items-center w-full pb-4 border-b border-white/10 mb-6">
+            <span className="text-[11px] font-black text-[#F5D0A9] uppercase tracking-widest">
+              ⏱️ DERS ÇALIŞMA SAYACI
+            </span>
+            <span className={`text-xs font-black uppercase px-3 py-1 rounded-full ${pomoMode === "work" ? "bg-amber-600/50" : "bg-emerald-600/50"}`}>
+              {pomoMode === "work" ? "Çalışma Seansı" : "Mola Seansı"}
+            </span>
+          </div>
+
+          <div className="text-center py-6 relative">
+            <div className="text-6xl sm:text-7xl font-black tracking-widest font-mono text-white drop-shadow">
+              {formatPomoTime()}
+            </div>
+            <p className="text-xs text-primary-200 mt-2 font-bold opacity-80">25 Dk Çalışma / 5 Dk Mola</p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 w-full mt-6">
+            <button
+              onClick={() => setPomoActive(!pomoActive)}
+              className={`py-3.5 px-4 rounded-2xl text-sm font-black text-center transition-all active:scale-95 shadow ${
+                pomoActive 
+                  ? "bg-amber-500 hover:bg-amber-600 text-white" 
+                  : "bg-white text-[#1E3A8A] hover:bg-gray-100"
+              }`}
+            >
+              {pomoActive ? "⏸ Duraklat" : "▶ Başlat"}
+            </button>
+            <button
+              onClick={handlePomoReset}
+              className="bg-white/10 hover:bg-white/20 text-white py-3.5 px-4 rounded-2xl text-sm font-black text-center transition-all active:scale-95"
+            >
+              🔄 Sıfırla
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
