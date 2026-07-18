@@ -4,11 +4,38 @@ import { useState } from "react";
 
 export default function IletisimPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({ isim: "", email: "", konu: "", mesaj: "", onay: false });
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setSubmitted(true);
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/iletisim", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.isim,
+          email: form.email,
+          phone: "", // Opsiyonel telefon
+          message: `Konu: ${form.konu || "Genel"} - Mesaj: ${form.mesaj}`
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSubmitted(true);
+      } else {
+        setError(data.error || "Bir hata oluştu, lütfen tekrar deneyin.");
+      }
+    } catch (err) {
+      setError("Sunucuya bağlanılamadı. Lütfen internetinizi kontrol edin.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -30,6 +57,11 @@ export default function IletisimPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5">
+                {error && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 text-xs font-bold p-3.5 rounded-xl">
+                    ⚠️ {error}
+                  </div>
+                )}
                 <div>
                   <label className="block text-sm font-black text-[#1E3A8A] mb-1.5">Ad Soyad *</label>
                   <input type="text" required value={form.isim}
@@ -69,9 +101,12 @@ export default function IletisimPage() {
                     <a href="/gizlilik" className="text-[#D97706] underline">Gizlilik Politikası</a>'nı okudum, onay veriyorum.
                   </label>
                 </div>
-                <button type="submit"
-                  className="w-full bg-[#D97706] hover:bg-[#B45309] text-white font-black py-3.5 rounded-xl transition-colors shadow-sm">
-                  Mesajı Gönder
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-[#D97706] hover:bg-[#B45309] text-white font-black py-3.5 rounded-xl transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? "Gönderiliyor..." : "Mesajı Gönder"}
                 </button>
               </form>
             )}
