@@ -1,17 +1,15 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { meslekNetVerisi } from "@/data/araclar";
+import { getMeslekVerisiBySearch } from "@/data/meslekler_helper";
 import { waLink } from "@/lib/utils";
 
 export default function MeslekNetAtlasPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedMeslek, setSelectedMeslek] = useState<typeof meslekNetVerisi[0] | null>(null);
+  const [selectedMeslek, setSelectedMeslek] = useState<any | null>(null);
 
-  const filteredMeslekler = meslekNetVerisi.filter((m) =>
-    m.ad.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    m.uni.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Arama mantığını dinamik helper ile çalıştır (100% meslek kapsamı)
+  const filteredMeslekler = getMeslekVerisiBySearch(searchTerm);
 
   return (
     <div className="bg-[#FAF8F5] min-h-screen text-gray-900 py-12 px-4 sm:px-6 lg:px-8">
@@ -31,7 +29,7 @@ export default function MeslekNetAtlasPage() {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Meslek veya üniversite adı arayın... (Örn: Tıp, ODTÜ, Hukuk)"
+            placeholder="Meslek veya üniversite adı arayın... (Örn: Tıp, Yazılım, Eczacılık, Psikoloji)"
             className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl py-3 px-4 text-sm font-bold text-gray-800 outline-none focus:border-[#D97706] transition-colors"
           />
         </div>
@@ -43,22 +41,26 @@ export default function MeslekNetAtlasPage() {
             <span className="text-xs font-black text-[#D97706] bg-[#FAF0E3] px-3 py-1 rounded-xl">Son Yerleşen Verileri</span>
           </div>
 
-          <div className="divide-y divide-gray-100">
-            {filteredMeslekler.map((meslek) => (
-              <button
-                key={meslek.id}
-                onClick={() => setSelectedMeslek(meslek)}
-                className="w-full py-4 text-left flex justify-between items-center hover:bg-gray-50/50 transition-colors first:pt-0 last:pb-0"
-              >
-                <div>
-                  <h3 className="font-black text-gray-800 text-sm sm:text-base">{meslek.ad}</h3>
-                  <p className="text-xs text-gray-555 font-bold mt-1">🎓 {meslek.uni}</p>
-                </div>
-                <div className="bg-[#FAF8F5] border border-[#EFECE6] text-[#1E3A8A] font-black px-4 py-2.5 rounded-xl text-xs flex-shrink-0">
-                  Sıralama: {meslek.saySiralama}
-                </div>
-              </button>
-            ))}
+          <div className="divide-y divide-gray-100 max-h-[350px] overflow-y-auto pr-2 scrollbar-thin">
+            {filteredMeslekler.length > 0 ? (
+              filteredMeslekler.map((meslek: any) => (
+                <button
+                  key={meslek.ad}
+                  onClick={() => setSelectedMeslek(meslek)}
+                  className="w-full py-4 text-left flex justify-between items-center hover:bg-gray-50/50 transition-colors first:pt-0 last:pb-0"
+                >
+                  <div>
+                    <h3 className="font-black text-gray-800 text-sm sm:text-base">{meslek.ad}</h3>
+                    <p className="text-xs text-gray-555 font-bold mt-1">🎓 {meslek.uni}</p>
+                  </div>
+                  <div className="bg-[#FAF8F5] border border-[#EFECE6] text-[#1E3A8A] font-black px-4 py-2.5 rounded-xl text-xs flex-shrink-0">
+                    Sıralama: {meslek.saySiralama}
+                  </div>
+                </button>
+              ))
+            ) : (
+              <div className="py-6 text-center text-sm text-gray-400 font-bold">Uyumlu meslek veya üniversite bulunamadı.</div>
+            )}
           </div>
         </div>
 
@@ -76,7 +78,7 @@ export default function MeslekNetAtlasPage() {
                 onClick={() => setSelectedMeslek(null)}
                 className="text-xs font-bold text-gray-400 hover:text-gray-600"
               >
-                Kapat
+                ✕ Kapat
               </button>
             </div>
 
