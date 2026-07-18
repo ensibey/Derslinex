@@ -18,7 +18,7 @@ export default function WhatsAppButton() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="WhatsApp ile iletişime geç"
-      className="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-xl transition-all hover:scale-110 animate-bounce"
+      className="hidden lg:block fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-xl transition-all hover:scale-110 animate-bounce"
       style={{ animationIterationCount: 3 }}
     >
       <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
