@@ -64,6 +64,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="tr" className={inter.variable}>
       <head>
+        <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://www.google-analytics.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <link rel="icon" href="/logo.png?v=7" sizes="192x192" type="image/png" />
         <link rel="icon" href="/logo.png?v=7" sizes="96x96" type="image/png" />
         <link rel="icon" href="/logo.png?v=7" sizes="48x48" type="image/png" />
@@ -77,7 +81,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-J3JSE0GLD5');
+            gtag('config', 'G-J3JSE0GLD5', { 'anonymize_ip': true });
           `
         }} />
       </head>
