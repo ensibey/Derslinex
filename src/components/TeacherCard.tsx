@@ -20,7 +20,8 @@ export default function TeacherCard({ hoca }: { hoca: Hoca }) {
               alt={hoca.isim}
               fill
               className="object-cover group-hover:scale-110 transition-transform duration-300"
-              sizes="64px"
+              sizes="96px"
+              quality={75}
             />
           </div>
           <div className="flex-1 min-w-0">
