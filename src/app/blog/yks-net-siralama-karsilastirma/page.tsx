@@ -40,25 +40,25 @@ export default function NetSiralamaKarsilastirmaPage() {
             <span className="text-xs font-bold text-gray-400">Yaklaşık Sonuçlar</span>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs sm:text-sm">
+          <div className="overflow-x-auto whitespace-nowrap scrollbar-thin pb-2">
+            <table className="w-full text-left border-collapse text-xs sm:text-sm min-w-[500px]">
               <thead>
                 <tr className="border-b border-[#FAF8F5] text-gray-450 font-black uppercase tracking-wider">
-                  <th className="pb-3">TYT Net</th>
-                  <th className="pb-3">AYT Net</th>
-                  <th className="pb-3">OBP</th>
-                  <th className="pb-3 text-right">Sayısal Sıralama</th>
-                  <th className="pb-3 text-right">Eşit Ağırlık</th>
+                  <th className="pb-3 px-2">TYT Net</th>
+                  <th className="pb-3 px-2">AYT Net</th>
+                  <th className="pb-3 px-2">OBP</th>
+                  <th className="pb-3 px-2 text-right">Sayısal Sıralama</th>
+                  <th className="pb-3 px-2 text-right">Eşit Ağırlık</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 font-bold text-gray-700">
                 {veri2025.map((row, idx) => (
                   <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="py-4 text-[#1E3A8A]">{row.tytNet}</td>
-                    <td className="py-4">{row.aytNet}</td>
-                    <td className="py-4">{row.obp}</td>
-                    <td className="py-4 text-right text-emerald-650 font-black">{row.saySiralama}</td>
-                    <td className="py-4 text-right text-[#D97706] font-black">{row.eaSiralama}</td>
+                    <td className="py-4 px-2 text-[#1E3A8A]">{row.tytNet}</td>
+                    <td className="py-4 px-2">{row.aytNet}</td>
+                    <td className="py-4 px-2">{row.obp}</td>
+                    <td className="py-4 px-2 text-right text-emerald-650 font-black">{row.saySiralama}</td>
+                    <td className="py-4 px-2 text-right text-[#D97706] font-black">{row.eaSiralama}</td>
                   </tr>
                 ))}
               </tbody>
@@ -73,25 +73,25 @@ export default function NetSiralamaKarsilastirmaPage() {
             <span className="text-xs font-bold text-gray-400">Resmi Veriler</span>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs sm:text-sm">
+          <div className="overflow-x-auto whitespace-nowrap scrollbar-thin pb-2">
+            <table className="w-full text-left border-collapse text-xs sm:text-sm min-w-[500px]">
               <thead>
                 <tr className="border-b border-[#FAF8F5] text-gray-450 font-black uppercase tracking-wider">
-                  <th className="pb-3">TYT Net</th>
-                  <th className="pb-3">AYT Net</th>
-                  <th className="pb-3">OBP</th>
-                  <th className="pb-3 text-right">Sayısal Sıralama</th>
-                  <th className="pb-3 text-right">Eşit Ağırlık</th>
+                  <th className="pb-3 px-2">TYT Net</th>
+                  <th className="pb-3 px-2">AYT Net</th>
+                  <th className="pb-3 px-2">OBP</th>
+                  <th className="pb-3 px-2 text-right">Sayısal Sıralama</th>
+                  <th className="pb-3 px-2 text-right">Eşit Ağırlık</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 font-bold text-gray-700">
                 {veri2024.map((row, idx) => (
                   <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="py-4 text-[#1E3A8A]">{row.tytNet}</td>
-                    <td className="py-4">{row.aytNet}</td>
-                    <td className="py-4">{row.obp}</td>
-                    <td className="py-4 text-right text-emerald-650 font-black">{row.saySiralama}</td>
-                    <td className="py-4 text-right text-[#D97706] font-black">{row.eaSiralama}</td>
+                    <td className="py-4 px-2 text-[#1E3A8A]">{row.tytNet}</td>
+                    <td className="py-4 px-2">{row.aytNet}</td>
+                    <td className="py-4 px-2">{row.obp}</td>
+                    <td className="py-4 px-2 text-right text-emerald-650 font-black">{row.saySiralama}</td>
+                    <td className="py-4 px-2 text-right text-[#D97706] font-black">{row.eaSiralama}</td>
                   </tr>
                 ))}
               </tbody>
