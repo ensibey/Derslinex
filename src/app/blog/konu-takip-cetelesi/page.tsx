@@ -8,15 +8,35 @@ export default function KonuTakipPage() {
   const [selectedDersIdx, setSelectedDersIdx] = useState(0);
   const [completedList, setCompletedList] = useState<{ [key: string]: boolean }>({});
 
+  // Tarayıcı yerel depolamasından (localStorage) işaretli konuları yükle
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("derslinex_konu_cetelesi");
+      if (saved) {
+        setCompletedList(JSON.parse(saved));
+      }
+    } catch (e) {
+      console.error("Local storage load error:", e);
+    }
+  }, []);
+
   const currentDers = konuTakipVerisi[selectedDersIdx];
 
-  // İşaretleme durumunu değiştir
+  // İşaretleme durumunu değiştir ve localStorage'a kaydet
   const handleToggle = (konu: string) => {
     const key = `${currentDers.id}-${konu}`;
-    setCompletedList((prev) => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
+    setCompletedList((prev) => {
+      const updated = {
+        ...prev,
+        [key]: !prev[key]
+      };
+      try {
+        localStorage.setItem("derslinex_konu_cetelesi", JSON.stringify(updated));
+      } catch (e) {
+        console.error("Local storage save error:", e);
+      }
+      return updated;
+    });
   };
 
   // Tamamlanma oranını hesapla
