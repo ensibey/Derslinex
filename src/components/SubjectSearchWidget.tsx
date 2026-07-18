@@ -12,6 +12,8 @@ export default function SubjectSearchWidget() {
           </label>
           <select
             id="calisma-alani"
+            name="calisma-alani"
+            aria-label="Çalışmak İstediğiniz YKS Ders Alanı"
             className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-xl px-3 py-2.5 text-sm font-bold text-gray-700 focus:outline-none focus:border-[#D97706]"
             onChange={(e) => {
               if (e.target.value) {
