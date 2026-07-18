@@ -4,7 +4,6 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import KeepAlive from "@/components/KeepAlive";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import CookieConsent from "@/components/CookieConsent";
 
@@ -85,7 +84,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Footer className="pb-24 lg:pb-14" />
         <MobileNavBar />
         <WhatsAppButton />
-        <KeepAlive />
         <GoogleAnalytics />
         <CookieConsent />
       </body>
