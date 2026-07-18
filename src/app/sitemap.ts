@@ -16,6 +16,7 @@ export default function sitemap() {
     "/blog/gunun-sorusu",
     "/blog/pomodoro-sayaci",
     "/blog/ders-sihirbazi",
+    "/blog/obp-siralamaya-etkisi",
     "/hakkimizda",
     "/iletisim",
     "/gizlilik",
