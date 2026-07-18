@@ -63,7 +63,9 @@ export default function HomePage() {
     "address": {
       "@type": "PostalAddress",
       "addressCountry": "TR",
-      "addressLocality": "Istanbul"
+      "addressLocality": "Denizli",
+      "addressRegion": "Pamukkale",
+      "streetAddress": "15 Mayıs Mah. 794 Sok. No : 17"
     },
     "aggregateRating": {
       "@type": "AggregateRating",

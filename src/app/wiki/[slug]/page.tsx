@@ -15,15 +15,116 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return { title: wiki.baslik, description: wiki.ozet };
 }
 
+function parseWikiContent(content: string) {
+  const lines = content.split("\n");
+  const parsedElements: React.ReactNode[] = [];
+  let currentList: { type: "ul" | "ol"; items: string[] } | null = null;
+
+  const flushList = (key: number) => {
+    if (currentList) {
+      if (currentList.type === "ul") {
+        parsedElements.push(
+          <ul key={`ul-${key}`} className="list-disc pl-6 space-y-2 my-4">
+            {currentList.items.map((item, i) => (
+              <li key={i} className="text-gray-750 font-medium text-base sm:text-lg">{item}</li>
+            ))}
+          </ul>
+        );
+      } else {
+        parsedElements.push(
+          <ol key={`ol-${key}`} className="list-decimal pl-6 space-y-2 my-4">
+            {currentList.items.map((item, i) => (
+              <li key={i} className="text-gray-750 font-medium text-base sm:text-lg">{item}</li>
+            ))}
+          </ol>
+        );
+      }
+      currentList = null;
+    }
+  };
+
+  lines.forEach((line, index) => {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      flushList(index);
+      return;
+    }
+
+    // Emojilerle başlayan başlık satırlarını kontrol et
+    const headingPattern = /^[📌📐🔄💡🧬🔬📝🎒🎓💬📁🔑🎯📊🔥🧭📚]/.test(trimmed);
+    if (headingPattern) {
+      flushList(index);
+      parsedElements.push(
+        <h2 key={index} className="text-xl sm:text-2xl font-black text-[#1E3A8A] mt-8 mb-4 flex items-center gap-2">
+          {trimmed}
+        </h2>
+      );
+      return;
+    }
+
+    // Liste elemanı kontrolü (yıldız veya eksi)
+    if (trimmed.startsWith("-")) {
+      const itemText = trimmed.substring(1).trim();
+      if (!currentList || currentList.type !== "ul") {
+        flushList(index);
+        currentList = { type: "ul", items: [itemText] };
+      } else {
+        currentList.items.push(itemText);
+      }
+      return;
+    }
+
+    // Numaralı liste elemanı kontrolü (örn. 1., 2.)
+    const numMatch = trimmed.match(/^(\d+)\.\s*(.*)/);
+    if (numMatch) {
+      const itemText = numMatch[2].trim();
+      if (!currentList || currentList.type !== "ol") {
+        flushList(index);
+        currentList = { type: "ol", items: [itemText] };
+      } else {
+        currentList.items.push(itemText);
+      }
+      return;
+    }
+
+    // Normal paragraf
+    flushList(index);
+    parsedElements.push(
+      <p key={index} className="text-gray-750 font-medium text-base sm:text-lg leading-relaxed mb-4">
+        {trimmed}
+      </p>
+    );
+  });
+
+  flushList(lines.length);
+  return parsedElements;
+}
+
 export default async function WikiKonuDetayPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
   const wiki = getWikiBySlug(resolvedParams.slug);
   if (!wiki) notFound();
 
+  const wikiSchema = {
+    "@context": "https://schema.org",
+    "@type": "DefinedTerm",
+    "name": wiki.baslik,
+    "description": wiki.ozet,
+    "inDefinedTermSet": {
+      "@type": "DefinedTermSet",
+      "name": "Derslinex Ders Sözlüğü",
+      "url": "https://derslinex.com/wiki"
+    }
+  };
+
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(wikiSchema) }}
+      />
       {/* Breadcrumb */}
-      <nav className="text-sm text-gray-550 mb-8 flex items-center gap-2 font-bold">
+      <nav className="text-sm text-gray-555 mb-8 flex items-center gap-2 font-bold">
         <Link href="/" className="hover:text-[#D97706] transition-colors">Ana Sayfa</Link>
         <span>/</span>
         <Link href="/wiki" className="hover:text-[#D97706] transition-colors">Ders Sözlüğü</Link>
@@ -45,7 +146,7 @@ export default async function WikiKonuDetayPage({ params }: { params: Promise<{ 
 
       {/* Main Content Body */}
       <div className="max-w-none text-gray-750 leading-relaxed font-medium space-y-6 text-base sm:text-lg border-b border-gray-100 pb-8 mb-8">
-        <div dangerouslySetInnerHTML={{ __html: wiki.icerik.replace(/\n/g, "<br />") }} />
+        <div>{parseWikiContent(wiki.icerik)}</div>
       </div>
 
       {/* Sales CTA Banner */}

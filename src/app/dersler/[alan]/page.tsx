@@ -109,7 +109,7 @@ export default async function DersAlaniPage({ params }: { params: Promise<{ alan
             <a href={waLink(`Merhaba, ${ders.isim} dersi için hoca arıyorum.`)}
               target="_blank" rel="noopener noreferrer"
               className="inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-xl">
-              WhatsApp\'tan Sor
+              WhatsApp'tan Sor
             </a>
           </div>
         )}

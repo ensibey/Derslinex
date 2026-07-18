@@ -35,8 +35,37 @@ export default async function HocaProfilPage({ params }: { params: Promise<{ slu
 
   const waUrl = waLinkHoca(hoca.isim, hoca.dersler[0]);
 
+  const tutorSchema = {
+    "@context": "https://schema.org",
+    "@type": "Tutor",
+    "name": hoca.isim,
+    "jobTitle": hoca.unvan,
+    "image": hoca.fotograf,
+    "description": hoca.ozgecmis,
+    "gender": hoca.isim.includes("Elif") || hoca.isim.includes("Zeynep") || hoca.isim.includes("Selin") || hoca.isim.includes("Ayşe") ? "Female" : "Male",
+    "offers": {
+      "@type": "Offer",
+      "category": `${hoca.dersler.join(", ")} Özel Ders`,
+      "areaServed": {
+        "@type": "AdministrativeArea",
+        "name": hoca.konum
+      }
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": hoca.puan.toString(),
+      "bestRating": "5",
+      "worstRating": "1",
+      "ratingCount": hoca.ogrenciSayisi.toString()
+    }
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen text-gray-900">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(tutorSchema) }}
+      />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Breadcrumb & Share */}
         <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">

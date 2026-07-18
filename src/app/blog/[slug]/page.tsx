@@ -24,8 +24,36 @@ export default async function BlogYazisiPage({ params }: { params: Promise<{ slu
 
   const diger = blogYazilari.filter((b) => b.slug !== yazi.slug).slice(0, 3);
 
+  const blogSchema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": yazi.baslik,
+    "description": yazi.ozet,
+    "datePublished": yazi.tarih,
+    "author": {
+      "@type": "Person",
+      "name": yazi.yazar
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Derslinex",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://derslinex.com/logo.png"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://derslinex.com/blog/${yazi.slug}`
+    }
+  };
+
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSchema) }}
+      />
       <nav className="text-sm text-gray-500 mb-8 flex items-center gap-2 font-bold">
         <Link href="/" className="hover:text-[#D97706] transition-colors">Ana Sayfa</Link>
         <span>/</span>
