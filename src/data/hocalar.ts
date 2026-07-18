@@ -15,7 +15,7 @@ export const hocalar: Hoca[] = [
     egitim: "ODTÜ — Matematik Öğretmenliği Bölümü",
     ozgecmis:
       "8 yıllık YKS hazırlık deneyimiyle 500'den fazla öğrenciye matematik öğretti. ODTÜ Matematik Öğretmenliği mezunu olan Ahmet Hoca, soyut kavramları somut örneklerle anlatan pedagojik yaklaşımıyla tanınıyor. TYT'den AYT Sayısal'a tüm matematik konularında ders veriyor. Öğrencilerinin yüzde doksanı hedef puanlarını aşmıştır.",
-    whatsapp: "905550000001",
+    whatsapp: "905405512020",
     puan: 4.9,
     ogrenciSayisi: 520,
     aktif: true,
@@ -34,7 +34,7 @@ export const hocalar: Hoca[] = [
     egitim: "Boğaziçi Üniversitesi — Türk Dili ve Edebiyatı",
     ozgecmis:
       "Boğaziçi Üniversitesi Türk Dili ve Edebiyatı mezunu Elif Hoca, dilbilgisi ve paragraf analizinde özgün bir yöntem geliştirmiştir. TYT Türkçe'de kısa sürede maksimum doğru yapmayı öğreten sistematik çalışma planları hazırlar. Edebiyat derslerinde dönem eserlerini interaktif anlatımla kavratır.",
-    whatsapp: "905550000002",
+    whatsapp: "905405512020",
     puan: 4.8,
     ogrenciSayisi: 310,
     aktif: true,
@@ -53,7 +53,7 @@ export const hocalar: Hoca[] = [
     egitim: "İTÜ — Fizik Mühendisliği (Doktora)",
     ozgecmis:
       "İstanbul Teknik Üniversitesi Fizik Mühendisliği doktorasını tamamlayan Mehmet Hoca, 10 yıldır YKS fiziği alanında uzmanlaşmıştır. Tamamen online ders veren Mehmet Hoca, Türkiye'nin her yerinden öğrencilere ulaşmaktadır. Simülasyonlar ve animasyonlarla soyut fizik kavramlarını görselleştirir.",
-    whatsapp: "905550000003",
+    whatsapp: "905405512020",
     puan: 4.9,
     ogrenciSayisi: 680,
     aktif: true,
@@ -72,7 +72,7 @@ export const hocalar: Hoca[] = [
     egitim: "Hacettepe Üniversitesi — Kimya Öğretmenliği",
     ozgecmis:
       "Hacettepe Üniversitesi Kimya Öğretmenliği mezunu Zeynep Hoca, kimya ve biyoloji derslerini paralel çalıştırarak öğrencilerin iki dersi birlikte verimli şekilde hazırlamasını sağlar. AYT Sayısal'ın en zorlu konu bloklarını sistematik tekrar programlarıyla pekiştirir.",
-    whatsapp: "905550000004",
+    whatsapp: "905405512020",
     puan: 4.7,
     ogrenciSayisi: 245,
     aktif: true,
@@ -91,7 +91,7 @@ export const hocalar: Hoca[] = [
     egitim: "Ankara Üniversitesi — Tarih Bölümü",
     ozgecmis:
       "Ankara Üniversitesi Tarih Bölümü mezunu Can Hoca, hem Ankara'da yüz yüze hem de tüm Türkiye'de online ders vermektedir. Tarih ve Coğrafya'yı birleşik sistem anlayışıyla anlatan özgün ders notları hazırlar. TYT Sosyal bölümünde hızlı konu tekrarı metodolojisiyle tanınır.",
-    whatsapp: "905550000005",
+    whatsapp: "905405512020",
     puan: 4.8,
     ogrenciSayisi: 390,
     aktif: true,
@@ -110,7 +110,7 @@ export const hocalar: Hoca[] = [
     egitim: "İstanbul Üniversitesi — İngiliz Dili ve Edebiyatı",
     ozgecmis:
       "9 yıllık YDT deneyimiyle AYT İngilizce'nin tüm soru tiplerine hâkim olan Selin Hoca, okuma anlama, gramer ve kelime bilgisi konularında kapsamlı ders programları oluşturmaktadır. Öğrencilerini YDT'nin özgün soru formatına en iyi şekilde hazırlar.",
-    whatsapp: "905550000006",
+    whatsapp: "905405512020",
     puan: 4.9,
     ogrenciSayisi: 420,
     aktif: true,
@@ -129,7 +129,7 @@ export const hocalar: Hoca[] = [
     egitim: "Bilkent Üniversitesi — Matematik",
     ozgecmis:
       "Bilkent Üniversitesi Matematik mezunu Burak Hoca, özellikle TYT Matematik'te sıfırdan başlayan öğrencilerin temel kavramları hızla kazanmasına odaklanır. Online ders platformlarında video ders serisiyle geniş bir öğrenci kitlesine ulaşmıştır. Pratik soru çözme teknikleri ile tanınır.",
-    whatsapp: "905550000007",
+    whatsapp: "905405512020",
     puan: 4.7,
     ogrenciSayisi: 175,
     aktif: true,
@@ -148,7 +148,7 @@ export const hocalar: Hoca[] = [
     egitim: "Ege Üniversitesi — Felsefe Bölümü",
     ozgecmis:
       "11 yıllık tecrübesiyle Ege Üniversitesi Felsefe Bölümü mezunu Ayşe Hoca, AYT Sözel'in en puan getiren derslerinden biri olan Felsefe'de ciddi bir başarı siciline sahiptir. Öğrencilerine hem İzmir'de yüz yüze hem de online ders vermektedir. Akıcı ve motivasyonel anlatım tarzıyla tanınır.",
-    whatsapp: "905550000008",
+    whatsapp: "905405512020",
     puan: 4.9,
     ogrenciSayisi: 290,
     aktif: true,
@@ -167,7 +167,7 @@ export const hocalar: Hoca[] = [
     egitim: "Ege Üniversitesi — Kimya Bölümü (Doktora)",
     ozgecmis:
       "Kimya doktoru olan Kemal Hoca, 12 yıllık YKS deneyimiyle özellikle organik kimya ve reaksiyon mekanizmalarında derinlemesine bilgi aktarımı yapıyor. Laboratuvar geçmişinden beslenen somut örnekleri ile soyut kimya konularını somutlaştırır. İzmir'de yüz yüze ve Türkiye genelinde online ders verir.",
-    whatsapp: "905550000009",
+    whatsapp: "905405512020",
     puan: 4.8,
     ogrenciSayisi: 350,
     aktif: true,

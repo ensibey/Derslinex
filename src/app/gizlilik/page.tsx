@@ -15,7 +15,7 @@ export default function GizlilikPage() {
           ["3. Verilerin İşlenme Amacı", "Kişisel verileriniz; ders hizmetinin sağlanması, hoca-öğrenci eşleşmesi ve iletişim amaçlarıyla işlenmektedir."],
           ["4. Verilerin Saklanma Süresi", "Form verileri 90 gün, sözleşme kapsamındaki veriler yasal süreler boyunca saklanır."],
           ["5. İlgili Kişi Hakları", "KVKK m.11 kapsamında verilerinize erişim, düzeltme veya silme talebinde bulunabilirsiniz. Talep için: info@derslinex.com"],
-          ["6. Çerezler", "Sitemiz, oturum ve analitik amaçlarla çerez kullanmaktadır. Tarayıcı ayarlarınızdan çerezleri reddedebilirsiniz."],
+          ["6. Çerezler", "Sitemize ilk girişinizde bir çerez onay bildirimi gösterilir. Analitik çerezler (Google Analytics) yalnızca 'Kabul Et' seçeneğini onayladığınızda etkinleşir. 'Reddet' seçeneğini seçerseniz analitik çerezler yüklenmez."],
         ].map(([baslik, icerik]) => (
           <div key={baslik}>
             <h2 className="text-lg font-bold text-gray-900">{baslik}</h2>

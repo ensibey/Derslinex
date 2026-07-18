@@ -5,6 +5,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import KeepAlive from "@/components/KeepAlive";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
+import CookieConsent from "@/components/CookieConsent";
 
 const inter = Inter({ subsets: ["latin", "latin-ext"], variable: "--font-inter" });
 
@@ -76,16 +78,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" href="/favicon.ico?v=7" sizes="any" />
         <link rel="shortcut icon" href="/favicon.ico?v=7" />
         <link rel="apple-touch-icon" href="/logo.png?v=7" sizes="180x180" />
-        {/* Google Analytics (gtag.js) */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-J3JSE0GLD5"></script>
-        <script dangerouslySetInnerHTML={{
-          __html: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-J3JSE0GLD5', { 'anonymize_ip': true });
-          `
-        }} />
       </head>
       <body className="bg-[#FAF8F5] text-gray-900 antialiased">
         <Header />
@@ -94,6 +86,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <MobileNavBar />
         <WhatsAppButton />
         <KeepAlive />
+        <GoogleAnalytics />
+        <CookieConsent />
       </body>
     </html>
   );
