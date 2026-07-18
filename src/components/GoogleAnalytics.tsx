@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Script from "next/script";
 
 const GA_ID = "G-J3JSE0GLD5";
 export const CONSENT_KEY = "derslinex-cerez-onayi"; // "kabul" | "red"
@@ -22,13 +23,7 @@ export default function GoogleAnalytics() {
   }, []);
 
   useEffect(() => {
-    if (!loaded || (window as any).__gaInjected) return;
-    (window as any).__gaInjected = true;
-
-    const script = document.createElement("script");
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
-    script.async = true;
-    document.head.appendChild(script);
+    if (!loaded) return;
 
     (window as any).dataLayer = (window as any).dataLayer || [];
     function gtag(...args: unknown[]) {
@@ -39,5 +34,12 @@ export default function GoogleAnalytics() {
     gtag("config", GA_ID, { anonymize_ip: true });
   }, [loaded]);
 
-  return null;
+  if (!loaded) return null;
+
+  return (
+    <Script
+      src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+      strategy="afterInteractive"
+    />
+  );
 }

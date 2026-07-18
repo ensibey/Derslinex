@@ -69,5 +69,55 @@ export default function sitemap() {
     priority: 0.5,
   }));
 
-  return [...statikSayfalar, ...hocaSayfalari, ...dersSayfalari, ...blogSayfalari, ...wikiSayfalari];
+  // Dinamik Şehir ve İlçe Rotaları (Geo-SEO)
+  const konumlarSet = new Set<string>();
+  const sehirlerSet = new Set<string>();
+
+  hocalar.forEach((h) => {
+    if (!h.aktif || !h.konum.includes(",")) return;
+    const parts = h.konum.split(",");
+    const rawIlce = parts[0].trim();
+    const rawSehir = parts[1].replace(/\/.*$/, "").trim();
+
+    const toSlug = (text: string) =>
+      text
+        .toLowerCase()
+        .replace(/ş/g, "s")
+        .replace(/ç/g, "c")
+        .replace(/ı/g, "i")
+        .replace(/ğ/g, "g")
+        .replace(/ü/g, "u")
+        .replace(/ö/g, "o")
+        .replace(/\s+/g, "-");
+
+    const sehirSlug = toSlug(rawSehir);
+    const ilceSlug = toSlug(rawIlce);
+
+    sehirlerSet.add(sehirSlug);
+    konumlarSet.add(`${sehirSlug}/${ilceSlug}`);
+  });
+
+  const sehirSayfalari = Array.from(sehirlerSet).map((sehirSlug) => ({
+    url: `${baseUrl}/ozel-ders/${sehirSlug}`,
+    lastModified: new Date().toISOString().split("T")[0],
+    changeFrequency: "weekly",
+    priority: 0.7,
+  }));
+
+  const ilceSayfalari = Array.from(konumlarSet).map((path) => ({
+    url: `${baseUrl}/ozel-ders/${path}`,
+    lastModified: new Date().toISOString().split("T")[0],
+    changeFrequency: "weekly",
+    priority: 0.7,
+  }));
+
+  return [
+    ...statikSayfalar,
+    ...hocaSayfalari,
+    ...dersSayfalari,
+    ...blogSayfalari,
+    ...wikiSayfalari,
+    ...sehirSayfalari,
+    ...ilceSayfalari,
+  ];
 }

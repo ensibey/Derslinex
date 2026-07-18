@@ -1,8 +1,11 @@
 "use client";
 
 import { waLink } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export default function SubjectSearchWidget() {
+  const router = useRouter();
+
   return (
     <div className="bg-white p-4 rounded-2xl shadow-md border border-[#EFECE6] max-w-lg">
       <div className="flex flex-col sm:flex-row gap-3">
@@ -17,7 +20,7 @@ export default function SubjectSearchWidget() {
             className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-xl px-3 py-2.5 text-sm font-bold text-gray-700 focus:outline-none focus:border-[#D97706]"
             onChange={(e) => {
               if (e.target.value) {
-                window.location.href = `/dersler/${e.target.value}`;
+                router.push(`/dersler/${e.target.value}`);
               }
             }}
           >
