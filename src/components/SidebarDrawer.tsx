@@ -34,6 +34,7 @@ export default function SidebarDrawer() {
     { href: "/blog/pomodoro-sayaci", label: "⏱️ Pomodoro Çalışma Sayacı" },
     { href: "/blog/ders-sihirbazi", label: "⚡ 3 Saniyede Özel Ders Sihirbazı" },
     { href: "/blog/obp-siralamaya-etkisi", label: "⚖️ OBP Sıralama Etki Robotu" },
+    { href: "/blog/soru-dagilimlari", label: "📊 YKS & LGS Soru Dağılımları" },
     { href: "/blog/bilgi-kartlari", label: "🃏 Sınav Hap Bilgileri" },
     { href: "/blog/gunun-sorusu", label: "🎮 Günün Özel Sorusu" },
     { href: "/hocalar?alan=Matematik", label: "📐 Matematik Özel Ders" },
@@ -94,7 +95,7 @@ export default function SidebarDrawer() {
               POPÜLER ARAÇLAR & DERSLER
             </span>
             <div className="space-y-2">
-              {quickLinks.slice(0, 7).map((link) => (
+              {quickLinks.slice(0, 8).map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
@@ -113,7 +114,7 @@ export default function SidebarDrawer() {
               OKUNMASI GEREKEN REHBERLER
             </span>
             <div className="space-y-2">
-              {quickLinks.slice(7).map((link) => (
+              {quickLinks.slice(8).map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}

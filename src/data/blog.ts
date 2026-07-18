@@ -6,7 +6,7 @@ export const blogYazilari: BlogYazisi[] = [
     slug: "yks-matematik-hazirlik-rehberi",
     baslik: "YKS Matematik Hazırlık Rehberi: TYT'den AYT'ye Tam Plan",
     ozet: "TYT ve AYT Sayısal matematik konularını en verimli şekilde çalışmak için adım adım rehber. Hangi konudan başlamalı, ne kadar süre ayırmalı?",
-    icerik: `YKS matematiği iki temel aşamadan oluşur: TYT (Temel Yeterlilik Testi) ve AYT (Alan Yeterlilik Testi). Bu iki sınav, yapısı ve ölçtüğü beceriler açısından birbirinden oldukça farklıdır. TYT Matematik daha çok mantıksal akıl yürütme, problem çözme hızı ve temel matematiksel kavramları günlük hayat senaryolarına uygulama becerisini ölçerken; AYT Matematik ise derinlemesine formül bilgisi, teorik analiz ve akademik matematik yeteneğini sorgular.
+    icerik: `YKS matematiği iki temel aşamadan oluşur: TYT (Temel Yeterlilik Testi) ve AYT (Alan Yeterlilik Testi). Bu iki sınav, yapısı ve ölçtüğü beceriler açısından birbirinden oldukça farklıdır. <a href="/hocalar?alan=Matematik" className="text-primary-650 font-black hover:underline">TYT Matematik</a> daha çok mantıksal akıl yürütme, problem çözme hızı ve temel matematiksel kavramları günlük hayat senaryolarına uygulama becerisini ölçerken; <a href="/hocalar?alan=Matematik" className="text-primary-650 font-black hover:underline">AYT Matematik</a> ise derinlemesine formül bilgisi, teorik analiz ve akademik matematik yeteneğini sorgular.
 
 Verimli bir hazırlık süreci için şu adımları izlemelisiniz:
 

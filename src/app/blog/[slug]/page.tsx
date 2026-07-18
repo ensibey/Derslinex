@@ -48,7 +48,7 @@ export default async function BlogYazisiPage({ params }: { params: Promise<{ slu
       {/* İçerik — rahat okuma düzeni */}
       <div className="max-w-none text-gray-700 leading-relaxed font-medium space-y-6 text-base sm:text-lg whitespace-pre-line">
         <p className="text-lg sm:text-xl text-[#1E3A8A] leading-relaxed font-bold border-l-4 border-[#D97706] pl-4 italic bg-[#FAF8F5] py-3 px-4 rounded-r-xl">{yazi.ozet}</p>
-        <p className="leading-relaxed">{yazi.icerik}</p>
+        <div dangerouslySetInnerHTML={{ __html: yazi.icerik }} className="leading-relaxed" />
       </div>
 
       {/* Diğer Yazılar */}
