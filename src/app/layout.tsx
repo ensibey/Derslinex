@@ -70,6 +70,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" href="/favicon.ico?v=7" sizes="any" />
         <link rel="shortcut icon" href="/favicon.ico?v=7" />
         <link rel="apple-touch-icon" href="/logo.png?v=7" sizes="180x180" />
+        {/* Google Analytics (gtag.js) */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-JJJSE0GLD5"></script>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-JJJSE0GLD5');
+          `
+        }} />
       </head>
       <body className="bg-[#FAF8F5] text-gray-900 antialiased">
         <Header />
