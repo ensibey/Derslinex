@@ -44,8 +44,8 @@ export default async function WikiKonuDetayPage({ params }: { params: Promise<{ 
       </p>
 
       {/* Main Content Body */}
-      <div className="max-w-none text-gray-750 leading-relaxed font-medium space-y-6 text-base sm:text-lg whitespace-pre-line border-b border-gray-100 pb-8 mb-8">
-        {wiki.icerik}
+      <div className="max-w-none text-gray-750 leading-relaxed font-medium space-y-6 text-base sm:text-lg border-b border-gray-100 pb-8 mb-8">
+        <div dangerouslySetInnerHTML={{ __html: wiki.icerik.replace(/\n/g, "<br />") }} />
       </div>
 
       {/* Sales CTA Banner */}
