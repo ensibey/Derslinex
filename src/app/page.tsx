@@ -114,7 +114,7 @@ export default function HomePage() {
               <div className="flex items-center gap-3.5 mb-6 pb-4 border-b border-[#FAF8F5]">
                 <div className="w-12 h-12 rounded-xl bg-[#1E3A8A]/10 flex items-center justify-center text-xl text-[#1E3A8A] font-bold shadow-sm">🏫</div>
                 <div>
-                  <h4 className="text-base font-black text-[#1E3A8A]">Derslinex Modeli</h4>
+                  <h2 className="text-base font-black text-[#1E3A8A]">Derslinex Modeli</h2>
                   <p className="text-xs text-gray-500 font-bold">Birebir YKS Koçluğu & Takip</p>
                 </div>
               </div>

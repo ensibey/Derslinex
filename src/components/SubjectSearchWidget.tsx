@@ -7,10 +7,11 @@ export default function SubjectSearchWidget() {
     <div className="bg-white p-4 rounded-2xl shadow-md border border-[#EFECE6] max-w-lg">
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1">
-          <label className="block text-xs font-black text-[#1E3A8A] uppercase tracking-wider mb-1.5">
+          <label htmlFor="calisma-alani" className="block text-xs font-black text-[#1E3A8A] uppercase tracking-wider mb-1.5">
             Çalışmak İstediğin Alan
           </label>
           <select
+            id="calisma-alani"
             className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-xl px-3 py-2.5 text-sm font-bold text-gray-700 focus:outline-none focus:border-[#D97706]"
             onChange={(e) => {
               if (e.target.value) {
