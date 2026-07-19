@@ -6,7 +6,7 @@ export default function IletisimPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({ isim: "", email: "", konu: "", mesaj: "", onay: false });
+  const [form, setForm] = useState({ isim: "", email: "", konu: "", mesaj: "", onay: false, honey: "" });
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -21,7 +21,8 @@ export default function IletisimPage() {
           name: form.isim,
           email: form.email,
           phone: "", // Opsiyonel telefon
-          message: `Konu: ${form.konu || "Genel"} - Mesaj: ${form.mesaj}`
+          message: `Konu: ${form.konu || "Genel"} - Mesaj: ${form.mesaj}`,
+          honey: form.honey
         })
       });
 
@@ -94,6 +95,17 @@ export default function IletisimPage() {
                     className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-xl px-4 py-3 text-sm focus:border-[#B45309] text-gray-900 outline-none resize-none font-medium"
                     placeholder="Mesajınızı yazın..." />
                 </div>
+                {/* Honeypot hidden input */}
+                <input
+                  type="text"
+                  name="honey"
+                  value={form.honey}
+                  onChange={e => setForm({...form, honey: e.target.value})}
+                  className="hidden"
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+
                 <div className="flex items-start gap-2">
                   <input type="checkbox" id="onay" required checked={form.onay}
                     onChange={e => setForm({...form, onay: e.target.checked})} className="mt-1" />

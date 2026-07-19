@@ -4,7 +4,15 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, phone, message } = body;
+    const { name, email, phone, message, honey } = body;
+
+    // Honeypot Spam Verification
+    if (honey) {
+      return NextResponse.json({
+        success: true,
+        message: "Mesajınız başarıyla iletildi. En kısa sürede geri dönüş sağlayacağız."
+      });
+    }
 
     // Basit Sunucu Taraflı Validasyon
     if (!name || !email || !message) {
