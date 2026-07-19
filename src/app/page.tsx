@@ -280,7 +280,7 @@ export default function HomePage() {
               href={waLink()}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-[#B45309] hover:bg-[#92400E] text-white font-black text-lg px-10 py-4 rounded-xl transition-all shadow-md hover:scale-105"
+              className="inline-flex items-center gap-2 bg-[#B45309] hover:bg-[#92400E] text-white font-black text-lg px-10 py-4 rounded-xl transition-all shadow-md hover:scale-105 relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_3s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/25 before:to-transparent"
             >
               Hemen Başla — WhatsApp
             </a>
@@ -308,7 +308,7 @@ export default function HomePage() {
             href={waLink("Merhaba, hangi hoca bana uygun olur konusunda yardım almak istiyorum.")}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-[#B45309] hover:bg-[#92400E] text-white font-black text-lg px-10 py-4 rounded-xl transition-all hover:scale-105 relative z-10"
+            className="inline-flex items-center gap-2 bg-[#B45309] hover:bg-[#92400E] text-white font-black text-lg px-10 py-4 rounded-xl transition-all hover:scale-105 relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_3s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/25 before:to-transparent z-10"
           >
             💬 Bize Danış — Ücretsiz
           </a>

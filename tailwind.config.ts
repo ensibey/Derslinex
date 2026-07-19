@@ -30,6 +30,14 @@ const config: Config = {
       boxShadow: {
         premium: "0 10px 40px -10px rgba(30, 58, 138, 0.12)",
         glow: "0 0 20px rgba(16, 185, 129, 0.2)",
+      },
+      keyframes: {
+        shimmer: {
+          "100%": { transform: "translateX(100%)" }
+        }
+      },
+      animation: {
+        shimmer: "shimmer 2.5s infinite"
       }
     },
   },

@@ -11,7 +11,12 @@ export default function TeacherCard({ hoca }: { hoca: Hoca }) {
   };
 
   return (
-    <div className="bg-white/85 backdrop-blur-md rounded-3xl shadow-premium border border-[#EFECE6]/65 hover:border-[#F5D0A9]/80 hover:bg-white/95 hover:shadow-md transition-all duration-300 overflow-hidden group">
+    <div className="bg-white/85 backdrop-blur-md rounded-3xl shadow-premium border border-[#EFECE6]/65 hover:border-[#F5D0A9]/80 hover:bg-white/95 hover:shadow-md transition-all duration-300 overflow-hidden group relative">
+      {/* Active Indicator Tag */}
+      <div className="absolute top-4 right-4 flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-100 text-[9px] font-black px-2.5 py-0.5 rounded-full shadow-sm z-10">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+        <span>Aktif</span>
+      </div>
       <div className="p-4 sm:p-6">
         <div className="flex items-start gap-3 sm:gap-4">
           <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl overflow-hidden flex-shrink-0 ring-4 ring-[#FAF0E3]">
