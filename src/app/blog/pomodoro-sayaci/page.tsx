@@ -9,6 +9,57 @@ export default function PomodoroPage() {
 
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
+  // Pure Web Audio API Synthesiser Bell Chime
+  const playPomoAlarm = () => {
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const ctx = new AudioContextClass();
+      
+      const playTone = (freq: number, startTime: number, duration: number) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, startTime);
+        
+        gain.gain.setValueAtTime(0.15, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+      };
+      
+      // Play a lovely major triad chime
+      playTone(523.25, ctx.currentTime, 0.4); // C5
+      playTone(659.25, ctx.currentTime + 0.15, 0.4); // E5
+      playTone(783.99, ctx.currentTime + 0.3, 0.5); // G5
+    } catch (e) {
+      console.error("Audio synthesiser failed:", e);
+    }
+  };
+
+  const formatPomoTime = (timeInSecs: number) => {
+    const mins = Math.floor(timeInSecs / 60);
+    const secs = timeInSecs % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  // Update browser tab title dynamically
+  useEffect(() => {
+    if (pomoActive) {
+      document.title = `(${formatPomoTime(pomoTime)}) ${pomoMode === "work" ? "Çalışma" : "Mola"} | Derslinex`;
+    } else {
+      document.title = "Pomodoro Çalışma Sayacı | Derslinex";
+    }
+    return () => {
+      document.title = "Derslinex | Online Özel Ders & Birebir YKS LGS Hazırlık";
+    };
+  }, [pomoTime, pomoActive, pomoMode]);
+
   useEffect(() => {
     if (pomoActive) {
       timerRef.current = setInterval(() => {
@@ -16,6 +67,7 @@ export default function PomodoroPage() {
           if (prev <= 1) {
             clearInterval(timerRef.current!);
             setPomoActive(false);
+            playPomoAlarm();
             if (pomoMode === "work") {
               setStatusMessage("Tebrikler! Çalışma seansı bitti. Şimdi mola zamanı. 🎉");
               setPomoMode("break");
@@ -44,12 +96,6 @@ export default function PomodoroPage() {
     setPomoTime(1500);
   };
 
-  const formatPomoTime = () => {
-    const mins = Math.floor(pomoTime / 60);
-    const secs = pomoTime % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-  };
-
   return (
     <div className="bg-[#FAF8F5] min-h-screen text-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-xl mx-auto text-center">
@@ -74,7 +120,7 @@ export default function PomodoroPage() {
 
           <div className="text-center py-6 relative">
             <div className="text-6xl sm:text-7xl font-black tracking-widest font-mono text-white drop-shadow">
-              {formatPomoTime()}
+              {formatPomoTime(pomoTime)}
             </div>
             <p className="text-xs text-primary-200 mt-2 font-bold opacity-80">25 Dk Çalışma / 5 Dk Mola</p>
           </div>

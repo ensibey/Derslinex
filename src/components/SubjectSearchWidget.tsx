@@ -50,6 +50,24 @@ export default function SubjectSearchWidget() {
             <option value="kimya-yks">Kimya YKS</option>
             <option value="biyoloji-yks">Biyoloji YKS</option>
           </select>
+          
+          <div className="flex flex-wrap gap-1.5 mt-2.5 items-center">
+            <span className="text-[10px] text-gray-500 font-bold mr-1">Hızlı Seç:</span>
+            {Object.entries(subjectLabels).map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setSelected(key)}
+                className={`text-[10px] font-black px-2.5 py-1 rounded-lg border transition-all ${
+                  selected === key
+                    ? "bg-[#B45309] text-white border-[#B45309]"
+                    : "bg-[#FAF8F5] text-gray-600 border-[#EFECE6] hover:bg-gray-100"
+                }`}
+              >
+                {label} YKS
+              </button>
+            ))}
+          </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-3">
           <button
