@@ -6,6 +6,7 @@ import { waLink } from "@/lib/utils";
 export default function ObpHesaplayiciPage() {
   const [obp, setObp] = useState<number>(80);
   const [tytNet, setTytNet] = useState<number>(70);
+  const [isKirikObp, setIsKirikObp] = useState<boolean>(false);
   const [showResult, setShowResult] = useState(false);
   const [obpPuan, setObpPuan] = useState(0);
   const [ekstraSiralamaEtki, setEkstraSiralamaEtki] = useState(0);
@@ -15,8 +16,10 @@ export default function ObpHesaplayiciPage() {
     const verifiedObp = Math.min(100, Math.max(50, obp));
     const verifiedNet = Math.min(120, Math.max(0, tytNet));
 
-    const puan = Number((verifiedObp * 5 * 0.12).toFixed(2));
-    const obpKaybi = 60 - puan;
+    // Kırık OBP durumunda katsayı yarıya düşer (0.12 yerine 0.06)
+    const katsayi = isKirikObp ? 0.06 : 0.12;
+    const puan = Number((verifiedObp * 5 * katsayi).toFixed(2));
+    const obpKaybi = 60 - puan; // En yüksek (100) OBP'ye göre puan kaybı
     const netEsdegeri = Number((obpKaybi / 1.33).toFixed(1));
 
     let siralamaKaybi = 0;
@@ -81,6 +84,19 @@ export default function ObpHesaplayiciPage() {
                 placeholder="Örn: 75"
               />
               <p className="text-[10px] text-gray-400 font-bold mt-1.5">Sıralama yığılması tahmini için gereklidir.</p>
+            </div>
+
+            <div className="flex items-center gap-3 bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl p-4">
+              <input
+                id="kirik-obp-checkbox"
+                type="checkbox"
+                checked={isKirikObp}
+                onChange={(e) => setIsKirikObp(e.target.checked)}
+                className="w-4 h-4 text-[#B45309] border-[#EFECE6] rounded focus:ring-[#B45309] focus:ring-offset-0 cursor-pointer"
+              />
+              <label htmlFor="kirik-obp-checkbox" className="text-xs font-black text-[#1E3A8A] cursor-pointer select-none">
+                Geçen yıl bir üniversite programına yerleştim (Kırık OBP uygulansın)
+              </label>
             </div>
           </div>
 
