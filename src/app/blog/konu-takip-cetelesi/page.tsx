@@ -52,9 +52,9 @@ export default function KonuTakipPage() {
     <div className="bg-[#FAF8F5] min-h-screen text-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-10">
-          <span className="text-[#D97706] text-xs font-black uppercase tracking-widest">ÇALIŞMA DİSİPLİNİ</span>
+          <span className="text-[#B45309] text-xs font-black uppercase tracking-widest">ÇALIŞMA DİSİPLİNİ</span>
           <h1 className="text-3xl sm:text-4xl font-black text-[#1E3A8A] mt-2 mb-3">YKS & LGS Konu Takip Çetelesi</h1>
-          <p className="text-gray-550 text-sm font-semibold leading-relaxed">
+          <p className="text-gray-500 text-sm font-semibold leading-relaxed">
             Hangi dersten hangi konuları bitirdiğinizi işaretleyin, tamamlanma oranınızı görün ve eksiklerinizi planlayın.
           </p>
         </div>
@@ -68,7 +68,7 @@ export default function KonuTakipPage() {
               className={`flex-1 py-3 px-3 text-center text-xs font-black rounded-xl transition-all whitespace-nowrap ${
                 selectedDersIdx === idx
                   ? "bg-[#1E3A8A] text-white shadow-sm"
-                  : "text-gray-650 hover:bg-gray-50"
+                  : "text-gray-600 hover:bg-gray-50"
               }`}
             >
               {item.ders}
@@ -80,11 +80,11 @@ export default function KonuTakipPage() {
         <div className="bg-white border border-[#EFECE6] rounded-3xl p-6 sm:p-8 shadow-sm mb-6 flex flex-col space-y-3">
           <div className="flex justify-between items-center text-sm font-bold text-gray-700">
             <span>Ders Tamamlanma Oranı</span>
-            <span className="text-[#D97706] font-black">{percentage}%</span>
+            <span className="text-[#B45309] font-black">{percentage}%</span>
           </div>
           <div className="w-full bg-gray-100 rounded-full h-3.5 overflow-hidden">
             <div
-              className="bg-[#D97706] h-full rounded-full transition-all duration-500"
+              className="bg-[#B45309] h-full rounded-full transition-all duration-500"
               style={{ width: `${percentage}%` }}
             />
           </div>
@@ -94,7 +94,7 @@ export default function KonuTakipPage() {
         <div className="bg-white border border-[#EFECE6] rounded-3xl p-6 sm:p-8 shadow-md flex flex-col space-y-4">
           <div className="flex justify-between items-center pb-4 border-b border-[#FAF8F5] mb-2">
             <span className="text-xs font-black text-gray-400 uppercase tracking-widest">{currentDers.ders} Müfredatı</span>
-            <span className="text-xs font-black text-[#D97706] bg-[#FAF0E3] px-3 py-1 rounded-xl">2027 Uyumlu</span>
+            <span className="text-xs font-black text-[#B45309] bg-[#FAF0E3] px-3 py-1 rounded-xl">2027 Uyumlu</span>
           </div>
 
           <div className="space-y-2">

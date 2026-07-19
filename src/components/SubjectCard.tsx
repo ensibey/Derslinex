@@ -20,7 +20,7 @@ export default function SubjectCard({ ders }: { ders: DersAlani }) {
   return (
     <Link
       href={`/dersler/${ders.slug}`}
-      className="group bg-white rounded-3xl border border-[#EFECE6] hover:border-[#F5D0A9] shadow-sm hover:shadow-md transition-all duration-300 p-5 flex flex-col gap-4"
+      className="group bg-white/80 backdrop-blur-md rounded-3xl border border-[#EFECE6]/60 hover:border-[#F5D0A9]/80 hover:bg-white/95 shadow-sm hover:shadow-premium transition-all duration-300 p-5 flex flex-col gap-4"
     >
       <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-[#FAF0E3] flex items-center justify-center group-hover:scale-105 transition-transform duration-300 flex-shrink-0">
         {imagePath ? (
@@ -38,10 +38,10 @@ export default function SubjectCard({ ders }: { ders: DersAlani }) {
         )}
       </div>
       <div>
-        <h3 className="font-black text-[#1E3A8A] text-lg group-hover:text-[#D97706] transition-colors">
+        <h3 className="font-black text-[#1E3A8A] text-lg group-hover:text-[#B45309] transition-colors">
           {ders.isim}
         </h3>
-        <p className="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed font-medium">{ders.aciklama}</p>
+        <p className="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed font-semibold">{ders.aciklama}</p>
       </div>
       <div className="flex flex-wrap gap-1 mt-auto pt-2">
         {ders.yksTuru.map((t) => (

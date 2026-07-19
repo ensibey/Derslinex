@@ -11,9 +11,9 @@ export default function WikiIndexPage() {
     <div className="bg-[#FAF8F5] min-h-screen text-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <span className="text-[#D97706] text-xs font-black uppercase tracking-widest">EĞİTİM KÜTÜPHANESİ</span>
+          <span className="text-[#B45309] text-xs font-black uppercase tracking-widest">EĞİTİM KÜTÜPHANESİ</span>
           <h1 className="text-3xl sm:text-4xl font-black text-[#1E3A8A] mt-2 mb-3">Ders Konuları Sözlüğü</h1>
-          <p className="text-gray-550 text-sm font-semibold max-w-xl mx-auto leading-relaxed">
+          <p className="text-gray-500 text-sm font-semibold max-w-xl mx-auto leading-relaxed">
             YKS ve LGS sınavlarında karşına çıkabilecek kritik terimleri, kuralları ve ÖSYM soru tiplerini tek tıkla öğren.
           </p>
         </div>
@@ -23,11 +23,11 @@ export default function WikiIndexPage() {
           {wikiKonulari.map((wiki) => (
             <div
               key={wiki.id}
-              className="bg-white border border-[#EFECE6] rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md hover:border-[#D97706] transition-all duration-300"
+              className="bg-white border border-[#EFECE6] rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md hover:border-[#B45309] transition-all duration-300"
             >
               <div>
                 <div className="flex justify-between items-center mb-4">
-                  <span className="text-[10px] font-black text-[#D97706] bg-[#FAF0E3] px-2.5 py-1 rounded-xl">
+                  <span className="text-[10px] font-black text-[#B45309] bg-[#FAF0E3] px-2.5 py-1 rounded-xl">
                     {wiki.kategori} {wiki.ders}
                   </span>
                 </div>

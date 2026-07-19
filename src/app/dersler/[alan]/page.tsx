@@ -34,9 +34,9 @@ export default async function DersAlaniPage({ params }: { params: Promise<{ alan
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-500 mb-8 flex items-center gap-2 font-bold">
-        <Link href="/" className="hover:text-[#D97706] transition-colors">Ana Sayfa</Link>
+        <Link href="/" className="hover:text-[#B45309] transition-colors">Ana Sayfa</Link>
         <span>/</span>
-        <Link href="/dersler" className="hover:text-[#D97706] transition-colors">Dersler</Link>
+        <Link href="/dersler" className="hover:text-[#B45309] transition-colors">Dersler</Link>
         <span>/</span>
         <span className="text-gray-900 font-black">{ders.isim}</span>
       </nav>
@@ -58,7 +58,7 @@ export default async function DersAlaniPage({ params }: { params: Promise<{ alan
           </div>
           <a href={waLink(`Merhaba, ${ders.isim} dersi için YKS hazırlık hocası arıyorum.`)}
             target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center justify-center bg-[#D97706] hover:bg-[#B45309] text-white font-black px-10 py-3.5 rounded-xl transition-all shadow-sm">
+            className="inline-flex items-center justify-center bg-[#B45309] hover:bg-[#92400E] text-white font-black px-10 py-3.5 rounded-xl transition-all shadow-sm">
             WhatsApp ile Hoca Bul
           </a>
         </div>

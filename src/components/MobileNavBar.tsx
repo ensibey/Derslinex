@@ -22,12 +22,12 @@ export default function MobileNavBar() {
   const linkClass = (path: string) => {
     const isActive = pathname === path;
     return `flex flex-col items-center justify-center text-center flex-1 py-1 group transition-all ${
-      isActive ? "text-[#D97706] scale-105" : "text-[#1E3A8A] hover:text-[#D97706]"
+      isActive ? "text-[#B45309] scale-105" : "text-[#1E3A8A] hover:text-[#B45309]"
     }`;
   };
 
   return (
-    <div className="lg:hidden fixed bottom-4 left-4 right-4 h-16 bg-white/90 backdrop-blur-lg border border-[#EFECE6] rounded-2xl z-50 flex items-center justify-around px-2 shadow-xl">
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 h-[calc(4.5rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px)] bg-white/95 backdrop-blur-lg border-t border-[#EFECE6] z-50 flex items-center justify-around px-2 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
       {/* Anasayfa */}
       <Link href="/" className={linkClass("/")}>
         <span className="text-xl">🏠</span>
@@ -49,7 +49,7 @@ export default function MobileNavBar() {
       {/* Hızlı Araçlar */}
       <button
         onClick={triggerSidebar}
-        className="flex flex-col items-center justify-center text-center flex-1 py-1 text-[#1E3A8A] hover:text-[#D97706] transition-all outline-none"
+        className="flex flex-col items-center justify-center text-center flex-1 py-1 text-[#1E3A8A] hover:text-[#B45309] transition-all outline-none"
       >
         <span className="relative flex h-5 w-5 justify-center items-center">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-20"></span>

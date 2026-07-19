@@ -53,9 +53,9 @@ export default function PomodoroPage() {
   return (
     <div className="bg-[#FAF8F5] min-h-screen text-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-xl mx-auto text-center">
-        <span className="text-[#D97706] text-xs font-black uppercase tracking-widest">ÇALIŞMA KONDİSYONU</span>
+        <span className="text-[#B45309] text-xs font-black uppercase tracking-widest">ÇALIŞMA KONDİSYONU</span>
         <h1 className="text-3xl sm:text-4xl font-black text-[#1E3A8A] mt-2 mb-4">Pomodoro Çalışma Sayacı</h1>
-        <p className="text-gray-550 text-sm font-semibold mb-10 leading-relaxed">
+        <p className="text-gray-500 text-sm font-semibold mb-10 leading-relaxed">
           25 dakika odaklanmış ders çalışması ve ardından gelen 5 dakikalık zihinsel molalarla sınav veriminizi katlayın.
         </p>
 

@@ -38,9 +38,9 @@ export default function ObpHesaplayiciPage() {
     <div className="bg-[#FAF8F5] min-h-screen text-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-xl mx-auto">
         <div className="text-center mb-10">
-          <span className="text-[#D97706] text-xs font-black uppercase tracking-widest">YKS SIRALAMA SİMÜLATÖRÜ</span>
+          <span className="text-[#B45309] text-xs font-black uppercase tracking-widest">YKS SIRALAMA SİMÜLATÖRÜ</span>
           <h1 className="text-3xl sm:text-4xl font-black text-[#1E3A8A] mt-2 mb-3">OBP Sıralama Etki Robotu</h1>
-          <p className="text-gray-550 text-sm font-semibold leading-relaxed">
+          <p className="text-gray-500 text-sm font-semibold leading-relaxed">
             Diploma notunuzun (OBP) YKS yerleştirme sıralamanızı nasıl etkileyeceğini ve size kaç net kazandırıp kaybettireceğini görün.
           </p>
         </div>
@@ -60,7 +60,7 @@ export default function ObpHesaplayiciPage() {
                 step="0.01"
                 value={obp}
                 onChange={(e) => setObp(parseFloat(e.target.value) || 0)}
-                className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl py-3 px-4 text-sm font-bold text-gray-800 outline-none focus:border-[#D97706] transition-colors"
+                className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl py-3 px-4 text-sm font-bold text-gray-800 outline-none focus:border-[#B45309] transition-colors"
                 placeholder="Örn: 85.5"
               />
               <p className="text-[10px] text-gray-400 font-bold mt-1.5">En düşük diploma notu 50 olarak hesaplanır.</p>
@@ -77,7 +77,7 @@ export default function ObpHesaplayiciPage() {
                 max="120"
                 value={tytNet}
                 onChange={(e) => setTytNet(parseInt(e.target.value) || 0)}
-                className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl py-3 px-4 text-sm font-bold text-gray-800 outline-none focus:border-[#D97706] transition-colors"
+                className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl py-3 px-4 text-sm font-bold text-gray-800 outline-none focus:border-[#B45309] transition-colors"
                 placeholder="Örn: 75"
               />
               <p className="text-[10px] text-gray-400 font-bold mt-1.5">Sıralama yığılması tahmini için gereklidir.</p>
@@ -86,7 +86,7 @@ export default function ObpHesaplayiciPage() {
 
           <button
             onClick={handleCalculate}
-            className="w-full bg-[#D97706] hover:bg-[#B45309] text-white font-black py-4 rounded-2xl transition-all shadow-md active:scale-95 text-sm"
+            className="w-full bg-[#B45309] hover:bg-[#92400E] text-white font-black py-4 rounded-2xl transition-all shadow-md active:scale-95 text-sm"
           >
             Etkiyi Hesapla ➔
           </button>
@@ -149,22 +149,22 @@ export default function ObpHesaplayiciPage() {
             <p className="text-xs text-gray-500 font-bold leading-relaxed mb-4">
               Okul puanı (OBP), YKS yerleştirme puanına doğrudan eklenir ve lise yazılı notlarınızın ortalamasından elde edilir. OBP'yi yüksek tutmak için:
             </p>
-            <ul className="list-disc pl-5 text-xs text-gray-650 font-bold space-y-2">
+            <ul className="list-disc pl-5 text-xs text-gray-600 font-bold space-y-2">
               <li>
-                <span className="text-[#D97706]">Yazılı Sınavlarına Düzenli Çalışın:</span> Lise not ortalamanızın her puanı, yerleştirmede sizi binlerce kişinin önüne geçirecek ağırlığa sahiptir.
+                <span className="text-[#B45309]">Yazılı Sınavlarına Düzenli Çalışın:</span> Lise not ortalamanızın her puanı, yerleştirmede sizi binlerce kişinin önüne geçirecek ağırlığa sahiptir.
               </li>
               <li>
-                <span className="text-[#D97706]">Sözlü Notlarını İhmal Etmeyin:</span> Ders içi performans notları ortalamayı doğrudan etkiler. Öğretmenlerinizle iletişimi ve ders katılımını güçlü tutun.
+                <span className="text-[#B45309]">Sözlü Notlarını İhmal Etmeyin:</span> Ders içi performans notları ortalamayı doğrudan etkiler. Öğretmenlerinizle iletişimi ve ders katılımını güçlü tutun.
               </li>
               <li>
-                <span className="text-[#D97706]">Sayısal ve Sözel Dengeyi Koruyun:</span> Sadece kendi alanınızdaki derslere değil, ortalamaya etki eden müzik, beden, resim gibi yan derslere de önem verin.
+                <span className="text-[#B45309]">Sayısal ve Sözel Dengeyi Koruyun:</span> Sadece kendi alanınızdaki derslere değil, ortalamaya etki eden müzik, beden, resim gibi yan derslere de önem verin.
               </li>
             </ul>
           </section>
 
           <section className="bg-white border border-[#EFECE6] rounded-3xl p-6 sm:p-8 shadow-sm">
             <h2 className="text-lg font-black text-[#1E3A8A] mb-3">🛡️ Düşük OBP'yi YKS'de Eritecek Çalışma Taktikleri</h2>
-            <p className="text-xs text-gray-650 font-semibold leading-relaxed">
+            <p className="text-xs text-gray-600 font-semibold leading-relaxed">
               Eğer lise diploma notunuz düşükse ve YKS'de geriye düşmekten korkuyorsanız endişelenmeyin. Bu dezavantajı tamamen kapatacak formül şudur:
               <br /><br />
               <strong>1. AYT Netlerine Yüklenin:</strong> YKS yerleştirme puanında TYT'nin soru başı katsayısı daha düşükken, AYT netlerinin çarpanı çok daha yüksektir. OBP kaybınızı, AYT Matematik ve AYT Fen alanından yapacağınız fazladan 2-3 netle tamamen sıfırlayabilirsiniz.

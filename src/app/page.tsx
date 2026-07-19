@@ -84,10 +84,10 @@ export default function HomePage() {
       {/* Hero */}
       <section className="relative overflow-hidden bg-[#FAF8F5] pt-20 pb-28 px-4 border-b border-[#EFECE6]">
         {/* Glow & Academic Pattern Mockups */}
-        <div className="absolute top-[-10%] left-[-10%] w-[45%] h-[45%] rounded-full bg-[#D97706]/5 blur-[120px] pointer-events-none" />
+        <div className="absolute top-[-10%] left-[-10%] w-[45%] h-[45%] rounded-full bg-[#B45309]/5 blur-[120px] pointer-events-none" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[55%] h-[55%] rounded-full bg-[#1E3A8A]/5 blur-[150px] pointer-events-none" />
         <div className="absolute top-10 right-[15%] w-72 h-72 border border-[#EFECE6]/40 rounded-full pointer-events-none" />
-        <div className="absolute top-20 right-[18%] w-56 h-56 border border-[#D97706]/5 rounded-full pointer-events-none" />
+        <div className="absolute top-20 right-[18%] w-56 h-56 border border-[#B45309]/5 rounded-full pointer-events-none" />
 
         <div className="max-w-7xl mx-auto grid lg:grid-cols-12 gap-12 items-center relative z-10">
           {/* Left Column: Info & Action */}
@@ -95,7 +95,7 @@ export default function HomePage() {
             <MiniCountdown />
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight mb-6 tracking-tight text-[#1E3A8A]">
               YKS'de Hedeflediğin <br />
-              <span className="text-[#D97706] relative">
+              <span className="text-[#B45309] relative">
                 Bölümü Şansa Bırakma!
                 <span className="absolute bottom-1 left-0 w-full h-[4px] bg-[#FAF0E3] -z-10 rounded-full" />
               </span>
@@ -110,7 +110,7 @@ export default function HomePage() {
 
           {/* Right Column: Visual Academic Dashboard Card */}
           <div className="lg:col-span-5 hidden lg:block">
-            <div className="bg-white border border-[#EFECE6] rounded-3xl p-8 shadow-md hover:shadow-lg transition-all duration-300 relative overflow-hidden group hover:-translate-y-1">
+            <div className="bg-white/80 backdrop-blur-md border border-[#EFECE6]/60 rounded-3xl p-8 shadow-premium hover:shadow-lg transition-all duration-300 relative overflow-hidden group hover:-translate-y-1">
               <div className="absolute top-0 right-0 w-24 h-24 bg-[#FAF0E3]/60 rounded-bl-full -z-10" />
               
               <div className="flex items-center gap-3.5 mb-6 pb-4 border-b border-[#FAF8F5]">
@@ -147,7 +147,7 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-20">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mb-12">
           {stats.map((s) => (
-            <div key={s.etiket} className="bg-white border border-[#EFECE6] rounded-2xl shadow-sm p-6 text-center hover:-translate-y-1 transition-all duration-300">
+            <div key={s.etiket} className="bg-white/80 backdrop-blur-md border border-[#EFECE6]/60 rounded-2xl shadow-premium p-6 text-center hover:-translate-y-1 hover:bg-white/95 hover:border-[#F5D0A9]/60 transition-all duration-300">
               <div className="text-3xl sm:text-4xl font-black text-[#1E3A8A]">{s.rakam}</div>
               <div className="text-xs sm:text-sm text-gray-500 font-black mt-2 uppercase tracking-widest">{s.etiket}</div>
             </div>
@@ -158,40 +158,40 @@ export default function HomePage() {
       </section>
 
       {/* Ders Formatı */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-32">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 sm:mt-24 lg:mt-32">
         <div className="text-center mb-16">
-          <span className="text-[#D97706] text-xs font-black uppercase tracking-widest">ÇALIŞMA MODELİ</span>
+          <span className="text-[#B45309] text-xs font-black uppercase tracking-widest">ÇALIŞMA MODELİ</span>
           <h2 className="text-3xl sm:text-5xl font-black text-[#1E3A8A] mt-2">Sana Uygun Ders Formatı</h2>
-          <p className="text-gray-600 mt-4 max-w-xl mx-auto font-medium">Nerede olursan ol, kesintisiz öğrenmeye devam et.</p>
+          <p className="text-gray-600 mt-4 max-w-xl mx-auto font-semibold">Nerede olursan ol, kesintisiz öğrenmeye devam et.</p>
         </div>
         <div className="grid sm:grid-cols-2 gap-8">
-          <div className="bg-white rounded-3xl p-8 sm:p-10 border border-[#EFECE6] shadow-sm flex flex-col hover:shadow-md transition-shadow">
+          <div className="bg-white/80 backdrop-blur-md rounded-3xl p-8 sm:p-10 border border-[#EFECE6]/60 shadow-premium flex flex-col hover:shadow-lg hover:bg-white/90 hover:border-[#F5D0A9]/60 transition-all duration-300">
             <div className="w-14 h-14 bg-[#FAF0E3] rounded-2xl flex items-center justify-center text-3xl mb-6">🏫</div>
             <h3 className="text-2xl font-bold text-[#1E3A8A] mb-4">Yüz Yüze Ders</h3>
-            <p className="text-gray-600 mb-8 leading-relaxed text-sm">
+            <p className="text-gray-600 mb-8 leading-relaxed text-sm font-semibold">
               Belirlenen çalışma merkezlerinde veya evinizde eğitmenle birebir ders. Anlık geri bildirim ve yüksek odaklanma.
             </p>
-            <ul className="space-y-3.5 text-sm text-gray-600 mb-8 mt-auto">
+            <ul className="space-y-3.5 text-sm text-gray-600 mb-8 mt-auto font-semibold">
               {["Seçili şehirlerdeki uzman hocalar", "Birebir konforlu çalışma ortamı", "Haftalık hedeflere dayalı program", "Eğitmen rehberliğinde özel materyaller"].map(i => (
-                <li key={i} className="flex items-center gap-3"><span className="text-[#D97706] font-bold">✓</span>{i}</li>
+                <li key={i} className="flex items-center gap-3"><span className="text-[#B45309] font-bold">✓</span>{i}</li>
               ))}
             </ul>
-            <Link href="/hocalar?format=yuz-yuze" className="inline-block text-center bg-[#D97706] hover:bg-[#B45309] text-white font-bold px-8 py-4 rounded-xl transition-all duration-200">
+            <Link href="/hocalar?format=yuz-yuze" className="inline-block text-center bg-[#B45309] hover:bg-[#92400E] text-white font-bold px-8 py-4 rounded-xl transition-all duration-200">
               Yüz Yüze Hocaları Gör
             </Link>
           </div>
-          <div className="bg-white rounded-3xl p-8 sm:p-10 border border-[#EFECE6] shadow-sm flex flex-col hover:shadow-md transition-shadow">
+          <div className="bg-white/80 backdrop-blur-md rounded-3xl p-8 sm:p-10 border border-[#EFECE6]/60 shadow-premium flex flex-col hover:shadow-lg hover:bg-white/90 hover:border-[#F5D0A9]/60 transition-all duration-300">
             <div className="w-14 h-14 bg-[#1E3A8A]/10 rounded-2xl flex items-center justify-center text-3xl mb-6">💻</div>
             <h3 className="text-2xl font-bold text-[#1E3A8A] mb-4">Online Ders</h3>
-            <p className="text-gray-600 mb-8 leading-relaxed text-sm">
+            <p className="text-gray-600 mb-8 leading-relaxed text-sm font-semibold">
               Mesafe sınırı olmadan en iyi hocalara anında erişin. İnteraktif beyaz tahta ve video kayıt imkanıyla yüksek verim.
             </p>
-            <ul className="space-y-3.5 text-sm text-gray-600 mb-8 mt-auto">
+            <ul className="space-y-3.5 text-sm text-gray-600 mb-8 mt-auto font-semibold">
               {["Tüm Türkiye genelinden seçkin hocalar", "Gelişmiş dijital eğitim araçları", "Kayıt imkanıyla dersi tekrar izleme", "Zaman ve mekan esnekliği"].map(i => (
-                <li key={i} className="flex items-center gap-3"><span className="text-[#D97706] font-bold">✓</span>{i}</li>
+                <li key={i} className="flex items-center gap-3"><span className="text-[#B45309] font-bold">✓</span>{i}</li>
               ))}
             </ul>
-            <Link href="/hocalar?format=online" className="inline-block text-center bg-[#D97706] hover:bg-[#B45309] text-white font-bold px-8 py-4 rounded-xl transition-all duration-200">
+            <Link href="/hocalar?format=online" className="inline-block text-center bg-[#B45309] hover:bg-[#92400E] text-white font-bold px-8 py-4 rounded-xl transition-all duration-200">
               Online Hocaları Gör
             </Link>
           </div>
@@ -199,18 +199,22 @@ export default function HomePage() {
       </section>
 
       {/* Öne Çıkan Hocalar */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16 lg:mt-20">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-3xl font-black text-[#1E3A8A]">Öne Çıkan Hocalar</h2>
-            <p className="text-gray-600 mt-1 font-medium">En yüksek puanlı, deneyimli hocalarımız</p>
+            <p className="text-gray-600 mt-1 font-semibold">En yüksek puanlı, deneyimli hocalarımız</p>
           </div>
-          <Link href="/hocalar" className="hidden sm:inline-flex items-center gap-1 text-[#D97706] font-bold hover:underline">
+          <Link href="/hocalar" className="hidden sm:inline-flex items-center gap-1 text-[#B45309] font-bold hover:underline">
             Tümünü Gör →
           </Link>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {oneHocalar.map((h) => <TeacherCard key={h.id} hoca={h} />)}
+        <div className="flex overflow-x-auto pb-4 gap-6 snap-x snap-mandatory sm:grid sm:grid-cols-2 lg:grid-cols-3">
+          {oneHocalar.map((h) => (
+            <div key={h.id} className="w-[85vw] max-w-[320px] flex-shrink-0 snap-start sm:w-auto sm:max-w-none">
+              <TeacherCard hoca={h} />
+            </div>
+          ))}
         </div>
         <div className="text-center mt-8">
           <Link href="/hocalar" className="inline-block border-2 border-[#1E3A8A] text-[#1E3A8A] hover:bg-[#1E3A8A] hover:text-white font-bold px-8 py-3 rounded-xl transition-all">
@@ -220,23 +224,23 @@ export default function HomePage() {
       </section>
 
       {/* Ders Alanları */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16 lg:mt-20">
         <div className="text-center mb-10">
           <h2 className="text-3xl font-black text-[#1E3A8A]">YKS Ders Alanları</h2>
-          <p className="text-gray-650 mt-2 font-medium">TYT'den AYT'ye tüm alanlar için uzman hocalar</p>
+          <p className="text-gray-600 mt-2 font-semibold">TYT'den AYT'ye tüm alanlar için uzman hocalar</p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {dersAlanlari.slice(0, 8).map((d) => <SubjectCard key={d.id} ders={d} />)}
         </div>
         <div className="text-center mt-6">
-          <Link href="/dersler" className="text-[#D97706] font-bold hover:underline">
+          <Link href="/dersler" className="text-[#B45309] font-bold hover:underline">
             Tüm ders alanlarını gör →
           </Link>
         </div>
       </section>
 
       {/* Nasıl Çalışır */}
-      <section className="bg-white border-t border-b border-[#EFECE6] mt-20 py-20">
+      <section className="bg-white/80 backdrop-blur-md border-t border-b border-[#EFECE6] mt-12 sm:mt-16 lg:mt-20 py-10 sm:py-16 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-black text-[#1E3A8A]">3 Adımda Ders Al</h2>
@@ -253,7 +257,7 @@ export default function HomePage() {
                 </div>
                 <div className="text-3xl mb-3">{s.emoji}</div>
                 <h3 className="text-xl font-black text-[#1E3A8A] mb-2">{s.title}</h3>
-                <p className="text-gray-650 text-sm font-medium leading-relaxed">{s.desc}</p>
+                <p className="text-gray-600 text-sm font-semibold leading-relaxed">{s.desc}</p>
               </div>
             ))}
           </div>
@@ -262,7 +266,7 @@ export default function HomePage() {
               href={waLink()}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-[#D97706] hover:bg-[#B45309] text-white font-black text-lg px-10 py-4 rounded-xl transition-all shadow-md hover:scale-105"
+              className="inline-flex items-center gap-2 bg-[#B45309] hover:bg-[#92400E] text-white font-black text-lg px-10 py-4 rounded-xl transition-all shadow-md hover:scale-105"
             >
               Hemen Başla — WhatsApp
             </a>
@@ -271,7 +275,7 @@ export default function HomePage() {
       </section>
 
       {/* SSS */}
-      <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
+      <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16 lg:mt-20">
         <div className="text-center mb-10">
           <h2 className="text-3xl font-black text-[#1E3A8A]">Sıkça Sorulan Sorular</h2>
         </div>
@@ -279,18 +283,18 @@ export default function HomePage() {
       </section>
 
       {/* CTA Banner */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20 mb-8">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16 lg:mt-20 mb-8">
         <div className="bg-gradient-to-br from-[#1E3A8A] to-[#111827] rounded-3xl p-10 sm:p-14 text-center text-white shadow-md relative overflow-hidden">
           <div className="absolute top-[-50%] left-[-50%] w-full h-full bg-white/5 rounded-full blur-3xl pointer-events-none" />
           <h2 className="text-3xl sm:text-4xl font-black mb-4 relative z-10">Hâlâ kararsız mısın?</h2>
-          <p className="text-gray-200 text-lg mb-8 max-w-xl mx-auto relative z-10 font-medium">
+          <p className="text-gray-200 text-lg mb-8 max-w-xl mx-auto relative z-10 font-semibold">
             WhatsApp'tan bize ulaş, ihtiyacına en uygun hocanı birlikte bulalım. Yanıt süresi: &lt; 1 saat.
           </p>
           <a
             href={waLink("Merhaba, hangi hoca bana uygun olur konusunda yardım almak istiyorum.")}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-[#D97706] hover:bg-[#B45309] text-white font-black text-lg px-10 py-4 rounded-xl transition-all hover:scale-105 relative z-10"
+            className="inline-flex items-center gap-2 bg-[#B45309] hover:bg-[#92400E] text-white font-black text-lg px-10 py-4 rounded-xl transition-all hover:scale-105 relative z-10"
           >
             💬 Bize Danış — Ücretsiz
           </a>

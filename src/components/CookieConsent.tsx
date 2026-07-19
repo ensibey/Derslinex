@@ -42,7 +42,7 @@ export default function CookieConsent() {
           </button>
           <button
             onClick={() => karar("kabul")}
-            className="px-4 py-2 rounded-xl text-sm font-black bg-[#D97706] hover:bg-[#B45309] transition-colors"
+            className="px-4 py-2 rounded-xl text-sm font-black bg-[#B45309] hover:bg-[#92400E] transition-colors"
           >
             Kabul Et
           </button>

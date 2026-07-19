@@ -91,12 +91,12 @@ export default async function IlceOzelDersPage({ params }: PageProps) {
     <div className="bg-[#FAF8F5] min-h-screen text-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Breadcrumb */}
-        <nav className="text-sm text-gray-550 mb-8 flex items-center gap-2 font-bold">
-          <Link href="/" className="hover:text-[#D97706] transition-colors">Ana Sayfa</Link>
+        <nav className="text-sm text-gray-500 mb-8 flex items-center gap-2 font-bold">
+          <Link href="/" className="hover:text-[#B45309] transition-colors">Ana Sayfa</Link>
           <span>/</span>
-          <Link href="/hocalar" className="hover:text-[#D97706] transition-colors">Eğitmenler</Link>
+          <Link href="/hocalar" className="hover:text-[#B45309] transition-colors">Eğitmenler</Link>
           <span>/</span>
-          <Link href={`/ozel-ders/${sehirSlug}`} className="hover:text-[#D97706] transition-colors">{sehirName}</Link>
+          <Link href={`/ozel-ders/${sehirSlug}`} className="hover:text-[#B45309] transition-colors">{sehirName}</Link>
           <span>/</span>
           <span className="text-gray-900 font-black">{ilceName}</span>
         </nav>
@@ -112,12 +112,12 @@ export default async function IlceOzelDersPage({ params }: PageProps) {
             <h1 className="text-3xl sm:text-5xl font-black mb-4 tracking-tight text-[#1E3A8A]">
               {sehirName} {ilceName} Birebir Özel Ders
             </h1>
-            <p className="text-gray-650 text-base sm:text-lg max-w-2xl mb-8 leading-relaxed font-medium">
+            <p className="text-gray-600 text-base sm:text-lg max-w-2xl mb-8 leading-relaxed font-medium">
               {sehirName} - {ilceName} bölgesinde yüz yüze ders veren öğretmenlerimizle veya online canlı ders altyapımızla hedefinize emin adımlarla ilerleyin. Derslinex ile derece yapmış öğretmenlerden kişiye özel YKS LGS hazırlık eğitimi alın.
             </p>
             <a href={waLink(`Merhaba, ${sehirName} ${ilceName} bölgesinde yüz yüze/online ders almak için hoca arıyorum.`)}
               target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center justify-center bg-[#D97706] hover:bg-[#B45309] text-white font-black px-10 py-4 rounded-xl transition-all shadow-sm">
+              className="inline-flex items-center justify-center bg-[#B45309] hover:bg-[#92400E] text-white font-black px-10 py-4 rounded-xl transition-all shadow-sm">
               WhatsApp ile Hoca Önerisi Al
             </a>
           </div>
@@ -139,10 +139,10 @@ export default async function IlceOzelDersPage({ params }: PageProps) {
             <div className="text-center py-16 bg-white rounded-3xl border border-[#EFECE6] p-8 shadow-sm">
               <div className="text-5xl mb-4">🔍</div>
               <h3 className="text-xl font-black text-[#1E3A8A] mb-2">Bu bölgeye özel yüz yüze hoca kaydı bulunamadı</h3>
-              <p className="text-gray-550 mb-6 font-medium">Online ders altyapımızla Türkiye'nin en seçkin hocalarıyla hemen derse başlayabilirsiniz.</p>
+              <p className="text-gray-500 mb-6 font-medium">Online ders altyapımızla Türkiye'nin en seçkin hocalarıyla hemen derse başlayabilirsiniz.</p>
               <a href={waLink(`Merhaba, ${sehirName} ${ilceName} bölgesinde online özel ders için bilgi almak istiyorum.`)}
                 target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-[#D97706] hover:bg-[#B45309] text-white font-black px-6 py-3 rounded-xl transition-all shadow-sm">
+                className="inline-flex items-center gap-2 bg-[#B45309] hover:bg-[#92400E] text-white font-black px-6 py-3 rounded-xl transition-all shadow-sm">
                 WhatsApp'tan Sor
               </a>
             </div>

@@ -52,7 +52,7 @@ export default function YksHazirlikPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-14">
           <span className="text-primary-650 text-xs font-bold uppercase tracking-widest">KÜTÜPHANE & ARAÇLAR</span>
-          <h1 className="text-4xl sm:text-5xl font-black mb-4 mt-2 bg-gradient-to-r from-primary-600 to-indigo-650 bg-clip-text text-transparent">YKS Hazırlık Merkezi</h1>
+          <h1 className="text-4xl sm:text-5xl font-black mb-4 mt-2 bg-gradient-to-r from-primary-600 to-indigo-600 bg-clip-text text-transparent">YKS Hazırlık Merkezi</h1>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
             Sınav yolculuğunuzda ihtiyacınız olan tüm interaktif planlama ve analiz araçları tek bir yerde.
           </p>
@@ -174,11 +174,11 @@ export default function YksHazirlikPage() {
                   <span className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-4">Hesaplanan Sonuçlar</span>
                   <div className="space-y-4">
                     <div>
-                      <div className="text-3xl font-black text-primary-750">{scores.tytScore}</div>
+                      <div className="text-3xl font-black text-primary-800">{scores.tytScore}</div>
                       <div className="text-xs text-gray-500 font-bold">TYT Tahmini Puan</div>
                     </div>
                     <div>
-                      <div className="text-3xl font-black text-indigo-650">{scores.sayScore}</div>
+                      <div className="text-3xl font-black text-indigo-600">{scores.sayScore}</div>
                       <div className="text-xs text-gray-500 font-bold">Sayısal Tahmini Puan</div>
                     </div>
                   </div>
@@ -236,7 +236,7 @@ export default function YksHazirlikPage() {
                 className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-6">
                 <span className="text-xs font-bold text-primary-700 bg-primary-50 border border-primary-100/50 px-2.5 py-1 rounded-full">{b.kategori}</span>
                 <h3 className="font-bold text-gray-900 mt-3 leading-snug line-clamp-2">{b.baslik}</h3>
-                <p className="text-sm text-gray-650 mt-2 line-clamp-2">{b.ozet}</p>
+                <p className="text-sm text-gray-600 mt-2 line-clamp-2">{b.ozet}</p>
                 <p className="text-xs text-gray-500 mt-3 font-semibold">{b.okumaSuresi} dk okuma</p>
               </Link>
             ))}

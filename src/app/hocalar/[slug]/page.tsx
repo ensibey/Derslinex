@@ -86,7 +86,7 @@ export default async function HocaProfilPage({ params }: { params: Promise<{ slu
               {/* Foto */}
               <div className="bg-gradient-to-b from-primary-600 to-indigo-800 p-8 flex flex-col items-center">
                 <div className="relative w-28 h-28 rounded-full overflow-hidden ring-4 ring-white/10 mb-4">
-                  <Image src={hoca.fotograf} alt={hoca.isim} fill className="object-cover" sizes="112px" />
+                  <Image src={hoca.fotograf} alt={hoca.isim} fill className="object-cover" sizes="112px" unoptimized />
                 </div>
                 <h1 className="text-xl font-black text-white text-center">
                   {hoca.unvan === "Dr." ? `Dr. ${hoca.isim}` : hoca.isim}

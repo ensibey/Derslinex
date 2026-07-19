@@ -55,9 +55,9 @@ export default async function BlogYazisiPage({ params }: { params: Promise<{ slu
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSchema) }}
       />
       <nav className="text-sm text-gray-500 mb-8 flex items-center gap-2 font-bold">
-        <Link href="/" className="hover:text-[#D97706] transition-colors">Ana Sayfa</Link>
+        <Link href="/" className="hover:text-[#B45309] transition-colors">Ana Sayfa</Link>
         <span>/</span>
-        <Link href="/blog" className="hover:text-[#D97706] transition-colors">Blog</Link>
+        <Link href="/blog" className="hover:text-[#B45309] transition-colors">Blog</Link>
         <span>/</span>
         <span className="text-gray-900 font-black truncate">{yazi.baslik}</span>
       </nav>
@@ -75,7 +75,7 @@ export default async function BlogYazisiPage({ params }: { params: Promise<{ slu
 
       {/* İçerik — rahat okuma düzeni */}
       <div className="max-w-none text-gray-700 leading-relaxed font-medium space-y-6 text-base sm:text-lg whitespace-pre-line">
-        <p className="text-lg sm:text-xl text-[#1E3A8A] leading-relaxed font-bold border-l-4 border-[#D97706] pl-4 italic bg-[#FAF8F5] py-3 px-4 rounded-r-xl">{yazi.ozet}</p>
+        <p className="text-lg sm:text-xl text-[#1E3A8A] leading-relaxed font-bold border-l-4 border-[#B45309] pl-4 italic bg-[#FAF8F5] py-3 px-4 rounded-r-xl">{yazi.ozet}</p>
         <div dangerouslySetInnerHTML={{ __html: yazi.icerik }} className="leading-relaxed" />
       </div>
 
@@ -86,7 +86,7 @@ export default async function BlogYazisiPage({ params }: { params: Promise<{ slu
           <div className="space-y-3">
             {diger.map((d) => (
               <Link key={d.id} href={`/blog/${d.slug}`}
-                className="flex justify-between items-center bg-white border border-[#EFECE6] rounded-xl px-5 py-4 hover:border-[#D97706] hover:shadow-sm transition-all group">
+                className="flex justify-between items-center bg-white border border-[#EFECE6] rounded-xl px-5 py-4 hover:border-[#B45309] hover:shadow-sm transition-all group">
                 <span className="font-bold text-gray-700 text-sm line-clamp-1 group-hover:text-[#1E3A8A] transition-colors">{d.baslik}</span>
                 <span className="text-xs text-gray-400 flex-shrink-0 ml-3 font-bold">{d.okumaSuresi} dk</span>
               </Link>

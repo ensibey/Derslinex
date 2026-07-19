@@ -20,9 +20,9 @@ export default function DerslerPage() {
     <div className="bg-[#FAF8F5] min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-10">
-          <span className="text-[#D97706] text-xs font-black uppercase tracking-widest">SINAV KATEGORİLERİ</span>
+          <span className="text-[#B45309] text-xs font-black uppercase tracking-widest">SINAV KATEGORİLERİ</span>
           <h1 className="text-4xl sm:text-5xl font-black mb-2 mt-2 text-[#1E3A8A]">Ders Alanları</h1>
-          <p className="text-gray-650 text-lg font-medium">YKS'nin tüm sınav türleri ve dersleri için uzman hoca desteği</p>
+          <p className="text-gray-600 text-lg font-medium">YKS'nin tüm sınav türleri ve dersleri için uzman hoca desteği</p>
         </div>
 
         {/* YKS Sınav Grupları */}
@@ -30,7 +30,7 @@ export default function DerslerPage() {
           {yksGruplari.map((g) => (
             <div key={g.id} className={`${g.renk} rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group`}>
               <div className="absolute top-0 right-0 w-16 h-16 bg-[#FAF0E3]/60 rounded-bl-full -z-10" />
-              <div className="font-black text-[#1E3A8A] text-lg mb-1 group-hover:text-[#D97706] transition-colors">{g.label}</div>
+              <div className="font-black text-[#1E3A8A] text-lg mb-1 group-hover:text-[#B45309] transition-colors">{g.label}</div>
               <div className="text-xs text-gray-500 font-bold leading-relaxed">{g.desc}</div>
             </div>
           ))}

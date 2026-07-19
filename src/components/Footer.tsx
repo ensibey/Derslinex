@@ -13,7 +13,7 @@ const dersLinks = [
 
 export default function Footer({ className }: { className?: string }) {
   return (
-    <footer className={`bg-[#1E3A8A] text-white mt-20 ${className || ""}`}>
+    <footer className={`bg-[#1E3A8A] text-white mt-12 sm:mt-16 lg:mt-20 ${className || ""}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Brand */}
@@ -37,7 +37,7 @@ export default function Footer({ className }: { className?: string }) {
               href={waLink()}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 mt-5 bg-[#D97706] hover:bg-[#B45309] text-white text-sm font-black px-4 py-2.5 rounded-xl transition-all shadow-sm"
+              className="inline-flex items-center gap-2 mt-5 bg-[#B45309] hover:bg-[#92400E] text-white text-sm font-black px-4 py-2.5 rounded-xl transition-all shadow-sm"
             >
               WhatsApp: Ders Al
             </a>
@@ -49,7 +49,7 @@ export default function Footer({ className }: { className?: string }) {
             <ul className="space-y-2">
               {dersLinks.map((l) => (
                 <li key={l.href}>
-                  <Link href={l.href} className="text-sm text-gray-200 hover:text-[#D97706] transition-colors font-medium">
+                  <Link href={l.href} className="text-sm text-gray-200 hover:text-[#B45309] transition-colors font-medium">
                     {l.label}
                   </Link>
                 </li>
@@ -70,7 +70,7 @@ export default function Footer({ className }: { className?: string }) {
                 { href: "/kullanim-kosullari", label: "Kullanım Koşulları" },
               ].map((l) => (
                 <li key={l.href}>
-                  <Link href={l.href} className="text-sm text-gray-200 hover:text-[#D97706] transition-colors font-medium">
+                  <Link href={l.href} className="text-sm text-gray-200 hover:text-[#B45309] transition-colors font-medium">
                     {l.label}
                   </Link>
                 </li>
@@ -97,11 +97,11 @@ export default function Footer({ className }: { className?: string }) {
             </ul>
             <div className="mt-5 flex gap-3">
               <a href="https://instagram.com/derslinex" target="_blank" rel="noopener noreferrer"
-                className="bg-white/10 hover:bg-[#D97706] px-3 py-1.5 rounded-lg transition-colors text-xs font-bold">
+                className="bg-white/10 hover:bg-[#92400E] px-3 py-1.5 rounded-lg transition-colors text-xs font-bold">
                 Instagram
               </a>
               <a href="https://youtube.com" target="_blank" rel="noopener noreferrer"
-                className="bg-white/10 hover:bg-[#D97706] px-3 py-1.5 rounded-lg transition-colors text-xs font-bold">
+                className="bg-white/10 hover:bg-[#92400E] px-3 py-1.5 rounded-lg transition-colors text-xs font-bold">
                 YouTube
               </a>
             </div>

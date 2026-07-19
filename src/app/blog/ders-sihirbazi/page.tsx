@@ -23,7 +23,7 @@ export default function TercihRobotuPage() {
     <div className="bg-[#FAF8F5] min-h-screen text-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <span className="text-[#D97706] text-xs font-black uppercase tracking-widest">YÖK ATLAS & ÖSYM UYUMLU</span>
+          <span className="text-[#B45309] text-xs font-black uppercase tracking-widest">YÖK ATLAS & ÖSYM UYUMLU</span>
           <h1 className="text-3xl sm:text-5xl font-black text-[#1E3A8A] mt-2 mb-4">Netine Göre Tercih Robotu</h1>
           <p className="text-gray-600 text-sm font-semibold max-w-xl mx-auto leading-relaxed">
             Mevcut netlerinizi girin, en güncel taban puanı verilerine göre kazanabileceğiniz popüler üniversite programlarını ve liseleri anında listeleyin.
@@ -71,7 +71,7 @@ export default function TercihRobotuPage() {
                     max="120"
                     value={tytNet}
                     onChange={(e) => setTytNet(Number(e.target.value))}
-                    className="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-[#D97706]"
+                    className="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-[#B45309]"
                   />
                   <div className="flex justify-between text-[10px] text-gray-400 font-bold mt-1.5">
                     <span>0 Net</span>
@@ -89,7 +89,7 @@ export default function TercihRobotuPage() {
                     max="80"
                     value={aytNet}
                     onChange={(e) => setAytNet(Number(e.target.value))}
-                    className="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-[#D97706]"
+                    className="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-[#B45309]"
                   />
                   <div className="flex justify-between text-[10px] text-gray-400 font-bold mt-1.5">
                     <span>0 Net</span>
@@ -108,7 +108,7 @@ export default function TercihRobotuPage() {
                   max="90"
                   value={lgsNet}
                   onChange={(e) => setLgsNet(Number(e.target.value))}
-                  className="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-[#D97706]"
+                  className="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-[#B45309]"
                 />
                 <div className="flex justify-between text-[10px] text-gray-400 font-bold mt-1.5">
                   <span>0 Net</span>
@@ -119,7 +119,7 @@ export default function TercihRobotuPage() {
 
             <div className="mt-8 pt-6 border-t border-[#FAF8F5] text-center">
               <span className="text-xs font-bold text-gray-400 uppercase">Tahmini Yerleştirme Puanı</span>
-              <p className="text-3xl font-black text-[#D97706] mt-2">{tahminiPuan} Puan</p>
+              <p className="text-3xl font-black text-[#B45309] mt-2">{tahminiPuan} Puan</p>
             </div>
           </div>
 
@@ -178,7 +178,7 @@ export default function TercihRobotuPage() {
                 href={waLink()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block mt-4 bg-[#D97706] hover:bg-[#B45309] text-white font-black px-8 py-3.5 rounded-xl text-sm transition-all"
+                className="inline-block mt-4 bg-[#B45309] hover:bg-[#92400E] text-white font-black px-8 py-3.5 rounded-xl text-sm transition-all"
               >
                 Hemen WhatsApp'tan Destek Al
               </a>

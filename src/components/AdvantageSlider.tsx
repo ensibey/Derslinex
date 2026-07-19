@@ -33,7 +33,7 @@ export default function AdvantageSlider() {
   }, []);
 
   return (
-    <div className="bg-white border border-[#EFECE6] rounded-3xl p-6 sm:p-10 shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-white/80 backdrop-blur-md border border-[#EFECE6]/60 rounded-3xl p-6 sm:p-10 shadow-premium hover:shadow-lg transition-all duration-300">
       <div className="flex flex-wrap gap-2 mb-8 justify-center sm:justify-start">
         {avantajlar.map((av, idx) => (
           <button
@@ -55,7 +55,7 @@ export default function AdvantageSlider() {
           <h3 className="text-xl sm:text-2xl font-black text-[#1E3A8A] mb-3">
             {avantajlar[activeTab].title}
           </h3>
-          <p className="text-sm sm:text-base text-gray-600 leading-relaxed max-w-3xl font-medium">
+          <p className="text-sm sm:text-base text-gray-600 leading-relaxed max-w-3xl font-semibold">
             {avantajlar[activeTab].desc}
           </p>
         </div>
@@ -68,7 +68,7 @@ export default function AdvantageSlider() {
               <span
                 key={idx}
                 className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  activeTab === idx ? "w-6 bg-[#D97706]" : "bg-[#EFECE6]"
+                  activeTab === idx ? "w-6 bg-[#B45309]" : "bg-[#EFECE6]"
                 }`}
               />
             ))}

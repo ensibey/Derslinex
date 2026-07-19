@@ -4,7 +4,6 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import KeepAlive from "@/components/KeepAlive";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import CookieConsent from "@/components/CookieConsent";
 
@@ -81,11 +80,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="bg-[#FAF8F5] text-gray-900 antialiased">
         <Header />
-        <main className="pb-16 lg:pb-0">{children}</main>
-        <Footer className="pb-24 lg:pb-14" />
+        <main className="pb-24 lg:pb-0">{children}</main>
+        <Footer className="pb-28 lg:pb-14" />
         <MobileNavBar />
         <WhatsAppButton />
-        <KeepAlive />
         <GoogleAnalytics />
         <CookieConsent />
       </body>

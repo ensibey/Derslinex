@@ -22,7 +22,7 @@ export default function sitemap() {
     "/blog/yks-net-siralama-karsilastirma",
     "/blog/konu-takip-cetelesi",
     "/blog/lise-taban-puanlari",
-    "/blog/meslek-net-atlası",
+    "/blog/meslek-net-atlasi",
     "/wiki",
     "/hakkimizda",
     "/iletisim",

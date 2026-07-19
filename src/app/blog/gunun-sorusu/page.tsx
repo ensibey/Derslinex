@@ -175,15 +175,15 @@ export default function GunlukQuizPage() {
     <div className="bg-[#FAF8F5] min-h-screen text-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-xl mx-auto">
         <div className="text-center mb-10">
-          <span className="text-[#D97706] text-xs font-black uppercase tracking-widest">GÜNLÜK MEYDAN OKUMA</span>
+          <span className="text-[#B45309] text-xs font-black uppercase tracking-widest">GÜNLÜK MEYDAN OKUMA</span>
           <h1 className="text-3xl sm:text-4xl font-black text-[#1E3A8A] mt-2 mb-3">Günün Özel Sorusu</h1>
-          <p className="text-gray-550 text-sm font-semibold">Her gün yeni bir soru çözerek bilgilerinizi tazeleyin.</p>
+          <p className="text-gray-500 text-sm font-semibold">Her gün yeni bir soru çözerek bilgilerinizi tazeleyin.</p>
         </div>
 
         {/* Question Container */}
         <div className="bg-white border border-[#EFECE6] rounded-3xl p-6 sm:p-8 shadow-md flex flex-col space-y-6">
           <div className="flex justify-between items-center pb-4 border-b border-[#FAF8F5]">
-            <span className="text-xs font-black text-[#D97706] bg-[#FAF0E3] px-3 py-1 rounded-xl">{current.ders}</span>
+            <span className="text-xs font-black text-[#B45309] bg-[#FAF0E3] px-3 py-1 rounded-xl">{current.ders}</span>
             <span className="text-xs text-gray-400 font-bold">Soru {current.id} / {sorular.length}</span>
           </div>
 
@@ -198,7 +198,7 @@ export default function GunlukQuizPage() {
               
               let btnClass = "border-[#EFECE6] bg-[#FAF8F5] text-gray-700 hover:bg-[#FAF0E3] hover:border-[#F5D0A9]";
               if (isSelected) {
-                btnClass = "border-[#D97706] bg-[#FAF0E3] text-[#B45309]";
+                btnClass = "border-[#B45309] bg-[#FAF0E3] text-[#B45309]";
               }
               if (showAnswer) {
                 if (isCorrect) {
@@ -218,7 +218,7 @@ export default function GunlukQuizPage() {
                   className={`w-full text-left flex items-center gap-4 border rounded-2xl px-5 py-4 transition-all outline-none font-bold text-sm ${btnClass}`}
                 >
                   <span className={`w-7 h-7 rounded-xl flex items-center justify-center font-black ${
-                    isSelected ? "bg-[#D97706] text-white" : "bg-white border border-[#EFECE6] text-gray-500"
+                    isSelected ? "bg-[#B45309] text-white" : "bg-white border border-[#EFECE6] text-gray-500"
                   }`}>
                     {opt.key}
                   </span>
@@ -235,7 +235,7 @@ export default function GunlukQuizPage() {
               disabled={!userChoice}
               className={`w-full font-black py-4 rounded-2xl transition-all shadow-sm ${
                 userChoice 
-                  ? "bg-[#D97706] hover:bg-[#B45309] text-white active:scale-95 cursor-pointer" 
+                  ? "bg-[#B45309] hover:bg-[#92400E] text-white active:scale-95 cursor-pointer" 
                   : "bg-gray-100 text-gray-400 cursor-not-allowed"
               }`}
             >

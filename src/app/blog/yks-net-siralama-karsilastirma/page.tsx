@@ -26,9 +26,9 @@ export default function NetSiralamaKarsilastirmaPage() {
     <div className="bg-[#FAF8F5] min-h-screen text-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <span className="text-[#D97706] text-xs font-black uppercase tracking-widest">YKS VERİ MERKEZİ</span>
+          <span className="text-[#B45309] text-xs font-black uppercase tracking-widest">YKS VERİ MERKEZİ</span>
           <h1 className="text-3xl sm:text-4xl font-black text-[#1E3A8A] mt-2 mb-3">YKS Net ve Sıralama Karşılaştırma Tabloları</h1>
-          <p className="text-gray-550 text-sm font-semibold max-w-xl mx-auto leading-relaxed">
+          <p className="text-gray-500 text-sm font-semibold max-w-xl mx-auto leading-relaxed">
             Geçmiş sınav yıllarına ait netlerin yaklaşık sıralama karşılıklarını inceleyerek, yığılmanın netler üzerindeki etkisini analiz edin.
           </p>
         </div>
@@ -58,7 +58,7 @@ export default function NetSiralamaKarsilastirmaPage() {
                     <td className="py-4 px-2">{row.aytNet}</td>
                     <td className="py-4 px-2">{row.obp}</td>
                     <td className="py-4 px-2 text-right text-emerald-650 font-black">{row.saySiralama}</td>
-                    <td className="py-4 px-2 text-right text-[#D97706] font-black">{row.eaSiralama}</td>
+                    <td className="py-4 px-2 text-right text-[#B45309] font-black">{row.eaSiralama}</td>
                   </tr>
                 ))}
               </tbody>
@@ -91,7 +91,7 @@ export default function NetSiralamaKarsilastirmaPage() {
                     <td className="py-4 px-2">{row.aytNet}</td>
                     <td className="py-4 px-2">{row.obp}</td>
                     <td className="py-4 px-2 text-right text-emerald-650 font-black">{row.saySiralama}</td>
-                    <td className="py-4 px-2 text-right text-[#D97706] font-black">{row.eaSiralama}</td>
+                    <td className="py-4 px-2 text-right text-[#B45309] font-black">{row.eaSiralama}</td>
                   </tr>
                 ))}
               </tbody>

@@ -42,9 +42,9 @@ export default function IletisimPage() {
     <div className="bg-[#FAF8F5] min-h-screen text-gray-900">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-10">
-          <span className="text-[#D97706] text-xs font-black uppercase tracking-widest font-sans">BİZE ULAŞIN</span>
+          <span className="text-[#B45309] text-xs font-black uppercase tracking-widest font-sans">BİZE ULAŞIN</span>
           <h1 className="text-4xl sm:text-5xl font-black mb-3 mt-2 text-[#1E3A8A]">İletişim</h1>
-          <p className="text-gray-650 text-lg font-medium">Soru, öneri veya ders talebi için bize ulaşın.</p>
+          <p className="text-gray-600 text-lg font-medium">Soru, öneri veya ders talebi için bize ulaşın.</p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-10">
@@ -63,23 +63,23 @@ export default function IletisimPage() {
                   </div>
                 )}
                 <div>
-                  <label className="block text-sm font-black text-[#1E3A8A] mb-1.5">Ad Soyad *</label>
-                  <input type="text" required value={form.isim}
+                  <label htmlFor="isim" className="block text-sm font-black text-[#1E3A8A] mb-1.5">Ad Soyad *</label>
+                  <input type="text" id="isim" required value={form.isim}
                     onChange={e => setForm({...form, isim: e.target.value})}
-                    className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-xl px-4 py-3 text-sm focus:border-[#D97706] text-gray-900 outline-none font-medium"
+                    className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-xl px-4 py-3 text-sm focus:border-[#B45309] text-gray-900 outline-none font-medium"
                     placeholder="Adınız Soyadınız" />
                 </div>
                 <div>
-                  <label className="block text-sm font-black text-[#1E3A8A] mb-1.5">E-posta *</label>
-                  <input type="email" required value={form.email}
+                  <label htmlFor="email" className="block text-sm font-black text-[#1E3A8A] mb-1.5">E-posta *</label>
+                  <input type="email" id="email" required value={form.email}
                     onChange={e => setForm({...form, email: e.target.value})}
-                    className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-xl px-4 py-3 text-sm focus:border-[#D97706] text-gray-900 outline-none font-medium"
+                    className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-xl px-4 py-3 text-sm focus:border-[#B45309] text-gray-900 outline-none font-medium"
                     placeholder="ornek@email.com" />
                 </div>
                 <div>
-                  <label className="block text-sm font-black text-[#1E3A8A] mb-1.5">Konu</label>
-                  <select value={form.konu} onChange={e => setForm({...form, konu: e.target.value})}
-                    className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-xl px-4 py-3 text-sm focus:border-[#D97706] text-gray-900 outline-none font-bold">
+                  <label htmlFor="konu" className="block text-sm font-black text-[#1E3A8A] mb-1.5">Konu</label>
+                  <select id="konu" value={form.konu} onChange={e => setForm({...form, konu: e.target.value})}
+                    className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-xl px-4 py-3 text-sm focus:border-[#B45309] text-gray-900 outline-none font-bold">
                     <option value="" className="bg-white">Seçiniz</option>
                     <option className="bg-white">Ders Talebi</option>
                     <option className="bg-white">Hoca Başvurusu</option>
@@ -88,23 +88,23 @@ export default function IletisimPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-black text-[#1E3A8A] mb-1.5">Mesaj *</label>
-                  <textarea required rows={4} value={form.mesaj}
+                  <label htmlFor="mesaj" className="block text-sm font-black text-[#1E3A8A] mb-1.5">Mesaj *</label>
+                  <textarea id="mesaj" required rows={4} value={form.mesaj}
                     onChange={e => setForm({...form, mesaj: e.target.value})}
-                    className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-xl px-4 py-3 text-sm focus:border-[#D97706] text-gray-900 outline-none resize-none font-medium"
+                    className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-xl px-4 py-3 text-sm focus:border-[#B45309] text-gray-900 outline-none resize-none font-medium"
                     placeholder="Mesajınızı yazın..." />
                 </div>
                 <div className="flex items-start gap-2">
                   <input type="checkbox" id="onay" required checked={form.onay}
                     onChange={e => setForm({...form, onay: e.target.checked})} className="mt-1" />
                   <label htmlFor="onay" className="text-xs text-gray-500 font-bold">
-                    <a href="/gizlilik" className="text-[#D97706] underline">Gizlilik Politikası</a>'nı okudum, onay veriyorum.
+                    <a href="/gizlilik" className="text-[#B45309] underline">Gizlilik Politikası</a>'nı okudum, onay veriyorum.
                   </label>
                 </div>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-[#D97706] hover:bg-[#B45309] text-white font-black py-3.5 rounded-xl transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-[#B45309] hover:bg-[#92400E] text-white font-black py-3.5 rounded-xl transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? "Gönderiliyor..." : "Mesajı Gönder"}
                 </button>
@@ -126,7 +126,7 @@ export default function IletisimPage() {
               <div className="w-14 h-14 bg-[#FAF0E3] rounded-2xl flex items-center justify-center text-[#B45309] text-2xl flex-shrink-0">✉️</div>
               <div>
                 <p className="font-black text-[#1E3A8A]">E-posta</p>
-                <p className="text-[#D97706] font-black">info@derslinex.com</p>
+                <p className="text-[#B45309] font-black">info@derslinex.com</p>
                 <p className="text-xs text-gray-500 mt-1 font-bold">İş birliği ve hoca başvuruları için</p>
               </div>
             </div>
@@ -142,7 +142,7 @@ export default function IletisimPage() {
               <h3 className="font-black text-[#1E3A8A] mb-3">Yanıt Süreleri</h3>
               <ul className="space-y-2 text-sm text-gray-700 font-bold">
                 <li className="flex items-center gap-2"><span className="text-emerald-500">●</span> WhatsApp: &lt;1 saat (09:00–22:00)</li>
-                <li className="flex items-center gap-2"><span className="text-[#D97706]">●</span> E-posta: 1 iş günü</li>
+                <li className="flex items-center gap-2"><span className="text-[#B45309]">●</span> E-posta: 1 iş günü</li>
                 <li className="flex items-center gap-2"><span className="text-[#1E3A8A]">●</span> Form: 1 iş günü</li>
               </ul>
             </div>

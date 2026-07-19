@@ -15,9 +15,9 @@ export default function MeslekNetAtlasPage() {
     <div className="bg-[#FAF8F5] min-h-screen text-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-10">
-          <span className="text-[#D97706] text-xs font-black uppercase tracking-widest">YKS NET HEDEF SÖZLÜĞÜ</span>
+          <span className="text-[#B45309] text-xs font-black uppercase tracking-widest">YKS NET HEDEF SÖZLÜĞÜ</span>
           <h1 className="text-3xl sm:text-4xl font-black text-[#1E3A8A] mt-2 mb-3">Hangi Meslek Kaç Net İstiyor?</h1>
-          <p className="text-gray-550 text-sm font-semibold leading-relaxed">
+          <p className="text-gray-500 text-sm font-semibold leading-relaxed">
             Hedeflediğiniz üniversite bölümlerini seçin, yerleşen son kişilerin YKS TYT ve AYT net ortalamalarını detaylıca analiz edin.
           </p>
         </div>
@@ -30,7 +30,7 @@ export default function MeslekNetAtlasPage() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Meslek veya üniversite adı arayın... (Örn: Tıp, Yazılım, Eczacılık, Psikoloji)"
-            className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl py-3 px-4 text-sm font-bold text-gray-800 outline-none focus:border-[#D97706] transition-colors"
+            className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl py-3 px-4 text-sm font-bold text-gray-800 outline-none focus:border-[#B45309] transition-colors"
           />
         </div>
 
@@ -38,7 +38,7 @@ export default function MeslekNetAtlasPage() {
         <div className="bg-white border border-[#EFECE6] rounded-3xl p-6 sm:p-8 shadow-md flex flex-col space-y-4 mb-8">
           <div className="flex justify-between items-center pb-4 border-b border-[#FAF8F5]">
             <span className="text-xs font-black text-gray-400 uppercase tracking-widest">YKS Bölümler Listesi</span>
-            <span className="text-xs font-black text-[#D97706] bg-[#FAF0E3] px-3 py-1 rounded-xl">Son Yerleşen Verileri</span>
+            <span className="text-xs font-black text-[#B45309] bg-[#FAF0E3] px-3 py-1 rounded-xl">Son Yerleşen Verileri</span>
           </div>
 
           <div className="divide-y divide-gray-100 max-h-[350px] overflow-y-auto pr-2 scrollbar-thin">

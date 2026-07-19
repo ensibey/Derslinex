@@ -28,9 +28,9 @@ export default function SoruDagilimlariPage() {
     <div className="bg-[#FAF8F5] min-h-screen text-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-10">
-          <span className="text-[#D97706] text-xs font-black uppercase tracking-widest">KONU VE SORU DAĞILIMLARI</span>
+          <span className="text-[#B45309] text-xs font-black uppercase tracking-widest">KONU VE SORU DAĞILIMLARI</span>
           <h1 className="text-3xl sm:text-4xl font-black text-[#1E3A8A] mt-2 mb-3">YKS & LGS Soru Dağılımları</h1>
-          <p className="text-gray-550 text-sm font-semibold leading-relaxed">
+          <p className="text-gray-500 text-sm font-semibold leading-relaxed">
             Sınava hazırlık sürecinde hangi dersten kaç soru çıkacağını öğrenin ve çalışmalarınızı en çok soru getiren konulara göre şekillendirin.
           </p>
         </div>
@@ -42,7 +42,7 @@ export default function SoruDagilimlariPage() {
             className={`flex-1 py-3 text-center text-xs sm:text-sm font-black rounded-xl transition-all ${
               activeTab === "YKS"
                 ? "bg-[#1E3A8A] text-white shadow-sm"
-                : "text-gray-650 hover:bg-gray-50"
+                : "text-gray-600 hover:bg-gray-50"
             }`}
           >
             🎓 YKS Soru Dağılımı
@@ -52,7 +52,7 @@ export default function SoruDagilimlariPage() {
             className={`flex-1 py-3 text-center text-xs sm:text-sm font-black rounded-xl transition-all ${
               activeTab === "LGS"
                 ? "bg-[#1E3A8A] text-white shadow-sm"
-                : "text-gray-650 hover:bg-gray-50"
+                : "text-gray-600 hover:bg-gray-50"
             }`}
           >
             🏫 LGS Soru Dağılımı
@@ -63,7 +63,7 @@ export default function SoruDagilimlariPage() {
         <div className="bg-white border border-[#EFECE6] rounded-3xl p-6 sm:p-8 shadow-md space-y-4">
           <div className="flex justify-between items-center pb-4 border-b border-[#FAF8F5]">
             <span className="text-xs font-black text-gray-400 uppercase tracking-widest">{activeTab} Testleri</span>
-            <span className="text-xs font-black text-[#D97706] bg-[#FAF0E3] px-3 py-1 rounded-xl">2027 Müfredatı</span>
+            <span className="text-xs font-black text-[#B45309] bg-[#FAF0E3] px-3 py-1 rounded-xl">2027 Müfredatı</span>
           </div>
 
           <div className="divide-y divide-gray-100">
@@ -73,7 +73,7 @@ export default function SoruDagilimlariPage() {
                   <h3 className="font-black text-gray-800 text-sm sm:text-base">{item.ders}</h3>
                   <p className="text-xs text-gray-500 font-bold mt-1 leading-relaxed">{item.detay}</p>
                 </div>
-                <div className="flex-shrink-0 font-black text-[#D97706] bg-[#FAF0E3] px-3 py-1 rounded-xl text-xs sm:text-sm">
+                <div className="flex-shrink-0 font-black text-[#B45309] bg-[#FAF0E3] px-3 py-1 rounded-xl text-xs sm:text-sm">
                   {item.soru} Soru
                 </div>
               </div>

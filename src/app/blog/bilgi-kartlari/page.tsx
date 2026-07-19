@@ -40,9 +40,9 @@ export default function BilgiKartlariPage() {
   return (
     <div className="bg-[#FAF8F5] min-h-screen text-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-xl mx-auto text-center">
-        <span className="text-[#D97706] text-xs font-black uppercase tracking-widest">İNTERAKTİF ÖĞRENME</span>
+        <span className="text-[#B45309] text-xs font-black uppercase tracking-widest">İNTERAKTİF ÖĞRENME</span>
         <h1 className="text-3xl sm:text-4xl font-black text-[#1E3A8A] mt-2 mb-4">Sınav Hap Bilgileri</h1>
-        <p className="text-gray-550 text-sm font-semibold mb-10 leading-relaxed">
+        <p className="text-gray-500 text-sm font-semibold mb-10 leading-relaxed">
           Kaydırarak veya yön tuşlarıyla sınavda çıkabilecek altın değerindeki bilgileri hızla öğrenin.
         </p>
 
@@ -52,7 +52,7 @@ export default function BilgiKartlariPage() {
           
           <div className="w-full flex justify-between items-center pb-4 border-b border-[#FAF8F5]">
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{kartlar[currentIdx].kategori}</span>
-            <span className="text-xs font-black text-[#D97706] bg-[#FAF0E3] px-3 py-1 rounded-xl">{kartlar[currentIdx].ders}</span>
+            <span className="text-xs font-black text-[#B45309] bg-[#FAF0E3] px-3 py-1 rounded-xl">{kartlar[currentIdx].ders}</span>
           </div>
 
           <div className="my-6 text-center">
@@ -66,7 +66,7 @@ export default function BilgiKartlariPage() {
             <span className="text-xs text-gray-400 font-bold">Kart {currentIdx + 1} / {kartlar.length}</span>
             <Link
               href={kartlar[currentIdx].hocaLink}
-              className="text-xs font-black text-[#1E3A8A] hover:text-[#D97706] transition-colors flex items-center gap-1"
+              className="text-xs font-black text-[#1E3A8A] hover:text-[#B45309] transition-colors flex items-center gap-1"
             >
               👨‍🏫 {kartlar[currentIdx].hocaAd} ile Konuyu Çalış ➔
             </Link>
@@ -83,7 +83,7 @@ export default function BilgiKartlariPage() {
           </button>
           <button
             onClick={handleNext}
-            className="bg-[#D97706] hover:bg-[#B45309] text-white font-black px-8 py-3.5 rounded-2xl transition-all active:scale-95 shadow-md text-sm"
+            className="bg-[#B45309] hover:bg-[#92400E] text-white font-black px-8 py-3.5 rounded-2xl transition-all active:scale-95 shadow-md text-sm"
           >
             Sonraki Kart ➔
           </button>

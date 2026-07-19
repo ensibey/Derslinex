@@ -32,9 +32,9 @@ function HocalarContent() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="mb-10">
-          <span className="text-[#D97706] text-xs font-black uppercase tracking-widest font-sans">EĞİTMEN KADROMUZ</span>
+          <span className="text-[#B45309] text-xs font-black uppercase tracking-widest font-sans">EĞİTMEN KADROMUZ</span>
           <h1 className="text-4xl sm:text-5xl font-black mb-2 mt-2 text-[#1E3A8A]">Uzman Hocalarımız</h1>
-          <p className="text-gray-650 text-lg font-medium">
+          <p className="text-gray-600 text-lg font-medium">
             YKS'nin her alanı için deneyimli uzman hocalar. WhatsApp ile anında iletişim.
           </p>
         </div>
@@ -113,13 +113,13 @@ function HocalarContent() {
             {filtrelenmis.map((h) => <TeacherCard key={h.id} hoca={h} />)}
           </div>
         ) : (
-          <div className="text-center py-20 bg-white border border-[#EFECE6] rounded-3xl p-8 shadow-sm">
+          <div className="text-center py-10 sm:py-20 bg-white/80 backdrop-blur-md border border-[#EFECE6]/60 rounded-3xl p-8 shadow-premium">
             <div className="text-5xl mb-4">🔍</div>
             <h3 className="text-xl font-black text-[#1E3A8A] mb-2">Bu filtreye uygun hoca bulunamadı</h3>
-            <p className="text-gray-500 mb-6 font-medium">Filtreleri değiştirmeyi ya da WhatsApp'tan bize danışmayı deneyin.</p>
+            <p className="text-gray-500 mb-6 font-semibold">Filtreleri değiştirmeyi ya da WhatsApp'tan bize danışmayı deneyin.</p>
             <a href={waLink("Merhaba, aradığım kriterlerde hoca bulamadım. Yardımcı olur musunuz?")}
               target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-[#D97706] hover:bg-[#B45309] text-white font-black px-6 py-3 rounded-xl transition-all shadow-sm">
+              className="inline-flex items-center gap-2 bg-[#B45309] hover:bg-[#92400E] text-white font-black px-6 py-3 rounded-xl transition-all shadow-sm">
               WhatsApp'tan Sor
             </a>
           </div>
@@ -132,7 +132,7 @@ function HocalarContent() {
 export default function HocalarPage() {
   return (
     <Suspense fallback={
-      <div className="max-w-7xl mx-auto px-4 py-20 text-center text-gray-500">
+      <div className="max-w-7xl mx-auto px-4 py-10 sm:py-20 text-center text-gray-500 font-bold">
         Yükleniyor...
       </div>
     }>

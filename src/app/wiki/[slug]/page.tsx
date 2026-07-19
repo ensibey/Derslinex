@@ -125,9 +125,9 @@ export default async function WikiKonuDetayPage({ params }: { params: Promise<{ 
       />
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-555 mb-8 flex items-center gap-2 font-bold">
-        <Link href="/" className="hover:text-[#D97706] transition-colors">Ana Sayfa</Link>
+        <Link href="/" className="hover:text-[#B45309] transition-colors">Ana Sayfa</Link>
         <span>/</span>
-        <Link href="/wiki" className="hover:text-[#D97706] transition-colors">Ders Sözlüğü</Link>
+        <Link href="/wiki" className="hover:text-[#B45309] transition-colors">Ders Sözlüğü</Link>
         <span>/</span>
         <span className="text-gray-950 font-black truncate">{wiki.baslik}</span>
       </nav>
@@ -140,7 +140,7 @@ export default async function WikiKonuDetayPage({ params }: { params: Promise<{ 
         {wiki.baslik}
       </h1>
 
-      <p className="text-base sm:text-lg text-[#1E3A8A] leading-relaxed font-bold border-l-4 border-[#D97706] pl-4 italic bg-[#FAF8F5] py-4 px-5 rounded-r-2xl mb-8">
+      <p className="text-base sm:text-lg text-[#1E3A8A] leading-relaxed font-bold border-l-4 border-[#B45309] pl-4 italic bg-[#FAF8F5] py-4 px-5 rounded-r-2xl mb-8">
         {wiki.ozet}
       </p>
 
@@ -169,7 +169,7 @@ export default async function WikiKonuDetayPage({ params }: { params: Promise<{ 
           href={waLink(`Merhaba, ders konuları sözlüğündeki ${wiki.baslik} konusu hakkında ${wiki.hocaAd} hocamızdan birebir özel ders almak istiyorum.`)}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-[#D97706] hover:bg-[#B45309] text-white font-black px-6 py-3.5 rounded-xl transition-all shadow-sm active:scale-95 text-xs text-center whitespace-nowrap z-10"
+          className="bg-[#B45309] hover:bg-[#92400E] text-white font-black px-6 py-3.5 rounded-xl transition-all shadow-sm active:scale-95 text-xs text-center whitespace-nowrap z-10"
         >
           ⚡ {wiki.hocaAd} ile Derse Başla
         </a>

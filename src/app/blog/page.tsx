@@ -11,7 +11,7 @@ export default function BlogPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-10">
-        <span className="text-[#D97706] text-xs font-black uppercase tracking-widest">GÜNCEL YAZILAR</span>
+        <span className="text-[#B45309] text-xs font-black uppercase tracking-widest">GÜNCEL YAZILAR</span>
         <h1 className="text-4xl font-black text-[#1E3A8A] mt-2">Derslinex Blog</h1>
         <p className="text-gray-500 mt-2 text-lg font-medium">YKS hazırlığı için rehber yazılar ve ipuçları</p>
       </div>
@@ -25,7 +25,7 @@ export default function BlogPage() {
             </div>
             <div className="p-6">
               <span className="text-[10px] font-black text-[#B45309] bg-[#FAF0E3] px-3 py-1 rounded-lg uppercase tracking-wider">{b.kategori}</span>
-              <h2 className="font-black text-[#1E3A8A] text-lg mt-3 leading-snug group-hover:text-[#D97706] transition-colors line-clamp-2">
+              <h2 className="font-black text-[#1E3A8A] text-lg mt-3 leading-snug group-hover:text-[#B45309] transition-colors line-clamp-2">
                 {b.baslik}
               </h2>
               <p className="text-xs text-gray-500 mt-2 line-clamp-2 leading-relaxed font-medium">{b.ozet}</p>
@@ -39,9 +39,9 @@ export default function BlogPage() {
       </div>
 
       {/* İnteraktif Sınav Araçları Bölümü (Yetim Sayfaları Önlemek ve Dahili Link Yapısını Güçlendirmek İçin) */}
-      <section className="mt-20">
+      <section className="mt-12 sm:mt-16 lg:mt-20">
         <div className="mb-10 text-center">
-          <span className="text-[#D97706] text-xs font-black uppercase tracking-widest">DİJİTAL SİMÜLATÖRLER</span>
+          <span className="text-[#B45309] text-xs font-black uppercase tracking-widest">DİJİTAL SİMÜLATÖRLER</span>
           <h2 className="text-3xl font-black text-[#1E3A8A] mt-2">İnteraktif Sınav Araçlarımız</h2>
           <p className="text-gray-500 mt-2 text-sm font-medium">Netlerinizi artırmanıza ve hedeflerinizi planlamanıza yardımcı akıllı araçlar</p>
         </div>
@@ -53,7 +53,7 @@ export default function BlogPage() {
             { title: "Günün Sorusu", desc: "Her Gün Yeni YKS/LGS Soru Çözümü", icon: "❓", url: "/blog/gunun-sorusu" },
             { title: "Konu Çetelesi", desc: "localStorage Tabanlı Konu Takibi", icon: "✅", url: "/blog/konu-takip-cetelesi" },
             { title: "Taban Puanları", desc: "Lise Yüzdelik Dilim & Net İhtiyacı", icon: "📊", url: "/blog/lise-taban-puanlari" },
-            { title: "Net Atlası", desc: "YKS Hangi Meslek Kaç Net İstiyor?", icon: "📈", url: "/blog/meslek-net-atlası" },
+            { title: "Net Atlası", desc: "YKS Hangi Meslek Kaç Net İstiyor?", icon: "📈", url: "/blog/meslek-net-atlasi" },
             { title: "OBP Hesaplayıcı", desc: "Diploma Notunun Sıralamaya Etkisi", icon: "🧮", url: "/blog/obp-siralamaya-etkisi" },
             { title: "Pomodoro Sayacı", desc: "Zaman Yönetimi & Çalışma Arkadaşı", icon: "⏱️", url: "/blog/pomodoro-sayaci" },
             { title: "Soru Dağılımları", desc: "Yıllara Göre Soru Konu İstatistikleri", icon: "📅", url: "/blog/soru-dagilimlari" },
@@ -67,7 +67,7 @@ export default function BlogPage() {
               <div className="w-12 h-12 rounded-2xl bg-[#FAF0E3] text-[#B45309] border border-[#F5D0A9]/30 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-300 mb-4">
                 {tool.icon}
               </div>
-              <h3 className="font-black text-[#1E3A8A] text-sm group-hover:text-[#D97706] transition-colors line-clamp-1">
+              <h3 className="font-black text-[#1E3A8A] text-sm group-hover:text-[#B45309] transition-colors line-clamp-1">
                 {tool.title}
               </h3>
               <p className="text-[10px] text-gray-500 font-bold mt-1 leading-snug line-clamp-2">

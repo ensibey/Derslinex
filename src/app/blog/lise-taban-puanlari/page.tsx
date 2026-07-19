@@ -45,9 +45,9 @@ export default function LiseTabanPuanlariPage() {
     <div className="bg-[#FAF8F5] min-h-screen text-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-10">
-          <span className="text-[#D97706] text-xs font-black uppercase tracking-widest">LGS TERCİH ROBOTU</span>
+          <span className="text-[#B45309] text-xs font-black uppercase tracking-widest">LGS TERCİH ROBOTU</span>
           <h1 className="text-3xl sm:text-4xl font-black text-[#1E3A8A] mt-2 mb-3">LGS Taban Puanları ve Net Hedefleri</h1>
-          <p className="text-gray-550 text-sm font-semibold leading-relaxed max-w-2xl mx-auto">
+          <p className="text-gray-500 text-sm font-semibold leading-relaxed max-w-2xl mx-auto">
             Türkiye genelindeki nitelikli fen, anadolu ve sosyal bilimler liselerini şehirlere göre filtreleyin, taban puanları ve kazanmak için yapmanız gereken hedefleri analiz edin.
           </p>
         </div>
@@ -62,7 +62,7 @@ export default function LiseTabanPuanlariPage() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Örn: Galatasaray, Kars Fen, Rize TOBB..."
-              className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl py-3 px-4 text-sm font-bold text-gray-800 outline-none focus:border-[#D97706] transition-colors"
+              className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl py-3 px-4 text-sm font-bold text-gray-800 outline-none focus:border-[#B45309] transition-colors"
             />
           </div>
 
@@ -72,7 +72,7 @@ export default function LiseTabanPuanlariPage() {
               id="sehir-select"
               value={sehirFilter}
               onChange={(e) => setSehirFilter(e.target.value)}
-              className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl py-3 px-4 text-sm font-bold text-gray-800 outline-none focus:border-[#D97706] transition-colors"
+              className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl py-3 px-4 text-sm font-bold text-gray-800 outline-none focus:border-[#B45309] transition-colors"
             >
               {sehirler.map((sehir) => (
                 <option key={sehir} value={sehir}>{sehir}</option>
@@ -85,7 +85,7 @@ export default function LiseTabanPuanlariPage() {
         <div className="bg-white border border-[#EFECE6] rounded-3xl p-6 sm:p-8 shadow-md flex flex-col space-y-4 mb-8">
           <div className="flex justify-between items-center pb-4 border-b border-[#FAF8F5]">
             <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Nitelikli Liseler Listesi ({filteredLiseler.length} Okul)</span>
-            <span className="text-xs font-black text-[#D97706] bg-[#FAF0E3] px-3 py-1 rounded-xl">2026/2027 Uyumlu</span>
+            <span className="text-xs font-black text-[#B45309] bg-[#FAF0E3] px-3 py-1 rounded-xl">2026/2027 Uyumlu</span>
           </div>
 
           <div className="divide-y divide-gray-100 max-h-[380px] overflow-y-auto pr-2 scrollbar-thin">

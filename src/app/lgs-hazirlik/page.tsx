@@ -51,7 +51,7 @@ export default function LgsHazirlikPage() {
     <div className="bg-[#FAF8F5] min-h-screen text-gray-900">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-14">
-          <span className="text-[#D97706] text-xs font-black uppercase tracking-widest">KÜTÜPHANE & ARAÇLAR</span>
+          <span className="text-[#B45309] text-xs font-black uppercase tracking-widest">KÜTÜPHANE & ARAÇLAR</span>
           <h1 className="text-4xl sm:text-5xl font-black mb-4 mt-2 text-[#1E3A8A]">LGS Hazırlık Merkezi</h1>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto font-medium">
             Liselere Geçiş Sistemi (LGS) yolculuğunda hedefinize ulaşmanız için özel hazırladığımız araçlar.
@@ -93,7 +93,7 @@ export default function LgsHazirlikPage() {
                   { label: "Dakika", value: timeLeft.dakika },
                 ].map((item) => (
                   <div key={item.label} className="bg-[#FAF0E3] border border-[#F5D0A9] rounded-2xl p-4 sm:p-6 w-24 sm:w-32 flex flex-col items-center">
-                    <span className="text-3xl sm:text-5xl font-black text-[#D97706]">{item.value}</span>
+                    <span className="text-3xl sm:text-5xl font-black text-[#B45309]">{item.value}</span>
                     <span className="text-xs sm:text-sm text-gray-600 font-bold mt-2">{item.label}</span>
                   </div>
                 ))}
@@ -128,7 +128,7 @@ export default function LgsHazirlikPage() {
                               const val = parseFloat(e.target.value) || 0;
                               setNets({ ...nets, [d.key]: val });
                             }}
-                            className={`w-20 bg-[#FAF8F5] border rounded-xl px-3 py-2 text-sm text-right focus:border-[#D97706] outline-none font-bold text-[#1E3A8A] ${isInvalid ? "border-red-500" : "border-[#EFECE6]"}`}
+                            className={`w-20 bg-[#FAF8F5] border rounded-xl px-3 py-2 text-sm text-right focus:border-[#B45309] outline-none font-bold text-[#1E3A8A] ${isInvalid ? "border-red-500" : "border-[#EFECE6]"}`}
                           />
                         </div>
                         {isInvalid && (
@@ -139,7 +139,7 @@ export default function LgsHazirlikPage() {
                   })}
                   <button
                     onClick={calculateScore}
-                    className="w-full bg-[#D97706] hover:bg-[#B45309] text-white font-black py-3 rounded-xl transition-all shadow-sm mt-4"
+                    className="w-full bg-[#B45309] hover:bg-[#92400E] text-white font-black py-3 rounded-xl transition-all shadow-sm mt-4"
                   >
                     Puanı Hesapla
                   </button>
@@ -167,7 +167,7 @@ export default function LgsHazirlikPage() {
             href={waLink("Merhaba, LGS özel ders ve LGS hazırlık koçluğu hakkında bilgi almak istiyorum.")}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-[#D97706] hover:bg-[#B45309] text-white font-black px-8 py-3.5 rounded-xl transition-all shadow-sm"
+            className="inline-flex items-center gap-2 bg-[#B45309] hover:bg-[#92400E] text-white font-black px-8 py-3.5 rounded-xl transition-all shadow-sm"
           >
             LGS Bilgisi Alın
           </a>

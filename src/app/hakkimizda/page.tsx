@@ -17,9 +17,9 @@ export default function HakkimizdaPage() {
     <div className="bg-[#FAF8F5] min-h-screen text-gray-900">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-12">
-          <span className="text-[#D97706] text-xs font-black uppercase tracking-widest font-sans">BİZ KİMİZ?</span>
+          <span className="text-[#B45309] text-xs font-black uppercase tracking-widest font-sans">BİZ KİMİZ?</span>
           <h1 className="text-4xl sm:text-5xl font-black mb-4 mt-2 text-[#1E3A8A]">Hakkımızda</h1>
-          <p className="text-lg text-gray-650 max-w-2xl font-medium leading-relaxed">
+          <p className="text-lg text-gray-600 max-w-2xl font-medium leading-relaxed">
             YKS hazırlığında öğrencileri Türkiye'nin en iyi hocalarıyla buluşturan, başarı odaklı yeni nesil eğitim platformu.
           </p>
         </div>
@@ -30,7 +30,7 @@ export default function HakkimizdaPage() {
           <div className="w-16 h-16 rounded-2xl bg-[#FAF0E3] flex items-center justify-center text-4xl shadow-sm flex-shrink-0">🎯</div>
           <div>
             <h2 className="text-2xl font-black text-[#1E3A8A] mb-3">Misyonumuz</h2>
-            <p className="text-gray-650 text-base leading-relaxed max-w-2xl font-medium">
+            <p className="text-gray-600 text-base leading-relaxed max-w-2xl font-medium">
               Her öğrencinin kaliteli eğitime erişebilmesi gerektiğine inanıyoruz. Derslinex olarak, YKS hazırlığında doğru hocayı bulmayı kolaylaştırıyor, online ve yüz yüze ders seçenekleriyle Türkiye'nin her köşesine ulaşıyoruz.
             </p>
           </div>
@@ -63,7 +63,7 @@ export default function HakkimizdaPage() {
               <div key={d.baslik} className="bg-white rounded-2xl border border-[#EFECE6] shadow-sm p-6 hover:-translate-y-1 transition-transform">
                 <div className="text-4xl mb-4">{d.emoji}</div>
                 <h3 className="text-lg font-black text-[#1E3A8A] mb-2">{d.baslik}</h3>
-                <p className="text-gray-650 text-sm leading-relaxed font-medium">{d.aciklama}</p>
+                <p className="text-gray-600 text-sm leading-relaxed font-medium">{d.aciklama}</p>
               </div>
             ))}
           </div>
@@ -86,14 +86,14 @@ export default function HakkimizdaPage() {
         {/* CTA */}
         <div className="bg-white border border-[#EFECE6] rounded-3xl p-8 text-center shadow-sm">
           <h2 className="text-2xl font-black text-[#1E3A8A] mb-3">Başarı Yolculuğuna Başlayın</h2>
-          <p className="text-gray-650 max-w-xl mx-auto mb-6 text-sm font-medium">
+          <p className="text-gray-600 max-w-xl mx-auto mb-6 text-sm font-medium">
             Alanında uzman eğitmenlerimizle size en uygun programı hazırlamak için buradayız.
           </p>
           <a
             href={waLink()}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-[#D97706] hover:bg-[#B45309] text-white font-black px-8 py-3.5 rounded-xl transition-all shadow-sm"
+            className="inline-flex items-center gap-2 bg-[#B45309] hover:bg-[#92400E] text-white font-black px-8 py-3.5 rounded-xl transition-all shadow-sm"
           >
             Hemen İletişime Geçin
           </a>

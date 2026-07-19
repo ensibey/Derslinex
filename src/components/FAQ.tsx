@@ -23,7 +23,7 @@ export default function FAQ({ items }: { items: FAQItem[] }) {
               onClick={() => setOpen(isOpen ? null : i)}
               className="w-full text-left flex justify-between items-center px-6 py-5 bg-white hover:bg-[#FAF8F5]/30 transition-colors gap-4 outline-none"
             >
-              <span className={`font-black text-sm sm:text-base transition-colors duration-200 ${isOpen ? "text-[#D97706]" : "text-[#1E3A8A]"}`}>
+              <span className={`font-black text-sm sm:text-base transition-colors duration-200 ${isOpen ? "text-[#B45309]" : "text-[#1E3A8A]"}`}>
                 {item.soru}
               </span>
               <span className={`w-8 h-8 rounded-xl flex items-center justify-center bg-[#FAF8F5] border border-[#EFECE6] text-gray-500 transition-all duration-300 ${isOpen ? "rotate-180 bg-[#FAF0E3] border-[#F5D0A9] text-[#B45309]" : ""}`}>
@@ -37,7 +37,7 @@ export default function FAQ({ items }: { items: FAQItem[] }) {
                 isOpen ? "max-h-[500px] border-t border-[#EFECE6] bg-[#FAF8F5]/40" : "max-h-0"
               }`}
             >
-              <div className="px-6 py-5 text-gray-650 text-sm leading-relaxed font-medium">
+              <div className="px-6 py-5 text-gray-600 text-sm leading-relaxed font-medium">
                 {item.cevap}
               </div>
             </div>

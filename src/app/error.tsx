@@ -18,7 +18,7 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
         </button>
         <Link
           href="/"
-          className="bg-gray-150 hover:bg-gray-200 text-gray-800 font-bold px-6 py-3 rounded-xl transition-all border border-gray-250"
+          className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold px-6 py-3 rounded-xl transition-all border border-gray-200"
         >
           Ana Sayfaya Git
         </Link>
