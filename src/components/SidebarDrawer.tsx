@@ -100,6 +100,17 @@ export default function SidebarDrawer() {
 
   return (
     <>
+      {/* Drawer Hamburger Button - Desktop Only */}
+      <button
+        onClick={() => setIsOpen(true)}
+        className="hidden lg:flex w-11 h-11 bg-white hover:bg-[#FAF8F5] border border-[#EFECE6] rounded-xl items-center justify-center transition-all shadow-sm text-[#1E3A8A] active:scale-95"
+        aria-label="Hızlı Araçlar Menüsü"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
       {/* Backdrop */}
       {isOpen && (
         <div
