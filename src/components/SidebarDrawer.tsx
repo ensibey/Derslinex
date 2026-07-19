@@ -4,23 +4,23 @@ import { useState, useEffect } from "react";
 import { waLink } from "@/lib/utils";
 
 const quickLinks = [
-  { href: "/yks-hazirlik", label: "🧮 YKS Puan Hesaplama & Sayaç" },
-  { href: "/lgs-hazirlik", label: "⏰ LGS Puan Hesaplama & Geri Sayım" },
-  { href: "/blog/pomodoro-sayaci", label: "⏱️ Pomodoro Çalışma Sayacı" },
-  { href: "/blog/ders-sihirbazi", label: "⚡ 3 Saniyede Özel Ders Sihirbazı" },
-  { href: "/blog/obp-siralamaya-etkisi", label: "⚖️ OBP Sıralama Etki Robotu" },
-  { href: "/blog/soru-dagilimlari", label: "📊 YKS & LGS Soru Dağılımları" },
-  { href: "/blog/yks-net-siralama-karsilastirma", label: "📈 YKS Net - Sıralama Kıyaslama" },
-  { href: "/blog/konu-takip-cetelesi", label: "📋 Konu Takip Çetelesi" },
-  { href: "/blog/lise-taban-puanlari", label: "🏫 Lise Taban Puan & Net Analizi" },
-  { href: "/blog/meslek-net-atlasi", label: "💼 Hangi Meslek Kaç Net İstiyor?" },
-  { href: "/wiki", label: "📚 Ders Konuları Sözlüğü (Wiki)" },
-  { href: "/blog/bilgi-kartlari", label: "🃏 Sınav Hap Bilgileri" },
-  { href: "/blog/gunun-sorusu", label: "🎮 Günün Özel Sorusu" },
-  { href: "/hocalar?alan=Matematik", label: "📐 Matematik Özel Ders" },
-  { href: "/hocalar?alan=Fizik", label: "⚡ Fizik Özel Ders" },
-  { href: "/blog/yks-matematik-hazirlik-rehberi", label: "📚 YKS Matematik Çalışma Planı" },
-  { href: "/blog/tyt-ayt-farki-nedir", label: "❓ TYT ve AYT Farkı Nedir" }
+  { href: "/yks-hazirlik", label: "🧮 YKS Puan Hesaplama & Sayaç", desc: "TYT-AYT netlerinle güncel yerleştirme sıralamasını hesapla" },
+  { href: "/lgs-hazirlik", label: "⏰ LGS Puan Hesaplama & Geri Sayım", desc: "LGS net sayılarıyla tahmini puan ve liselere giriş analizi" },
+  { href: "/blog/pomodoro-sayaci", label: "⏱️ Pomodoro Çalışma Sayacı", desc: "25+5 odaklanma sayacı ile ders çalışma verimini artır" },
+  { href: "/blog/ders-sihirbazi", label: "⚡ 3 Saniyede Özel Ders Sihirbazı", desc: "Seviyene en uygun dersi ve öğretmen kadrosunu hızlıca seç" },
+  { href: "/blog/obp-siralamaya-etkisi", label: "⚖️ OBP Sıralama Etki Robotu", desc: "Diploma notunun YKS yerleştirme sıralamana etkisini gör" },
+  { href: "/blog/soru-dagilimlari", label: "📊 YKS & LGS Soru Dağılımları", desc: "ÖSYM ve MEB müfredatı son 5 yılın çıkmış soru istatistikleri" },
+  { href: "/blog/yks-net-siralama-karsilastirma", label: "📈 YKS Net - Sıralama Kıyaslama", desc: "Önceki yılların net sayılarıyla hedef sıralama analizi yap" },
+  { href: "/blog/konu-takip-cetelesi", label: "📋 Konu Takip Çetelesi", desc: "Bitirdiğin ders konularını adım adım işaretle ve planla" },
+  { href: "/blog/lise-taban-puanlari", label: "🏫 Lise Taban Puan & Net Analizi", desc: "Nitelikli liselerin güncel taban puanları ve yüzdelik dilimleri" },
+  { href: "/blog/meslek-net-atlasi", label: "💼 Hangi Meslek Kaç Net İstiyor?", desc: "Hedeflediğin üniversite bölümleri için yapman gereken netler" },
+  { href: "/wiki", label: "📚 Ders Konuları Sözlüğü (Wiki)", desc: "Matematik, Fizik, Türkçe kuralları, formülleri ve ders özetleri" },
+  { href: "/blog/bilgi-kartlari", label: "🃏 Sınav Hap Bilgileri", desc: "Ezberlemeni kolaylaştıracak tarih, coğrafya, edebiyat bilgi kartları" },
+  { href: "/blog/gunun-sorusu", label: "🎮 Günün Özel Sorusu", desc: "Her gün yeni bir YKS & LGS sorusu çöz, rakiplerinin önüne geç" },
+  { href: "/hocalar?alan=Matematik", label: "📐 Matematik Özel Ders", desc: "Dereceli hocalarla TYT, AYT ve LGS Matematik özel dersi" },
+  { href: "/hocalar?alan=Fizik", label: "⚡ Fizik Özel Ders", desc: "Deneyimli eğitmenlerle YKS ve LGS Fizik konu anlatımı" },
+  { href: "/blog/yks-matematik-hazirlik-rehberi", label: "📚 YKS Matematik Çalışma Planı", desc: "Sıfırdan zirveye TYT-AYT Matematik netlerini artırma rehberi" },
+  { href: "/blog/tyt-ayt-farki-nedir", label: "❓ TYT ve AYT Farkı Nedir", desc: "YKS puan türleri hesaplaması ve baraj kuralları rehberi" }
 ];
 
 export default function SidebarDrawer() {
@@ -100,39 +100,54 @@ export default function SidebarDrawer() {
             <Link
               href="/blog/pomodoro-sayaci"
               onClick={() => setIsOpen(false)}
-              className="bg-white/70 backdrop-blur-md border border-[#EFECE6] rounded-2xl p-4 font-bold text-[#1E3A8A] hover:border-[#B45309] hover:bg-white hover:shadow-sm transition-all flex items-center justify-between group"
+              className="bg-white border border-[#EFECE6] rounded-2xl p-4 hover:border-[#B45309] hover:bg-white hover:shadow-sm transition-all flex items-center justify-between group"
             >
-              <div className="flex items-center gap-2">
-                <span>⏱️</span>
-                <span>Canlı Pomodoro Sayacı</span>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2 font-bold text-[#1E3A8A]">
+                  <span>⏱️</span>
+                  <span>Canlı Pomodoro Sayacı</span>
+                </div>
+                <span className="text-[10px] text-gray-500 font-semibold mt-1 leading-normal">
+                  25+5 odaklanma tekniği ile YKS & LGS ders çalışma verimini artır
+                </span>
               </div>
-              <span className="text-gray-400 group-hover:translate-x-1 transition-transform">→</span>
+              <span className="text-gray-400 group-hover:translate-x-1 transition-transform ml-2 flex-shrink-0">→</span>
             </Link>
 
             {/* 2. Pratik Net Hesaplama Link */}
             <Link
               href="/yks-hazirlik"
               onClick={() => setIsOpen(false)}
-              className="bg-white/70 backdrop-blur-md border border-[#EFECE6] rounded-2xl p-4 font-bold text-[#1E3A8A] hover:border-[#B45309] hover:bg-white hover:shadow-sm transition-all flex items-center justify-between group"
+              className="bg-white border border-[#EFECE6] rounded-2xl p-4 hover:border-[#B45309] hover:bg-white hover:shadow-sm transition-all flex items-center justify-between group"
             >
-              <div className="flex items-center gap-2">
-                <span>🧮</span>
-                <span>Pratik Net Hesaplama</span>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2 font-bold text-[#1E3A8A]">
+                  <span>🧮</span>
+                  <span>Pratik Net Hesaplama</span>
+                </div>
+                <span className="text-[10px] text-gray-500 font-semibold mt-1 leading-normal">
+                  ÖSYM uyumlu TYT, AYT ve LGS puan hesaplama motoru
+                </span>
               </div>
-              <span className="text-gray-400 group-hover:translate-x-1 transition-transform">→</span>
+              <span className="text-gray-400 group-hover:translate-x-1 transition-transform ml-2 flex-shrink-0">→</span>
             </Link>
 
             {/* 3. Akıllı Sözlük Link */}
             <Link
               href="/wiki"
               onClick={() => setIsOpen(false)}
-              className="bg-white/70 backdrop-blur-md border border-[#EFECE6] rounded-2xl p-4 font-bold text-[#1E3A8A] hover:border-[#B45309] hover:bg-white hover:shadow-sm transition-all flex items-center justify-between group"
+              className="bg-white border border-[#EFECE6] rounded-2xl p-4 hover:border-[#B45309] hover:bg-white hover:shadow-sm transition-all flex items-center justify-between group"
             >
-              <div className="flex items-center gap-2">
-                <span>🔍</span>
-                <span>Akıllı Sözlük (Wiki)</span>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2 font-bold text-[#1E3A8A]">
+                  <span>🔍</span>
+                  <span>Akıllı Sözlük (Wiki)</span>
+                </div>
+                <span className="text-[10px] text-gray-500 font-semibold mt-1 leading-normal">
+                  Sınavda çıkabilecek kritik ders terimleri, formüller ve özetler
+                </span>
               </div>
-              <span className="text-gray-400 group-hover:translate-x-1 transition-transform">→</span>
+              <span className="text-gray-400 group-hover:translate-x-1 transition-transform ml-2 flex-shrink-0">→</span>
             </Link>
           </div>
 
@@ -147,9 +162,10 @@ export default function SidebarDrawer() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setIsOpen(false)}
-                  className="block bg-white border border-[#EFECE6] rounded-2xl p-4 text-sm font-bold text-[#1E3A8A] hover:border-[#B45309] hover:shadow-sm transition-all"
+                  className="block bg-white border border-[#EFECE6] rounded-2xl p-4 hover:border-[#B45309] hover:shadow-sm transition-all"
                 >
-                  {link.label}
+                  <span className="text-sm font-bold text-[#1E3A8A] block">{link.label}</span>
+                  <span className="text-[10px] text-gray-500 font-semibold mt-1 block leading-normal">{link.desc}</span>
                 </Link>
               ))}
             </div>
@@ -166,9 +182,10 @@ export default function SidebarDrawer() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setIsOpen(false)}
-                  className="block bg-white border border-[#EFECE6] rounded-2xl p-4 text-xs font-bold text-gray-600 hover:border-[#B45309] hover:text-[#1E3A8A] hover:shadow-sm transition-all leading-relaxed"
+                  className="block bg-white border border-[#EFECE6] rounded-2xl p-4 hover:border-[#B45309] hover:shadow-sm transition-all"
                 >
-                  {link.label}
+                  <span className="text-xs font-bold text-gray-600 hover:text-[#1E3A8A] block">{link.label}</span>
+                  <span className="text-[10px] text-gray-500 font-semibold mt-1 block leading-normal">{link.desc}</span>
                 </Link>
               ))}
             </div>
