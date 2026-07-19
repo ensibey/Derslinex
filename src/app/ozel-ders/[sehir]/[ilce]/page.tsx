@@ -61,7 +61,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const sehirName = formatSlug(resolvedParams.sehir);
   const ilceName = formatSlug(resolvedParams.ilce);
   return {
-    title: `${ilceName} Birebir Özel Ders — ${sehirName} YKS LGS Hocaları`,
+    title: {
+      absolute: `${ilceName} Birebir Özel Ders — ${sehirName} YKS LGS Hocaları`
+    },
     description: `${sehirName} ${ilceName} bölgesinde yüz yüze birebir özel ders veya online eğitim alın. Matematik, Fizik, Türkçe derslerinde derece yapmış en iyi öğretmenler.`,
   };
 }

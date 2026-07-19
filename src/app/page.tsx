@@ -51,34 +51,48 @@ const stats = [
 export default function HomePage() {
   const oneHocalar = hocalar.filter((h) => h.aktif).slice(0, 3);
 
-  // Google SEO Starter Guide: Structured Data (JSON-LD) for LocalBusiness & EducationOrganization
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "EducationalOrganization",
-    "name": "Derslinex",
-    "url": "https://derslinex.com",
-    "logo": "https://derslinex.com/logo.png",
-    "description": "YKS ve LGS sınav hazırlığı için Türkiye'nin en iyi hocalarından online özel ders ve birebir ders alın.",
-    "telephone": "+905342407519",
-    "address": {
-      "@type": "PostalAddress",
-      "addressCountry": "TR",
-      "addressLocality": "Denizli",
-      "addressRegion": "Pamukkale",
-      "streetAddress": "15 Mayıs Mah. 794 Sok. No : 17"
+  // Google SEO: Structured Data (JSON-LD) for EducationalOrganization & FAQPage
+  const schemas = [
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "Derslinex",
+      "url": "https://derslinex.com",
+      "logo": "https://derslinex.com/logo.png",
+      "description": "YKS ve LGS sınav hazırlığı için Türkiye'nin en iyi hocalarından online özel ders ve birebir ders alın.",
+      "telephone": "+905342407519",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "TR",
+        "addressLocality": "Denizli",
+        "addressRegion": "Pamukkale",
+        "streetAddress": "15 Mayıs Mah. 794 Sok. No : 17"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "120"
+      }
     },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "reviewCount": "120"
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": faqItems.map((item) => ({
+        "@type": "Question",
+        "name": item.soru,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": item.cevap
+        }
+      }))
     }
-  };
+  ];
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }}
       />
 
       {/* Hero */}
@@ -94,9 +108,9 @@ export default function HomePage() {
           <div className="lg:col-span-7 text-left">
             <MiniCountdown />
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight mb-6 tracking-tight text-[#1E3A8A]">
-              YKS'de Hedeflediğin <br />
+              Online Özel Ders ve <br />
               <span className="text-[#B45309] relative">
-                Bölümü Şansa Bırakma!
+                Birebir YKS & LGS Hazırlık
                 <span className="absolute bottom-1 left-0 w-full h-[4px] bg-[#FAF0E3] -z-10 rounded-full" />
               </span>
             </h1>
@@ -116,7 +130,7 @@ export default function HomePage() {
               <div className="flex items-center gap-3.5 mb-6 pb-4 border-b border-[#FAF8F5]">
                 <div className="w-12 h-12 rounded-xl bg-[#1E3A8A]/10 flex items-center justify-center text-xl text-[#1E3A8A] font-bold shadow-sm">🏫</div>
                 <div>
-                  <h2 className="text-base font-black text-[#1E3A8A]">Derslinex Modeli</h2>
+                  <h3 className="text-base font-black text-[#1E3A8A]">Derslinex Modeli</h3>
                   <p className="text-xs text-gray-500 font-bold">Birebir YKS Koçluğu & Takip</p>
                 </div>
               </div>
@@ -286,7 +300,7 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16 lg:mt-20 mb-8">
         <div className="bg-gradient-to-br from-[#1E3A8A] to-[#111827] rounded-3xl p-10 sm:p-14 text-center text-white shadow-md relative overflow-hidden">
           <div className="absolute top-[-50%] left-[-50%] w-full h-full bg-white/5 rounded-full blur-3xl pointer-events-none" />
-          <h2 className="text-3xl sm:text-4xl font-black mb-4 relative z-10">Hâlâ kararsız mısın?</h2>
+          <h3 className="text-3xl sm:text-4xl font-black mb-4 relative z-10">Hâlâ kararsız mısın?</h3>
           <p className="text-gray-200 text-lg mb-8 max-w-xl mx-auto relative z-10 font-semibold">
             WhatsApp'tan bize ulaş, ihtiyacına en uygun hocanı birlikte bulalım. Yanıt süresi: &lt; 1 saat.
           </p>

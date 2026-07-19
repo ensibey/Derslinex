@@ -35,36 +35,46 @@ export default async function HocaProfilPage({ params }: { params: Promise<{ slu
 
   const waUrl = waLinkHoca(hoca.isim, hoca.dersler[0]);
 
-  const tutorSchema = {
-    "@context": "https://schema.org",
-    "@type": "Tutor",
-    "name": hoca.isim,
-    "jobTitle": hoca.unvan,
-    "image": hoca.fotograf,
-    "description": hoca.ozgecmis,
-    "gender": hoca.isim.includes("Elif") || hoca.isim.includes("Zeynep") || hoca.isim.includes("Selin") || hoca.isim.includes("Ayşe") ? "Female" : "Male",
-    "offers": {
-      "@type": "Offer",
-      "category": `${hoca.dersler.join(", ")} Özel Ders`,
-      "areaServed": {
-        "@type": "AdministrativeArea",
-        "name": hoca.konum
+  const schemas = [
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "@id": `https://derslinex.com/hocalar/${hoca.slug}#service`,
+      "name": `${hoca.isim} — Özel Ders`,
+      "image": hoca.fotograf,
+      "description": hoca.ozgecmis,
+      "telephone": hoca.whatsapp ? `+${hoca.whatsapp}` : "+905405512020",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": hoca.konum
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": hoca.puan.toString(),
+        "reviewCount": hoca.ogrenciSayisi.toString(),
+        "bestRating": "5",
+        "worstRating": "1"
       }
     },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": hoca.puan.toString(),
-      "bestRating": "5",
-      "worstRating": "1",
-      "ratingCount": hoca.ogrenciSayisi.toString()
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfilePage",
+      "@id": `https://derslinex.com/hocalar/${hoca.slug}#profile`,
+      "mainEntity": {
+        "@type": "Person",
+        "name": hoca.isim,
+        "jobTitle": `${hoca.unvan} / ${hoca.egitim}`,
+        "image": hoca.fotograf,
+        "description": hoca.ozgecmis
+      }
     }
-  };
+  ];
 
   return (
     <div className="bg-gray-50 min-h-screen text-gray-900">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(tutorSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }}
       />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Breadcrumb & Share */}
@@ -175,7 +185,6 @@ export default async function HocaProfilPage({ params }: { params: Promise<{ slu
                 <span className="text-2xl mt-1">🎓</span>
                 <div>
                   <p className="font-semibold text-gray-900">{hoca.egitim}</p>
-                  <p className="text-sm text-gray-500 mt-1 font-semibold">Mezuniyet Yılı: {new Date().getFullYear() - hoca.deneyimYili - 4} (tahmini)</p>
                 </div>
               </div>
             </div>
