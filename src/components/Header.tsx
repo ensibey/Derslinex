@@ -14,6 +14,8 @@ const navLinks = [
   { href: "/iletisim", label: "İletişim" },
 ];
 
+import SidebarDrawer from "@/components/SidebarDrawer";
+
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -32,8 +34,9 @@ export default function Header() {
     <header className="sticky top-0 z-50 bg-[#FAF8F5]/90 backdrop-blur-md shadow-sm border-b border-[#EFECE6]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex items-center">
+          {/* Logo & Sidebar Drawer */}
+          <div className="flex items-center gap-5 sm:gap-6">
+            <SidebarDrawer />
             <Link href="/" className="flex items-center gap-2 group">
               <div className="relative w-12 h-12 group-hover:scale-105 transition-transform flex items-center justify-center">
                 <Image
