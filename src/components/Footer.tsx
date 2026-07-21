@@ -21,7 +21,7 @@ export default function Footer({ className }: { className?: string }) {
             <div className="flex items-center gap-2.5 mb-4">
               <div className="relative w-9 h-9 rounded-lg overflow-hidden border border-white/10 shadow-md flex items-center justify-center">
                 <Image
-                  src="/logo.png?v=7"
+                  src="/logo.png?v=8"
                   alt="Derslinex Logo"
                   fill
                   className="object-contain"
