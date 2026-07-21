@@ -27,14 +27,14 @@ export const metadata: Metadata = {
   verification: { google: "google5716913a2e6e8126" },
   icons: {
     icon: [
-      { url: "/logo.png?v=8", sizes: "192x192", type: "image/png" },
-      { url: "/logo.png?v=8", sizes: "96x96", type: "image/png" },
-      { url: "/logo.png?v=8", sizes: "48x48", type: "image/png" },
-      { url: "/favicon.ico?v=8", sizes: "any" }
+      { url: "/logo.png?v=9", sizes: "192x192", type: "image/png" },
+      { url: "/logo.png?v=9", sizes: "96x96", type: "image/png" },
+      { url: "/logo.png?v=9", sizes: "48x48", type: "image/png" },
+      { url: "/favicon.ico?v=9", sizes: "any" }
     ],
-    shortcut: "/favicon.ico?v=8",
+    shortcut: "/favicon.ico?v=9",
     apple: [
-      { url: "/logo.png?v=8", sizes: "180x180", type: "image/png" }
+      { url: "/logo.png?v=9", sizes: "180x180", type: "image/png" }
     ]
   },
   openGraph: {
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     description: "Türkiye'nin en iyi hocalarından online özel ders ve birebir ders alın. Online birebir eğitim.",
     images: [
       {
-        url: "/logo.png?v=8",
+        url: "/logo.png?v=9",
         width: 800,
         height: 600,
         alt: "Derslinex Logo",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    images: ["/logo.png?v=8"],
+    images: ["/logo.png?v=9"],
   },
   other: {
     "og:locale": "tr_TR",
@@ -71,12 +71,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <link rel="dns-prefetch" href="https://ui-avatars.com" />
-        <link rel="icon" href="/logo.png?v=8" sizes="192x192" type="image/png" />
-        <link rel="icon" href="/logo.png?v=8" sizes="96x96" type="image/png" />
-        <link rel="icon" href="/logo.png?v=8" sizes="48x48" type="image/png" />
-        <link rel="icon" href="/favicon.ico?v=8" sizes="any" />
-        <link rel="shortcut icon" href="/favicon.ico?v=8" />
-        <link rel="apple-touch-icon" href="/logo.png?v=8" sizes="180x180" />
+        <link rel="icon" href="/logo.png?v=9" sizes="192x192" type="image/png" />
+        <link rel="icon" href="/logo.png?v=9" sizes="96x96" type="image/png" />
+        <link rel="icon" href="/logo.png?v=9" sizes="48x48" type="image/png" />
+        <link rel="icon" href="/favicon.ico?v=9" sizes="any" />
+        <link rel="shortcut icon" href="/favicon.ico?v=9" />
+        <link rel="apple-touch-icon" href="/logo.png?v=9" sizes="180x180" />
       </head>
       <body className="bg-[#FAF8F5] text-gray-900 antialiased">
         <Header />

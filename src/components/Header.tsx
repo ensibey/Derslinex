@@ -40,7 +40,7 @@ export default function Header() {
             <Link href="/" className="flex items-center gap-2 group">
               <div className="relative w-12 h-12 group-hover:scale-105 transition-transform flex items-center justify-center">
                 <Image
-                  src="/logo.png?v=8"
+                  src="/logo.png?v=9"
                   alt="Derslinex Logo"
                   fill
                   className="object-contain"
