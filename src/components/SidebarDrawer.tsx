@@ -149,6 +149,42 @@ export default function SidebarDrawer() {
               </div>
               <span className="text-gray-400 group-hover:translate-x-1 transition-transform ml-2 flex-shrink-0">→</span>
             </Link>
+
+            {/* 4. Çalışma Programı Robotu Link */}
+            <Link
+              href="/blog/ders-calisma-programi"
+              onClick={() => setIsOpen(false)}
+              className="bg-white border border-[#EFECE6] rounded-2xl p-4 hover:border-[#B45309] hover:bg-white hover:shadow-sm transition-all flex items-center justify-between group"
+            >
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2 font-bold text-[#1E3A8A]">
+                  <span>📅</span>
+                  <span>Çalışma Programı Robotu</span>
+                </div>
+                <span className="text-[10px] text-gray-500 font-semibold mt-1 leading-normal">
+                  Haftalık çalışma yoğunluğuna özel birebir ders çalışma programı oluştur
+                </span>
+              </div>
+              <span className="text-gray-400 group-hover:translate-x-1 transition-transform ml-2 flex-shrink-0">→</span>
+            </Link>
+
+            {/* 5. Deneme Net Takip Link */}
+            <Link
+              href="/blog/deneme-net-takip"
+              onClick={() => setIsOpen(false)}
+              className="bg-white border border-[#EFECE6] rounded-2xl p-4 hover:border-[#B45309] hover:bg-white hover:shadow-sm transition-all flex items-center justify-between group"
+            >
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2 font-bold text-[#1E3A8A]">
+                  <span>📊</span>
+                  <span>Deneme Net Takip Paneli</span>
+                </div>
+                <span className="text-[10px] text-gray-500 font-semibold mt-1 leading-normal">
+                  Çözdüğün deneme netlerini kaydet ve gelişim eğrini canlı takip et
+                </span>
+              </div>
+              <span className="text-gray-400 group-hover:translate-x-1 transition-transform ml-2 flex-shrink-0">→</span>
+            </Link>
           </div>
 
           {/* Quick Links Section */}

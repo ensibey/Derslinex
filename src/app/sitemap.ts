@@ -23,6 +23,8 @@ export default function sitemap() {
     "/blog/konu-takip-cetelesi",
     "/blog/lise-taban-puanlari",
     "/blog/meslek-net-atlasi",
+    "/blog/ders-calisma-programi",
+    "/blog/deneme-net-takip",
     "/wiki",
     "/hakkimizda",
     "/iletisim",

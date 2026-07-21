@@ -124,7 +124,7 @@ export default function BlogPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {[
             { title: "Tercih Robotu", desc: "Netine Göre Üniversite & Lise Bulucu", icon: "🏫", url: "/blog/ders-sihirbazi" },
             { title: "Hap Bilgiler", desc: "YKS / LGS Ders Bilgi Kartları", icon: "🃏", url: "/blog/bilgi-kartlari" },
@@ -135,7 +135,9 @@ export default function BlogPage() {
             { title: "OBP Hesaplayıcı", desc: "Diploma Notunun Sıralamaya Etkisi", icon: "🧮", url: "/blog/obp-siralamaya-etkisi" },
             { title: "Pomodoro Sayacı", desc: "Zaman Yönetimi & Çalışma Arkadaşı", icon: "⏱️", url: "/blog/pomodoro-sayaci" },
             { title: "Soru Dağılımları", desc: "Yıllara Göre Soru Konu İstatistikleri", icon: "📅", url: "/blog/soru-dagilimlari" },
-            { title: "Net Kıyaslama", desc: "YKS Net ve Sıralama Karşılaştırma", icon: "🔄", url: "/blog/yks-net-siralama-karsilastirma" }
+            { title: "Net Kıyaslama", desc: "YKS Net ve Sıralama Karşılaştırma", icon: "🔄", url: "/blog/yks-net-siralama-karsilastirma" },
+            { title: "Çalışma Programı", desc: "Yoğunluğa Özel Program Robotu", icon: "📅", url: "/blog/ders-calisma-programi" },
+            { title: "Deneme Takip", desc: "Net İlerleme Grafiği ve Kaydı", icon: "📊", url: "/blog/deneme-net-takip" }
           ].map((tool, idx) => (
             <Link
               key={idx}
