@@ -6,3 +6,11 @@ node_modules/
 out/
 .DS_Store
 *.log
+
+/src/generated/prisma
+*.db
+*.db-journal
+.agents/
+.claude/
+.windsurf/
+skills-lock.json

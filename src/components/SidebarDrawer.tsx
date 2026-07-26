@@ -90,6 +90,45 @@ export default function SidebarDrawer() {
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto min-h-0 p-6 space-y-6 scrollbar-thin">
+          {/* Profil ve Yönetici Linkleri */}
+          <div className="flex flex-col gap-3">
+            <span className="text-[10px] font-black text-[#1E3A8A] uppercase tracking-widest block">
+              👤 PROFİL & YÖNETİM
+            </span>
+            <Link
+              href="/profil"
+              onClick={() => setIsOpen(false)}
+              className="bg-white border border-[#EFECE6] rounded-2xl p-4 hover:border-[#1E3A8A] hover:bg-white hover:shadow-sm transition-all flex items-center justify-between group"
+            >
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2 font-bold text-[#1E3A8A]">
+                  <span>👤</span>
+                  <span>Öğrenci & Öğretmen Profili</span>
+                </div>
+                <span className="text-[10px] text-gray-500 font-semibold mt-1 leading-normal">
+                  Profil bilgilerini yönet ve görüşlerini/taleplerini ilet
+                </span>
+              </div>
+              <span className="text-gray-400 group-hover:translate-x-1 transition-transform ml-2 flex-shrink-0">→</span>
+            </Link>
+            <Link
+              href="/admin"
+              onClick={() => setIsOpen(false)}
+              className="bg-white border border-[#EFECE6] rounded-2xl p-4 hover:border-[#1E3A8A] hover:bg-white hover:shadow-sm transition-all flex items-center justify-between group"
+            >
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2 font-bold text-[#1E3A8A]">
+                  <span>🔑</span>
+                  <span>Yönetici (Admin) Paneli</span>
+                </div>
+                <span className="text-[10px] text-gray-500 font-semibold mt-1 leading-normal">
+                  Kayıtları yönet, iletişim durumlarını kontrol et
+                </span>
+              </div>
+              <span className="text-gray-400 group-hover:translate-x-1 transition-transform ml-2 flex-shrink-0">→</span>
+            </Link>
+          </div>
+
           {/* Canlı Etkileşimli Araçlar (Glassmorphic Link Kartları) */}
           <div className="flex flex-col gap-3">
             <span className="text-[10px] font-black text-[#B45309] uppercase tracking-widest block">
