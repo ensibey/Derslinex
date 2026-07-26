@@ -10,8 +10,6 @@ const navLinks = [
   { href: "/dersler", label: "Dersler" },
   { href: "/yks-hazirlik", label: "YKS Hazırlık" },
   { href: "/lgs-hazirlik", label: "LGS Hazırlık" },
-  { href: "/profil", label: "Profilim" },
-  { href: "/admin", label: "Yönetici" },
   { href: "/iletisim", label: "İletişim" },
 ];
 
@@ -67,7 +65,19 @@ export default function Header() {
           </nav>
 
           {/* CTA */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-4">
+            <Link
+              href="/admin"
+              className="text-sm font-bold text-[#1E3A8A]/80 hover:text-[#B45309] transition-colors"
+            >
+              Yönetici
+            </Link>
+            <Link
+              href="/profil"
+              className="inline-flex items-center justify-center border border-[#1E3A8A]/20 hover:border-[#B45309]/50 text-sm font-bold text-[#1E3A8A] hover:text-[#B45309] px-4 py-2.5 rounded-xl transition-all"
+            >
+              👤 Profilim
+            </Link>
             <a
               href={waLink()}
               target="_blank"
@@ -117,6 +127,20 @@ export default function Header() {
                   {l.label}
                 </Link>
               ))}
+            <Link
+              href="/profil"
+              onClick={() => setMenuOpen(false)}
+              className="block px-3 py-2 text-[#B45309] font-bold hover:bg-gray-100 rounded-lg border-t border-[#EFECE6]/50 mt-2 pt-2"
+            >
+              👤 Profilim
+            </Link>
+            <Link
+              href="/admin"
+              onClick={() => setMenuOpen(false)}
+              className="block px-3 py-2 text-[#1E3A8A]/75 font-bold hover:bg-gray-100 rounded-lg"
+            >
+              🔑 Yönetici Paneli
+            </Link>
           </div>
         </div>
       )}
