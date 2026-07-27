@@ -213,7 +213,7 @@ export default async function HocaProfilPage({ params }: { params: Promise<{ slu
           <div className="lg:col-span-2 space-y-8">
             {/* Hakkında */}
             <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Hoca Hakkında</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Öğretmen Hakkında</h2>
               <p className="text-gray-700 leading-relaxed">{hoca.ozgecmis}</p>
             </div>
 

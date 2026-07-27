@@ -4,16 +4,15 @@ import { hocalar } from "@/data/hocalar";
 import TeacherCard from "@/components/TeacherCard";
 import { waLink } from "@/lib/utils";
 import React, { Suspense } from "react";
-
 import Link from "next/link";
 
-function HocalarContent() {
+function OgretmenlerContent() {
   const searchParams = useSearchParams();
   const alan = searchParams.get("alan") || undefined;
   const format = searchParams.get("format") || undefined;
   const yks = searchParams.get("yks") || undefined;
 
-  const [allHocalar, setAllHocalar] = React.useState<any[]>([]);
+  const [allOgretmenler, setAllOgretmenler] = React.useState<any[]>([]);
 
   React.useEffect(() => {
     // Load static and dynamic teachers
@@ -46,15 +45,15 @@ function HocalarContent() {
           list = [...list, ...approvedDb];
         }
       } catch (err) {
-        console.error("Dinamik hocalar yüklenemedi:", err);
+        console.error("Dinamik öğretmenler yüklenemedi:", err);
       }
-      setAllHocalar(list);
+      setAllOgretmenler(list);
     };
 
     loadTeachers();
   }, []);
 
-  const filtrelenmis = allHocalar.filter((h) => {
+  const filtrelenmis = allOgretmenler.filter((h) => {
     if (!h.aktif) return false;
     if (alan && alan !== "tumu") {
       if (!h.dersler.some((d: string) => d.toLowerCase().includes(alan.toLowerCase()))) return false;
@@ -74,9 +73,9 @@ function HocalarContent() {
         {/* Header */}
         <div className="mb-10">
           <span className="text-[#B45309] text-xs font-black uppercase tracking-widest font-sans">EĞİTMEN KADROMUZ</span>
-          <h1 className="text-4xl sm:text-5xl font-black mb-2 mt-2 text-[#1E3A8A]">Uzman Hocalarımız</h1>
+          <h1 className="text-4xl sm:text-5xl font-black mb-2 mt-2 text-[#1E3A8A]">Uzman Öğretmenlerimiz</h1>
           <p className="text-gray-600 text-lg font-medium">
-            YKS'nin her alanı için deneyimli uzman hocalar. WhatsApp ile anında iletişim.
+            YKS'nin her alanı için deneyimli uzman öğretmenler. WhatsApp ile anında iletişim.
           </p>
         </div>
 
@@ -87,12 +86,12 @@ function HocalarContent() {
               <label className="block text-xs font-black text-gray-500 mb-3 uppercase tracking-wider">
                 Ders Alanı
               </label>
-              <Link href="/hocalar" className={`block w-full text-xs font-black py-2.5 rounded-xl border text-center transition-all duration-200 mb-2 ${!alan || alan === "tumu" ? "bg-[#1E3A8A] text-white border-[#1E3A8A] shadow-sm" : "bg-[#FAF8F5] text-[#1E3A8A] border-[#EFECE6] hover:border-[#FAF0E3]"}`}>
+              <Link href="/ogretmenler" className={`block w-full text-xs font-black py-2.5 rounded-xl border text-center transition-all duration-200 mb-2 ${!alan || alan === "tumu" ? "bg-[#1E3A8A] text-white border-[#1E3A8A] shadow-sm" : "bg-[#FAF8F5] text-[#1E3A8A] border-[#EFECE6] hover:border-[#FAF0E3]"}`}>
                 Tümü
               </Link>
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {["Matematik", "Fizik", "Kimya", "Türkçe", "Tarih", "İngilizce"].map((a) => (
-                  <Link key={a} href={`/hocalar?alan=${a}${format ? `&format=${format}` : ""}${yks ? `&yks=${yks}` : ""}`}
+                  <Link key={a} href={`/ogretmenler?alan=${a}${format ? `&format=${format}` : ""}${yks ? `&yks=${yks}` : ""}`}
                     className={`text-[11px] font-black px-3 py-1.5 rounded-xl border transition-all duration-200 ${alan === a ? "bg-[#1E3A8A] text-white border-[#1E3A8A] shadow-sm" : "bg-[#FAF8F5] text-gray-600 border-[#EFECE6] hover:border-[#FAF0E3]"}`}>
                     {a}
                   </Link>
@@ -111,7 +110,7 @@ function HocalarContent() {
                   { value: "online", label: "Online" },
                 ].map((f) => (
                   <Link key={f.value}
-                    href={`/hocalar?${alan ? `alan=${alan}&` : ""}format=${f.value}${yks ? `&yks=${yks}` : ""}`}
+                    href={`/ogretmenler?${alan ? `alan=${alan}&` : ""}format=${f.value}${yks ? `&yks=${yks}` : ""}`}
                     className={`text-xs font-black py-2.5 rounded-xl border text-center transition-all duration-200 ${format === f.value || (!format && f.value === "tumu") ? "bg-[#1E3A8A] text-white border-[#1E3A8A] shadow-sm" : "bg-[#FAF8F5] text-gray-600 border-[#EFECE6] hover:border-[#FAF0E3]"}`}>
                     {f.label}
                   </Link>
@@ -133,7 +132,7 @@ function HocalarContent() {
                   { value: "AYT Dil", label: "AYT Dil" },
                 ].map((y) => (
                   <Link key={y.value}
-                    href={`/hocalar?${alan ? `alan=${alan}&` : ""}${format ? `format=${format}&` : ""}yks=${y.value}`}
+                    href={`/ogretmenler?${alan ? `alan=${alan}&` : ""}${format ? `format=${format}&` : ""}yks=${y.value}`}
                     className={`text-xs font-black py-2.5 rounded-xl border text-center transition-all duration-200 ${yks === y.value || (!yks && y.value === "tumu") ? "bg-[#1E3A8A] text-white border-[#1E3A8A] shadow-sm" : "bg-[#FAF8F5] text-gray-600 border-[#EFECE6] hover:border-[#FAF0E3]"}`}>
                     {y.label}
                   </Link>
@@ -156,9 +155,9 @@ function HocalarContent() {
         ) : (
           <div className="text-center py-10 sm:py-20 bg-white/80 backdrop-blur-md border border-[#EFECE6]/60 rounded-3xl p-8 shadow-premium">
             <div className="text-5xl mb-4">🔍</div>
-            <h3 className="text-xl font-black text-[#1E3A8A] mb-2">Bu filtreye uygun hoca bulunamadı</h3>
+            <h3 className="text-xl font-black text-[#1E3A8A] mb-2">Bu filtreye uygun öğretmen bulunamadı</h3>
             <p className="text-gray-500 mb-6 font-semibold">Filtreleri değiştirmeyi ya da WhatsApp'tan bize danışmayı deneyin.</p>
-            <a href={waLink("Merhaba, aradığım kriterlerde hoca bulamadım. Yardımcı olur musunuz?")}
+            <a href={waLink("Merhaba, aradığım kriterlerde öğretmen bulamadım. Yardımcı olur musunuz?")}
               target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-[#B45309] hover:bg-[#92400E] text-white font-black px-6 py-3 rounded-xl transition-all shadow-sm">
               WhatsApp'tan Sor
@@ -170,14 +169,14 @@ function HocalarContent() {
   );
 }
 
-export default function HocalarPage() {
+export default function OgretmenlerPage() {
   return (
     <Suspense fallback={
       <div className="max-w-7xl mx-auto px-4 py-10 sm:py-20 text-center text-gray-500 font-bold">
         Yükleniyor...
       </div>
     }>
-      <HocalarContent />
+      <OgretmenlerContent />
     </Suspense>
   );
 }

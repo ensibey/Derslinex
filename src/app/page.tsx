@@ -15,34 +15,34 @@ import MiniCountdown from "@/components/MiniCountdown";
 export const metadata: Metadata = {
   title: "Derslinex | Online Özel Ders & Birebir YKS LGS Hazırlık",
   description:
-    "YKS ve LGS sınav hazırlığı için Türkiye'nin en iyi hocalarından online özel ders ve birebir ders alın. TYT, AYT, LGS Matematik, Fizik, Türkçe ve Kimya online eğitim.",
+    "YKS ve LGS sınav hazırlığı için Türkiye'nin en iyi öğretmenlerinden online özel ders ve birebir ders alın. TYT, AYT, LGS Matematik, Fizik, Türkçe ve Kimya online eğitim.",
 };
 
 const faqItems = [
   {
     soru: "Dersler online mı yoksa yüz yüze mi yapılıyor?",
-    cevap: "Her iki seçeneği de sunuyoruz. Hocalarımızın bir kısmı yalnızca online, bir kısmı yalnızca yüz yüze, büyük çoğunluğu ise her ikisi ile ders vermektedir. Hoca profillerinde bu bilgi açıkça yer almaktadır.",
+    cevap: "Her iki seçeneği de sunuyoruz. Öğretmenlerimizin bir kısmı yalnızca online, bir kısmı yalnızca yüz yüze, büyük çoğunluğu ise her ikisi ile ders vermektedir. Öğretmen profillerinde bu bilgi açıkça yer almaktadır.",
   },
   {
     soru: "WhatsApp üzerinden nasıl ders alırım?",
-    cevap: "İstediğiniz hocanın profilindeki 'WhatsApp ile Ders Al' butonuna tıklayın. Otomatik hazırlanan mesajı gönderin, hocamız en kısa sürede size döner ve ders programını birlikte belirlersiniz.",
+    cevap: "İstediğiniz öğretmenin profilindeki 'WhatsApp ile Ders Al' butonuna tıklayın. Otomatik hazırlanan mesajı gönderin, öğretmenimiz en kısa sürede size döner ve ders programını birlikte belirlersiniz.",
   },
   {
     soru: "Hangi YKS türleri için ders bulabilirsiniz?",
-    cevap: "TYT, AYT Sayısal, AYT Sözel, AYT Eşit Ağırlık ve AYT Dil (İngilizce, Almanca, Fransızca) için uzman hocalar platformumuzda yer almaktadır.",
+    cevap: "TYT, AYT Sayısal, AYT Sözel, AYT Eşit Ağırlık ve AYT Dil (İngilizce, Almanca, Fransızca) için uzman öğretmenler platformumuzda yer almaktadır.",
   },
   {
     soru: "Ücretler nasıl belirleniyor?",
-    cevap: "Ücretler, hocanın deneyimine, ders formatına (online/yüz yüze) ve ders süresine göre değişmektedir. WhatsApp üzerinden hocayla doğrudan görüşerek detayları öğrenebilirsiniz.",
+    cevap: "Ücretler, öğretmenin deneyimine, ders formatına (online/yüz yüze) ve ders süresine göre değişmektedir. WhatsApp üzerinden öğretmenle doğrudan görüşerek detayları öğrenebilirsiniz.",
   },
   {
     soru: "Şehir dışından da ders alabilir miyim?",
-    cevap: "Evet. Platformumuzda Türkiye geneline online ders veren çok sayıda hoca bulunmaktadır. Online seçeneğini kullanarak Türkiye'nin her yerinden ders alabilirsiniz.",
+    cevap: "Evet. Platformumuzda Türkiye geneline online ders veren çok sayıda öğretmen bulunmaktadır. Online seçeneğini kullanarak Türkiye'nin her yerinden ders alabilirsiniz.",
   },
 ];
 
 const stats = [
-  { rakam: "9+", etiket: "Uzman Hoca" },
+  { rakam: "9+", etiket: "Uzman Öğretmen" },
   { rakam: "3.000+", etiket: "Mutlu Öğrenci" },
   { rakam: "12+", etiket: "YKS Dersi" },
   { rakam: "4.8★", etiket: "Ortalama Puan" },
@@ -59,7 +59,7 @@ export default function HomePage() {
       "name": "Derslinex",
       "url": "https://derslinex.com",
       "logo": "https://derslinex.com/logo.png",
-      "description": "YKS ve LGS sınav hazırlığı için Türkiye'nin en iyi hocalarından online özel ders ve birebir ders alın.",
+      "description": "YKS ve LGS sınav hazırlığı için Türkiye'nin en iyi öğretmenlerinden online özel ders ve birebir ders alın.",
       "telephone": "+905342407519",
       "address": {
         "@type": "PostalAddress",
@@ -115,7 +115,7 @@ export default function HomePage() {
               </span>
             </h1>
             <p className="text-base sm:text-lg text-gray-600 mb-8 leading-relaxed max-w-xl font-medium">
-              Türkiye'nin en seçkin YKS dereceli hocalarından TYT, AYT Sayısal, Sözel, EA ve Dil dersleri. Haftalık ders takipleriyle hedefinize emin adımlarla ilerleyin.
+              Türkiye'nin en seçkin YKS dereceli öğretmenlerinden TYT, AYT Sayısal, Sözel, EA ve Dil dersleri. Haftalık ders takipleriyle hedefinize emin adımlarla ilerleyin.
             </p>
 
             {/* Interactive Search Box */}
@@ -138,8 +138,8 @@ export default function HomePage() {
               <div className="space-y-4">
                 {[
                   { title: "Kişiye Özel Haftalık Program", desc: "Seviyenize ve hedeflerinize uygun haftalık ders saatleri", icon: "📅", color: "bg-[#FAF0E3]/70 text-[#B45309]" },
-                  { title: "Zirvedeki Öğretmenler", desc: "Derece yapanları yetiştirmiş uzman hoca kadrosu", icon: "🏆", color: "bg-[#1E3A8A]/5 text-[#1E3A8A]" },
-                  { title: "Anlık WhatsApp İletişimi", desc: "Hocalarınızla 7/24 kesintisiz iletişim kanalları", icon: "💬", color: "bg-[#E8F5E9] text-[#2E7D32]" }
+                  { title: "Zirvedeki Öğretmenler", desc: "Derece yapanları yetiştirmiş uzman öğretmen kadrosu", icon: "🏆", color: "bg-[#1E3A8A]/5 text-[#1E3A8A]" },
+                  { title: "Anlık WhatsApp İletişimi", desc: "Öğretmenlerinizle 7/24 kesintisiz iletişim kanalları", icon: "💬", color: "bg-[#E8F5E9] text-[#2E7D32]" }
                 ].map((item, idx) => (
                   <div key={idx} className="flex gap-4 p-3 rounded-2xl hover:bg-[#FAF8F5] transition-colors border border-transparent hover:border-[#EFECE6]">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${item.color} flex-shrink-0 shadow-sm`}>
@@ -186,7 +186,7 @@ export default function HomePage() {
               Belirlenen çalışma merkezlerinde veya evinizde eğitmenle birebir ders. Anlık geri bildirim ve yüksek odaklanma.
             </p>
             <ul className="space-y-3.5 text-sm text-gray-600 mb-8 mt-auto font-semibold">
-              {["Seçili şehirlerdeki uzman hocalar", "Birebir konforlu çalışma ortamı", "Haftalık hedeflere dayalı program", "Eğitmen rehberliğinde özel materyaller"].map(i => (
+              {["Seçili şehirlerdeki uzman öğretmenler", "Birebir konforlu çalışma ortamı", "Haftalık hedeflere dayalı program", "Eğitmen rehberliğinde özel materyaller"].map(i => (
                 <li key={i} className="flex items-center gap-3"><span className="text-[#B45309] font-bold">✓</span>{i}</li>
               ))}
             </ul>
@@ -198,10 +198,10 @@ export default function HomePage() {
             <div className="w-14 h-14 bg-[#1E3A8A]/10 rounded-2xl flex items-center justify-center text-3xl mb-6">💻</div>
             <h3 className="text-2xl font-bold text-[#1E3A8A] mb-4">Online Ders</h3>
             <p className="text-gray-600 mb-8 leading-relaxed text-sm font-semibold">
-              Mesafe sınırı olmadan en iyi hocalara anında erişin. İnteraktif beyaz tahta ve video kayıt imkanıyla yüksek verim.
+              Mesafe sınırı olmadan en iyi öğretmenlere anında erişin. İnteraktif beyaz tahta ve video kayıt imkanıyla yüksek verim.
             </p>
             <ul className="space-y-3.5 text-sm text-gray-600 mb-8 mt-auto font-semibold">
-              {["Tüm Türkiye genelinden seçkin hocalar", "Gelişmiş dijital eğitim araçları", "Kayıt imkanıyla dersi tekrar izleme", "Zaman ve mekan esnekliği"].map(i => (
+              {["Tüm Türkiye genelinden seçkin öğretmenler", "Gelişmiş dijital eğitim araçları", "Kayıt imkanıyla dersi tekrar izleme", "Zaman ve mekan esnekliği"].map(i => (
                 <li key={i} className="flex items-center gap-3"><span className="text-[#B45309] font-bold">✓</span>{i}</li>
               ))}
             </ul>
@@ -241,7 +241,7 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16 lg:mt-20">
         <div className="text-center mb-10">
           <h2 className="text-3xl font-black text-[#1E3A8A]">YKS Ders Alanları</h2>
-          <p className="text-gray-600 mt-2 font-semibold">TYT'den AYT'ye tüm alanlar için uzman hocalar</p>
+          <p className="text-gray-600 mt-2 font-semibold">TYT'den AYT'ye tüm alanlar için uzman öğretmenler</p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {dersAlanlari.slice(0, 8).map((d) => <SubjectCard key={d.id} ders={d} />)}
@@ -261,8 +261,8 @@ export default function HomePage() {
           </div>
           <div className="grid sm:grid-cols-3 gap-8">
             {[
-              { step: "1", title: "Hocayı Seç", desc: "Alanına ve ders formatına göre filtreleyerek istediğin hocayı bul. CV'sini ve yorumlarını incele.", emoji: "🔍" },
-              { step: "2", title: "WhatsApp'a Yaz", desc: "Profildeki butona tıkla, otomatik mesajı gönder. Hocayla program ve ücret konuşun.", emoji: "💬" },
+              { step: "1", title: "Öğretmeni Seç", desc: "Alanına ve ders formatına göre filtreleyerek istediğin öğretmeni bul. CV'sini ve yorumlarını incele.", emoji: "🔍" },
+              { step: "2", title: "WhatsApp'a Yaz", desc: "Profildeki butona tıkla, otomatik mesajı gönder. Öğretmenle program ve ücret konuşun.", emoji: "💬" },
               { step: "3", title: "Derse Başla", desc: "Anlaştıktan sonra online veya yüz yüze derse başla. Hedef puanına odaklan!", emoji: "🚀" },
             ].map((s) => (
               <div key={s.step} className="text-center">
@@ -302,10 +302,10 @@ export default function HomePage() {
           <div className="absolute top-[-50%] left-[-50%] w-full h-full bg-white/5 rounded-full blur-3xl pointer-events-none" />
           <h3 className="text-3xl sm:text-4xl font-black mb-4 relative z-10">Hâlâ kararsız mısın?</h3>
           <p className="text-gray-200 text-lg mb-8 max-w-xl mx-auto relative z-10 font-semibold">
-            WhatsApp'tan bize ulaş, ihtiyacına en uygun hocanı birlikte bulalım. Yanıt süresi: &lt; 1 saat.
+            WhatsApp'tan bize ulaş, ihtiyacına en uygun öğretmenini birlikte bulalım. Yanıt süresi: &lt; 1 saat.
           </p>
           <a
-            href={waLink("Merhaba, hangi hoca bana uygun olur konusunda yardım almak istiyorum.")}
+            href={waLink("Merhaba, hangi öğretmen bana uygun olur konusunda yardım almak istiyorum.")}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-[#B45309] hover:bg-[#92400E] text-white font-black text-lg px-10 py-4 rounded-xl transition-all hover:scale-105 relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_3s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/25 before:to-transparent z-10"
