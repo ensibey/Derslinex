@@ -261,17 +261,18 @@ export default function AdminPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
           {[
             { label: "Öğretmenler", val: teachers.length, icon: "👨‍🏫" },
             { label: "Öğrenciler", val: students.length, icon: "🎓" },
-            { label: "Ders Teklifleri", val: lessons.length, icon: "📚" },
-            { label: "Blog Yazıları", val: blogs.length, icon: "✍️" },
-            { label: "Görüş & Talepler", val: feedbacks.length, icon: "💬" },
+            { label: "Canlı Dersler", val: liveSessions.length, icon: "🎥" },
+            { label: "Ders İlanları", val: lessons.length, icon: "📚" },
+            { label: "Bloglar", val: blogs.length, icon: "✍️" },
+            { label: "Görüş & Talep", val: feedbacks.length, icon: "💬" },
           ].map((s) => (
-            <div key={s.label} className="bg-white border border-[#EFECE6] p-5 rounded-2xl shadow-xs">
+            <div key={s.label} className="bg-white border border-[#EFECE6] p-4 sm:p-5 rounded-2xl shadow-xs hover:border-[#1E3A8A]/30 transition-all">
               <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">{s.label}</span>
-              <span className="text-2xl font-black text-[#1E3A8A] block mt-1.5 flex items-center gap-2">
+              <span className="text-xl sm:text-2xl font-black text-[#1E3A8A] block mt-1.5 flex items-center gap-2">
                 <span>{s.icon}</span>
                 <span>{s.val}</span>
               </span>
