@@ -5,14 +5,53 @@ import { notFound } from "next/navigation";
 import { hocalar, getHocaBySlug } from "@/data/hocalar";
 import StarRating from "@/components/StarRating";
 import { waLinkHoca } from "@/lib/utils";
+import { prisma } from "@/lib/db";
+
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
   return hocalar.map((h) => ({ slug: h.slug }));
 }
 
+async function getHocaOrDb(slug: string) {
+  const staticH = getHocaBySlug(slug);
+  if (staticH) return staticH;
+
+  // Query database
+  const dbTeachers = await prisma.teacher.findMany({
+    where: { status: "İletişime Geçildi" }
+  });
+
+  const matched = dbTeachers.find(
+    (t) => t.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") === slug
+  );
+
+  if (matched) {
+    return {
+      id: `db-${matched.id}`,
+      slug: slug,
+      isim: matched.name,
+      unvan: "Eğitmen",
+      fotograf: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(matched.name)}&eyebrows=default&mouth=smile`,
+      dersler: [matched.branch],
+      yksTuru: ["TYT", "AYT Sayısal", "AYT EA"] as any[],
+      format: "online" as const,
+      konum: "Online / Türkiye Geneli",
+      deneyimYili: 5,
+      egitim: "Derslinex Onaylı Özel Ders Eğitmeni",
+      ozgecmis: `${matched.name}, Derslinex platformu bünyesinde ${matched.branch} alanında profesyonel online birebir dersler sunmaktadır.`,
+      whatsapp: matched.phone.replace(/[^0-9]/g, ""),
+      puan: 4.9,
+      ogrenciSayisi: 15,
+      aktif: true
+    };
+  }
+  return undefined;
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const resolvedParams = await params;
-  const hoca = getHocaBySlug(resolvedParams.slug);
+  const hoca = await getHocaOrDb(resolvedParams.slug);
   if (!hoca) return {};
   return {
     title: `${hoca.isim} — ${hoca.dersler.join(", ")} Öğretmeni`,
@@ -30,7 +69,7 @@ import ShareButtons from "@/components/ShareButtons";
 
 export default async function HocaProfilPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
-  const hoca = getHocaBySlug(resolvedParams.slug);
+  const hoca = await getHocaOrDb(resolvedParams.slug);
   if (!hoca) notFound();
 
   const waUrl = waLinkHoca(hoca.isim, hoca.dersler[0]);

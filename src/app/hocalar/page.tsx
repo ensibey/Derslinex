@@ -13,10 +13,51 @@ function HocalarContent() {
   const format = searchParams.get("format") || undefined;
   const yks = searchParams.get("yks") || undefined;
 
-  const filtrelenmis = hocalar.filter((h) => {
+  const [allHocalar, setAllHocalar] = React.useState<any[]>([]);
+
+  React.useEffect(() => {
+    // Load static and dynamic teachers
+    const loadTeachers = async () => {
+      let list = [...hocalar];
+      try {
+        const res = await fetch("/api/profil/ogretmen");
+        const data = await res.json();
+        if (data.success && data.teachers) {
+          const approvedDb = data.teachers
+            .filter((t: any) => t.status === "İletişime Geçildi")
+            .map((t: any) => ({
+              id: `db-${t.id}`,
+              slug: t.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+              isim: t.name,
+              unvan: "Eğitmen",
+              fotograf: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(t.name)}&eyebrows=default&mouth=smile`,
+              dersler: [t.branch],
+              yksTuru: ["TYT", "AYT Sayısal", "AYT EA"],
+              format: "online",
+              konum: "Online / Türkiye Geneli",
+              deneyimYili: 5,
+              egitim: "Derslinex Onaylı Özel Ders Eğitmeni",
+              ozgecmis: `${t.name}, Derslinex platformu bünyesinde ${t.branch} alanında profesyonel online birebir dersler sunmaktadır.`,
+              whatsapp: t.phone.replace(/[^0-9]/g, ""),
+              puan: 4.9,
+              ogrenciSayisi: 15,
+              aktif: true
+            }));
+          list = [...list, ...approvedDb];
+        }
+      } catch (err) {
+        console.error("Dinamik hocalar yüklenemedi:", err);
+      }
+      setAllHocalar(list);
+    };
+
+    loadTeachers();
+  }, []);
+
+  const filtrelenmis = allHocalar.filter((h) => {
     if (!h.aktif) return false;
     if (alan && alan !== "tumu") {
-      if (!h.dersler.some((d) => d.toLowerCase().includes(alan.toLowerCase()))) return false;
+      if (!h.dersler.some((d: string) => d.toLowerCase().includes(alan.toLowerCase()))) return false;
     }
     if (format && format !== "tumu") {
       if (h.format !== format && h.format !== "her-ikisi") return false;
