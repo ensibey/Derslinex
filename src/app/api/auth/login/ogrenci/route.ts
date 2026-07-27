@@ -19,6 +19,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Geçersiz e-posta adresi veya şifre." }, { status: 400 });
     }
 
+    if (student.isBanned) {
+      return NextResponse.json({ success: false, error: "Hesabınız yasaklanmıştır. Lütfen yönetici ile iletişime geçin." }, { status: 430 });
+    }
+
     // Remove password before returning
     const { password: _, ...studentWithoutPassword } = student;
 

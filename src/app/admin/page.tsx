@@ -8,6 +8,7 @@ interface Student {
   phone: string;
   email: string;
   status: string;
+  isBanned: boolean;
   createdAt: string;
 }
 
@@ -17,7 +18,10 @@ interface Teacher {
   phone: string;
   email: string;
   branch: string;
+  egitim: string | null;
+  ozgecmis: string | null;
   status: string;
+  isBanned: boolean;
   createdAt: string;
 }
 
@@ -32,11 +36,35 @@ interface Feedback {
   createdAt: string;
 }
 
+interface Lesson {
+  id: number;
+  title: string;
+  price: number;
+  format: string;
+  description: string | null;
+  teacherId: number;
+  teacherName: string;
+  createdAt: string;
+}
+
+interface BlogPost {
+  id: number;
+  title: string;
+  slug: string;
+  content: string;
+  category: string;
+  authorId: number;
+  authorName: string;
+  createdAt: string;
+}
+
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<"teachers" | "students" | "feedbacks">("teachers");
+  const [activeTab, setActiveTab] = useState<"teachers" | "students" | "lessons" | "blogs" | "feedbacks">("teachers");
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [blogs, setBlogs] = useState<BlogPost[]>([]);
   
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
@@ -44,19 +72,25 @@ export default function AdminPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [tRes, sRes, fRes] = await Promise.all([
+      const [tRes, sRes, fRes, lRes, bRes] = await Promise.all([
         fetch("/api/profil/ogretmen"),
         fetch("/api/profil/ogrenci"),
         fetch("/api/gorus"),
+        fetch("/api/admin/lessons"),
+        fetch("/api/admin/blogs"),
       ]);
 
       const tData = await tRes.json();
       const sData = await sRes.json();
       const fData = await fRes.json();
+      const lData = await lRes.json();
+      const bData = await bRes.json();
 
       if (tData.success) setTeachers(tData.teachers || []);
       if (sData.success) setStudents(sData.students || []);
       if (fData.success) setFeedbacks(fData.feedbacks || []);
+      if (lData.success) setLessons(lData.lessons || []);
+      if (bData.success) setBlogs(bData.posts || []);
     } catch (e) {
       console.error("Data fetch error", e);
     } finally {
@@ -84,7 +118,7 @@ export default function AdminPage() {
       const data = await res.json();
       if (data.success) {
         showMsg("Durum başarıyla güncellendi", "success");
-        fetchData(); // reload
+        fetchData();
       } else {
         showMsg("Durum güncellenemedi", "error");
       }
@@ -93,18 +127,111 @@ export default function AdminPage() {
     }
   };
 
+  const handleBanToggle = async (id: number, role: "student" | "teacher", isCurrentlyBanned: boolean) => {
+    const action = isCurrentlyBanned ? "unban" : "ban";
+    if (!confirm(`Bu kullanıcıyı ${isCurrentlyBanned ? "etkinleştirmek" : "yasaklamak"} istediğinize emin misiniz?`)) return;
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, role, action }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showMsg(data.message || "İşlem başarılı.", "success");
+        fetchData();
+      } else {
+        showMsg(data.error || "İşlem başarısız.", "error");
+      }
+    } catch (err) {
+      showMsg("Bağlantı hatası", "error");
+    }
+  };
+
+  const handleDeleteUser = async (id: number, role: "student" | "teacher") => {
+    if (!confirm("Kullanıcıyı ve ona ait TÜM verileri (ilanlar, bloglar vb.) TAMAMEN silmek istediğinize emin misiniz? Bu işlem geri alınamaz!")) return;
+    try {
+      const res = await fetch(`/api/admin/users?id=${id}&role=${role}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        showMsg(data.message || "Kullanıcı silindi.", "success");
+        fetchData();
+      } else {
+        showMsg(data.error || "Silme başarısız.", "error");
+      }
+    } catch (err) {
+      showMsg("Bağlantı hatası", "error");
+    }
+  };
+
+  const handleDeleteLesson = async (id: number) => {
+    if (!confirm("Bu özel ders teklifini kaldırmak istediğinize emin misiniz?")) return;
+    try {
+      const res = await fetch(`/api/admin/lessons?id=${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        showMsg(data.message || "Ders kaldırıldı.", "success");
+        fetchData();
+      } else {
+        showMsg(data.error || "İşlem başarısız.", "error");
+      }
+    } catch (err) {
+      showMsg("Bağlantı hatası", "error");
+    }
+  };
+
+  const handleDeleteBlog = async (id: number) => {
+    if (!confirm("Bu blog yazısını silmek istediğinize emin misiniz?")) return;
+    try {
+      const res = await fetch(`/api/admin/blogs?id=${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        showMsg(data.message || "Blog yazısı silindi.", "success");
+        fetchData();
+      } else {
+        showMsg(data.error || "İşlem başarısız.", "error");
+      }
+    } catch (err) {
+      showMsg("Bağlantı hatası", "error");
+    }
+  };
+
+  const handleDeleteFeedback = async (id: number) => {
+    if (!confirm("Bu görüşü / randevu talebini kaldırmak istediğinize emin misiniz?")) return;
+    try {
+      const res = await fetch(`/api/gorus?id=${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        showMsg(data.message || "Görüş silindi.", "success");
+        fetchData();
+      } else {
+        showMsg(data.error || "İşlem başarısız.", "error");
+      }
+    } catch (err) {
+      showMsg("Bağlantı hatası", "error");
+    }
+  };
+
   return (
-    <div className="bg-[#FAF8F5] min-h-screen py-16 px-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="bg-[#FAF8F5] min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-10">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
           <div>
             <span className="text-[#B45309] text-xs font-black uppercase tracking-widest block mb-1">
               DERSLINEX KONTROL PANELİ
             </span>
-            <h1 className="text-4xl font-black text-[#1E3A8A]">Yönetim Paneli</h1>
-            <p className="text-gray-500 font-semibold mt-1">
-              Kayıtlı öğrencileri, öğretmenleri ve tüm ders/randevu görüşlerini yönetin.
+            <h1 className="text-4xl font-black text-[#1E3A8A]">Yönetim & Moderasyon</h1>
+            <p className="text-gray-500 font-semibold mt-1 text-sm sm:text-base">
+              Üye yönetimi, yasaklama/silme ve ders/blog içeriklerinin denetim merkezi.
             </p>
           </div>
           <button
@@ -114,6 +241,25 @@ export default function AdminPage() {
           >
             {loading ? "Yükleniyor..." : "🔄 Verileri Yenile"}
           </button>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+          {[
+            { label: "Öğretmenler", val: teachers.length, icon: "👨‍🏫" },
+            { label: "Öğrenciler", val: students.length, icon: "🎓" },
+            { label: "Ders Teklifleri", val: lessons.length, icon: "📚" },
+            { label: "Blog Yazıları", val: blogs.length, icon: "✍️" },
+            { label: "Görüş & Talepler", val: feedbacks.length, icon: "💬" },
+          ].map((s) => (
+            <div key={s.label} className="bg-white border border-[#EFECE6] p-5 rounded-2xl shadow-xs">
+              <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">{s.label}</span>
+              <span className="text-2xl font-black text-[#1E3A8A] block mt-1.5 flex items-center gap-2">
+                <span>{s.icon}</span>
+                <span>{s.val}</span>
+              </span>
+            </div>
+          ))}
         </div>
 
         {/* Global message */}
@@ -126,48 +272,39 @@ export default function AdminPage() {
             }`}
           >
             <span>{message.text}</span>
-            <button className="text-xs opacity-60 hover:opacity-100" onClick={() => setMessage(null)}>
+            <button className="text-xs opacity-60 hover:opacity-100 font-black" onClick={() => setMessage(null)}>
               ✕
             </button>
           </div>
         )}
 
-        {/* Tabs */}
-        <div className="flex bg-white/70 backdrop-blur border border-[#EFECE6] p-1.5 rounded-2xl mb-8 shadow-sm overflow-x-auto">
-          <button
-            onClick={() => setActiveTab("teachers")}
-            className={`py-3.5 px-6 text-sm font-black rounded-xl transition-all duration-200 whitespace-nowrap flex-1 ${
-              activeTab === "teachers"
-                ? "bg-[#1E3A8A] text-white shadow-sm"
-                : "text-gray-600 hover:text-[#1E3A8A] hover:bg-white"
-            }`}
-          >
-            👨‍🏫 Öğretmen Başvuruları ({teachers.length})
-          </button>
-          <button
-            onClick={() => setActiveTab("students")}
-            className={`py-3.5 px-6 text-sm font-black rounded-xl transition-all duration-200 whitespace-nowrap flex-1 ${
-              activeTab === "students"
-                ? "bg-[#1E3A8A] text-white shadow-sm"
-                : "text-gray-600 hover:text-[#1E3A8A] hover:bg-white"
-            }`}
-          >
-            🎓 Kayıtlı Öğrenciler ({students.length})
-          </button>
-          <button
-            onClick={() => setActiveTab("feedbacks")}
-            className={`py-3.5 px-6 text-sm font-black rounded-xl transition-all duration-200 whitespace-nowrap flex-1 ${
-              activeTab === "feedbacks"
-                ? "bg-[#1E3A8A] text-white shadow-sm"
-                : "text-gray-600 hover:text-[#1E3A8A] hover:bg-white"
-            }`}
-          >
-            💬 Öğrenci Görüşleri ({feedbacks.length})
-          </button>
+        {/* Tabs Bar */}
+        <div className="flex bg-white/70 backdrop-blur border border-[#EFECE6] p-1.5 rounded-2xl mb-8 shadow-sm overflow-x-auto gap-1">
+          {[
+            { key: "teachers", label: "Öğretmenler", count: teachers.length, icon: "👨‍🏫" },
+            { key: "students", label: "Öğrenciler", count: students.length, icon: "🎓" },
+            { key: "lessons", label: "Özel Dersler", count: lessons.length, icon: "📚" },
+            { key: "blogs", label: "Bloglar", count: blogs.length, icon: "✍️" },
+            { key: "feedbacks", label: "Görüşler", count: feedbacks.length, icon: "💬" },
+          ].map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setActiveTab(t.key as any)}
+              className={`py-3 px-5 text-xs sm:text-sm font-black rounded-xl transition-all duration-200 whitespace-nowrap flex-1 flex items-center justify-center gap-1.5 ${
+                activeTab === t.key
+                  ? "bg-[#1E3A8A] text-white shadow-xs"
+                  : "text-gray-600 hover:text-[#1E3A8A] hover:bg-white"
+              }`}
+            >
+              <span>{t.icon}</span>
+              <span>{t.label} ({t.count})</span>
+            </button>
+          ))}
         </div>
 
-        {/* CONTENT */}
+        {/* Content Box */}
         <div className="bg-white rounded-3xl border border-[#EFECE6] overflow-hidden shadow-sm">
+          
           {/* TEACHERS TAB */}
           {activeTab === "teachers" && (
             <div className="overflow-x-auto">
@@ -177,9 +314,9 @@ export default function AdminPage() {
                     <th className="p-4 sm:p-5">Adı Soyadı</th>
                     <th className="p-4 sm:p-5">Branş</th>
                     <th className="p-4 sm:p-5">İletişim</th>
-                    <th className="p-4 sm:p-5">Kayıt Tarihi</th>
-                    <th className="p-4 sm:p-5">Durum</th>
-                    <th className="p-4 sm:p-5 text-right">İşlem</th>
+                    <th className="p-4 sm:p-5">Eğitim / Hakkında</th>
+                    <th className="p-4 sm:p-5">Durum / Ban</th>
+                    <th className="p-4 sm:p-5 text-right">İşlemler</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#EFECE6] font-semibold text-gray-700">
@@ -191,52 +328,86 @@ export default function AdminPage() {
                     </tr>
                   ) : (
                     teachers.map((t) => (
-                      <tr key={t.id} className="hover:bg-[#FAF8F5]/50 transition-colors">
-                        <td className="p-4 sm:p-5 font-black text-gray-900">{t.name}</td>
+                      <tr key={t.id} className={`hover:bg-[#FAF8F5]/50 transition-colors ${t.isBanned ? "bg-rose-50/20" : ""}`}>
+                        <td className="p-4 sm:p-5 font-black text-gray-900">
+                          <div>{t.name}</div>
+                          <span className="text-[10px] text-gray-400 font-bold block mt-0.5">
+                            Kayıt: {new Date(t.createdAt).toLocaleDateString("tr-TR")}
+                          </span>
+                        </td>
                         <td className="p-4 sm:p-5">
-                          <span className="bg-blue-50 text-blue-700 text-xs px-2.5 py-1 rounded-full border border-blue-100">
+                          <span className="bg-blue-50 text-blue-700 text-xs px-2.5 py-1 rounded-full border border-blue-100 font-bold">
                             {t.branch}
                           </span>
                         </td>
                         <td className="p-4 sm:p-5 space-y-0.5 text-xs">
                           <div>📞 {t.phone}</div>
-                          <div>✉️ {t.email}</div>
+                          <div className="text-gray-500">{t.email}</div>
                         </td>
-                        <td className="p-4 sm:p-5 text-xs text-gray-500">
-                          {new Date(t.createdAt).toLocaleDateString("tr-TR")}
+                        <td className="p-4 sm:p-5 max-w-xs text-xs space-y-1.5">
+                          {t.egitim && <div><span className="text-gray-400 font-bold block text-[10px] uppercase">Eğitim:</span>{t.egitim}</div>}
+                          {t.ozgecmis && <div className="line-clamp-2 text-gray-500 leading-relaxed"><span className="text-gray-400 font-bold block text-[10px] uppercase">Özgeçmiş:</span>{t.ozgecmis}</div>}
+                          {!t.egitim && !t.ozgecmis && <span className="text-gray-400 italic">Profil Bilgisi Girilmemiş</span>}
                         </td>
-                        <td className="p-4 sm:p-5">
-                          <span
-                            className={`inline-block text-xs px-2.5 py-1 rounded-full font-bold border ${
-                              t.status === "İletişime Geçildi"
-                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                                : "bg-amber-50 text-amber-700 border-amber-200"
-                            }`}
-                          >
-                            {t.status === "İletişime Geçildi" ? "Onaylandı" : "Beklemede"}
-                          </span>
-                        </td>
-                        <td className="p-4 sm:p-5 text-right flex items-center justify-end gap-2">
-                          {t.status === "İletişime Geçildi" && (
-                            <a
-                              href={`/ogretmenler/${t.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs px-3 py-1.5 rounded-lg border font-black bg-white hover:bg-gray-50 text-[#1E3A8A] border-[#EFECE6] transition-all flex items-center gap-1 shadow-xs"
+                        <td className="p-4 sm:p-5 space-y-1.5">
+                          <div>
+                            <span
+                              className={`inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold border ${
+                                t.status === "İletişime Geçildi"
+                                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                  : "bg-amber-50 text-amber-700 border-amber-200"
+                              }`}
                             >
-                              🔍 Profili Gör
-                            </a>
+                              {t.status === "İletişime Geçildi" ? "Onaylı" : "Beklemede"}
+                            </span>
+                          </div>
+                          {t.isBanned && (
+                            <div>
+                              <span className="inline-block text-[10px] bg-red-100 text-red-700 border border-red-200 px-2.5 py-0.5 rounded-full font-bold">
+                                ⛔ Yasaklı
+                              </span>
+                            </div>
                           )}
-                          <button
-                            onClick={() => handleUpdateStatus(t.id, "teacher", t.status)}
-                            className={`text-xs px-3.5 py-1.5 rounded-lg border font-black transition-all shadow-xs ${
-                              t.status === "İletişime Geçildi"
-                                ? "bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200"
-                                : "bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600"
-                            }`}
-                          >
-                            {t.status === "İletişime Geçildi" ? "Beklemeye Al" : "Onayla ve Yayına Al"}
-                          </button>
+                        </td>
+                        <td className="p-4 sm:p-5 text-right">
+                          <div className="flex items-center justify-end gap-2 flex-wrap">
+                            {t.status === "İletişime Geçildi" && (
+                              <a
+                                href={`/ogretmenler/${t.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs px-3 py-1.5 rounded-lg border font-black bg-white hover:bg-gray-50 text-[#1E3A8A] border-[#EFECE6] transition-all shadow-xs"
+                              >
+                                🔍 Profili Gör
+                              </a>
+                            )}
+                            <button
+                              onClick={() => handleUpdateStatus(t.id, "teacher", t.status)}
+                              className={`text-xs px-3 py-1.5 rounded-lg border font-black transition-all shadow-xs ${
+                                t.status === "İletişime Geçildi"
+                                  ? "bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-200"
+                                  : "bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600"
+                              }`}
+                            >
+                              {t.status === "İletişime Geçildi" ? "Beklemeye Al" : "Onayla"}
+                            </button>
+                            <button
+                              onClick={() => handleBanToggle(t.id, "teacher", t.isBanned)}
+                              className={`text-xs px-3 py-1.5 rounded-lg border font-black transition-all shadow-xs ${
+                                t.isBanned
+                                  ? "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200"
+                                  : "bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200"
+                              }`}
+                            >
+                              {t.isBanned ? "Engeli Kaldır" : "Engelle"}
+                            </button>
+                            <button
+                              onClick={() => handleDeleteUser(t.id, "teacher")}
+                              className="text-xs px-3 py-1.5 rounded-lg font-black transition-all bg-red-650 hover:bg-red-700 text-white shadow-xs"
+                            >
+                              Sil
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -254,50 +425,190 @@ export default function AdminPage() {
                   <tr className="bg-[#FAF8F5] border-b border-[#EFECE6] text-gray-500 font-black uppercase text-xs">
                     <th className="p-4 sm:p-5">Adı Soyadı</th>
                     <th className="p-4 sm:p-5">İletişim</th>
-                    <th className="p-4 sm:p-5">Kayıt Tarihi</th>
-                    <th className="p-4 sm:p-5">Durum</th>
-                    <th className="p-4 sm:p-5 text-right">İşlem</th>
+                    <th className="p-4 sm:p-5">Durum / Ban</th>
+                    <th className="p-4 sm:p-5 text-right">İşlemler</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#EFECE6] font-semibold text-gray-700">
                   {students.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="p-10 text-center text-gray-400">
+                      <td colSpan={4} className="p-10 text-center text-gray-400">
                         Henüz kayıtlı öğrenci bulunmuyor.
                       </td>
                     </tr>
                   ) : (
                     students.map((s) => (
-                      <tr key={s.id} className="hover:bg-[#FAF8F5]/50 transition-colors">
-                        <td className="p-4 sm:p-5 font-black text-gray-900">{s.name}</td>
-                        <td className="p-4 sm:p-5 space-y-0.5 text-xs">
-                          <div>📞 {s.phone}</div>
-                          <div>✉️ {s.email}</div>
-                        </td>
-                        <td className="p-4 sm:p-5 text-xs text-gray-500">
-                          {new Date(s.createdAt).toLocaleDateString("tr-TR")}
-                        </td>
-                        <td className="p-4 sm:p-5">
-                          <span
-                            className={`inline-block text-xs px-2.5 py-1 rounded-full font-bold border ${
-                              s.status === "İletişime Geçildi"
-                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                                : "bg-amber-50 text-amber-700 border-amber-200"
-                            }`}
-                          >
-                            {s.status}
+                      <tr key={s.id} className={`hover:bg-[#FAF8F5]/50 transition-colors ${s.isBanned ? "bg-rose-50/20" : ""}`}>
+                        <td className="p-4 sm:p-5 font-black text-gray-900">
+                          <div>{s.name}</div>
+                          <span className="text-[10px] text-gray-400 font-bold block mt-0.5">
+                            Kayıt: {new Date(s.createdAt).toLocaleDateString("tr-TR")}
                           </span>
+                        </td>
+                        <td className="p-4 sm:p-5 space-y-0.5 text-xs font-semibold">
+                          <div>📞 {s.phone}</div>
+                          <div className="text-gray-500">✉️ {s.email}</div>
+                        </td>
+                        <td className="p-4 sm:p-5 space-y-1.5">
+                          <div>
+                            <span
+                              className={`inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold border ${
+                                s.status === "İletişime Geçildi"
+                                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                  : "bg-amber-50 text-amber-700 border-amber-200"
+                              }`}
+                            >
+                              {s.status}
+                            </span>
+                          </div>
+                          {s.isBanned && (
+                            <div>
+                              <span className="inline-block text-[10px] bg-red-100 text-red-700 border border-red-200 px-2.5 py-0.5 rounded-full font-bold">
+                                ⛔ Yasaklı
+                              </span>
+                            </div>
+                          )}
+                        </td>
+                        <td className="p-4 sm:p-5 text-right">
+                          <div className="flex items-center justify-end gap-2 flex-wrap">
+                            <button
+                              onClick={() => handleUpdateStatus(s.id, "student", s.status)}
+                              className={`text-xs px-3.5 py-1.5 rounded-lg border font-black transition-all shadow-xs ${
+                                s.status === "İletişime Geçildi"
+                                  ? "bg-white hover:bg-gray-50 text-gray-700 border-[#EFECE6]"
+                                  : "bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600"
+                              }`}
+                            >
+                              {s.status === "İletişime Geçildi" ? "Beklemeye Al" : "İletişime Geçildi İşaretle"}
+                            </button>
+                            <button
+                              onClick={() => handleBanToggle(s.id, "student", s.isBanned)}
+                              className={`text-xs px-3 py-1.5 rounded-lg border font-black transition-all shadow-xs ${
+                                s.isBanned
+                                  ? "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200"
+                                  : "bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200"
+                              }`}
+                            >
+                              {s.isBanned ? "Engeli Kaldır" : "Engelle"}
+                            </button>
+                            <button
+                              onClick={() => handleDeleteUser(s.id, "student")}
+                              className="text-xs px-3 py-1.5 rounded-lg font-black bg-red-650 hover:bg-red-700 text-white shadow-xs"
+                            >
+                              Sil
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* LESSONS MODERATION TAB */}
+          {activeTab === "lessons" && (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr className="bg-[#FAF8F5] border-b border-[#EFECE6] text-gray-500 font-black uppercase text-xs">
+                    <th className="p-4 sm:p-5">Ders Başlığı</th>
+                    <th className="p-4 sm:p-5">Açan Öğretmen</th>
+                    <th className="p-4 sm:p-5">Ücret / Format</th>
+                    <th className="p-4 sm:p-5">Açıklama</th>
+                    <th className="p-4 sm:p-5 text-right">İşlem</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#EFECE6] font-semibold text-gray-700">
+                  {lessons.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="p-10 text-center text-gray-400">
+                        Sistemde kayıtlı ders ilanı bulunmuyor.
+                      </td>
+                    </tr>
+                  ) : (
+                    lessons.map((l) => (
+                      <tr key={l.id} className="hover:bg-[#FAF8F5]/50 transition-colors">
+                        <td className="p-4 sm:p-5 font-black text-gray-900">{l.title}</td>
+                        <td className="p-4 sm:p-5 text-[#1E3A8A] font-black">{l.teacherName}</td>
+                        <td className="p-4 sm:p-5 space-y-1">
+                          <div className="text-[#B45309] font-black">{l.price} TL / Saat</div>
+                          <span className="inline-block text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-100 font-bold uppercase">
+                            {l.format}
+                          </span>
+                        </td>
+                        <td className="p-4 sm:p-5 max-w-sm text-xs text-gray-500 leading-relaxed truncate">
+                          {l.description || "-"}
                         </td>
                         <td className="p-4 sm:p-5 text-right">
                           <button
-                            onClick={() => handleUpdateStatus(s.id, "student", s.status)}
-                            className={`text-xs px-3.5 py-1.5 rounded-lg border font-black transition-all shadow-xs ${
-                              s.status === "İletişime Geçildi"
-                                ? "bg-white hover:bg-gray-50 text-gray-700 border-[#EFECE6]"
-                                : "bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600"
-                            }`}
+                            onClick={() => handleDeleteLesson(l.id)}
+                            className="text-xs px-3 py-1.5 rounded-lg font-black bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-all shadow-xs"
                           >
-                            {s.status === "İletişime Geçildi" ? "Beklemeye Al" : "İletişime Geçildi İşaretle"}
+                            🗑️ İlanı Sil
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* BLOGS MODERATION TAB */}
+          {activeTab === "blogs" && (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr className="bg-[#FAF8F5] border-b border-[#EFECE6] text-gray-500 font-black uppercase text-xs">
+                    <th className="p-4 sm:p-5">Başlık</th>
+                    <th className="p-4 sm:p-5">Yazar</th>
+                    <th className="p-4 sm:p-5">Kategori / Tarih</th>
+                    <th className="p-4 sm:p-5">İçerik Özeti</th>
+                    <th className="p-4 sm:p-5 text-right">İşlem</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#EFECE6] font-semibold text-gray-700">
+                  {blogs.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="p-10 text-center text-gray-400">
+                        Sistemde dynamic olarak yazılmış blog yazısı bulunmuyor.
+                      </td>
+                    </tr>
+                  ) : (
+                    blogs.map((b) => (
+                      <tr key={b.id} className="hover:bg-[#FAF8F5]/50 transition-colors">
+                        <td className="p-4 sm:p-5 font-black text-gray-900">
+                          <div>{b.title}</div>
+                          <a
+                            href={`/blog/${b.slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] text-blue-650 hover:underline font-bold"
+                          >
+                            🔗 Sitede Gör
+                          </a>
+                        </td>
+                        <td className="p-4 sm:p-5 text-[#1E3A8A] font-black">{b.authorName}</td>
+                        <td className="p-4 sm:p-5 space-y-0.5 text-xs">
+                          <span className="inline-block text-[10px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-md font-black uppercase">
+                            {b.category}
+                          </span>
+                          <div className="text-gray-400 font-bold block mt-1">
+                            {new Date(b.createdAt).toLocaleDateString("tr-TR")}
+                          </div>
+                        </td>
+                        <td className="p-4 sm:p-5 max-w-sm text-xs text-gray-500 leading-relaxed truncate">
+                          {b.content}
+                        </td>
+                        <td className="p-4 sm:p-5 text-right">
+                          <button
+                            onClick={() => handleDeleteBlog(b.id)}
+                            className="text-xs px-3 py-1.5 rounded-lg font-black bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-all shadow-xs"
+                          >
+                            🗑️ Makaleyi Sil
                           </button>
                         </td>
                       </tr>
@@ -316,24 +627,30 @@ export default function AdminPage() {
                   Henüz öğrenciler tarafından yazılmış bir görüş veya talep bulunmamaktadır.
                 </p>
               ) : (
-                <div className="grid sm:grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-2 gap-6">
                   {feedbacks.map((f) => (
-                    <div key={f.id} className="p-4 bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl relative shadow-xs">
-                      <div className="flex justify-between items-center mb-2">
+                    <div key={f.id} className="p-5 bg-[#FAF8F5]/50 border border-[#EFECE6] rounded-2xl relative shadow-xs hover:border-[#1E3A8A]/35 transition-all">
+                      <div className="flex justify-between items-start mb-3">
                         <div>
                           <span className="font-black text-sm text-[#1E3A8A] block">{f.studentName}</span>
                           <span className="text-[10px] text-gray-400">{f.studentEmail || "E-posta Gizli"}</span>
                         </div>
-                        <div className="text-right">
+                        <div className="flex gap-2">
                           <span className="bg-amber-50 text-amber-700 border border-amber-200 font-black text-xs px-2 py-0.5 rounded-md">
                             {f.rating} ★
                           </span>
+                          <button
+                            onClick={() => handleDeleteFeedback(f.id)}
+                            className="text-xs text-rose-600 hover:text-rose-800 font-bold"
+                          >
+                            Sil
+                          </button>
                         </div>
                       </div>
                       <p className="text-gray-655 text-xs font-semibold leading-relaxed mb-4 p-3 bg-white rounded-xl border border-[#EFECE6]/50">
                         {f.content}
                       </p>
-                      <div className="flex justify-between items-center text-[10px] text-gray-500 font-bold border-t border-[#EFECE6] pt-2">
+                      <div className="flex justify-between items-center text-[10px] text-gray-500 font-bold border-t border-[#EFECE6]/40 pt-2">
                         <span>Hedef Öğretmen: <span className="text-indigo-650 font-black">{f.teacherName}</span></span>
                         <span>{new Date(f.createdAt).toLocaleDateString("tr-TR")}</span>
                       </div>
@@ -343,6 +660,7 @@ export default function AdminPage() {
               )}
             </div>
           )}
+
         </div>
       </div>
     </div>

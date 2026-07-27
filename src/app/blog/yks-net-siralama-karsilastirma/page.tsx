@@ -284,7 +284,7 @@ export default function NetSiralamaKarsilastirmaPage() {
             </p>
           </div>
           <Link
-            href="/hocalar"
+            href="/ogretmenler"
             className="bg-white hover:bg-gray-50 text-[#B45309] font-black px-6 py-3.5 rounded-xl transition-all shadow-sm active:scale-95 text-xs text-center whitespace-nowrap flex-shrink-0"
           >
             Birebir Ders Al ➔

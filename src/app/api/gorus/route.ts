@@ -54,3 +54,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, error: "Sunucu hatası" }, { status: 500 });
   }
 }
+
+// DELETE: delete a feedback/gorus (admin only)
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const idStr = searchParams.get("id");
+
+    if (!idStr) {
+      return NextResponse.json({ success: false, error: "Görüş ID gereklidir" }, { status: 400 });
+    }
+
+    await prisma.feedback.delete({
+      where: { id: parseInt(idStr) },
+    });
+
+    return NextResponse.json({ success: true, message: "Görüş/Randevu talebi başarıyla kaldırıldı." });
+  } catch (error) {
+    console.error("Görüş DELETE Hatası:", error);
+    return NextResponse.json({ success: false, error: "Sunucu hatası" }, { status: 500 });
+  }
+}

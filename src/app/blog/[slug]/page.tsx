@@ -1,25 +1,51 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { blogYazilari, getBlogBySlug } from "@/data/blog";
-import { waLink } from "@/lib/utils";
+import { blogYazilari } from "@/data/blog";
+import { prisma } from "@/lib/db";
+import ShareButtons from "@/components/ShareButtons";
+
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
   return blogYazilari.map((b) => ({ slug: b.slug }));
 }
 
+async function getBlogOrDb(slug: string) {
+  const staticPost = blogYazilari.find((p) => p.slug === slug);
+  if (staticPost) return staticPost;
+
+  // Query database
+  const dbPost = await prisma.blogPost.findUnique({
+    where: { slug }
+  });
+
+  if (dbPost) {
+    return {
+      id: `db-${dbPost.id}`,
+      slug: dbPost.slug,
+      baslik: dbPost.title,
+      ozet: dbPost.content.slice(0, 150) + (dbPost.content.length > 150 ? "..." : ""),
+      icerik: dbPost.content,
+      yazar: dbPost.authorName,
+      tarih: dbPost.createdAt.toISOString(),
+      kategori: dbPost.category,
+      okumaSuresi: Math.max(1, Math.ceil(dbPost.content.split(/\s+/).length / 200)),
+    };
+  }
+  return undefined;
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const resolvedParams = await params;
-  const yazi = getBlogBySlug(resolvedParams.slug);
+  const yazi = await getBlogOrDb(resolvedParams.slug);
   if (!yazi) return {};
   return { title: yazi.baslik, description: yazi.ozet };
 }
 
-import ShareButtons from "@/components/ShareButtons";
-
 export default async function BlogYazisiPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
-  const yazi = getBlogBySlug(resolvedParams.slug);
+  const yazi = await getBlogOrDb(resolvedParams.slug);
   if (!yazi) notFound();
 
   const diger = blogYazilari.filter((b) => b.slug !== yazi.slug).slice(0, 3);
@@ -73,7 +99,7 @@ export default async function BlogYazisiPage({ params }: { params: Promise<{ slu
         <ShareButtons title={yazi.baslik} />
       </div>
 
-      {/* İçerik — rahat okuma düzeni */}
+      {/* İçerik */}
       <div className="max-w-none text-gray-700 leading-relaxed font-medium space-y-6 text-base sm:text-lg whitespace-pre-line">
         <p className="text-lg sm:text-xl text-[#1E3A8A] leading-relaxed font-bold border-l-4 border-[#B45309] pl-4 italic bg-[#FAF8F5] py-3 px-4 rounded-r-xl">{yazi.ozet}</p>
         <div dangerouslySetInnerHTML={{ __html: yazi.icerik }} className="leading-relaxed" />

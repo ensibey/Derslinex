@@ -17,6 +17,8 @@ export interface Hoca {
   whatsapp: string;
   puan: number;
   ogrenciSayisi: number;
+  linkedin?: string | null;
+  youtube?: string | null;
   aktif: boolean;
 }
 

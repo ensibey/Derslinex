@@ -7,6 +7,13 @@ import StarRating from "@/components/StarRating";
 import { waLinkHoca } from "@/lib/utils";
 import { prisma } from "@/lib/db";
 
+function getYouTubeEmbedId(url: string | null) {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : null;
+}
+
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
@@ -43,6 +50,8 @@ async function getHocaOrDb(slug: string) {
       whatsapp: matched.phone.replace(/[^0-9]/g, ""),
       puan: 4.9,
       ogrenciSayisi: 15,
+      linkedin: matched.linkedin,
+      youtube: matched.youtube,
       aktif: true
     };
   }
@@ -72,13 +81,67 @@ export default async function HocaProfilPage({ params }: { params: Promise<{ slu
   const hoca = await getHocaOrDb(resolvedParams.slug);
   if (!hoca) notFound();
 
+  // Load custom lesson offers and other details
+  let customLessons: any[] = [];
+  let faqs: any[] = [];
+  let realRating = hoca.puan;
+  let totalReviews = hoca.ogrenciSayisi;
+
+  if (hoca.id.toString().startsWith("db-")) {
+    const dbId = parseInt(hoca.id.toString().replace("db-", ""));
+    const [dbLessons, dbFaqs, dbFeedbacks] = await Promise.all([
+      prisma.lessonOffer.findMany({
+        where: { teacherId: dbId },
+        orderBy: { createdAt: "desc" }
+      }),
+      prisma.teacherFAQ.findMany({
+        where: { teacherId: dbId },
+        orderBy: { createdAt: "asc" }
+      }),
+      prisma.feedback.findMany({
+        where: { teacherId: dbId }
+      })
+    ]);
+    
+    customLessons = dbLessons;
+    faqs = dbFaqs;
+    
+    if (dbFeedbacks.length > 0) {
+      const totalScore = dbFeedbacks.reduce((acc, curr) => acc + curr.rating, 0);
+      realRating = parseFloat((totalScore / dbFeedbacks.length).toFixed(1));
+      totalReviews = dbFeedbacks.length;
+    }
+  } else {
+    customLessons = [
+      {
+        id: "static-1",
+        title: `${hoca.dersler[0]} Birebir Özel Ders`,
+        price: 450,
+        format: hoca.format,
+        description: `${hoca.isim} öğretmenimizden hedeflerinize özel hazırlanmış birebir ${hoca.dersler[0]} dersleri.`
+      }
+    ];
+    faqs = [
+      {
+        id: "static-faq-1",
+        question: "Dersler ne kadar sürüyor?",
+        answer: "Birebir özel derslerimiz standart olarak 50 dakika ders + 10 dakika mola şeklinde 1 saat olarak uygulanmaktadır."
+      },
+      {
+        id: "static-faq-2",
+        question: "Ders dışı soru sorabiliyor muyum?",
+        answer: "Evet, tüm öğrencilerimiz takıldıkları soruları WhatsApp üzerinden öğretmenlerimize haftalık soru limitleri dahilinde sorabilirler."
+      }
+    ];
+  }
+
   const waUrl = waLinkHoca(hoca.isim, hoca.dersler[0]);
 
   const schemas = [
     {
       "@context": "https://schema.org",
       "@type": "ProfessionalService",
-      "@id": `https://derslinex.com/hocalar/${hoca.slug}#service`,
+      "@id": `https://derslinex.com/ogretmenler/${hoca.slug}#service`,
       "name": `${hoca.isim} — Özel Ders`,
       "image": hoca.fotograf,
       "description": hoca.ozgecmis,
@@ -98,7 +161,7 @@ export default async function HocaProfilPage({ params }: { params: Promise<{ slu
     {
       "@context": "https://schema.org",
       "@type": "ProfilePage",
-      "@id": `https://derslinex.com/hocalar/${hoca.slug}#profile`,
+      "@id": `https://derslinex.com/ogretmenler/${hoca.slug}#profile`,
       "mainEntity": {
         "@type": "Person",
         "name": hoca.isim,
@@ -121,7 +184,7 @@ export default async function HocaProfilPage({ params }: { params: Promise<{ slu
           <nav className="text-sm text-gray-500 flex items-center gap-2 font-bold">
             <Link href="/" className="hover:text-primary-600">Ana Sayfa</Link>
             <span>/</span>
-            <Link href="/hocalar" className="hover:text-primary-600">Hocalar</Link>
+            <Link href="/ogretmenler" className="hover:text-primary-600">Öğretmenler</Link>
             <span>/</span>
             <span className="text-gray-900 font-black">{hoca.isim}</span>
           </nav>
@@ -147,11 +210,14 @@ export default async function HocaProfilPage({ params }: { params: Promise<{ slu
               <div className="p-5 space-y-3">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500 font-semibold">Puan</span>
-                  <StarRating puan={hoca.puan} />
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-gray-800">{realRating}</span>
+                    <StarRating puan={realRating} />
+                  </div>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500 font-semibold">Öğrenci</span>
-                  <span className="font-bold text-gray-800">{hoca.ogrenciSayisi}+</span>
+                  <span className="text-gray-500 font-semibold">Görüş / İstek</span>
+                  <span className="font-bold text-gray-800">{totalReviews}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500 font-semibold">Deneyim</span>
@@ -204,7 +270,37 @@ export default async function HocaProfilPage({ params }: { params: Promise<{ slu
                   </svg>
                   WhatsApp ile Ders Al
                 </a>
+                <a
+                  href={`/profil?startChatWithTeacherId=${hoca.id.toString().replace("db-", "")}&teacherName=${encodeURIComponent(hoca.isim)}`}
+                  className="flex items-center justify-center gap-2 w-full bg-white hover:bg-gray-50 text-[#1E3A8A] font-bold py-3 rounded-xl transition-all text-sm border border-gray-200 shadow-xs"
+                >
+                  💬 Site İçi Mesaj Gönder
+                </a>
                 <p className="text-center text-xs text-gray-500 font-semibold">Genellikle 1 saat içinde yanıt verilir</p>
+                {(hoca.linkedin || hoca.youtube) && (
+                  <div className="pt-3.5 mt-2 border-t border-gray-100 flex items-center justify-center gap-4 flex-wrap">
+                    {hoca.linkedin && (
+                      <a
+                        href={hoca.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-500 hover:text-blue-700 transition-colors flex items-center gap-1 font-bold text-xs"
+                      >
+                        <span className="text-sm">👔</span> LinkedIn
+                      </a>
+                    )}
+                    {hoca.youtube && (
+                      <a
+                        href={hoca.youtube}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-500 hover:text-red-600 transition-colors flex items-center gap-1 font-bold text-xs"
+                      >
+                        <span className="text-sm">🎥</span> YouTube Tanıtımı
+                      </a>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -217,6 +313,22 @@ export default async function HocaProfilPage({ params }: { params: Promise<{ slu
               <p className="text-gray-700 leading-relaxed">{hoca.ozgecmis}</p>
             </div>
 
+            {/* Tanıtım Videosu */}
+            {hoca.youtube && getYouTubeEmbedId(hoca.youtube) && (
+              <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Tanıtım Videosu</h2>
+                <div className="relative aspect-video rounded-2xl overflow-hidden border border-gray-100 shadow-sm bg-gray-50">
+                  <iframe
+                    className="absolute inset-0 w-full h-full"
+                    src={`https://www.youtube.com/embed/${getYouTubeEmbedId(hoca.youtube)}`}
+                    title="Öğretmen Tanıtım Videosu"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Eğitim */}
             <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Eğitim Geçmişi</h2>
@@ -228,12 +340,50 @@ export default async function HocaProfilPage({ params }: { params: Promise<{ slu
               </div>
             </div>
 
+            {/* Ders Teklifleri */}
+            {customLessons.length > 0 && (
+              <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Açtığı Dersler & Saatlik Ücretler</h2>
+                <div className="grid gap-4">
+                  {customLessons.map((l: any) => {
+                    // Generate specialized WhatsApp booking link
+                    const targetPhone = hoca.whatsapp || "905342407519";
+                    const lessonWa = `https://wa.me/${targetPhone}?text=${encodeURIComponent(
+                      `Merhaba, Derslinex üzerinden "${l.title}" dersinizi saatlik ${l.price} TL karşılığında almak istiyorum.`
+                    )}`;
+                    return (
+                      <div key={l.id} className="p-4 bg-[#FAF8F5]/80 border border-gray-150 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:border-emerald-100 hover:bg-[#FAF8F5] transition">
+                        <div>
+                          <h4 className="font-bold text-[#1E3A8A] text-sm sm:text-base">{l.title}</h4>
+                          <span className="inline-block text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full font-bold border border-emerald-100 mt-1">
+                            {l.format === "online" ? "💻 Online" : l.format === "yuz-yuze" ? "🏫 Yüz Yüze" : "🔄 Online & Yüz Yüze"}
+                          </span>
+                          {l.description && <p className="text-gray-500 text-xs mt-2 font-semibold leading-relaxed">{l.description}</p>}
+                        </div>
+                        <div className="flex sm:flex-col items-end gap-2 w-full sm:w-auto">
+                          <span className="text-sm sm:text-lg font-black text-[#B45309] whitespace-nowrap">{l.price} TL / Saat</span>
+                          <a
+                            href={lessonWa}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl text-center transition w-full sm:w-auto whitespace-nowrap"
+                          >
+                            Ders Al (WhatsApp)
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* İstatistikler */}
             <div className="grid grid-cols-3 gap-4">
               {[
                 { val: `${hoca.deneyimYili}+`, lbl: "Yıl Deneyim" },
-                { val: `${hoca.ogrenciSayisi}+`, lbl: "Öğrenci" },
-                { val: `${hoca.puan}/5.0`, lbl: "Ortalama Puan" },
+                { val: `${totalReviews}`, lbl: "Görüş / İstek" },
+                { val: `${realRating}/5.0`, lbl: "Ortalama Puan" },
               ].map((s) => (
                 <div key={s.lbl} className="bg-primary-50/50 border border-primary-100 rounded-2xl p-4 text-center">
                   <div className="text-2xl font-black text-primary-600">{s.val}</div>
@@ -264,6 +414,26 @@ export default async function HocaProfilPage({ params }: { params: Promise<{ slu
                 </div>
               )}
             </div>
+
+            {/* Sıkça Sorulan Sorular */}
+            {faqs.length > 0 && (
+              <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Sıkça Sorulan Sorular (SSS)</h2>
+                <div className="space-y-3">
+                  {faqs.map((faq) => (
+                    <details key={faq.id} className="group border border-gray-100 rounded-2xl overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                      <summary className="flex items-center justify-between p-4 bg-gray-50/50 hover:bg-gray-50 cursor-pointer transition select-none">
+                        <span className="font-bold text-sm text-gray-900 leading-snug">{faq.question}</span>
+                        <span className="text-gray-400 group-open:rotate-180 transition-transform duration-200">▼</span>
+                      </summary>
+                      <div className="p-4 border-t border-gray-100 bg-white text-xs text-gray-655 font-semibold leading-relaxed">
+                        {faq.answer}
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Alt CTA */}
             <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-3xl p-8 text-white text-center shadow-md relative overflow-hidden">

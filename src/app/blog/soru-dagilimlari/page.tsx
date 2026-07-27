@@ -90,10 +90,10 @@ export default function SoruDagilimlariPage() {
             </p>
           </div>
           <Link
-            href="/hocalar"
+            href="/ogretmenler"
             className="bg-[#1E3A8A] hover:bg-[#152a60] text-white text-xs font-black px-6 py-3 rounded-xl transition-all shadow-sm active:scale-95 whitespace-nowrap"
           >
-            Özel Ders Hocalarını İncele ➔
+            Özel Ders Öğretmenlerini İncele ➔
           </Link>
         </div>
       </div>

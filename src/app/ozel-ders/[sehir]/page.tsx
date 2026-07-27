@@ -85,7 +85,7 @@ export default async function SehirOzelDersPage({ params }: PageProps) {
         <nav className="text-sm text-gray-500 mb-8 flex items-center gap-2 font-bold">
           <Link href="/" className="hover:text-[#B45309] transition-colors">Ana Sayfa</Link>
           <span>/</span>
-          <Link href="/hocalar" className="hover:text-[#B45309] transition-colors">Eğitmenler</Link>
+          <Link href="/ogretmenler" className="hover:text-[#B45309] transition-colors">Öğretmenler</Link>
           <span>/</span>
           <span className="text-gray-900 font-black">{sehirName}</span>
         </nav>

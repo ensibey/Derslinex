@@ -17,8 +17,8 @@ const quickLinks = [
   { href: "/wiki", label: "📚 Ders Konuları Sözlüğü (Wiki)", desc: "Matematik, Fizik, Türkçe kuralları, formülleri ve ders özetleri" },
   { href: "/blog/bilgi-kartlari", label: "🃏 Sınav Hap Bilgileri", desc: "Ezberlemeni kolaylaştıracak tarih, coğrafya, edebiyat bilgi kartları" },
   { href: "/blog/gunun-sorusu", label: "🎮 Günün Özel Sorusu", desc: "Her gün yeni bir YKS & LGS sorusu çöz, rakiplerinin önüne geç" },
-  { href: "/hocalar?alan=Matematik", label: "📐 Matematik Özel Ders", desc: "Dereceli hocalarla TYT, AYT ve LGS Matematik özel dersi" },
-  { href: "/hocalar?alan=Fizik", label: "⚡ Fizik Özel Ders", desc: "Deneyimli eğitmenlerle YKS ve LGS Fizik konu anlatımı" },
+  { href: "/ogretmenler?alan=Matematik", label: "📐 Matematik Özel Ders", desc: "Dereceli öğretmenlerle TYT, AYT ve LGS Matematik özel dersi" },
+  { href: "/ogretmenler?alan=Fizik", label: "⚡ Fizik Özel Ders", desc: "Deneyimli eğitmenlerle YKS ve LGS Fizik konu anlatımı" },
   { href: "/blog/yks-matematik-hazirlik-rehberi", label: "📚 YKS Matematik Çalışma Planı", desc: "Sıfırdan zirveye TYT-AYT Matematik netlerini artırma rehberi" },
   { href: "/blog/tyt-ayt-farki-nedir", label: "❓ TYT ve AYT Farkı Nedir", desc: "YKS puan türleri hesaplaması ve baraj kuralları rehberi" }
 ];

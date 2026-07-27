@@ -14,6 +14,7 @@ model Student {
   email     String
   password  String
   status    String   @default("Beklemede")
+  isBanned  Boolean  @default(false)
   createdAt DateTime @default(now())
 }
 
@@ -27,6 +28,9 @@ model Teacher {
   egitim    String?
   ozgecmis  String?
   status    String   @default("Beklemede")
+  isBanned  Boolean  @default(false)
+  linkedin  String?
+  youtube   String?
   createdAt DateTime @default(now())
 }
 
@@ -39,4 +43,51 @@ model Feedback {
   content      String
   rating       Int      @default(5)
   createdAt    DateTime @default(now())
+}
+
+model LessonOffer {
+  id          Int      @id @default(autoincrement())
+  title       String
+  price       Float
+  format      String
+  description String?
+  teacherId   Int
+  createdAt   DateTime @default(now())
+}
+
+model BlogPost {
+  id          Int      @id @default(autoincrement())
+  title       String
+  slug        String   @unique
+  content     String
+  category    String
+  authorId    Int
+  authorName  String
+  createdAt   DateTime @default(now())
+}
+
+model ChatRoom {
+  id          Int      @id @default(autoincrement())
+  studentId   Int
+  studentName String
+  teacherId   Int
+  teacherName String
+  createdAt   DateTime @default(now())
+}
+
+model ChatMessage {
+  id         Int      @id @default(autoincrement())
+  roomId     Int
+  senderId   Int
+  senderRole String   // "student" or "teacher"
+  content    String
+  createdAt  DateTime @default(now())
+}
+
+model TeacherFAQ {
+  id        Int      @id @default(autoincrement())
+  teacherId Int
+  question  String
+  answer    String
+  createdAt DateTime @default(now())
 }

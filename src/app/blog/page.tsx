@@ -1,16 +1,34 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { blogYazilari } from "@/data/blog";
 
 export default function BlogPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Tümü");
+  const [blogs, setBlogs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const res = await fetch("/api/blog/public");
+        const data = await res.json();
+        if (data.success && data.posts) {
+          setBlogs(data.posts);
+        }
+      } catch (err) {
+        console.error("Bloglar yüklenemedi:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBlogs();
+  }, []);
 
   // Dynamically retrieve all unique blog categories
-  const categories = ["Tümü", ...Array.from(new Set(blogYazilari.map((b) => b.kategori)))];
+  const categories = ["Tümü", ...Array.from(new Set(blogs.map((b) => b.kategori)))];
 
-  const filteredBlogYazilari = blogYazilari.filter((b) => {
+  const filteredBlogYazilari = blogs.filter((b) => {
     const matchesSearch =
       b.baslik.toLowerCase().includes(searchQuery.toLowerCase()) ||
       b.ozet.toLowerCase().includes(searchQuery.toLowerCase());
@@ -65,7 +83,11 @@ export default function BlogPage() {
       </div>
 
       {/* Blog Cards Grid */}
-      {filteredBlogYazilari.length > 0 ? (
+      {loading ? (
+        <div className="text-center py-16 font-bold text-gray-500">
+          Yazılar yükleniyor...
+        </div>
+      ) : filteredBlogYazilari.length > 0 ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredBlogYazilari.map((b) => (
             <Link
