@@ -97,9 +97,9 @@ export async function POST(request: Request) {
     await Promise.allSettled(mailPromises);
 
     return NextResponse.json({ success: true, session });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Admin Sessions Create Error:", error);
-    return NextResponse.json({ success: false, error: "Sunucu hatası" }, { status: 500 });
+    return NextResponse.json({ success: false, error: error?.message || "Sunucu hatası" }, { status: 500 });
   }
 }
 
