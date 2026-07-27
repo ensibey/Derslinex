@@ -6,7 +6,7 @@ import { waLink } from "@/lib/utils";
 
 const navLinks = [
   { href: "/hakkimizda", label: "Hakkımızda" },
-  { href: "/hocalar", label: "Öğretmenlerimiz" },
+  { href: "/ogretmenler", label: "Öğretmenlerimiz" },
   { href: "/dersler", label: "Dersler" },
   { href: "/yks-hazirlik", label: "YKS Hazırlık" },
   { href: "/lgs-hazirlik", label: "LGS Hazırlık" },

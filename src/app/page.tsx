@@ -190,8 +190,8 @@ export default function HomePage() {
                 <li key={i} className="flex items-center gap-3"><span className="text-[#B45309] font-bold">✓</span>{i}</li>
               ))}
             </ul>
-            <Link href="/hocalar?format=yuz-yuze" className="inline-block text-center bg-[#B45309] hover:bg-[#92400E] text-white font-bold px-8 py-4 rounded-xl transition-all duration-200">
-              Yüz Yüze Hocaları Gör
+            <Link href="/ogretmenler?format=yuz-yuze" className="inline-block text-center bg-[#B45309] hover:bg-[#92400E] text-white font-bold px-8 py-4 rounded-xl transition-all duration-200">
+              Yüz Yüze Öğretmenleri Gör
             </Link>
           </div>
           <div className="bg-white/80 backdrop-blur-md rounded-3xl p-8 sm:p-10 border border-[#EFECE6]/60 shadow-premium flex flex-col hover:shadow-lg hover:bg-white/90 hover:border-[#F5D0A9]/60 transition-all duration-300">
@@ -205,8 +205,8 @@ export default function HomePage() {
                 <li key={i} className="flex items-center gap-3"><span className="text-[#B45309] font-bold">✓</span>{i}</li>
               ))}
             </ul>
-            <Link href="/hocalar?format=online" className="inline-block text-center bg-[#B45309] hover:bg-[#92400E] text-white font-bold px-8 py-4 rounded-xl transition-all duration-200">
-              Online Hocaları Gör
+            <Link href="/ogretmenler?format=online" className="inline-block text-center bg-[#B45309] hover:bg-[#92400E] text-white font-bold px-8 py-4 rounded-xl transition-all duration-200">
+              Online Öğretmenleri Gör
             </Link>
           </div>
         </div>
@@ -216,10 +216,10 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16 lg:mt-20">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-3xl font-black text-[#1E3A8A]">Öne Çıkan Hocalar</h2>
-            <p className="text-gray-600 mt-1 font-semibold">En yüksek puanlı, deneyimli hocalarımız</p>
+            <h2 className="text-3xl font-black text-[#1E3A8A]">Öne Çıkan Öğretmenlerimiz</h2>
+            <p className="text-gray-600 mt-1 font-semibold">En yüksek puanlı, deneyimli öğretmenlerimiz</p>
           </div>
-          <Link href="/hocalar" className="hidden sm:inline-flex items-center gap-1 text-[#B45309] font-bold hover:underline">
+          <Link href="/ogretmenler" className="hidden sm:inline-flex items-center gap-1 text-[#B45309] font-bold hover:underline">
             Tümünü Gör →
           </Link>
         </div>
@@ -231,8 +231,8 @@ export default function HomePage() {
           ))}
         </div>
         <div className="text-center mt-8">
-          <Link href="/hocalar" className="inline-block border-2 border-[#1E3A8A] text-[#1E3A8A] hover:bg-[#1E3A8A] hover:text-white font-bold px-8 py-3 rounded-xl transition-all">
-            Tüm Hocaları Gör ({hocalar.length} hoca)
+          <Link href="/ogretmenler" className="inline-block border-2 border-[#1E3A8A] text-[#1E3A8A] hover:bg-[#1E3A8A] hover:text-white font-bold px-8 py-3 rounded-xl transition-all">
+            Tüm Öğretmenleri Gör ({hocalar.length} öğretmen)
           </Link>
         </div>
       </section>

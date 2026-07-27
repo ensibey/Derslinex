@@ -87,7 +87,7 @@ export default function TeacherCard({ hoca }: { hoca: Hoca }) {
       {/* Actions */}
       <div className="px-4 pb-4 sm:px-6 sm:pb-6 flex gap-2">
         <Link
-          href={`/hocalar/${hoca.slug}`}
+          href={`/ogretmenler/${hoca.slug}`}
           className="flex-1 text-center text-xs font-black text-[#1E3A8A] border border-[#1E3A8A]/20 hover:bg-[#FAF8F5] py-2.5 sm:py-3 rounded-xl transition-all duration-200"
         >
           Profil

@@ -63,7 +63,7 @@ export default function Footer({ className }: { className?: string }) {
             <ul className="space-y-2">
               {[
                 { href: "/hakkimizda", label: "Hakkımızda" },
-                { href: "/hocalar", label: "Hocalarımız" },
+                { href: "/ogretmenler", label: "Öğretmenlerimiz" },
                 { href: "/blog", label: "Blog" },
                 { href: "/iletisim", label: "İletişim" },
                 { href: "/gizlilik", label: "Gizlilik Politikası" },

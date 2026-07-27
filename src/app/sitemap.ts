@@ -9,7 +9,7 @@ export default function sitemap() {
   // Statik Sayfalar
   const statikSayfalar = [
     "",
-    "/hocalar",
+    "/ogretmenler",
     "/dersler",
     "/yks-hazirlik",
     "/blog",
@@ -37,11 +37,11 @@ export default function sitemap() {
     priority: route === "" ? 1.0 : 0.8,
   }));
 
-  // Dinamik Hocalar
+  // Dinamik Öğretmenler
   const hocaSayfalari = hocalar
     .filter((h) => h.aktif)
     .map((h) => ({
-      url: `${baseUrl}/hocalar/${h.slug}`,
+      url: `${baseUrl}/ogretmenler/${h.slug}`,
       lastModified: new Date().toISOString().split("T")[0],
       changeFrequency: "weekly",
       priority: 0.7,
