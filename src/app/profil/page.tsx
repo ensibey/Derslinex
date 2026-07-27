@@ -34,10 +34,13 @@ interface Feedback {
 export default function ProfilPage() {
   const [role, setRole] = useState<"student" | "teacher">("student");
   const [authMode, setAuthMode] = useState<"login" | "register">("login");
+  const [rememberMe, setRememberMe] = useState(false);
   
-  // Student Auth Form States
+  // Student Auth & Profile States
   const [studentForm, setStudentForm] = useState({ name: "", phone: "", email: "", password: "" });
   const [studentProfile, setStudentProfile] = useState<Student | null>(null);
+  const [editingStudent, setEditingStudent] = useState(false);
+  const [studentEditForm, setStudentEditForm] = useState({ name: "", phone: "" });
 
   // Teacher Auth Form States
   const [teacherForm, setTeacherForm] = useState({ name: "", phone: "", email: "", password: "", branch: "" });
@@ -56,14 +59,15 @@ export default function ProfilPage() {
   const [dbTeachers, setDbTeachers] = useState<any[]>([]);
 
   useEffect(() => {
-    // Check auto-login from localstorage on mount
-    const savedRole = localStorage.getItem("derslinex_role");
-    const savedUser = localStorage.getItem("derslinex_user");
+    // Check auto-login from both localStorage (persistent) and sessionStorage (temporary)
+    const savedRole = localStorage.getItem("derslinex_role") || sessionStorage.getItem("derslinex_role");
+    const savedUser = localStorage.getItem("derslinex_user") || sessionStorage.getItem("derslinex_user");
     
     if (savedRole && savedUser) {
       const parsedUser = JSON.parse(savedUser);
       if (savedRole === "student") {
         setStudentProfile(parsedUser);
+        setStudentEditForm({ name: parsedUser.name, phone: parsedUser.phone });
         setRole("student");
       } else {
         setTeacherProfile(parsedUser);
@@ -92,8 +96,12 @@ export default function ProfilPage() {
   };
 
   const handleLogout = () => {
+    // Clear both storages to ensure safety
     localStorage.removeItem("derslinex_role");
     localStorage.removeItem("derslinex_user");
+    sessionStorage.removeItem("derslinex_role");
+    sessionStorage.removeItem("derslinex_user");
+    
     setStudentProfile(null);
     setTeacherProfile(null);
     setStudentFeedbacks([]);
@@ -121,14 +129,55 @@ export default function ProfilPage() {
       if (data.success) {
         const student = data.student;
         setStudentProfile(student);
-        localStorage.setItem("derslinex_role", "student");
-        localStorage.setItem("derslinex_user", JSON.stringify(student));
+        setStudentEditForm({ name: student.name, phone: student.phone });
+        
+        // Conditional storage based on "Remember Me"
+        const storage = rememberMe ? localStorage : sessionStorage;
+        storage.setItem("derslinex_role", "student");
+        storage.setItem("derslinex_user", JSON.stringify(student));
+        
         showMsg(authMode === "login" ? "Giriş başarılı!" : "Kayıt başarıyla oluşturuldu!", "success");
       } else {
         showMsg(data.error || "Giriş/Kayıt işlemi başarısız.", "error");
       }
     } catch (err) {
       showMsg("Bağlantı hatası oluştu.", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // STUDENT PROFILE UPDATE
+  const handleStudentUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!studentProfile) return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/profil/ogrenci", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: studentProfile.email,
+          name: studentEditForm.name,
+          phone: studentEditForm.phone
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        const updated = data.student;
+        setStudentProfile(updated);
+        
+        // Sync updated profile to active storage
+        const storage = localStorage.getItem("derslinex_role") ? localStorage : sessionStorage;
+        storage.setItem("derslinex_user", JSON.stringify(updated));
+        
+        setEditingStudent(false);
+        showMsg("Profil bilgileriniz başarıyla güncellendi!", "success");
+      } else {
+        showMsg(data.error || "Profil güncellenemedi.", "error");
+      }
+    } catch (err) {
+      showMsg("Bağlantı hatası.", "error");
     } finally {
       setLoading(false);
     }
@@ -154,10 +203,14 @@ export default function ProfilPage() {
       if (data.success) {
         const teacher = data.teacher;
         setTeacherProfile(teacher);
-        localStorage.setItem("derslinex_role", "teacher");
-        localStorage.setItem("derslinex_user", JSON.stringify(teacher));
+        
+        // Conditional storage based on "Remember Me"
+        const storage = rememberMe ? localStorage : sessionStorage;
+        storage.setItem("derslinex_role", "teacher");
+        storage.setItem("derslinex_user", JSON.stringify(teacher));
+        
         showMsg(authMode === "login" ? "Giriş başarılı!" : "Başvurunuz alındı ve kayıt oluşturuldu!", "success");
-        fetchDbTeachers(); // Refresh teacher list
+        fetchDbTeachers(); // Refresh list
       } else {
         showMsg(data.error || "Giriş/Kayıt işlemi başarısız.", "error");
       }
@@ -283,7 +336,7 @@ export default function ProfilPage() {
           </div>
         )}
 
-        {/* Auth Mode & Role Switch Container */}
+        {/* AUTH FORMS */}
         {(!studentProfile && !teacherProfile) && (
           <div className="space-y-6">
             {/* Role Select */}
@@ -319,7 +372,6 @@ export default function ProfilPage() {
               </span>
             </div>
 
-            {/* AUTH FORMS */}
             <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 sm:p-8 shadow-sm">
               <h3 className="text-lg font-black text-[#1E3A8A] mb-6 text-center">
                 {role === "student" ? "🎓 Öğrenci" : "👨‍🏫 Öğretmen"}{" "}
@@ -372,8 +424,22 @@ export default function ProfilPage() {
                       required
                       value={studentForm.password}
                       onChange={(e) => setStudentForm({ ...studentForm, password: e.target.value })}
-                      className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-[#FAF0E3]"
+                      className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none"
                     />
+                  </div>
+
+                  {/* Remember Me Checkbox */}
+                  <div className="flex items-center gap-2 pt-1">
+                    <input
+                      type="checkbox"
+                      id="studentRemember"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="w-4 h-4 rounded border-[#EFECE6] text-[#1E3A8A] focus:ring-[#1E3A8A]"
+                    />
+                    <label htmlFor="studentRemember" className="text-xs text-gray-500 font-bold select-none cursor-pointer">
+                      Beni Hatırla (Ortak bilgisayarda işaretlemeyiniz)
+                    </label>
                   </div>
 
                   <button
@@ -407,7 +473,7 @@ export default function ProfilPage() {
                             placeholder="05xx xxx xx xx"
                             value={teacherForm.phone}
                             onChange={(e) => setTeacherForm({ ...teacherForm, phone: e.target.value })}
-                            className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-[#FAF0E3]"
+                            className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none"
                           />
                         </div>
                       </div>
@@ -419,7 +485,7 @@ export default function ProfilPage() {
                           placeholder="Matematik, Fizik vb."
                           value={teacherForm.branch}
                           onChange={(e) => setTeacherForm({ ...teacherForm, branch: e.target.value })}
-                          className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-[#FAF0E3]"
+                          className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none"
                         />
                       </div>
                     </>
@@ -443,8 +509,22 @@ export default function ProfilPage() {
                       required
                       value={teacherForm.password}
                       onChange={(e) => setTeacherForm({ ...teacherForm, password: e.target.value })}
-                      className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-[#FAF0E3]"
+                      className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none"
                     />
+                  </div>
+
+                  {/* Remember Me Checkbox */}
+                  <div className="flex items-center gap-2 pt-1">
+                    <input
+                      type="checkbox"
+                      id="teacherRemember"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="w-4 h-4 rounded border-[#EFECE6] text-[#1E3A8A] focus:ring-[#1E3A8A]"
+                    />
+                    <label htmlFor="teacherRemember" className="text-xs text-gray-500 font-bold select-none cursor-pointer">
+                      Beni Hatırla (Ortak bilgisayarda işaretlemeyiniz)
+                    </label>
                   </div>
 
                   <button
@@ -463,127 +543,226 @@ export default function ProfilPage() {
         {/* LOGGED IN WORKSPACES */}
         {(studentProfile || teacherProfile) && (
           <div className="space-y-8">
-            <div className="flex justify-between items-center bg-white border border-[#EFECE6] p-4 sm:p-5 rounded-3xl shadow-xs">
+            {/* Top Workspace Header Bar */}
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-white border border-[#EFECE6] p-5 rounded-3xl gap-4 shadow-sm">
               <div>
-                <span className="text-[10px] text-[#B45309] font-black uppercase tracking-widest">AKTİF OTURUM</span>
-                <h4 className="text-base font-black text-[#1E3A8A]">
+                <span className="text-[10px] text-[#B45309] font-black uppercase tracking-widest">DERSLINEX HESABIM</span>
+                <h4 className="text-xl font-black text-[#1E3A8A] mt-0.5">
                   Merhaba, {studentProfile ? studentProfile.name : teacherProfile?.name}
                 </h4>
-                <p className="text-xs text-gray-500 font-bold">
-                  Rol: {studentProfile ? "🎓 Öğrenci" : `👨‍🏫 Öğretmen (${teacherProfile?.branch})`} | Onay: {studentProfile ? studentProfile.status : teacherProfile?.status}
+                <p className="text-xs text-gray-500 font-bold mt-0.5">
+                  Rol: {studentProfile ? "🎓 Öğrenci" : `👨‍🏫 Öğretmen (${teacherProfile?.branch})`}
                 </p>
               </div>
               <button
                 onClick={handleLogout}
-                className="bg-rose-50 hover:bg-rose-100 text-rose-700 font-black text-xs px-4 py-2.5 rounded-xl transition"
+                className="self-start sm:self-auto bg-rose-50 hover:bg-rose-100 text-rose-700 font-black text-xs px-5 py-3 rounded-xl transition shadow-xs"
               >
-                Oturumu Kapat ✕
+                Oturumu Güvenli Kapat ✕
               </button>
             </div>
 
-            {/* Student View (Send Feedback) */}
+            {/* STUDENT VIEW */}
             {studentProfile && (
-              <div className="grid md:grid-cols-12 gap-8">
-                {/* Feedback Form */}
-                <div className="md:col-span-7 bg-white rounded-3xl border border-[#EFECE6] p-6 sm:p-8 shadow-sm">
-                  <h3 className="text-lg font-black text-[#1E3A8A] mb-4">Görüş / Randevu Talebi Gönder</h3>
-                  <form onSubmit={handleSendFeedback} className="space-y-4">
-                    <div>
-                      <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Öğretmen Seçin</label>
-                      <select
-                        value={selectedTeacherId}
-                        onChange={(e) => setSelectedTeacherId(e.target.value)}
-                        required
-                        className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none"
-                      >
-                        <option value="">Lütfen listeden seçin...</option>
-                        <optgroup label="Sistem Öğretmenleri">
-                          {hocalar.map((h) => (
-                            <option key={`static-${h.id}`} value={`static-${h.id}`}>
-                              {h.isim} ({h.dersler.join(", ")})
-                            </option>
-                          ))}
-                        </optgroup>
-                        {dbTeachers.length > 0 && (
-                          <optgroup label="Yeni Kayıtlı Öğretmenler">
-                            {dbTeachers.map((h) => (
-                              <option key={h.id} value={h.id}>
-                                {h.name} ({h.branch})
-                              </option>
-                            ))}
-                          </optgroup>
-                        )}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Puanınız (1 - 5)</label>
-                      <div className="flex gap-2">
-                        {[1, 2, 3, 4, 5].map((num) => (
-                          <button
-                            key={num}
-                            type="button"
-                            onClick={() => setFeedbackRating(num)}
-                            className={`w-10 h-10 rounded-xl font-black text-sm transition-all border ${
-                              feedbackRating === num
-                                ? "bg-amber-500 text-white border-amber-500"
-                                : "bg-[#FAF8F5] text-gray-600 border-[#EFECE6]"
-                            }`}
-                          >
-                            {num} ★
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Mesajınız / Talebiniz</label>
-                      <textarea
-                        rows={4}
-                        value={feedbackContent}
-                        onChange={(e) => setFeedbackContent(e.target.value)}
-                        required
-                        placeholder="Öğretmenle ilgili görüşlerinizi veya ders saati talebinizi yazın..."
-                        className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-[#FAF0E3]"
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="w-full bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-black py-3.5 rounded-xl text-sm transition-all"
-                    >
-                      Görüşü / Talebi Gönder
-                    </button>
-                  </form>
+              <div className="space-y-8">
+                {/* Stats Dashboard */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="bg-white/90 border border-[#EFECE6] p-5 rounded-2xl shadow-xs">
+                    <span className="text-[10px] font-black text-gray-450 uppercase tracking-wider block">Görüş ve Taleplerim</span>
+                    <span className="text-2xl font-black text-[#1E3A8A] block mt-1.5">{studentFeedbacks.length} Adet</span>
+                  </div>
+                  <div className="bg-white/90 border border-[#EFECE6] p-5 rounded-2xl shadow-xs">
+                    <span className="text-[10px] font-black text-gray-450 uppercase tracking-wider block">Hesap Onay Durumu</span>
+                    <span className={`inline-block text-xs px-2.5 py-1 rounded-full font-bold border mt-2 ${
+                      studentProfile.status === "İletişime Geçildi"
+                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                        : "bg-amber-50 text-amber-700 border-amber-200"
+                    }`}>
+                      {studentProfile.status}
+                    </span>
+                  </div>
+                  <div className="bg-white/90 border border-[#EFECE6] p-5 rounded-2xl shadow-xs">
+                    <span className="text-[10px] font-black text-gray-450 uppercase tracking-wider block">Son Görüş Zamanı</span>
+                    <span className="text-sm font-bold text-gray-700 block mt-3">
+                      {studentFeedbacks.length > 0
+                        ? new Date(studentFeedbacks[0].createdAt).toLocaleDateString("tr-TR")
+                        : "Yok"}
+                    </span>
+                  </div>
                 </div>
 
-                {/* Past Feedbacks */}
-                <div className="md:col-span-5 bg-white rounded-3xl border border-[#EFECE6] p-6 shadow-sm">
-                  <h3 className="text-base font-black text-[#1E3A8A] mb-4">Geçmiş Görüşleriniz</h3>
-                  {studentFeedbacks.length === 0 ? (
-                    <p className="text-xs text-gray-500 font-bold">Henüz görüş belirtmemişsiniz.</p>
-                  ) : (
-                    <div className="space-y-4 max-h-[380px] overflow-y-auto pr-1">
-                      {studentFeedbacks.map((f) => (
-                        <div key={f.id} className="p-3 bg-[#FAF8F5] border border-[#EFECE6] rounded-xl text-xs space-y-1">
-                          <div className="flex justify-between items-center">
-                            <span className="font-black text-[#1E3A8A]">{f.teacherName}</span>
-                            <span className="text-amber-500 font-black">{f.rating} ★</span>
-                          </div>
-                          <p className="text-gray-600 font-semibold">{f.content}</p>
-                          <span className="text-[9px] text-gray-400 block text-right">
-                            {new Date(f.createdAt).toLocaleDateString("tr-TR")}
-                          </span>
+                {/* Profile Edit & Send Request Sections */}
+                <div className="grid md:grid-cols-12 gap-8">
+                  {/* Left Column: Profile edit and Feedback Form */}
+                  <div className="md:col-span-7 space-y-8">
+                    {/* Student Info Card (Edit details) */}
+                    <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 shadow-sm">
+                      <div className="flex justify-between items-center mb-4 pb-2 border-b border-[#FAF8F5]">
+                        <h3 className="text-base font-black text-[#1E3A8A]">Profil Bilgilerim</h3>
+                        {!editingStudent ? (
+                          <button
+                            onClick={() => setEditingStudent(true)}
+                            className="text-xs text-[#B45309] font-black hover:underline"
+                          >
+                            ✎ Bilgileri Düzenle
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => setEditingStudent(false)}
+                            className="text-xs text-gray-500 font-bold hover:underline"
+                          >
+                            Vazgeç
+                          </button>
+                        )}
+                      </div>
+
+                      {!editingStudent ? (
+                        <div className="space-y-3 text-sm font-semibold text-gray-700">
+                          <div><span className="text-gray-400 block text-xs">Ad Soyad</span>{studentProfile.name}</div>
+                          <div><span className="text-gray-400 block text-xs">Telefon</span>{studentProfile.phone}</div>
+                          <div><span className="text-gray-400 block text-xs">E-posta</span>{studentProfile.email}</div>
                         </div>
-                      ))}
+                      ) : (
+                        <form onSubmit={handleStudentUpdate} className="space-y-4">
+                          <div>
+                            <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Ad Soyad</label>
+                            <input
+                              type="text"
+                              value={studentEditForm.name}
+                              onChange={(e) => setStudentEditForm({ ...studentEditForm, name: e.target.value })}
+                              required
+                              className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Telefon</label>
+                            <input
+                              type="text"
+                              value={studentEditForm.phone}
+                              onChange={(e) => setStudentEditForm({ ...studentEditForm, phone: e.target.value })}
+                              required
+                              className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
+                            />
+                          </div>
+                          <button
+                            type="submit"
+                            disabled={loading}
+                            className="bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-black px-5 py-2.5 rounded-xl text-xs transition"
+                          >
+                            Değişiklikleri Kaydet
+                          </button>
+                        </form>
+                      )}
                     </div>
-                  )}
+
+                    {/* Send Feedback / Lesson request */}
+                    <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 shadow-sm">
+                      <h3 className="text-base font-black text-[#1E3A8A] mb-4 pb-2 border-b border-[#FAF8F5]">
+                        Görüş / Randevu Talebi Gönder
+                      </h3>
+                      <form onSubmit={handleSendFeedback} className="space-y-4">
+                        <div>
+                          <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Öğretmen Seçin</label>
+                          <select
+                            value={selectedTeacherId}
+                            onChange={(e) => setSelectedTeacherId(e.target.value)}
+                            required
+                            className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-[#FAF0E3]"
+                          >
+                            <option value="">Lütfen listeden seçin...</option>
+                            <optgroup label="Sistem Öğretmenleri">
+                              {hocalar.map((h) => (
+                                <option key={`static-${h.id}`} value={`static-${h.id}`}>
+                                  {h.isim} ({h.dersler.join(", ")})
+                                </option>
+                              ))}
+                            </optgroup>
+                            {dbTeachers.length > 0 && (
+                              <optgroup label="Yeni Kayıtlı Öğretmenler">
+                                {dbTeachers.map((h) => (
+                                  <option key={h.id} value={h.id}>
+                                    {h.name} ({h.branch})
+                                  </option>
+                                ))}
+                              </optgroup>
+                            )}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Puanınız (1 - 5)</label>
+                          <div className="flex gap-2">
+                            {[1, 2, 3, 4, 5].map((num) => (
+                              <button
+                                key={num}
+                                type="button"
+                                onClick={() => setFeedbackRating(num)}
+                                className={`w-10 h-10 rounded-xl font-black text-sm transition-all border ${
+                                  feedbackRating === num
+                                    ? "bg-amber-500 text-white border-amber-500 shadow-xs"
+                                    : "bg-[#FAF8F5] text-gray-600 border-[#EFECE6]"
+                                }`}
+                              >
+                                {num} ★
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Görüş ve Randevu Mesajınız</label>
+                          <textarea
+                            rows={4}
+                            value={feedbackContent}
+                            onChange={(e) => setFeedbackContent(e.target.value)}
+                            required
+                            placeholder="Ders almak istediğiniz günleri ve hedeflerinizi yazın..."
+                            className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-[#FAF0E3]"
+                          />
+                        </div>
+
+                        <button
+                          type="submit"
+                          disabled={loading}
+                          className="w-full bg-[#B45309] hover:bg-[#92400E] text-white font-black py-3.5 rounded-xl text-sm transition-all"
+                        >
+                          Görüşü / Randevu Talebini İlet
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Premium Message-style Log of Past Feedbacks */}
+                  <div className="md:col-span-5 bg-white rounded-3xl border border-[#EFECE6] p-6 shadow-sm">
+                    <h3 className="text-base font-black text-[#1E3A8A] mb-4 pb-2 border-b border-[#FAF8F5]">
+                      Taleplerim & Görüşlerim
+                    </h3>
+                    {studentFeedbacks.length === 0 ? (
+                      <p className="text-xs text-gray-500 font-bold">Henüz bir görüş veya ders talebi iletmemişsiniz.</p>
+                    ) : (
+                      <div className="space-y-4 max-h-[480px] overflow-y-auto pr-1 scrollbar-thin">
+                        {studentFeedbacks.map((f) => (
+                          <div key={f.id} className="p-4 bg-[#FAF8F5]/60 border border-[#EFECE6] rounded-2xl relative shadow-xs hover:bg-[#FAF8F5] transition-all">
+                            <div className="flex justify-between items-center mb-2">
+                              <span className="font-black text-xs sm:text-sm text-[#1E3A8A]">{f.teacherName}</span>
+                              <span className="text-amber-500 font-bold text-xs">{f.rating} ★</span>
+                            </div>
+                            <p className="text-gray-655 text-xs font-semibold leading-relaxed mb-3">
+                              {f.content}
+                            </p>
+                            <span className="text-[9px] text-gray-400 block text-right">
+                              {new Date(f.createdAt).toLocaleDateString("tr-TR")}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Teacher View (Received Feedbacks) */}
+            {/* TEACHER VIEW */}
             {teacherProfile && (
               <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 sm:p-8 shadow-sm">
                 <h3 className="text-lg font-black text-[#1E3A8A] mb-4">Öğrencilerden Gelen Görüşler & Talepler</h3>
