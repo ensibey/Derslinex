@@ -213,19 +213,29 @@ export default function AdminPage() {
                                 : "bg-amber-50 text-amber-700 border-amber-200"
                             }`}
                           >
-                            {t.status}
+                            {t.status === "İletişime Geçildi" ? "Onaylandı" : "Beklemede"}
                           </span>
                         </td>
-                        <td className="p-4 sm:p-5 text-right">
+                        <td className="p-4 sm:p-5 text-right flex items-center justify-end gap-2">
+                          {t.status === "İletişime Geçildi" && (
+                            <a
+                              href={`/ogretmenler/${t.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs px-3 py-1.5 rounded-lg border font-black bg-white hover:bg-gray-50 text-[#1E3A8A] border-[#EFECE6] transition-all flex items-center gap-1 shadow-xs"
+                            >
+                              🔍 Profili Gör
+                            </a>
+                          )}
                           <button
                             onClick={() => handleUpdateStatus(t.id, "teacher", t.status)}
                             className={`text-xs px-3.5 py-1.5 rounded-lg border font-black transition-all shadow-xs ${
                               t.status === "İletişime Geçildi"
-                                ? "bg-white hover:bg-gray-50 text-gray-700 border-[#EFECE6]"
+                                ? "bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200"
                                 : "bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600"
                             }`}
                           >
-                            {t.status === "İletişime Geçildi" ? "Beklemeye Al" : "İletişime Geçildi İşaretle"}
+                            {t.status === "İletişime Geçildi" ? "Beklemeye Al" : "Onayla ve Yayına Al"}
                           </button>
                         </td>
                       </tr>
