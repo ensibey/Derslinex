@@ -438,7 +438,7 @@ export default function ProfilPage() {
                       className="w-4 h-4 rounded border-[#EFECE6] text-[#1E3A8A] focus:ring-[#1E3A8A]"
                     />
                     <label htmlFor="studentRemember" className="text-xs text-gray-500 font-bold select-none cursor-pointer">
-                      Beni Hatırla (Ortak bilgisayarda işaretlemeyiniz)
+                      Beni Hatırla
                     </label>
                   </div>
 
@@ -523,7 +523,7 @@ export default function ProfilPage() {
                       className="w-4 h-4 rounded border-[#EFECE6] text-[#1E3A8A] focus:ring-[#1E3A8A]"
                     />
                     <label htmlFor="teacherRemember" className="text-xs text-gray-500 font-bold select-none cursor-pointer">
-                      Beni Hatırla (Ortak bilgisayarda işaretlemeyiniz)
+                      Beni Hatırla
                     </label>
                   </div>
 
