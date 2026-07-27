@@ -30,7 +30,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, phone, email } = body;
+    const { name, phone, email, avatar } = body;
 
     if (!name || !phone || !email) {
       return NextResponse.json({ success: false, error: "Tüm alanlar zorunludur" }, { status: 400 });
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     if (existing) {
       student = await prisma.student.update({
         where: { id: existing.id },
-        data: { name, phone },
+        data: { name, phone, avatar },
       });
     } else {
       return NextResponse.json({ success: false, error: "Öğrenci bulunamadı" }, { status: 404 });

@@ -39,7 +39,7 @@ async function getHocaOrDb(slug: string) {
       slug: slug,
       isim: matched.name,
       unvan: "Eğitmen",
-      fotograf: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(matched.name)}&eyebrows=default&mouth=smile`,
+      fotograf: matched.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(matched.name)}&eyebrows=default&mouth=smile`,
       dersler: [matched.branch],
       yksTuru: ["TYT", "AYT Sayısal", "AYT EA"] as any[],
       format: "online" as const,

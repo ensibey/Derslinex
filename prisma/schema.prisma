@@ -13,6 +13,7 @@ model Student {
   phone     String
   email     String
   password  String
+  avatar    String?
   status    String   @default("Beklemede")
   isBanned  Boolean  @default(false)
   createdAt DateTime @default(now())
@@ -27,6 +28,7 @@ model Teacher {
   branch    String
   egitim    String?
   ozgecmis  String?
+  avatar    String?
   status    String   @default("Beklemede")
   isBanned  Boolean  @default(false)
   linkedin  String?

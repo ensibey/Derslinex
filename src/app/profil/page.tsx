@@ -9,6 +9,7 @@ interface Student {
   phone: string;
   email: string;
   status: string;
+  avatar?: string | null;
 }
 
 interface Teacher {
@@ -22,6 +23,7 @@ interface Teacher {
   ozgecmis?: string | null;
   linkedin?: string | null;
   youtube?: string | null;
+  avatar?: string | null;
 }
 
 interface Feedback {
@@ -44,13 +46,13 @@ export default function ProfilPage() {
   const [studentForm, setStudentForm] = useState({ name: "", phone: "", email: "", password: "" });
   const [studentProfile, setStudentProfile] = useState<Student | null>(null);
   const [editingStudent, setEditingStudent] = useState(false);
-  const [studentEditForm, setStudentEditForm] = useState({ name: "", phone: "" });
+  const [studentEditForm, setStudentEditForm] = useState({ name: "", phone: "", avatar: "" });
 
   // Teacher Auth Form States
   const [teacherForm, setTeacherForm] = useState({ name: "", phone: "", email: "", password: "", branch: "" });
   const [teacherProfile, setTeacherProfile] = useState<Teacher | null>(null);
   const [editingTeacher, setEditingTeacher] = useState(false);
-  const [teacherEditForm, setTeacherEditForm] = useState({ name: "", phone: "", branch: "", egitim: "", ozgecmis: "", linkedin: "", youtube: "" });
+  const [teacherEditForm, setTeacherEditForm] = useState({ name: "", phone: "", branch: "", egitim: "", ozgecmis: "", linkedin: "", youtube: "", avatar: "" });
   
   // Teacher Lesson and Blog States
   const [teacherLessons, setTeacherLessons] = useState<any[]>([]);
@@ -109,7 +111,7 @@ export default function ProfilPage() {
       const parsedUser = JSON.parse(savedUser);
       if (savedRole === "student") {
         setStudentProfile(parsedUser);
-        setStudentEditForm({ name: parsedUser.name, phone: parsedUser.phone });
+        setStudentEditForm({ name: parsedUser.name, phone: parsedUser.phone, avatar: parsedUser.avatar || "" });
         setRole("student");
       } else {
         setTeacherProfile(parsedUser);
@@ -120,7 +122,8 @@ export default function ProfilPage() {
           egitim: parsedUser.egitim || "",
           ozgecmis: parsedUser.ozgecmis || "",
           linkedin: parsedUser.linkedin || "",
-          youtube: parsedUser.youtube || ""
+          youtube: parsedUser.youtube || "",
+          avatar: parsedUser.avatar || ""
         });
         setRole("teacher");
         fetchTeacherDashboardData(parsedUser.id);
@@ -282,7 +285,7 @@ export default function ProfilPage() {
       if (data.success) {
         const student = data.student;
         setStudentProfile(student);
-        setStudentEditForm({ name: student.name, phone: student.phone });
+        setStudentEditForm({ name: student.name, phone: student.phone, avatar: student.avatar || "" });
         
         // Conditional storage based on "Remember Me"
         const storage = rememberMe ? localStorage : sessionStorage;
@@ -312,7 +315,8 @@ export default function ProfilPage() {
         body: JSON.stringify({
           email: studentProfile.email,
           name: studentEditForm.name,
-          phone: studentEditForm.phone
+          phone: studentEditForm.phone,
+          avatar: studentEditForm.avatar
         })
       });
       const data = await res.json();
@@ -323,6 +327,7 @@ export default function ProfilPage() {
         // Sync updated profile to active storage
         const storage = localStorage.getItem("derslinex_role") ? localStorage : sessionStorage;
         storage.setItem("derslinex_user", JSON.stringify(updated));
+        window.dispatchEvent(new Event("derslinex_auth_change"));
         
         setEditingStudent(false);
         showMsg("Profil bilgileriniz başarıyla güncellendi!", "success");
@@ -363,7 +368,8 @@ export default function ProfilPage() {
           egitim: teacher.egitim || "",
           ozgecmis: teacher.ozgecmis || "",
           linkedin: teacher.linkedin || "",
-          youtube: teacher.youtube || ""
+          youtube: teacher.youtube || "",
+          avatar: teacher.avatar || ""
         });
         
         // Conditional storage based on "Remember Me"
@@ -401,7 +407,8 @@ export default function ProfilPage() {
           egitim: teacherEditForm.egitim,
           ozgecmis: teacherEditForm.ozgecmis,
           linkedin: teacherEditForm.linkedin,
-          youtube: teacherEditForm.youtube
+          youtube: teacherEditForm.youtube,
+          avatar: teacherEditForm.avatar
         })
       });
       const data = await res.json();
@@ -412,6 +419,7 @@ export default function ProfilPage() {
         // Sync updated profile to active storage
         const storage = localStorage.getItem("derslinex_role") ? localStorage : sessionStorage;
         storage.setItem("derslinex_user", JSON.stringify(updated));
+        window.dispatchEvent(new Event("derslinex_auth_change"));
         
         setEditingTeacher(false);
         showMsg("Profil bilgileriniz başarıyla güncellendi!", "success");
@@ -1061,13 +1069,92 @@ export default function ProfilPage() {
                           </div>
 
                           {!editingStudent ? (
-                            <div className="space-y-3 text-sm font-semibold text-gray-700">
-                              <div><span className="text-gray-400 block text-xs">Ad Soyad</span>{studentProfile.name}</div>
-                              <div><span className="text-gray-400 block text-xs">Telefon</span>{studentProfile.phone}</div>
-                              <div><span className="text-gray-400 block text-xs">E-posta</span>{studentProfile.email}</div>
+                            <div className="flex flex-col sm:flex-row items-center gap-4 text-sm font-semibold text-gray-700">
+                              <div className="w-16 h-16 rounded-full bg-gradient-to-b from-[#1E3A8A] to-indigo-800 flex items-center justify-center text-white text-2xl font-black overflow-hidden shadow-xs flex-shrink-0">
+                                {studentProfile.avatar ? (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img src={studentProfile.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                                ) : (
+                                  studentProfile.name.charAt(0)
+                                )}
+                              </div>
+                              <div className="space-y-2 flex-1 w-full text-center sm:text-left">
+                                <div><span className="text-gray-400 block text-xs">Ad Soyad</span>{studentProfile.name}</div>
+                                <div><span className="text-gray-400 block text-xs">Telefon</span>{studentProfile.phone}</div>
+                                <div><span className="text-gray-400 block text-xs">E-posta</span>{studentProfile.email}</div>
+                              </div>
                             </div>
                           ) : (
                             <form onSubmit={handleStudentUpdate} className="space-y-4">
+                              {/* Avatar Picker widget */}
+                              <div className="mb-4">
+                                <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Profil Fotoğrafı Seç / Yükle</label>
+                                <div className="flex flex-col sm:flex-row items-center gap-4 bg-[#FAF8F5] p-4 rounded-2xl border border-[#EFECE6]">
+                                  <div className="relative w-16 h-16 bg-gradient-to-b from-[#1E3A8A] to-indigo-800 rounded-full overflow-hidden flex items-center justify-center border border-[#EFECE6] shadow-xs flex-shrink-0">
+                                    {studentEditForm.avatar ? (
+                                      // eslint-disable-next-line @next/next/no-img-element
+                                      <img src={studentEditForm.avatar} alt="Avatar Önizleme" className="w-full h-full object-cover" />
+                                    ) : (
+                                      <span className="text-2xl font-black text-white">{studentEditForm.name.charAt(0) || "?"}</span>
+                                    )}
+                                  </div>
+                                  <div className="flex-1 w-full space-y-2.5">
+                                    <div className="flex items-center gap-2">
+                                      <label className="cursor-pointer bg-white hover:bg-gray-50 border border-[#EFECE6] px-3.5 py-1.5 rounded-xl text-xs font-black text-gray-700 transition shadow-xs">
+                                        <span>📁 Fotoğraf Seç</span>
+                                        <input
+                                          type="file"
+                                          accept="image/*"
+                                          className="hidden"
+                                          onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                              const reader = new FileReader();
+                                              reader.onloadend = () => {
+                                                setStudentEditForm({ ...studentEditForm, avatar: reader.result as string });
+                                              };
+                                              reader.readAsDataURL(file);
+                                            }
+                                          }}
+                                        />
+                                      </label>
+                                      {studentEditForm.avatar && (
+                                        <button
+                                          type="button"
+                                          onClick={() => setStudentEditForm({ ...studentEditForm, avatar: "" })}
+                                          className="text-xs text-rose-600 hover:text-rose-800 font-bold"
+                                        >
+                                          Kaldır
+                                        </button>
+                                      )}
+                                    </div>
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {["👨‍🎓", "👩‍🎓", "🎓", "🧑‍💻", "👩‍💻", "⚡", "📚", "🎯"].map((emoji) => (
+                                        <button
+                                          key={emoji}
+                                          type="button"
+                                          onClick={() => {
+                                            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#1E3A8A"/><text x="50" y="65" font-size="50" text-anchor="middle">${emoji}</text></svg>`;
+                                            const dataUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+                                            setStudentEditForm({ ...studentEditForm, avatar: dataUrl });
+                                          }}
+                                          className="w-7 h-7 rounded-lg bg-white border border-[#EFECE6] flex items-center justify-center hover:bg-amber-50 hover:border-[#B45309]/50 transition-all text-sm shadow-xs"
+                                        >
+                                          {emoji}
+                                        </button>
+                                      ))}
+                                    </div>
+                                    <input
+                                      type="url"
+                                      placeholder="Resim URL yapıştırın (https://...)"
+                                      value={studentEditForm.avatar.startsWith("data:") ? "" : studentEditForm.avatar}
+                                      onChange={(e) => setStudentEditForm({ ...studentEditForm, avatar: e.target.value })}
+                                      className="w-full bg-white border border-[#EFECE6] px-3 py-1.5 rounded-lg text-xs font-semibold focus:outline-none"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+
                               <div>
                                 <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Ad Soyad</label>
                                 <input
@@ -1235,8 +1322,13 @@ export default function ProfilPage() {
                         <div className="md:col-span-4 space-y-6">
                           <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 shadow-sm">
                             <div className="flex flex-col items-center pb-6 border-b border-[#FAF8F5]">
-                              <div className="w-20 h-20 bg-gradient-to-b from-[#1E3A8A] to-indigo-800 rounded-full flex items-center justify-center text-3xl text-white font-black mb-3 shadow-sm">
-                                {teacherProfile.name.charAt(0)}
+                              <div className="w-20 h-20 bg-gradient-to-b from-[#1E3A8A] to-indigo-800 rounded-full flex items-center justify-center text-3xl text-white font-black mb-3 shadow-sm overflow-hidden">
+                                {teacherProfile.avatar ? (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img src={teacherProfile.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                                ) : (
+                                  teacherProfile.name.charAt(0)
+                                )}
                               </div>
                               <h3 className="text-lg font-black text-gray-900 text-center">{teacherProfile.name}</h3>
                               <span className="bg-blue-50 text-blue-700 text-xs px-2.5 py-0.5 rounded-full border border-blue-100 font-bold mt-1.5">
@@ -1347,13 +1439,82 @@ export default function ProfilPage() {
                       </div>
                     )}
 
-                    {/* Tab 2: Profilimi Düzenle */}
+{/* Tab 2: Profilimi Düzenle */}
                     {dashboardTab === "duzenle" && (
                       <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 sm:p-8 max-w-3xl shadow-sm">
                         <h3 className="text-lg font-black text-[#1E3A8A] mb-2">Profil Bilgilerimi Düzenle</h3>
                         <p className="text-xs text-gray-500 font-semibold mb-6">Öğrencilerin sizi daha iyi tanıması için tüm bilgilerinizi güncel tutun.</p>
                         
                         <form onSubmit={handleTeacherUpdate} className="space-y-6">
+                          {/* Avatar Picker widget */}
+                          <div>
+                            <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Profil Fotoğrafı Seç / Yükle</label>
+                            <div className="flex flex-col sm:flex-row items-center gap-4 bg-[#FAF8F5] p-4 rounded-2xl border border-[#EFECE6]">
+                              <div className="relative w-16 h-16 bg-gradient-to-b from-[#1E3A8A] to-indigo-800 rounded-full overflow-hidden flex items-center justify-center border border-[#EFECE6] shadow-xs flex-shrink-0">
+                                {teacherEditForm.avatar ? (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img src={teacherEditForm.avatar} alt="Avatar Önizleme" className="w-full h-full object-cover" />
+                                ) : (
+                                  <span className="text-2xl font-black text-white">{teacherEditForm.name.charAt(0) || "?"}</span>
+                                )}
+                              </div>
+                              <div className="flex-1 w-full space-y-2.5">
+                                <div className="flex items-center gap-2">
+                                  <label className="cursor-pointer bg-white hover:bg-gray-50 border border-[#EFECE6] px-3.5 py-1.5 rounded-xl text-xs font-black text-gray-700 transition shadow-xs">
+                                    <span>📁 Fotoğraf Seç</span>
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      className="hidden"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                          const reader = new FileReader();
+                                          reader.onloadend = () => {
+                                            setTeacherEditForm({ ...teacherEditForm, avatar: reader.result as string });
+                                          };
+                                          reader.readAsDataURL(file);
+                                        }
+                                      }}
+                                    />
+                                  </label>
+                                  {teacherEditForm.avatar && (
+                                    <button
+                                      type="button"
+                                      onClick={() => setTeacherEditForm({ ...teacherEditForm, avatar: "" })}
+                                      className="text-xs text-rose-600 hover:text-rose-800 font-bold"
+                                    >
+                                      Kaldır
+                                    </button>
+                                  )}
+                                </div>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {["👨‍🏫", "👩‍🏫", "🎓", "🧑‍💻", "👩‍💻", "🧑‍🎓", "👩‍🎓", "🧠", "📐", "🔬"].map((emoji) => (
+                                    <button
+                                      key={emoji}
+                                      type="button"
+                                      onClick={() => {
+                                        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#1E3A8A"/><text x="50" y="65" font-size="50" text-anchor="middle">${emoji}</text></svg>`;
+                                        const dataUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+                                        setTeacherEditForm({ ...teacherEditForm, avatar: dataUrl });
+                                      }}
+                                      className="w-7 h-7 rounded-lg bg-white border border-[#EFECE6] flex items-center justify-center hover:bg-amber-50 hover:border-[#B45309]/50 transition-all text-sm shadow-xs"
+                                    >
+                                      {emoji}
+                                    </button>
+                                  ))}
+                                </div>
+                                <input
+                                  type="url"
+                                  placeholder="Resim URL yapıştırın (https://...)"
+                                  value={teacherEditForm.avatar.startsWith("data:") ? "" : teacherEditForm.avatar}
+                                  onChange={(e) => setTeacherEditForm({ ...teacherEditForm, avatar: e.target.value })}
+                                  className="w-full bg-white border border-[#EFECE6] px-3 py-1.5 rounded-lg text-xs font-semibold focus:outline-none"
+                                />
+                              </div>
+                            </div>
+                          </div>
+
                           <div className="grid sm:grid-cols-2 gap-6">
                             <div>
                               <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Ad Soyad</label>

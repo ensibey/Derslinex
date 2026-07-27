@@ -11,13 +11,36 @@ const navLinks = [
   { href: "/yks-hazirlik", label: "YKS Hazırlık" },
   { href: "/lgs-hazirlik", label: "LGS Hazırlık" },
   { href: "/iletisim", label: "İletişim" },
-  { href: "/profil", label: "Profilim" },
 ];
 
 import SidebarDrawer from "@/components/SidebarDrawer";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedRole = localStorage.getItem("derslinex_role") || sessionStorage.getItem("derslinex_role");
+      const savedUser = localStorage.getItem("derslinex_user") || sessionStorage.getItem("derslinex_user");
+      if (savedRole && savedUser) {
+        setRole(savedRole);
+        setUser(JSON.parse(savedUser));
+      } else {
+        setRole(null);
+        setUser(null);
+      }
+    };
+    handleStorageChange();
+    
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("derslinex_auth_change", handleStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("derslinex_auth_change", handleStorageChange);
+    };
+  }, []);
 
   useEffect(() => {
     if (menuOpen) {
@@ -65,8 +88,8 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* CTA */}
-          <div className="hidden lg:flex items-center gap-3">
+          {/* CTA & Profile Avatar */}
+          <div className="hidden lg:flex items-center gap-4">
             <a
               href={waLink()}
               target="_blank"
@@ -79,24 +102,54 @@ export default function Header() {
               </svg>
               WhatsApp ile Ders Al
             </a>
+
+            {/* Profile Avatar Trigger Button */}
+            <Link
+              href="/profil"
+              className="group/avatar flex items-center gap-1.5 focus:outline-none"
+              aria-label="Profil Sayfası"
+            >
+              <div className="w-10 h-10 rounded-full bg-gradient-to-b from-[#1E3A8A] to-indigo-800 flex items-center justify-center text-white font-black overflow-hidden border border-[#EFECE6] shadow-xs group-hover/avatar:scale-105 transition-all">
+                {user?.avatar ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={user.avatar} alt="Profil" className="w-full h-full object-cover" />
+                ) : user?.name ? (
+                  user.name.charAt(0).toUpperCase()
+                ) : (
+                  "👤"
+                )}
+              </div>
+            </Link>
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="lg:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100"
-            aria-label="Menüyü aç/kapat"
-          >
-            {menuOpen ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+          {/* Mobile menu & avatar trigger button */}
+          <div className="lg:hidden flex items-center gap-3">
+            {user && (
+              <Link href="/profil" className="w-8 h-8 rounded-full bg-gradient-to-b from-[#1E3A8A] to-indigo-800 flex items-center justify-center text-white font-black overflow-hidden border border-[#EFECE6]">
+                {user.avatar ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={user.avatar} alt="Profil" className="w-full h-full object-cover" />
+                ) : (
+                  user.name.charAt(0).toUpperCase()
+                )}
+              </Link>
             )}
-          </button>
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="p-2 rounded-md text-gray-600 hover:bg-gray-100"
+              aria-label="Menüyü aç/kapat"
+            >
+              {menuOpen ? (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -111,11 +164,30 @@ export default function Header() {
                   key={l.href}
                   href={l.href}
                   onClick={() => setMenuOpen(false)}
-                  className="block px-3 py-2 text-[#1E3A8A] font-bold hover:bg-gray-100 rounded-lg"
+                  className="block px-3 py-2 text-[#1E3A8A] font-bold hover:bg-gray-100 rounded-lg text-sm"
                 >
                   {l.label}
                 </Link>
               ))}
+
+            {/* Mobile Profile Trigger Link */}
+            <Link
+              href="/profil"
+              onClick={() => setMenuOpen(false)}
+              className="flex items-center gap-3 px-3 py-2.5 bg-white border border-[#EFECE6] rounded-xl font-bold text-sm text-[#1E3A8A]"
+            >
+              <div className="w-7 h-7 rounded-full bg-gradient-to-b from-[#1E3A8A] to-indigo-800 flex items-center justify-center text-white font-black overflow-hidden border border-[#EFECE6]">
+                {user?.avatar ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={user.avatar} alt="Profil" className="w-full h-full object-cover" />
+                ) : user?.name ? (
+                  user.name.charAt(0).toUpperCase()
+                ) : (
+                  "👤"
+                )}
+              </div>
+              <span>{user ? user.name : "Giriş Yap / Kayıt Ol"}</span>
+            </Link>
           </div>
         </div>
       )}

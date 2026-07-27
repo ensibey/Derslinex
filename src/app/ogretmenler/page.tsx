@@ -29,7 +29,7 @@ function OgretmenlerContent() {
               slug: t.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
               isim: t.name,
               unvan: "Eğitmen",
-              fotograf: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(t.name)}&eyebrows=default&mouth=smile`,
+              fotograf: t.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(t.name)}&eyebrows=default&mouth=smile`,
               dersler: [t.branch],
               yksTuru: ["TYT", "AYT Sayısal", "AYT EA"],
               format: "online",
