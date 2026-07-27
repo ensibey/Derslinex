@@ -764,28 +764,40 @@ export default function ProfilPage() {
 
             {/* TEACHER VIEW */}
             {teacherProfile && (
-              <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 sm:p-8 shadow-sm">
-                <h3 className="text-lg font-black text-[#1E3A8A] mb-4">Öğrencilerden Gelen Görüşler & Talepler</h3>
-                {teacherFeedbacks.length === 0 ? (
-                  <p className="text-sm text-gray-500 font-semibold">Henüz size iletilen bir görüş veya randevu talebi bulunmamaktadır.</p>
-                ) : (
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    {teacherFeedbacks.map((f) => (
-                      <div key={f.id} className="p-4 bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl relative shadow-xs">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="font-black text-sm text-[#1E3A8A]">{f.studentName}</span>
-                          <span className="text-amber-500 font-bold text-xs">{f.rating} ★</span>
-                        </div>
-                        <p className="text-gray-655 text-xs font-semibold leading-relaxed mb-3">{f.content}</p>
-                        <div className="flex justify-between items-center text-[10px] text-gray-400">
-                          <span>{f.studentEmail || "E-posta Gizli"}</span>
-                          <span>{new Date(f.createdAt).toLocaleDateString("tr-TR")}</span>
-                        </div>
-                      </div>
-                    ))}
+              teacherProfile.status === "Beklemede" ? (
+                <div className="bg-white rounded-3xl border border-amber-200 bg-amber-50/20 p-8 sm:p-10 shadow-sm text-center">
+                  <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                    ⏳
                   </div>
-                )}
-              </div>
+                  <h3 className="text-xl font-black text-[#1E3A8A] mb-2">Başvurunuz Alındı!</h3>
+                  <p className="text-sm text-gray-600 font-bold max-w-lg mx-auto leading-relaxed">
+                    Kayıt ve başvuru bilgileriniz başarıyla sisteme alınmıştır. Sistem yöneticilerimiz başvurunuzu inceledikten sonra en kısa sürede sizinle iletişime geçecektir. Teşekkür ederiz.
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 sm:p-8 shadow-sm">
+                  <h3 className="text-lg font-black text-[#1E3A8A] mb-4">Öğrencilerden Gelen Görüşler & Talepler</h3>
+                  {teacherFeedbacks.length === 0 ? (
+                    <p className="text-sm text-gray-500 font-semibold">Henüz size iletilen bir görüş veya randevu talebi bulunmamaktadır.</p>
+                  ) : (
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      {teacherFeedbacks.map((f) => (
+                        <div key={f.id} className="p-4 bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl relative shadow-xs">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="font-black text-sm text-[#1E3A8A]">{f.studentName}</span>
+                            <span className="text-amber-500 font-bold text-xs">{f.rating} ★</span>
+                          </div>
+                          <p className="text-gray-655 text-xs font-semibold leading-relaxed mb-3">{f.content}</p>
+                          <div className="flex justify-between items-center text-[10px] text-gray-400">
+                            <span>{f.studentEmail || "E-posta Gizli"}</span>
+                            <span>{new Date(f.createdAt).toLocaleDateString("tr-TR")}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
             )}
           </div>
         )}
