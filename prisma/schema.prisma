@@ -8,32 +8,36 @@ generator client {
 }
 
 model Student {
-  id        Int      @id @default(autoincrement())
-  name      String
-  phone     String
-  email     String
-  password  String
-  avatar    String?
-  status    String   @default("Beklemede")
-  isBanned  Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id           Int                  @id @default(autoincrement())
+  name         String
+  phone        String
+  email        String
+  password     String
+  avatar       String?
+  status       String               @default("Beklemede")
+  isBanned     Boolean              @default(false)
+  createdAt    DateTime             @default(now())
+  sessions     SessionParticipant[]
+  feedbacks    SessionFeedback[]    @relation("StudentFeedback")
 }
 
 model Teacher {
-  id        Int      @id @default(autoincrement())
-  name      String
-  phone     String
-  email     String
-  password  String
-  branch    String
-  egitim    String?
-  ozgecmis  String?
-  avatar    String?
-  status    String   @default("Beklemede")
-  isBanned  Boolean  @default(false)
-  linkedin  String?
-  youtube   String?
-  createdAt DateTime @default(now())
+  id           Int               @id @default(autoincrement())
+  name         String
+  phone        String
+  email        String
+  password     String
+  branch       String
+  egitim       String?
+  ozgecmis     String?
+  avatar       String?
+  status       String            @default("Beklemede")
+  isBanned     Boolean           @default(false)
+  linkedin     String?
+  youtube      String?
+  createdAt    DateTime          @default(now())
+  liveSessions LiveSession[]
+  feedbacksGiven SessionFeedback[] @relation("TeacherFeedback")
 }
 
 model Feedback {
@@ -93,3 +97,76 @@ model TeacherFAQ {
   answer    String
   createdAt DateTime @default(now())
 }
+
+// ─── Canlı Ders Sistemi Modelleri ─────────────────────────────────────────────
+
+enum SessionStatus {
+  SCHEDULED
+  LIVE
+  ENDED
+  CANCELLED
+}
+
+model LiveSession {
+  id              Int                  @id @default(autoincrement())
+  title           String
+  description     String?
+  capacity        Int                  @default(1)
+  startTime       DateTime
+  durationMinutes Int                  @default(60)
+  // Daily.co room name (not full URL)
+  roomName        String?
+  // Full Daily.co room URL for iframe embedding
+  roomUrl         String?
+  recordSession   Boolean              @default(false)
+  recordingUrl    String?
+  status          SessionStatus        @default(SCHEDULED)
+  teacherId       Int
+  teacher         Teacher              @relation(fields: [teacherId], references: [id])
+  participants    SessionParticipant[]
+  resources       SessionResource[]
+  feedbacks       SessionFeedback[]
+  // Track whether reminder mail has already been sent
+  reminderSent    Boolean              @default(false)
+  createdAt       DateTime             @default(now())
+}
+
+model SessionParticipant {
+  id          Int          @id @default(autoincrement())
+  sessionId   Int
+  session     LiveSession  @relation(fields: [sessionId], references: [id])
+  studentId   Int
+  student     Student      @relation(fields: [studentId], references: [id])
+  joinedAt    DateTime?
+  leftAt      DateTime?
+  // True when student was present ≥ 50% of session duration
+  isAttended  Boolean      @default(false)
+
+  @@unique([sessionId, studentId])
+}
+
+model SessionResource {
+  id        Int         @id @default(autoincrement())
+  sessionId Int
+  session   LiveSession @relation(fields: [sessionId], references: [id])
+  title     String
+  fileUrl   String
+  createdAt DateTime    @default(now())
+}
+
+model SessionFeedback {
+  id            Int         @id @default(autoincrement())
+  sessionId     Int
+  session       LiveSession @relation(fields: [sessionId], references: [id])
+  teacherId     Int
+  teacher       Teacher     @relation("TeacherFeedback", fields: [teacherId], references: [id])
+  studentId     Int
+  student       Student     @relation("StudentFeedback", fields: [studentId], references: [id])
+  rating        Int         // 1 – 5
+  comment       String?
+  homeworkGiven Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+
+  @@unique([sessionId, studentId])
+}
+

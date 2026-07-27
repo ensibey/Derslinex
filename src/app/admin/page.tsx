@@ -59,25 +59,40 @@ interface BlogPost {
 }
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<"teachers" | "students" | "lessons" | "blogs" | "feedbacks">("teachers");
+  const [activeTab, setActiveTab] = useState<"teachers" | "students" | "lessons" | "blogs" | "feedbacks" | "sessions">("teachers");
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
-  
+  const [liveSessions, setLiveSessions] = useState<any[]>([]);
+
+  // Session Create Form
+  const [sessionForm, setSessionForm] = useState({
+    title: "",
+    description: "",
+    teacherId: "",
+    studentIds: [] as number[],
+    startTime: "",
+    durationMinutes: 60,
+    capacity: 1,
+    recordSession: false,
+  });
+  const [sessionCreating, setSessionCreating] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [tRes, sRes, fRes, lRes, bRes] = await Promise.all([
+      const [tRes, sRes, fRes, lRes, bRes, sessRes] = await Promise.all([
         fetch("/api/profil/ogretmen"),
         fetch("/api/profil/ogrenci"),
         fetch("/api/gorus"),
         fetch("/api/admin/lessons"),
         fetch("/api/admin/blogs"),
+        fetch("/api/admin/sessions"),
       ]);
 
       const tData = await tRes.json();
@@ -85,12 +100,14 @@ export default function AdminPage() {
       const fData = await fRes.json();
       const lData = await lRes.json();
       const bData = await bRes.json();
+      const sessData = await sessRes.json();
 
       if (tData.success) setTeachers(tData.teachers || []);
       if (sData.success) setStudents(sData.students || []);
       if (fData.success) setFeedbacks(fData.feedbacks || []);
       if (lData.success) setLessons(lData.lessons || []);
       if (bData.success) setBlogs(bData.posts || []);
+      if (sessData.success) setLiveSessions(sessData.sessions || []);
     } catch (e) {
       console.error("Data fetch error", e);
     } finally {
@@ -286,6 +303,7 @@ export default function AdminPage() {
             { key: "lessons", label: "Özel Dersler", count: lessons.length, icon: "📚" },
             { key: "blogs", label: "Bloglar", count: blogs.length, icon: "✍️" },
             { key: "feedbacks", label: "Görüşler", count: feedbacks.length, icon: "💬" },
+            { key: "sessions", label: "Canlı Dersler", count: liveSessions.length, icon: "🎥" },
           ].map((t) => (
             <button
               key={t.key}
@@ -658,6 +676,175 @@ export default function AdminPage() {
                   ))}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* SESSIONS TAB */}
+          {activeTab === "sessions" && (
+            <div className="p-6 space-y-8">
+              {/* Ders Oluşturma Formu */}
+              <div className="bg-[#FAF8F5] rounded-2xl border border-[#EFECE6] p-6">
+                <h3 className="text-lg font-black text-[#1E3A8A] mb-5">🎥 Yeni Canlı Ders Oluştur</h3>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">Ders Başlığı</label>
+                    <input
+                      type="text"
+                      placeholder="Matematik — Türevler"
+                      value={sessionForm.title}
+                      onChange={(e) => setSessionForm({ ...sessionForm, title: e.target.value })}
+                      className="w-full bg-white border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none focus:border-[#1E3A8A]/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">Öğretmen</label>
+                    <select
+                      value={sessionForm.teacherId}
+                      onChange={(e) => setSessionForm({ ...sessionForm, teacherId: e.target.value })}
+                      className="w-full bg-white border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
+                    >
+                      <option value="">Öğretmen seçin...</option>
+                      {teachers.map((t) => (
+                        <option key={t.id} value={t.id}>{t.name} — {t.branch}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">Öğrenciler (çoklu seçim)</label>
+                    <select
+                      multiple
+                      value={sessionForm.studentIds.map(String)}
+                      onChange={(e) => {
+                        const selected = Array.from(e.target.selectedOptions, (o) => parseInt(o.value));
+                        setSessionForm({ ...sessionForm, studentIds: selected });
+                      }}
+                      className="w-full bg-white border border-[#EFECE6] px-4 py-2 rounded-xl text-sm font-bold focus:outline-none h-28"
+                    >
+                      {students.map((s) => (
+                        <option key={s.id} value={s.id}>{s.name} ({s.email})</option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-gray-400 mt-1 font-semibold">Ctrl/Cmd tuşu ile birden fazla öğrenci seçebilirsiniz</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">Tarih & Saat</label>
+                    <input
+                      type="datetime-local"
+                      value={sessionForm.startTime}
+                      onChange={(e) => setSessionForm({ ...sessionForm, startTime: e.target.value })}
+                      className="w-full bg-white border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">Süre (dakika)</label>
+                    <input
+                      type="number"
+                      min={15}
+                      max={240}
+                      value={sessionForm.durationMinutes}
+                      onChange={(e) => setSessionForm({ ...sessionForm, durationMinutes: parseInt(e.target.value) || 60 })}
+                      className="w-full bg-white border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={sessionForm.recordSession}
+                        onChange={(e) => setSessionForm({ ...sessionForm, recordSession: e.target.checked })}
+                        className="w-5 h-5 accent-[#1E3A8A]"
+                      />
+                      <span className="text-sm font-bold text-gray-700">🔴 Dersi Kaydet (Cloud Recording)</span>
+                    </label>
+                  </div>
+                </div>
+                <button
+                  onClick={async () => {
+                    if (!sessionForm.title || !sessionForm.teacherId || !sessionForm.studentIds.length || !sessionForm.startTime) {
+                      showMsg("Lütfen tüm zorunlu alanları doldurun.", "error");
+                      return;
+                    }
+                    setSessionCreating(true);
+                    try {
+                      const res = await fetch("/api/admin/sessions", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          ...sessionForm,
+                          teacherId: parseInt(sessionForm.teacherId),
+                        }),
+                      });
+                      const data = await res.json();
+                      if (data.success) {
+                        showMsg("✅ Canlı ders oluşturuldu ve mailler gönderildi!", "success");
+                        setSessionForm({ title: "", description: "", teacherId: "", studentIds: [], startTime: "", durationMinutes: 60, capacity: 1, recordSession: false });
+                        fetchData();
+                      } else {
+                        showMsg(data.error || "Ders oluşturulamadı", "error");
+                      }
+                    } catch {
+                      showMsg("Bağlantı hatası", "error");
+                    } finally {
+                      setSessionCreating(false);
+                    }
+                  }}
+                  disabled={sessionCreating}
+                  className="mt-5 bg-[#1E3A8A] hover:bg-[#163070] text-white font-black py-3 px-8 rounded-xl transition disabled:opacity-60"
+                >
+                  {sessionCreating ? "Oluşturuluyor..." : "🚀 Ders Oluştur & Mailler Gönder"}
+                </button>
+              </div>
+
+              {/* Mevcut Oturumlar */}
+              <div>
+                <h3 className="text-lg font-black text-[#1E3A8A] mb-4">📋 Tüm Canlı Dersler ({liveSessions.length})</h3>
+                {liveSessions.length === 0 ? (
+                  <p className="text-gray-400 font-semibold text-sm py-8 text-center">Henüz ders oluşturulmadı.</p>
+                ) : (
+                  <div className="space-y-4">
+                    {liveSessions.map((s: any) => (
+                      <div key={s.id} className="bg-white border border-[#EFECE6] rounded-2xl p-5">
+                        <div className="flex flex-wrap gap-3 justify-between items-start">
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className={`text-xs font-black px-2.5 py-0.5 rounded-full ${
+                                s.status === "LIVE" ? "bg-red-100 text-red-700 border border-red-200" :
+                                s.status === "ENDED" ? "bg-gray-100 text-gray-600" :
+                                s.status === "CANCELLED" ? "bg-rose-100 text-rose-700" :
+                                "bg-blue-100 text-blue-700"
+                              }`}>{s.status}</span>
+                              {s.recordSession && <span className="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">🔴 Kayıt</span>}
+                            </div>
+                            <h4 className="font-black text-gray-900 text-base">{s.title}</h4>
+                            <p className="text-xs text-gray-500 font-semibold mt-0.5">
+                              👨‍🏫 {s.teacher?.name} • {new Date(s.startTime).toLocaleString("tr-TR")} • {s.durationMinutes} dk
+                            </p>
+                            <p className="text-xs text-indigo-600 font-bold mt-1">
+                              🎓 {s.participants?.map((p: any) => p.student?.name).join(", ")}
+                            </p>
+                          </div>
+                          <a
+                            href={`/ders/${s.id}`}
+                            target="_blank"
+                            className="bg-[#1E3A8A] hover:bg-[#163070] text-white text-xs font-black px-4 py-2 rounded-xl transition"
+                          >
+                            🔗 Odaya Gir
+                          </a>
+                        </div>
+                        {s.recordingUrl && (
+                          <a
+                            href={s.recordingUrl}
+                            target="_blank"
+                            className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:underline"
+                          >
+                            📹 Ders Kaydını İzle
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

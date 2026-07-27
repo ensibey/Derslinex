@@ -2,6 +2,220 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { hocalar } from "@/data/hocalar";
+import Link from "next/link";
+
+// ─── Yardımcı: Geri Sayım ─────────────────────────────────────────────────────
+function useCountdown(targetDate: string | Date | null) {
+  const [diff, setDiff] = useState(0);
+  useEffect(() => {
+    if (!targetDate) return;
+    const update = () => setDiff(new Date(targetDate).getTime() - Date.now());
+    update();
+    const id = setInterval(update, 1000);
+    return () => clearInterval(id);
+  }, [targetDate]);
+  const totalSec = Math.max(0, Math.floor(diff / 1000));
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return { diff, label: `${pad(h)}:${pad(m)}:${pad(s)}`, isNow: diff <= 10 * 60_000 && diff > 0 };
+}
+
+// ─── Öğrenci Canlı Dersler Sekmesi ───────────────────────────────────────────
+function SessionCard({ session, role }: { session: any; role: "student" | "teacher" }) {
+  const { label, isNow, diff } = useCountdown(
+    session.status === "SCHEDULED" || session.status === "LIVE" ? session.startTime : null
+  );
+  const isEnded = session.status === "ENDED";
+  const isLive  = session.status === "LIVE";
+  const isSoon  = isLive || isNow;
+
+  return (
+    <div className="bg-white border border-[#EFECE6] rounded-2xl p-5 shadow-xs">
+      <div className="flex flex-wrap justify-between gap-3 mb-3">
+        <div>
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
+            <span className={`text-xs font-black px-2.5 py-0.5 rounded-full ${
+              isLive ? "bg-red-100 text-red-700 border border-red-200 animate-pulse" :
+              isEnded ? "bg-gray-100 text-gray-600" :
+              "bg-blue-100 text-blue-700"
+            }`}>{isLive ? "🔴 CANLI" : isEnded ? "✅ Bitti" : "📅 Planlandı"}</span>
+            {session.recordSession && <span className="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">🔴 Kayıtlı</span>}
+          </div>
+          <h4 className="font-black text-gray-900 text-base">{session.title}</h4>
+          {role === "student" && session.teacher && (
+            <p className="text-xs text-gray-500 font-semibold mt-0.5">👨‍🏫 {session.teacher.name} — {session.teacher.branch}</p>
+          )}
+          <p className="text-xs text-indigo-600 font-bold mt-0.5">
+            🕐 {new Date(session.startTime).toLocaleString("tr-TR")} • {session.durationMinutes} dk
+          </p>
+        </div>
+        <div className="flex flex-col items-end gap-2">
+          {!isEnded && (
+            <div className="text-right">
+              {isSoon ? (
+                <Link href={`/ders/${session.id}`}>
+                  <button className="bg-red-600 hover:bg-red-500 text-white font-black text-sm px-5 py-2.5 rounded-xl transition animate-pulse">
+                    🚀 {role === "teacher" ? "Yayını Başlat" : "Derse Katıl"}
+                  </button>
+                </Link>
+              ) : (
+                <div className="text-center">
+                  <div className="font-black text-2xl text-[#1E3A8A] tabular-nums">{label}</div>
+                  <div className="text-xs text-gray-400 font-semibold">sonra başlıyor</div>
+                  <button
+                    disabled
+                    className="mt-2 opacity-40 cursor-not-allowed bg-gray-200 text-gray-500 font-black text-xs px-4 py-2 rounded-xl"
+                  >
+                    10 dk kala aktifleşir
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Materyaller */}
+      {session.resources?.length > 0 && (
+        <div className="border-t border-[#EFECE6] pt-3 mt-1">
+          <p className="text-xs font-black text-gray-500 uppercase tracking-wider mb-2">📎 Ders Materyalleri</p>
+          <div className="flex flex-wrap gap-2">
+            {session.resources.map((r: any) => (
+              <a key={r.id} href={r.fileUrl} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-1.5 bg-[#FAF8F5] border border-[#EFECE6] px-3 py-1.5 rounded-lg text-xs font-bold text-[#1E3A8A] hover:bg-blue-50 transition">
+                📄 {r.title}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Geçmiş ders: kayıt + öğretmen notu */}
+      {isEnded && (
+        <div className="border-t border-[#EFECE6] pt-3 mt-1 space-y-2">
+          {session.recordingUrl && (
+            <a href={session.recordingUrl} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:underline">
+              📹 Ders Kaydını İzle
+            </a>
+          )}
+          {/* Öğrenci için öğretmen notu */}
+          {role === "student" && session.myFeedback && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
+              <p className="text-xs font-black text-amber-800 mb-1">
+                ⭐ {"★".repeat(session.myFeedback.rating)}{"☆".repeat(5 - session.myFeedback.rating)} — Öğretmen Değerlendirmesi
+              </p>
+              {session.myFeedback.comment && (
+                <p className="text-xs text-amber-900 font-semibold">"{session.myFeedback.comment}"</p>
+              )}
+              {session.myFeedback.homeworkGiven && (
+                <span className="inline-block mt-1 text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">📝 Ödev verildi</span>
+              )}
+            </div>
+          )}
+          {/* Öğrenci yoklama */}
+          {role === "student" && session.participation && (
+            <span className={`inline-block text-xs font-bold px-2.5 py-0.5 rounded-full ${session.participation.isAttended ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
+              {session.participation.isAttended ? "✅ Yoklama: Katıldı" : "❌ Yoklama: Katılmadı"}
+            </span>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StudentSessionsTab({ userId }: { userId: number }) {
+  const [sessions, setSessions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/user/my-sessions", {
+      headers: { "x-user-id": String(userId), "x-user-role": "student" },
+    })
+      .then((r) => r.json())
+      .then((d) => { if (d.success) setSessions(d.sessions); })
+      .finally(() => setLoading(false));
+  }, [userId]);
+
+  const upcoming = sessions.filter((s) => s.status !== "ENDED" && s.status !== "CANCELLED");
+  const past     = sessions.filter((s) => s.status === "ENDED");
+
+  if (loading) return <div className="py-12 text-center text-gray-400 font-semibold">Yükleniyor...</div>;
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <h3 className="text-base font-black text-[#1E3A8A] mb-4">📅 Yaklaşan Canlı Derslerim ({upcoming.length})</h3>
+        {upcoming.length === 0 ? (
+          <p className="text-sm text-gray-400 font-semibold py-6 text-center">Yaklaşan dersiniz bulunmuyor.</p>
+        ) : (
+          <div className="space-y-4">
+            {upcoming.map((s) => <SessionCard key={s.id} session={s} role="student" />)}
+          </div>
+        )}
+      </div>
+      <div>
+        <h3 className="text-base font-black text-[#1E3A8A] mb-4">🕐 Geçmiş Derslerim & Öğretmen Notları ({past.length})</h3>
+        {past.length === 0 ? (
+          <p className="text-sm text-gray-400 font-semibold py-6 text-center">Henüz tamamlanan dersiniz yok.</p>
+        ) : (
+          <div className="space-y-4">
+            {past.map((s) => <SessionCard key={s.id} session={s} role="student" />)}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function TeacherSessionsTab({ userId }: { userId: number }) {
+  const [sessions, setSessions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/user/my-sessions", {
+      headers: { "x-user-id": String(userId), "x-user-role": "teacher" },
+    })
+      .then((r) => r.json())
+      .then((d) => { if (d.success) setSessions(d.sessions); })
+      .finally(() => setLoading(false));
+  }, [userId]);
+
+  const upcoming = sessions.filter((s) => s.status !== "ENDED" && s.status !== "CANCELLED");
+  const past     = sessions.filter((s) => s.status === "ENDED");
+
+  if (loading) return <div className="py-12 text-center text-gray-400 font-semibold">Yükleniyor...</div>;
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <h3 className="text-base font-black text-[#1E3A8A] mb-4">📅 Yaklaşan Canlı Derslerim ({upcoming.length})</h3>
+        {upcoming.length === 0 ? (
+          <p className="text-sm text-gray-400 font-semibold py-6 text-center">Planlı dersiniz bulunmuyor.</p>
+        ) : (
+          <div className="space-y-4">
+            {upcoming.map((s) => <SessionCard key={s.id} session={s} role="teacher" />)}
+          </div>
+        )}
+      </div>
+      <div>
+        <h3 className="text-base font-black text-[#1E3A8A] mb-4">🕐 Geçmiş Derslerim ({past.length})</h3>
+        {past.length === 0 ? (
+          <p className="text-sm text-gray-400 font-semibold py-6 text-center">Tamamlanan dersiniz yok.</p>
+        ) : (
+          <div className="space-y-4">
+            {past.map((s) => <SessionCard key={s.id} session={s} role="teacher" />)}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Ana Profil Sayfası ────────────────────────────────────────────────────────
 
 interface Student {
   id: number;
@@ -66,7 +280,7 @@ export default function ProfilPage() {
   const [faqForm, setFaqForm] = useState({ question: "", answer: "" });
 
   // Chat States
-  const [dashboardTab, setDashboardTab] = useState<"panel" | "duzenle" | "dersler" | "bloglar" | "faq" | "mesajlar">("panel");
+  const [dashboardTab, setDashboardTab] = useState<"panel" | "duzenle" | "dersler" | "bloglar" | "faq" | "mesajlar" | "canli">("panel");
   const [chatRooms, setChatRooms] = useState<any[]>([]);
   const [activeRoomId, setActiveRoomId] = useState<number | null>(null);
   const [activeRoomMessages, setActiveRoomMessages] = useState<any[]>([]);
@@ -969,6 +1183,16 @@ export default function ProfilPage() {
               {role === "student" ? (
                 <>
                   <button
+                    onClick={() => setDashboardTab("canli")}
+                    className={`text-xs font-black px-4 py-2.5 rounded-t-xl transition-all whitespace-nowrap ${
+                      dashboardTab === "canli"
+                        ? "bg-[#1E3A8A] text-white"
+                        : "text-gray-500 hover:text-gray-700 bg-white/50 border border-b-0 border-[#EFECE6]"
+                    }`}
+                  >
+                    🎥 Canlı Derslerim
+                  </button>
+                  <button
                     onClick={() => setDashboardTab("panel")}
                     className={`text-xs font-black px-4 py-2.5 rounded-t-xl transition-all whitespace-nowrap ${
                       dashboardTab === "panel"
@@ -992,6 +1216,7 @@ export default function ProfilPage() {
               ) : (
                 <>
                   {[
+                    { id: "canli", label: "🎥 Canlı Derslerim" },
                     { id: "panel", label: "📊 Panelim" },
                     { id: "duzenle", label: "✏️ Profilimi Düzenle" },
                     { id: "dersler", label: "📚 Özel Derslerim" },
@@ -1014,6 +1239,11 @@ export default function ProfilPage() {
                 </>
               )}
             </div>
+
+            {/* ─── STUDENT CANLI DERSLER ─── */}
+            {dashboardTab === "canli" && studentProfile && (
+              <StudentSessionsTab userId={studentProfile.id} />
+            )}
 
             {dashboardTab === "panel" && studentProfile && (
               <div className="space-y-8">
@@ -1314,6 +1544,11 @@ export default function ProfilPage() {
                         </p>
                       </div>
                     </div>
+
+                    {/* Tab: Canlı Derslerim */}
+                    {dashboardTab === "canli" && teacherProfile && (
+                      <TeacherSessionsTab userId={teacherProfile.id} />
+                    )}
 
                     {/* Tab 1: Panelim */}
                     {dashboardTab === "panel" && (

@@ -1,0 +1,362 @@
+"use client";
+
+import { useEffect, useRef, useState, useCallback } from "react";
+import { useParams, useRouter } from "next/navigation";
+
+interface Student {
+  id: number;
+  name: string;
+  isAttended: boolean;
+}
+
+interface FeedbackEntry {
+  rating: number;
+  comment: string;
+  homeworkGiven: boolean;
+}
+
+// ─── Ders Sonu Değerlendirme Modalı ──────────────────────────────────────────
+
+function FeedbackModal({
+  students,
+  sessionId,
+  teacherId,
+  onDone,
+}: {
+  students: Student[];
+  sessionId: number;
+  teacherId: number;
+  onDone: () => void;
+}) {
+  const [feedbacks, setFeedbacks] = useState<Record<number, FeedbackEntry>>(() =>
+    Object.fromEntries(
+      students.map((s) => [s.id, { rating: 5, comment: "", homeworkGiven: false }])
+    )
+  );
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const update = (studentId: number, field: keyof FeedbackEntry, value: unknown) => {
+    setFeedbacks((prev) => ({
+      ...prev,
+      [studentId]: { ...prev[studentId], [field]: value },
+    }));
+  };
+
+  const handleSubmit = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/sessions/${sessionId}/feedback`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          teacherId,
+          feedbacks: students.map((s) => ({
+            studentId: s.id,
+            ...feedbacks[s.id],
+          })),
+        }),
+      });
+      if (res.ok) {
+        setSaved(true);
+        setTimeout(onDone, 2000);
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (saved) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl p-10 text-center shadow-2xl">
+          <div className="text-5xl mb-4">✅</div>
+          <h3 className="text-xl font-black text-[#1E3A8A]">Değerlendirmeler Kaydedildi!</h3>
+          <p className="text-gray-500 mt-2">Yönlendiriliyorsunuz...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl my-8">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-[#1E3A8A] to-indigo-700 rounded-t-3xl p-6">
+          <h2 className="text-xl font-black text-white">📝 Ders Sonu Değerlendirme</h2>
+          <p className="text-indigo-200 text-sm mt-1">Her öğrenci için puan, yorum ve ödev bilgisini girin</p>
+        </div>
+
+        <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
+          {students.map((student) => (
+            <div key={student.id} className="border border-[#EFECE6] rounded-2xl p-5 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-b from-[#1E3A8A] to-indigo-800 flex items-center justify-center text-white font-black">
+                  {student.name.charAt(0)}
+                </div>
+                <div>
+                  <p className="font-black text-gray-900">{student.name}</p>
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${student.isAttended ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
+                    {student.isAttended ? "✅ Katıldı" : "❌ Katılmadı"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Yıldız Derecelendirme */}
+              <div>
+                <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Performans Puanı</label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => update(student.id, "rating", star)}
+                      className={`text-2xl transition-transform hover:scale-110 ${
+                        feedbacks[student.id]?.rating >= star ? "text-amber-400" : "text-gray-300"
+                      }`}
+                    >
+                      ★
+                    </button>
+                  ))}
+                  <span className="ml-2 text-sm font-bold text-gray-600">
+                    {feedbacks[student.id]?.rating}/5
+                  </span>
+                </div>
+              </div>
+
+              {/* Yorum */}
+              <div>
+                <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Öğrenci Notu / Yorum</label>
+                <textarea
+                  rows={2}
+                  placeholder="Bu ders için öğrenci hakkında notunuzu yazın..."
+                  value={feedbacks[student.id]?.comment || ""}
+                  onChange={(e) => update(student.id, "comment", e.target.value)}
+                  className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-xl px-4 py-2.5 text-sm font-semibold resize-none focus:outline-none focus:border-[#1E3A8A]/50"
+                />
+              </div>
+
+              {/* Ödev */}
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={feedbacks[student.id]?.homeworkGiven || false}
+                  onChange={(e) => update(student.id, "homeworkGiven", e.target.checked)}
+                  className="w-5 h-5 accent-[#1E3A8A]"
+                />
+                <span className="text-sm font-bold text-gray-700">Ödev verildi</span>
+              </label>
+            </div>
+          ))}
+        </div>
+
+        <div className="p-6 border-t border-[#EFECE6] flex gap-3">
+          <button
+            onClick={handleSubmit}
+            disabled={saving}
+            className="flex-1 bg-[#1E3A8A] hover:bg-[#163070] text-white font-black py-3.5 rounded-xl transition disabled:opacity-60"
+          >
+            {saving ? "Kaydediliyor..." : "💾 Değerlendirmeleri Kaydet"}
+          </button>
+          <button
+            onClick={onDone}
+            className="px-6 border border-[#EFECE6] text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition"
+          >
+            Geç
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Ana Canlı Ders Sayfası ───────────────────────────────────────────────────
+
+export default function LiveSessionPage() {
+  const { sessionId } = useParams<{ sessionId: string }>();
+  const router = useRouter();
+
+  const [status, setStatus] = useState<"loading" | "joining" | "live" | "error" | "ended">("loading");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [roomUrl, setRoomUrl] = useState("");
+  const [isOwner, setIsOwner] = useState(false);
+  const [userId, setUserId] = useState<number | null>(null);
+  const [role, setRole] = useState<"teacher" | "student" | null>(null);
+  const [sessionTitle, setSessionTitle] = useState("Canlı Ders");
+  const [students, setStudents] = useState<Student[]>([]);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Kullanıcıyı storage'dan oku ve odaya bağlan
+  const joinSession = useCallback(async () => {
+    const rawUser  = localStorage.getItem("derslinex_user")  || sessionStorage.getItem("derslinex_user");
+    const rawRole  = localStorage.getItem("derslinex_role")  || sessionStorage.getItem("derslinex_role");
+
+    if (!rawUser || !rawRole) {
+      setErrorMsg("Giriş yapmanız gerekiyor.");
+      setStatus("error");
+      return;
+    }
+
+    const user = JSON.parse(rawUser) as { id: number; name: string };
+    const userRole = rawRole as "teacher" | "student";
+
+    setUserId(user.id);
+    setRole(userRole);
+    setStatus("joining");
+
+    try {
+      const res = await fetch(`/api/sessions/${sessionId}/join`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id, role: userRole, userName: user.name }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        setErrorMsg(data.error || "Odaya bağlanılamadı.");
+        setStatus("error");
+        return;
+      }
+
+      // Daily Prebuilt URL'ye token ekle
+      const fullUrl = `${data.roomUrl}?t=${data.token}`;
+      setRoomUrl(fullUrl);
+      setIsOwner(data.isOwner);
+      setStatus("live");
+    } catch {
+      setErrorMsg("Sunucuya bağlanılamadı.");
+      setStatus("error");
+    }
+  }, [sessionId]);
+
+  useEffect(() => {
+    joinSession();
+  }, [joinSession]);
+
+  // Öğretmen "Dersi Bitir" butonuna bastığında
+  const handleEndSession = async () => {
+    if (!userId) return;
+    if (!confirm("Dersi bitirmek istediğinizden emin misiniz? Odadaki herkes çıkarılacak.")) return;
+
+    try {
+      const res = await fetch(`/api/sessions/${sessionId}/end`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ teacherId: userId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setStudents(data.students || []);
+        setShowFeedback(true);
+        setStatus("ended");
+      }
+    } catch {
+      alert("Ders bitirilirken bir hata oluştu.");
+    }
+  };
+
+  // ─── Yükleniyor Ekranı ─────────────────────────────────────────────────────
+  if (status === "loading" || status === "joining") {
+    return (
+      <div className="min-h-screen bg-[#0A1628] flex flex-col items-center justify-center text-white gap-4">
+        <div className="w-12 h-12 border-4 border-indigo-400 border-t-transparent rounded-full animate-spin" />
+        <p className="text-lg font-bold text-indigo-300">
+          {status === "loading" ? "Hazırlanıyor..." : "Odaya bağlanılıyor..."}
+        </p>
+      </div>
+    );
+  }
+
+  // ─── Hata Ekranı ───────────────────────────────────────────────────────────
+  if (status === "error") {
+    return (
+      <div className="min-h-screen bg-[#0A1628] flex flex-col items-center justify-center text-white gap-6 px-4">
+        <div className="text-6xl">🚫</div>
+        <h1 className="text-2xl font-black">Erişim Engellendi</h1>
+        <p className="text-indigo-300 text-center max-w-sm">{errorMsg}</p>
+        <button
+          onClick={() => router.push("/profil")}
+          className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-3 rounded-xl transition"
+        >
+          Profile Dön
+        </button>
+      </div>
+    );
+  }
+
+  // ─── Canlı Ders / Biten Ders Ekranı ───────────────────────────────────────
+  return (
+    <div className="min-h-screen bg-[#0A1628] flex flex-col">
+      {/* Üst Bar */}
+      <div className="flex items-center justify-between px-5 py-3 bg-[#0F1F3D] border-b border-white/10">
+        <div className="flex items-center gap-3">
+          <span className="text-white font-black text-lg">📚 Derslinex</span>
+          {status === "live" && (
+            <span className="flex items-center gap-1.5 bg-red-600/20 border border-red-500/40 text-red-400 text-xs font-black px-2.5 py-1 rounded-full">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              CANLI
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-indigo-300 text-sm font-bold hidden sm:block">{sessionTitle}</span>
+          {isOwner && status === "live" && (
+            <button
+              onClick={handleEndSession}
+              className="bg-red-600 hover:bg-red-500 text-white font-black text-sm px-5 py-2 rounded-xl transition flex items-center gap-2"
+            >
+              ⏹ Dersi Bitir
+            </button>
+          )}
+          <button
+            onClick={() => router.push("/profil")}
+            className="text-gray-400 hover:text-white text-sm font-bold transition"
+          >
+            ✕ Çık
+          </button>
+        </div>
+      </div>
+
+      {/* Daily.co Prebuilt iframe */}
+      {status === "live" && roomUrl && (
+        <iframe
+          ref={iframeRef}
+          src={roomUrl}
+          className="flex-1 w-full border-0"
+          allow="camera; microphone; fullscreen; speaker; display-capture"
+          allowFullScreen
+          title="Canlı Ders Odası"
+        />
+      )}
+
+      {/* Ders bitti ekranı (feedback modal açılıncaya kadar) */}
+      {status === "ended" && !showFeedback && (
+        <div className="flex-1 flex flex-col items-center justify-center text-white gap-4">
+          <div className="text-5xl">✅</div>
+          <h2 className="text-2xl font-black">Ders Sona Erdi</h2>
+          <button
+            onClick={() => router.push("/profil")}
+            className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-3 rounded-xl transition"
+          >
+            Profile Dön
+          </button>
+        </div>
+      )}
+
+      {/* Ders Sonu Değerlendirme Modalı */}
+      {showFeedback && userId && (
+        <FeedbackModal
+          students={students}
+          sessionId={parseInt(sessionId)}
+          teacherId={userId}
+          onDone={() => {
+            setShowFeedback(false);
+            router.push("/profil");
+          }}
+        />
+      )}
+    </div>
+  );
+}
