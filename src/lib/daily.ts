@@ -2,13 +2,16 @@
  * Daily.co REST API yardımcısı
  * Ders odası oluşturma, token üretme ve oda silme işlemlerini kapsar.
  */
-
 const DAILY_BASE = process.env.DAILY_API_BASE || "https://api.daily.co/v1";
-const DAILY_KEY  = process.env.DAILY_API_KEY!;
+
+function getDailyKey(): string {
+  const raw = process.env.DAILY_API_KEY || "a8e51bc26699bca3a015727f92d5dbf43ccef195cfacff77d8ce376c18534ee2";
+  return raw.trim().split(/\s+/)[0];
+}
 
 function dailyHeaders() {
   return {
-    Authorization: `Bearer ${DAILY_KEY}`,
+    Authorization: `Bearer ${getDailyKey()}`,
     "Content-Type": "application/json",
   };
 }
