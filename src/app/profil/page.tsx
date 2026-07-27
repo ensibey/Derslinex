@@ -64,7 +64,7 @@ export default function ProfilPage() {
   const [faqForm, setFaqForm] = useState({ question: "", answer: "" });
 
   // Chat States
-  const [dashboardTab, setDashboardTab] = useState<"panel" | "mesajlar">("panel");
+  const [dashboardTab, setDashboardTab] = useState<"panel" | "duzenle" | "dersler" | "bloglar" | "faq" | "mesajlar">("panel");
   const [chatRooms, setChatRooms] = useState<any[]>([]);
   const [activeRoomId, setActiveRoomId] = useState<number | null>(null);
   const [activeRoomMessages, setActiveRoomMessages] = useState<any[]>([]);
@@ -957,34 +957,58 @@ export default function ProfilPage() {
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex gap-2 border-b border-[#EFECE6] pb-1">
-              <button
-                onClick={() => setDashboardTab("panel")}
-                className={`text-xs font-black px-4 py-2.5 rounded-t-xl transition-all ${
-                  dashboardTab === "panel"
-                    ? "bg-[#1E3A8A] text-white"
-                    : "text-gray-500 hover:text-gray-700 bg-white/50 border border-b-0 border-[#EFECE6]"
-                }`}
-              >
-                📊 Kontrol Panelim
-              </button>
-              <button
-                onClick={() => setDashboardTab("mesajlar")}
-                className={`text-xs font-black px-4 py-2.5 rounded-t-xl transition-all flex items-center gap-1.5 ${
-                  dashboardTab === "mesajlar"
-                    ? "bg-[#1E3A8A] text-white"
-                    : "text-gray-500 hover:text-gray-700 bg-white/50 border border-b-0 border-[#EFECE6]"
-                }`}
-              >
-                💬 Mesajlarım ({chatRooms.length})
-              </button>
+            <div className="flex gap-1.5 border-b border-[#EFECE6] pb-1 overflow-x-auto scrollbar-none">
+              {role === "student" ? (
+                <>
+                  <button
+                    onClick={() => setDashboardTab("panel")}
+                    className={`text-xs font-black px-4 py-2.5 rounded-t-xl transition-all whitespace-nowrap ${
+                      dashboardTab === "panel"
+                        ? "bg-[#1E3A8A] text-white"
+                        : "text-gray-500 hover:text-gray-700 bg-white/50 border border-b-0 border-[#EFECE6]"
+                    }`}
+                  >
+                    📊 Kontrol Panelim
+                  </button>
+                  <button
+                    onClick={() => setDashboardTab("mesajlar")}
+                    className={`text-xs font-black px-4 py-2.5 rounded-t-xl transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                      dashboardTab === "mesajlar"
+                        ? "bg-[#1E3A8A] text-white"
+                        : "text-gray-500 hover:text-gray-700 bg-white/50 border border-b-0 border-[#EFECE6]"
+                    }`}
+                  >
+                    💬 Mesajlarım ({chatRooms.length})
+                  </button>
+                </>
+              ) : (
+                <>
+                  {[
+                    { id: "panel", label: "📊 Panelim" },
+                    { id: "duzenle", label: "✏️ Profilimi Düzenle" },
+                    { id: "dersler", label: "📚 Özel Derslerim" },
+                    { id: "bloglar", label: "✍️ Bloglarım" },
+                    { id: "faq", label: "❓ SSS (FAQ)" },
+                    { id: "mesajlar", label: "💬 Mesajlarım" }
+                  ].map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => setDashboardTab(t.id as any)}
+                      className={`text-xs font-black px-4 py-2.5 rounded-t-xl transition-all whitespace-nowrap ${
+                        dashboardTab === t.id
+                          ? "bg-[#1E3A8A] text-white"
+                          : "text-gray-500 hover:text-gray-700 bg-white/50 border border-b-0 border-[#EFECE6]"
+                      }`}
+                    >
+                      {t.id === "mesajlar" ? `${t.label} (${chatRooms.length})` : t.label}
+                    </button>
+                  ))}
+                </>
+              )}
             </div>
 
-            {dashboardTab === "panel" && (
-              <>
-                {/* STUDENT VIEW */}
-                {studentProfile && (
-                  <div className="space-y-8">
+            {dashboardTab === "panel" && studentProfile && (
+              <div className="space-y-8">
                     {/* Stats Dashboard */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="bg-white/90 border border-[#EFECE6] p-5 rounded-2xl shadow-xs">
@@ -1180,451 +1204,529 @@ export default function ProfilPage() {
                       </div>
                     </div>
                   </div>
-                )}
+            )}
 
                 {/* TEACHER VIEW */}
                 {teacherProfile && (
                   <div className="space-y-6">
-                    <div className="grid md:grid-cols-12 gap-8">
-                      {/* Left Column: Teacher Edit Card */}
-                      <div className="md:col-span-4 space-y-6">
-                        <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 shadow-sm">
-                          <div className="flex justify-between items-center mb-6 pb-2 border-b border-[#FAF8F5]">
-                            <h3 className="text-base font-black text-[#1E3A8A]">Profil Bilgilerim</h3>
-                            {!editingTeacher ? (
-                              <button
-                                onClick={() => setEditingTeacher(true)}
-                                className="text-xs bg-[#FAF8F5] hover:bg-[#FAF0E3] text-[#B45309] font-black px-3.5 py-1.5 rounded-lg border border-[#EFECE6] transition"
-                              >
-                                ✏️ Düzenle
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => {
-                                  setEditingTeacher(false);
-                                  setTeacherEditForm({
-                                    name: teacherProfile.name,
-                                    phone: teacherProfile.phone,
-                                    branch: teacherProfile.branch,
-                                    egitim: teacherProfile.egitim || "",
-                                    ozgecmis: teacherProfile.ozgecmis || "",
-                                    linkedin: teacherProfile.linkedin || "",
-                                    youtube: teacherProfile.youtube || ""
-                                  });
-                                }}
-                                className="text-xs bg-[#FAF8F5] hover:bg-gray-100 text-gray-500 font-black px-3.5 py-1.5 rounded-lg border border-[#EFECE6] transition"
-                              >
-                                Vazgeç
-                              </button>
-                            )}
-                          </div>
-
-                          {!editingTeacher ? (
-                            <div className="space-y-4 text-sm font-semibold text-gray-700">
-                              <div><span className="text-gray-400 block text-xs">Ad Soyad</span>{teacherProfile.name}</div>
-                              <div><span className="text-gray-400 block text-xs">Telefon</span>{teacherProfile.phone}</div>
-                              <div><span className="text-gray-400 block text-xs">Branş</span>{teacherProfile.branch}</div>
-                              <div><span className="text-gray-400 block text-xs">Eğitim</span>{teacherProfile.egitim || "Girilmemiş"}</div>
-                              <div><span className="text-gray-400 block text-xs">Hakkımda</span>{teacherProfile.ozgecmis || "Girilmemiş"}</div>
-                              <div><span className="text-gray-400 block text-xs">LinkedIn</span>{teacherProfile.linkedin || "Eklenmemiş"}</div>
-                              <div><span className="text-gray-400 block text-xs">YouTube Video Linki</span>{teacherProfile.youtube || "Eklenmemiş"}</div>
-                              <div><span className="text-gray-400 block text-xs">E-posta</span>{teacherProfile.email}</div>
-                            </div>
-                          ) : (
-                            <form onSubmit={handleTeacherUpdate} className="space-y-4">
-                              <div>
-                                <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Ad Soyad</label>
-                                <input
-                                  type="text"
-                                  value={teacherEditForm.name}
-                                  onChange={(e) => setTeacherEditForm({ ...teacherEditForm, name: e.target.value })}
-                                  required
-                                  className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Telefon</label>
-                                <input
-                                  type="text"
-                                  value={teacherEditForm.phone}
-                                  onChange={(e) => setTeacherEditForm({ ...teacherEditForm, phone: e.target.value })}
-                                  required
-                                  className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Branş</label>
-                                <input
-                                  type="text"
-                                  value={teacherEditForm.branch}
-                                  onChange={(e) => setTeacherEditForm({ ...teacherEditForm, branch: e.target.value })}
-                                  required
-                                  className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Eğitim Mezuniyet Bilgisi</label>
-                                <input
-                                  type="text"
-                                  value={teacherEditForm.egitim}
-                                  onChange={(e) => setTeacherEditForm({ ...teacherEditForm, egitim: e.target.value })}
-                                  placeholder="Örn: Boğaziçi Üniversitesi Matematik"
-                                  className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">LinkedIn Profil Linki</label>
-                                <input
-                                  type="url"
-                                  value={teacherEditForm.linkedin}
-                                  onChange={(e) => setTeacherEditForm({ ...teacherEditForm, linkedin: e.target.value })}
-                                  placeholder="Örn: https://linkedin.com/in/adiniz"
-                                  className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">YouTube Tanıtım Videosu Linki</label>
-                                <input
-                                  type="url"
-                                  value={teacherEditForm.youtube}
-                                  onChange={(e) => setTeacherEditForm({ ...teacherEditForm, youtube: e.target.value })}
-                                  placeholder="Örn: https://youtube.com/watch?v=..."
-                                  className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Öğretmen Hakkında (Tanıtım Yazısı)</label>
-                                <textarea
-                                  rows={4}
-                                  value={teacherEditForm.ozgecmis}
-                                  onChange={(e) => setTeacherEditForm({ ...teacherEditForm, ozgecmis: e.target.value })}
-                                  placeholder="Kendinizden, ders anlatım tarzınızdan bahsedin..."
-                                  className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
-                                />
-                              </div>
-                              <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-black px-5 py-3 rounded-xl text-xs transition"
-                              >
-                                Değişiklikleri Kaydet
-                              </button>
-                            </form>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Right Column: Status Warning OR Feedback Log */}
-                      <div className="md:col-span-8 space-y-6">
-                        {teacherProfile.status === "Beklemede" ? (
-                          <div className="bg-white rounded-3xl border border-amber-200 bg-amber-50/20 p-8 sm:p-10 shadow-sm text-center">
-                            <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
-                              ⏳
-                            </div>
-                            <h3 className="text-xl font-black text-[#1E3A8A] mb-2">Başvurunuz Alındı!</h3>
-                            <p className="text-sm text-gray-655 font-bold max-w-lg mx-auto leading-relaxed">
-                              Bilgileriniz başarıyla kaydedilmiştir. Başvurunuz yöneticilerimiz tarafından onaylandığı an profiliniz sitede yayınlanacaktır. Bu süreçte sol taraftan profilinizi düzenlemeye ve tamamlamaya devam edebilirsiniz.
-                            </p>
-                          </div>
-                        ) : (
-                          <div className="space-y-6">
-                            {/* Ders İlanlarım (Armut Modeli Ders Açma) */}
-                            <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 sm:p-8 shadow-sm">
-                              <div className="flex justify-between items-center mb-6 pb-2 border-b border-[#FAF8F5]">
-                                <div>
-                                  <h3 className="text-lg font-black text-[#1E3A8A]">Ders İlanlarım</h3>
-                                  <p className="text-xs text-gray-500 font-semibold mt-0.5">Sitede yayınlanacak özel ders tekliflerinizi yönetin.</p>
-                                </div>
-                                <button
-                                  onClick={() => setAddingLesson(!addingLesson)}
-                                  className="text-xs bg-[#B45309] hover:bg-[#92400E] text-white font-black px-4 py-2 rounded-xl transition"
-                                >
-                                  {addingLesson ? "Vazgeç" : "➕ Yeni İlan Aç"}
-                                </button>
-                              </div>
-
-                              {addingLesson ? (
-                                <form onSubmit={handleAddLesson} className="space-y-4 max-w-lg">
-                                  <div className="grid sm:grid-cols-2 gap-4">
-                                    <div>
-                                      <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Ders Başlığı</label>
-                                      <input
-                                        type="text"
-                                        required
-                                        placeholder="Örn: 10. Sınıf Fizik Özel Ders"
-                                        value={lessonForm.title}
-                                        onChange={(e) => setLessonForm({ ...lessonForm, title: e.target.value })}
-                                        className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
-                                      />
-                                    </div>
-                                    <div>
-                                      <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Saatlik Ücret (TL)</label>
-                                      <input
-                                        type="number"
-                                        required
-                                        placeholder="Örn: 400"
-                                        value={lessonForm.price}
-                                        onChange={(e) => setLessonForm({ ...lessonForm, price: e.target.value })}
-                                        className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
-                                      />
-                                    </div>
-                                  </div>
-                                  <div>
-                                    <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Ders Formatı</label>
-                                    <select
-                                      value={lessonForm.format}
-                                      onChange={(e) => setLessonForm({ ...lessonForm, format: e.target.value })}
-                                      className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
-                                    >
-                                      <option value="online">Online Ders</option>
-                                      <option value="yuz-yuze">Yüz Yüze Ders</option>
-                                      <option value="her-ikisi">Online & Yüz Yüze</option>
-                                    </select>
-                                  </div>
-                                  <div>
-                                    <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Açıklama (Opsiyonel)</label>
-                                    <textarea
-                                      rows={3}
-                                      placeholder="Ders süreci, seviye ve detaylar hakkında bilgi verin..."
-                                      value={lessonForm.description}
-                                      onChange={(e) => setLessonForm({ ...lessonForm, description: e.target.value })}
-                                      className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
-                                    />
-                                  </div>
-                                  <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-black px-6 py-3 rounded-xl text-xs transition"
-                                  >
-                                    İlanı Yayınla
-                                  </button>
-                                </form>
-                              ) : (
-                                teacherLessons.length === 0 ? (
-                                  <p className="text-sm text-gray-500 font-semibold">Henüz açtığınız bir ders ilanı bulunmuyor. İlan açarak öğrencilerin size ulaşmasını sağlayabilirsiniz.</p>
-                                ) : (
-                                  <div className="grid sm:grid-cols-2 gap-4">
-                                    {teacherLessons.map((l) => (
-                                      <div key={l.id} className="p-4 bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl relative shadow-xs flex flex-col justify-between">
-                                        <div>
-                                          <h4 className="font-black text-sm text-[#1E3A8A] mb-1">{l.title}</h4>
-                                          <p className="text-xs text-[#B45309] font-black">{l.price} TL / Saat</p>
-                                          <span className="inline-block text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-bold border border-blue-100 mt-2">
-                                            {l.format === "online" ? "💻 Online" : l.format === "yuz-yuze" ? "🏫 Yüz Yüze" : "🔄 Her İkisi"}
-                                          </span>
-                                          {l.description && (
-                                            <p className="text-gray-500 text-xs font-semibold mt-3 line-clamp-2">{l.description}</p>
-                                          )}
-                                        </div>
-                                        <div className="text-right mt-4 pt-3 border-t border-[#EFECE6]/50">
-                                          <button
-                                            onClick={() => handleDeleteLesson(l.id)}
-                                            className="text-xs text-rose-600 hover:text-rose-800 font-black"
-                                          >
-                                            🗑️ İlanı Kaldır
-                                          </button>
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                )
-                              )}
-                            </div>
-
-                            {/* Blog Yazılarım */}
-                            <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 sm:p-8 shadow-sm">
-                              <div className="flex justify-between items-center mb-6 pb-2 border-b border-[#FAF8F5]">
-                                <div>
-                                  <h3 className="text-lg font-black text-[#1E3A8A]">Blog Yazılarım</h3>
-                                  <p className="text-xs text-gray-500 font-semibold mt-0.5">Sitede yayınlanacak YKS rehber veya ders içeriklerinizi yazın.</p>
-                                </div>
-                                <button
-                                  onClick={() => setWritingBlog(!writingBlog)}
-                                  className="text-xs bg-[#B45309] hover:bg-[#92400E] text-white font-black px-4 py-2 rounded-xl transition"
-                                >
-                                  {writingBlog ? "Vazgeç" : "✍️ Yeni Yazı Paylaş"}
-                                </button>
-                              </div>
-
-                              {writingBlog ? (
-                                <form onSubmit={handleAddBlog} className="space-y-4">
-                                  <div className="grid sm:grid-cols-2 gap-4">
-                                    <div>
-                                      <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Başlık</label>
-                                      <input
-                                        type="text"
-                                        required
-                                        placeholder="Örn: TYT Matematik Net Arttırma Yöntemleri"
-                                        value={blogForm.title}
-                                        onChange={(e) => setBlogForm({ ...blogForm, title: e.target.value })}
-                                        className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
-                                      />
-                                    </div>
-                                    <div>
-                                      <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Kategori</label>
-                                      <select
-                                        value={blogForm.category}
-                                        onChange={(e) => setBlogForm({ ...blogForm, category: e.target.value })}
-                                        className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
-                                      >
-                                        <option value="YKS Bilgi">YKS Bilgi</option>
-                                        <option value="Ders Rehberleri">Ders Rehberleri</option>
-                                        <option value="Çalışma Teknikleri">Çalışma Teknikleri</option>
-                                        <option value="Genel Rehberlik">Genel Rehberlik</option>
-                                      </select>
-                                    </div>
-                                  </div>
-                                  <div>
-                                    <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">İçerik</label>
-                                    <textarea
-                                      rows={8}
-                                      required
-                                      placeholder="Yazınızı buraya yazın..."
-                                      value={blogForm.content}
-                                      onChange={(e) => setBlogForm({ ...blogForm, content: e.target.value })}
-                                      className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-semibold focus:outline-none"
-                                    />
-                                  </div>
-                                  <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-black px-6 py-3 rounded-xl text-xs transition"
-                                  >
-                                    Yazıyı Yayınla
-                                  </button>
-                                </form>
-                              ) : (
-                                teacherBlogs.length === 0 ? (
-                                  <p className="text-sm text-gray-500 font-semibold">Henüz paylaştığınız bir blog yazısı bulunmuyor. Yazı yayınlayarak öğrencilerinizin sizi tanımasını sağlayabilirsiniz.</p>
-                                ) : (
-                                  <div className="space-y-3">
-                                    {teacherBlogs.map((b) => (
-                                      <div key={b.id} className="p-4 bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl flex items-center justify-between shadow-xs">
-                                        <div>
-                                          <h4 className="font-black text-sm text-[#1E3A8A]">{b.title}</h4>
-                                          <div className="flex gap-3 text-[10px] text-gray-400 mt-1 font-bold">
-                                            <span>📂 {b.category}</span>
-                                            <span>📅 {new Date(b.createdAt).toLocaleDateString("tr-TR")}</span>
-                                            <a href={`/blog/${b.slug}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                                              🔗 Sitede Gör
-                                            </a>
-                                          </div>
-                                        </div>
-                                        <button
-                                          onClick={() => handleDeleteBlog(b.id)}
-                                          className="text-xs text-rose-600 hover:text-rose-800 font-black px-2.5 py-1 rounded-lg hover:bg-rose-50"
-                                        >
-                                          Sil
-                                        </button>
-                                      </div>
-                                    ))}
-                                  </div>
-                                )
-                              )}
-                            </div>
-
-                            {/* Sıkça Sorulan Sorular (FAQ) */}
-                            <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 sm:p-8 shadow-sm">
-                              <div className="flex justify-between items-center mb-6 pb-2 border-b border-[#FAF8F5]">
-                                <div>
-                                  <h3 className="text-lg font-black text-[#1E3A8A]">Sıkça Sorulan Sorular</h3>
-                                  <p className="text-xs text-gray-500 font-semibold mt-0.5">Profilinizde görünecek SSS listesini yönetin.</p>
-                                </div>
-                                <button
-                                  onClick={() => setAddingFaq(!addingFaq)}
-                                  className="text-xs bg-[#B45309] hover:bg-[#92400E] text-white font-black px-4 py-2 rounded-xl transition"
-                                >
-                                  {addingFaq ? "Vazgeç" : "➕ Yeni Soru Ekle"}
-                                </button>
-                              </div>
-
-                              {addingFaq ? (
-                                <form onSubmit={handleAddFaq} className="space-y-4">
-                                  <div>
-                                    <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Soru</label>
-                                    <input
-                                      type="text"
-                                      required
-                                      placeholder="Örn: Dersleri nerede yapıyorsunuz?"
-                                      value={faqForm.question}
-                                      onChange={(e) => setFaqForm({ ...faqForm, question: e.target.value })}
-                                      className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
-                                    />
-                                  </div>
-                                  <div>
-                                    <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Cevap</label>
-                                    <textarea
-                                      rows={3}
-                                      required
-                                      placeholder="Örn: Dersleri online olarak Zoom üzerinden ya da Kadıköy civarında yüz yüze yapıyorum."
-                                      value={faqForm.answer}
-                                      onChange={(e) => setFaqForm({ ...faqForm, answer: e.target.value })}
-                                      className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-semibold focus:outline-none"
-                                    />
-                                  </div>
-                                  <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-black px-6 py-3 rounded-xl text-xs transition"
-                                  >
-                                    Soruyu Kaydet
-                                  </button>
-                                </form>
-                              ) : (
-                                teacherFaqs.length === 0 ? (
-                                  <p className="text-sm text-gray-500 font-semibold">Henüz eklediğiniz bir soru bulunmuyor. SSS ekleyerek öğrencilerin en çok sorduğu soruları peşinen yanıtlayabilirsiniz.</p>
-                                ) : (
-                                  <div className="space-y-3">
-                                    {teacherFaqs.map((faq) => (
-                                      <div key={faq.id} className="p-4 bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl flex items-start justify-between shadow-xs gap-4">
-                                        <div className="flex-1">
-                                          <h4 className="font-black text-sm text-[#1E3A8A]">{faq.question}</h4>
-                                          <p className="text-xs text-gray-655 mt-2 font-semibold leading-relaxed">{faq.answer}</p>
-                                        </div>
-                                        <button
-                                          onClick={() => handleDeleteFaq(faq.id)}
-                                          className="text-xs text-rose-600 hover:text-rose-800 font-black px-2.5 py-1 rounded-lg hover:bg-rose-50 flex-shrink-0"
-                                        >
-                                          Sil
-                                        </button>
-                                      </div>
-                                    ))}
-                                  </div>
-                                )
-                              )}
-                            </div>
-
-                            {/* Görüşler */}
-                            <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 sm:p-8 shadow-sm">
-                              <h3 className="text-lg font-black text-[#1E3A8A] mb-4">Öğrencilerden Gelen Görüşler & Talepler</h3>
-                              {teacherFeedbacks.length === 0 ? (
-                                <p className="text-sm text-gray-500 font-semibold">Henüz size iletilen bir görüş veya randevu talebi bulunmamaktadır.</p>
-                              ) : (
-                                <div className="grid sm:grid-cols-2 gap-4">
-                                  {teacherFeedbacks.map((f) => (
-                                    <div key={f.id} className="p-4 bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl relative shadow-xs">
-                                      <div className="flex justify-between items-center mb-2">
-                                        <span className="font-black text-sm text-[#1E3A8A]">{f.studentName}</span>
-                                        <span className="text-amber-500 font-bold text-xs">{f.rating} ★</span>
-                                      </div>
-                                      <p className="text-gray-655 text-xs font-semibold leading-relaxed mb-3">{f.content}</p>
-                                      <div className="flex justify-between items-center text-[10px] text-gray-400">
-                                        <span>{f.studentEmail || "E-posta Gizli"}</span>
-                                        <span>{new Date(f.createdAt).toLocaleDateString("tr-TR")}</span>
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
+                    {/* Status Alert Banner */}
+                    <div className={`p-5 rounded-2xl border flex items-start sm:items-center gap-4 ${
+                      teacherProfile.status === "İletişime Geçildi" 
+                        ? "bg-emerald-50 border-emerald-200 text-emerald-800" 
+                        : "bg-amber-50 border-amber-200 text-amber-800"
+                    }`}>
+                      <span className="text-2xl mt-0.5 sm:mt-0">{teacherProfile.status === "İletişime Geçildi" ? "✅" : "⏳"}</span>
+                      <div>
+                        <h4 className="font-black text-sm">
+                          Profil Durumu: {teacherProfile.status === "İletişime Geçildi" ? "Onaylandı & Sitede Yayında" : "Başvuru Onay Bekliyor"}
+                        </h4>
+                        <p className="text-xs opacity-90 font-bold mt-0.5">
+                          {teacherProfile.status === "İletişime Geçildi" 
+                            ? "Tebrikler! Profiliniz web sitemizde aktif olarak yayındadır. Öğrenciler profilinizden ders alabilir ve size site içi mesaj gönderebilir." 
+                            : "Profil bilgileriniz incelenmektedir. Yöneticilerimiz onayladıktan sonra profiliniz otomatik olarak yayına alınacaktır. Bu esnada profilinizi düzenlemeye ve ilan eklemeye devam edebilirsiniz."}
+                        </p>
                       </div>
                     </div>
+
+                    {/* Tab 1: Panelim */}
+                    {dashboardTab === "panel" && (
+                      <div className="grid md:grid-cols-12 gap-8">
+                        {/* Left Card: Quick Profile Preview */}
+                        <div className="md:col-span-4 space-y-6">
+                          <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 shadow-sm">
+                            <div className="flex flex-col items-center pb-6 border-b border-[#FAF8F5]">
+                              <div className="w-20 h-20 bg-gradient-to-b from-[#1E3A8A] to-indigo-800 rounded-full flex items-center justify-center text-3xl text-white font-black mb-3 shadow-sm">
+                                {teacherProfile.name.charAt(0)}
+                              </div>
+                              <h3 className="text-lg font-black text-gray-900 text-center">{teacherProfile.name}</h3>
+                              <span className="bg-blue-50 text-blue-700 text-xs px-2.5 py-0.5 rounded-full border border-blue-100 font-bold mt-1.5">
+                                {teacherProfile.branch}
+                              </span>
+                            </div>
+                            <div className="space-y-4 pt-6 text-sm font-semibold text-gray-700">
+                              <div><span className="text-gray-400 block text-[10px] uppercase font-black mb-0.5">Telefon</span>{teacherProfile.phone}</div>
+                              <div><span className="text-gray-400 block text-[10px] uppercase font-black mb-0.5">E-posta</span>{teacherProfile.email}</div>
+                              <div><span className="text-gray-400 block text-[10px] uppercase font-black mb-0.5">Eğitim</span>{teacherProfile.egitim || "Girilmemiş"}</div>
+                              {teacherProfile.linkedin && <div><span className="text-gray-400 block text-[10px] uppercase font-black mb-0.5">LinkedIn</span><a href={teacherProfile.linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-650 hover:underline">Bağlantıyı Gör ➔</a></div>}
+                              {teacherProfile.youtube && <div><span className="text-gray-400 block text-[10px] uppercase font-black mb-0.5">YouTube</span><a href={teacherProfile.youtube} target="_blank" rel="noopener noreferrer" className="text-red-600 hover:underline">Tanıtım Videosunu Gör ➔</a></div>}
+                            </div>
+                            <button
+                              onClick={() => setDashboardTab("duzenle")}
+                              className="w-full mt-6 bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-black py-3 rounded-xl text-xs transition text-center shadow-xs"
+                            >
+                              ✏️ Profili Düzenle
+                            </button>
+                            {teacherProfile.status === "İletişime Geçildi" && (
+                              <a
+                                href={`/ogretmenler/${teacherProfile.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full mt-2 block bg-white hover:bg-gray-50 text-[#1E3A8A] border border-[#EFECE6] font-black py-2.5 rounded-xl text-xs transition text-center"
+                              >
+                                🔍 Yayındaki Profili Gör
+                              </a>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Right Area: Dynamic Stats & Quick Guide */}
+                        <div className="md:col-span-8 space-y-6">
+                          {/* Live stats */}
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                            {[
+                              { label: "Ders İlanları", val: teacherLessons.length, icon: "📚", tab: "dersler" },
+                              { label: "Blog Yazıları", val: teacherBlogs.length, icon: "✍️", tab: "bloglar" },
+                              { label: "Sorular (FAQ)", val: teacherFaqs.length, icon: "❓", tab: "faq" },
+                              { label: "Öğrenci Görüşleri", val: teacherFeedbacks.length, icon: "💬", tab: "panel" }
+                            ].map((s) => (
+                              <button
+                                key={s.label}
+                                onClick={() => setDashboardTab(s.tab as any)}
+                                className="bg-white border border-[#EFECE6] p-5 rounded-2xl shadow-xs text-center hover:border-[#1E3A8A]/45 hover:shadow-sm transition-all"
+                              >
+                                <span className="text-2xl block mb-1.5">{s.icon}</span>
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">{s.label}</span>
+                                <span className="text-xl font-black text-[#1E3A8A] block mt-1">{s.val}</span>
+                              </button>
+                            ))}
+                          </div>
+
+                          {/* Quick Guide / Checklist */}
+                          <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 sm:p-8 shadow-sm">
+                            <h3 className="text-lg font-black text-[#1E3A8A] mb-3">Derslinex Eğitmen Kontrol Paneli 🚀</h3>
+                            <p className="text-xs text-gray-655 font-bold leading-relaxed mb-6">
+                              Platformumuzda en yüksek randevu alan öğretmenlerin profillerinde eğitim, sosyal bağlantılar, net saatlik ders ücretleri ve sıkça sorulan sorular yer almaktadır.
+                            </p>
+                            <div className="grid sm:grid-cols-2 gap-4">
+                              {[
+                                { title: "Profilini Tamamla", desc: "Mezuniyet mezun bilgilerini, LinkedIn profil linkini ve kısa tanıtım yazını düzenle.", tab: "duzenle", action: "Profili Güncelle ➔" },
+                                { title: "Özel Ders İlanları Oluştur", desc: "Verdiğin her branş ve seviye için saatlik ücret belirterek yeni ilanlar aç.", tab: "dersler", action: "İlanları Yönet ➔" },
+                                { title: "Blog Paylaşımları Yap", desc: "YKS / LGS hazırlık tüyoları paylaşarak öğrencilerin dikkatini çek.", tab: "bloglar", action: "Blog Paylaş ➔" },
+                                { title: "Soru ve Cevaplar Ekle", desc: "Zoom dersleri, iptal politikaları veya kaynaklar hakkında en sık sorulan soruları ekle.", tab: "faq", action: "Soru Ekle ➔" }
+                              ].map((item) => (
+                                <div key={item.title} className="p-4 bg-[#FAF8F5]/50 border border-[#EFECE6]/70 rounded-2xl flex flex-col justify-between hover:bg-[#FAF8F5] transition-all">
+                                  <div>
+                                    <h4 className="text-sm font-black text-gray-800">{item.title}</h4>
+                                    <p className="text-xs text-gray-500 font-semibold mt-1 leading-relaxed">{item.desc}</p>
+                                  </div>
+                                  <button
+                                    onClick={() => setDashboardTab(item.tab as any)}
+                                    className="text-xs text-[#B45309] hover:text-[#92400E] font-black mt-4 block text-left"
+                                  >
+                                    {item.action}
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Student reviews block */}
+                          <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 sm:p-8 shadow-sm">
+                            <h3 className="text-base font-black text-[#1E3A8A] mb-4">Öğrencilerden Gelen Son Görüşler</h3>
+                            {teacherFeedbacks.length === 0 ? (
+                              <p className="text-sm text-gray-500 font-semibold">Henüz size iletilen bir öğrenci görüşü veya ders talebi bulunmamaktadır.</p>
+                            ) : (
+                              <div className="grid sm:grid-cols-2 gap-4">
+                                {teacherFeedbacks.map((f) => (
+                                  <div key={f.id} className="p-4 bg-[#FAF8F5]/60 border border-[#EFECE6] rounded-2xl relative shadow-xs">
+                                    <div className="flex justify-between items-center mb-2">
+                                      <span className="font-black text-sm text-[#1E3A8A]">{f.studentName}</span>
+                                      <span className="text-amber-500 font-bold text-xs">{f.rating} ★</span>
+                                    </div>
+                                    <p className="text-gray-655 text-xs font-semibold leading-relaxed mb-3">{f.content}</p>
+                                    <div className="flex justify-between items-center text-[10px] text-gray-400 border-t border-[#EFECE6]/40 pt-2">
+                                      <span>{f.studentEmail || "E-posta Gizli"}</span>
+                                      <span>{new Date(f.createdAt).toLocaleDateString("tr-TR")}</span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Tab 2: Profilimi Düzenle */}
+                    {dashboardTab === "duzenle" && (
+                      <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 sm:p-8 max-w-3xl shadow-sm">
+                        <h3 className="text-lg font-black text-[#1E3A8A] mb-2">Profil Bilgilerimi Düzenle</h3>
+                        <p className="text-xs text-gray-500 font-semibold mb-6">Öğrencilerin sizi daha iyi tanıması için tüm bilgilerinizi güncel tutun.</p>
+                        
+                        <form onSubmit={handleTeacherUpdate} className="space-y-6">
+                          <div className="grid sm:grid-cols-2 gap-6">
+                            <div>
+                              <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Ad Soyad</label>
+                              <input
+                                type="text"
+                                value={teacherEditForm.name}
+                                onChange={(e) => setTeacherEditForm({ ...teacherEditForm, name: e.target.value })}
+                                required
+                                className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none focus:border-[#1E3A8A]/50"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Telefon</label>
+                              <input
+                                type="text"
+                                value={teacherEditForm.phone}
+                                onChange={(e) => setTeacherEditForm({ ...teacherEditForm, phone: e.target.value })}
+                                required
+                                className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none focus:border-[#1E3A8A]/50"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid sm:grid-cols-2 gap-6">
+                            <div>
+                              <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Branş</label>
+                              <input
+                                type="text"
+                                value={teacherEditForm.branch}
+                                onChange={(e) => setTeacherEditForm({ ...teacherEditForm, branch: e.target.value })}
+                                required
+                                className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none focus:border-[#1E3A8A]/50"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Eğitim / Mezuniyet</label>
+                              <input
+                                type="text"
+                                value={teacherEditForm.egitim}
+                                onChange={(e) => setTeacherEditForm({ ...teacherEditForm, egitim: e.target.value })}
+                                placeholder="Örn: Boğaziçi Üniversitesi Matematik"
+                                className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none focus:border-[#1E3A8A]/50"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid sm:grid-cols-2 gap-6">
+                            <div>
+                              <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">LinkedIn Profil Linki</label>
+                              <input
+                                type="url"
+                                value={teacherEditForm.linkedin}
+                                onChange={(e) => setTeacherEditForm({ ...teacherEditForm, linkedin: e.target.value })}
+                                placeholder="Örn: https://linkedin.com/in/adiniz"
+                                className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none focus:border-[#1E3A8A]/50"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">YouTube Tanıtım Videosu Linki</label>
+                              <input
+                                type="url"
+                                value={teacherEditForm.youtube}
+                                onChange={(e) => setTeacherEditForm({ ...teacherEditForm, youtube: e.target.value })}
+                                placeholder="Örn: https://youtube.com/watch?v=..."
+                                className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none focus:border-[#1E3A8A]/50"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Öğretmen Hakkında (Tanıtım Yazısı)</label>
+                            <textarea
+                              rows={5}
+                              value={teacherEditForm.ozgecmis}
+                              onChange={(e) => setTeacherEditForm({ ...teacherEditForm, ozgecmis: e.target.value })}
+                              placeholder="Kendinizden, ders anlatım tarzınızdan ve YKS tecrübelerinizden bahsedin..."
+                              className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-semibold focus:outline-none focus:border-[#1E3A8A]/50"
+                            />
+                          </div>
+
+                          <div className="flex gap-4">
+                            <button
+                              type="submit"
+                              disabled={loading}
+                              className="bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-black px-8 py-3.5 rounded-xl text-xs transition shadow-xs"
+                            >
+                              Kaydet
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setDashboardTab("panel")}
+                              className="bg-white hover:bg-gray-50 text-gray-700 border border-[#EFECE6] font-black px-8 py-3.5 rounded-xl text-xs transition"
+                            >
+                              Vazgeç
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    )}
+
+                    {/* Tab 3: Özel Derslerim */}
+                    {dashboardTab === "dersler" && (
+                      <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 sm:p-8 shadow-sm">
+                        <div className="flex justify-between items-center mb-6 pb-2 border-b border-[#FAF8F5]">
+                          <div>
+                            <h3 className="text-lg font-black text-[#1E3A8A]">Özel Ders İlanlarım</h3>
+                            <p className="text-xs text-gray-500 font-semibold mt-0.5">Sitede yayınlanacak özel ders tekliflerinizi yönetin.</p>
+                          </div>
+                          <button
+                            onClick={() => setAddingLesson(!addingLesson)}
+                            className="text-xs bg-[#B45309] hover:bg-[#92400E] text-white font-black px-4 py-2 rounded-xl transition"
+                          >
+                            {addingLesson ? "Vazgeç" : "➕ Yeni İlan Aç"}
+                          </button>
+                        </div>
+
+                        {addingLesson ? (
+                          <form onSubmit={handleAddLesson} className="space-y-4 max-w-lg">
+                            <div className="grid sm:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Ders Başlığı</label>
+                                <input
+                                  type="text"
+                                  required
+                                  placeholder="Örn: 10. Sınıf Fizik Özel Ders"
+                                  value={lessonForm.title}
+                                  onChange={(e) => setLessonForm({ ...lessonForm, title: e.target.value })}
+                                  className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Saatlik Ücret (TL)</label>
+                                <input
+                                  type="number"
+                                  required
+                                  placeholder="Örn: 400"
+                                  value={lessonForm.price}
+                                  onChange={(e) => setLessonForm({ ...lessonForm, price: e.target.value })}
+                                  className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Ders Formatı</label>
+                              <select
+                                value={lessonForm.format}
+                                onChange={(e) => setLessonForm({ ...lessonForm, format: e.target.value })}
+                                className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
+                              >
+                                <option value="online">Online Ders</option>
+                                <option value="yuz-yuze">Yüz Yüze Ders</option>
+                                <option value="her-ikisi">Online & Yüz Yüze</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Açıklama (Opsiyonel)</label>
+                              <textarea
+                                rows={3}
+                                placeholder="Ders süreci, seviye ve detaylar hakkında bilgi verin..."
+                                value={lessonForm.description}
+                                onChange={(e) => setLessonForm({ ...lessonForm, description: e.target.value })}
+                                className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
+                              />
+                            </div>
+                            <button
+                              type="submit"
+                              disabled={loading}
+                              className="bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-black px-6 py-3 rounded-xl text-xs transition"
+                            >
+                              İlanı Yayınla
+                            </button>
+                          </form>
+                        ) : (
+                          teacherLessons.length === 0 ? (
+                            <p className="text-sm text-gray-500 font-semibold">Henüz açtığınız bir ders ilanı bulunmuyor. İlan açarak öğrencilerin size ulaşmasını sağlayabilirsiniz.</p>
+                          ) : (
+                            <div className="grid sm:grid-cols-2 gap-4">
+                              {teacherLessons.map((l) => (
+                                <div key={l.id} className="p-4 bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl relative shadow-xs flex flex-col justify-between">
+                                  <div>
+                                    <h4 className="font-black text-sm text-[#1E3A8A] mb-1">{l.title}</h4>
+                                    <p className="text-xs text-[#B45309] font-black">{l.price} TL / Saat</p>
+                                    <span className="inline-block text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-bold border border-blue-100 mt-2">
+                                      {l.format === "online" ? "💻 Online" : l.format === "yuz-yuze" ? "🏫 Yüz Yüze" : "🔄 Her İkisi"}
+                                    </span>
+                                    {l.description && (
+                                      <p className="text-gray-500 text-xs font-semibold mt-3 line-clamp-2">{l.description}</p>
+                                    )}
+                                  </div>
+                                  <div className="text-right mt-4 pt-3 border-t border-[#EFECE6]/50">
+                                    <button
+                                      onClick={() => handleDeleteLesson(l.id)}
+                                      className="text-xs text-rose-600 hover:text-rose-800 font-black"
+                                    >
+                                      🗑️ İlanı Kaldır
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )
+                        )}
+                      </div>
+                    )}
+
+                    {/* Tab 4: Bloglarım */}
+                    {dashboardTab === "bloglar" && (
+                      <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 sm:p-8 shadow-sm">
+                        <div className="flex justify-between items-center mb-6 pb-2 border-b border-[#FAF8F5]">
+                          <div>
+                            <h3 className="text-lg font-black text-[#1E3A8A]">Blog Yazılarım</h3>
+                            <p className="text-xs text-gray-500 font-semibold mt-0.5">Sitede yayınlanacak YKS rehber veya ders içeriklerinizi yazın.</p>
+                          </div>
+                          <button
+                            onClick={() => setWritingBlog(!writingBlog)}
+                            className="text-xs bg-[#B45309] hover:bg-[#92400E] text-white font-black px-4 py-2 rounded-xl transition"
+                          >
+                            {writingBlog ? "Vazgeç" : "✍️ Yeni Yazı Paylaş"}
+                          </button>
+                        </div>
+
+                        {writingBlog ? (
+                          <form onSubmit={handleAddBlog} className="space-y-4">
+                            <div className="grid sm:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Başlık</label>
+                                <input
+                                  type="text"
+                                  required
+                                  placeholder="Örn: TYT Matematik Net Arttırma Yöntemleri"
+                                  value={blogForm.title}
+                                  onChange={(e) => setBlogForm({ ...blogForm, title: e.target.value })}
+                                  className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Kategori</label>
+                                <select
+                                  value={blogForm.category}
+                                  onChange={(e) => setBlogForm({ ...blogForm, category: e.target.value })}
+                                  className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
+                                >
+                                  <option value="YKS Bilgi">YKS Bilgi</option>
+                                  <option value="Ders Rehberleri">Ders Rehberleri</option>
+                                  <option value="Çalışma Teknikleri">Çalışma Teknikleri</option>
+                                  <option value="Genel Rehberlik">Genel Rehberlik</option>
+                                </select>
+                              </div>
+                            </div>
+                            <div>
+                              <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">İçerik</label>
+                              <textarea
+                                rows={8}
+                                required
+                                placeholder="Yazınızı buraya yazın..."
+                                value={blogForm.content}
+                                onChange={(e) => setBlogForm({ ...blogForm, content: e.target.value })}
+                                className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-semibold focus:outline-none"
+                              />
+                            </div>
+                            <button
+                              type="submit"
+                              disabled={loading}
+                              className="bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-black px-6 py-3 rounded-xl text-xs transition"
+                            >
+                              Yazıyı Yayınla
+                            </button>
+                          </form>
+                        ) : (
+                          teacherBlogs.length === 0 ? (
+                            <p className="text-sm text-gray-500 font-semibold">Henüz paylaştığınız bir blog yazısı bulunmuyor. Yazı yayınlayarak öğrencilerinizin sizi tanımasını sağlayabilirsiniz.</p>
+                          ) : (
+                            <div className="space-y-3">
+                              {teacherBlogs.map((b) => (
+                                <div key={b.id} className="p-4 bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl flex items-center justify-between shadow-xs">
+                                  <div>
+                                    <h4 className="font-black text-sm text-[#1E3A8A]">{b.title}</h4>
+                                    <div className="flex gap-3 text-[10px] text-gray-400 mt-1 font-bold">
+                                      <span>📂 {b.category}</span>
+                                      <span>📅 {new Date(b.createdAt).toLocaleDateString("tr-TR")}</span>
+                                      <a href={`/blog/${b.slug}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                                        🔗 Sitede Gör
+                                      </a>
+                                    </div>
+                                  </div>
+                                  <button
+                                    onClick={() => handleDeleteBlog(b.id)}
+                                    className="text-xs text-rose-600 hover:text-rose-800 font-black px-2.5 py-1 rounded-lg hover:bg-rose-50"
+                                  >
+                                    Sil
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )
+                        )}
+                      </div>
+                    )}
+
+                    {/* Tab 5: SSS (FAQ) */}
+                    {dashboardTab === "faq" && (
+                      <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 sm:p-8 shadow-sm">
+                        <div className="flex justify-between items-center mb-6 pb-2 border-b border-[#FAF8F5]">
+                          <div>
+                            <h3 className="text-lg font-black text-[#1E3A8A]">Sıkça Sorulan Sorular</h3>
+                            <p className="text-xs text-gray-500 font-semibold mt-0.5">Profilinizde görünecek SSS listesini yönetin.</p>
+                          </div>
+                          <button
+                            onClick={() => setAddingFaq(!addingFaq)}
+                            className="text-xs bg-[#B45309] hover:bg-[#92400E] text-white font-black px-4 py-2 rounded-xl transition"
+                          >
+                            {addingFaq ? "Vazgeç" : "➕ Yeni Soru Ekle"}
+                          </button>
+                        </div>
+
+                        {addingFaq ? (
+                          <form onSubmit={handleAddFaq} className="space-y-4">
+                            <div>
+                              <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Soru</label>
+                              <input
+                                type="text"
+                                required
+                                placeholder="Örn: Dersleri nerede yapıyorsunuz?"
+                                value={faqForm.question}
+                                onChange={(e) => setFaqForm({ ...faqForm, question: e.target.value })}
+                                className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Cevap</label>
+                              <textarea
+                                rows={3}
+                                required
+                                placeholder="Örn: Dersleri online olarak Zoom üzerinden ya da Kadıköy civarında yüz yüze yapıyorum."
+                                value={faqForm.answer}
+                                onChange={(e) => setFaqForm({ ...faqForm, answer: e.target.value })}
+                                className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-semibold focus:outline-none"
+                              />
+                            </div>
+                            <button
+                              type="submit"
+                              disabled={loading}
+                              className="bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-black px-6 py-3 rounded-xl text-xs transition"
+                            >
+                              Soruyu Kaydet
+                            </button>
+                          </form>
+                        ) : (
+                          teacherFaqs.length === 0 ? (
+                            <p className="text-sm text-gray-500 font-semibold">Henüz eklediğiniz bir soru bulunmuyor. SSS ekleyerek öğrencilerin en çok sorduğu soruları peşinen yanıtlayabilirsiniz.</p>
+                          ) : (
+                            <div className="space-y-3">
+                              {teacherFaqs.map((faq) => (
+                                <div key={faq.id} className="p-4 bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl flex items-start justify-between shadow-xs gap-4">
+                                  <div className="flex-1">
+                                    <h4 className="font-black text-sm text-[#1E3A8A]">{faq.question}</h4>
+                                    <p className="text-xs text-gray-655 mt-2 font-semibold leading-relaxed">{faq.answer}</p>
+                                  </div>
+                                  <button
+                                    onClick={() => handleDeleteFaq(faq.id)}
+                                    className="text-xs text-rose-600 hover:text-rose-800 font-black px-2.5 py-1 rounded-lg hover:bg-rose-50 flex-shrink-0"
+                                  >
+                                    Sil
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
-              </>
-            )}
 
             {/* CHAT WORKSPACE VIEW */}
             {dashboardTab === "mesajlar" && (
