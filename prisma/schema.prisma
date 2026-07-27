@@ -24,6 +24,8 @@ model Teacher {
   email     String
   password  String
   branch    String
+  egitim    String?
+  ozgecmis  String?
   status    String   @default("Beklemede")
   createdAt DateTime @default(now())
 }

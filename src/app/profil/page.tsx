@@ -18,6 +18,8 @@ interface Teacher {
   email: string;
   branch: string;
   status: string;
+  egitim?: string | null;
+  ozgecmis?: string | null;
 }
 
 interface Feedback {
@@ -45,6 +47,8 @@ export default function ProfilPage() {
   // Teacher Auth Form States
   const [teacherForm, setTeacherForm] = useState({ name: "", phone: "", email: "", password: "", branch: "" });
   const [teacherProfile, setTeacherProfile] = useState<Teacher | null>(null);
+  const [editingTeacher, setEditingTeacher] = useState(false);
+  const [teacherEditForm, setTeacherEditForm] = useState({ name: "", phone: "", branch: "", egitim: "", ozgecmis: "" });
 
   // Feedback States
   const [selectedTeacherId, setSelectedTeacherId] = useState<string>("");
@@ -71,6 +75,13 @@ export default function ProfilPage() {
         setRole("student");
       } else {
         setTeacherProfile(parsedUser);
+        setTeacherEditForm({
+          name: parsedUser.name,
+          phone: parsedUser.phone,
+          branch: parsedUser.branch,
+          egitim: parsedUser.egitim || "",
+          ozgecmis: parsedUser.ozgecmis || ""
+        });
         setRole("teacher");
       }
     }
@@ -203,6 +214,13 @@ export default function ProfilPage() {
       if (data.success) {
         const teacher = data.teacher;
         setTeacherProfile(teacher);
+        setTeacherEditForm({
+          name: teacher.name,
+          phone: teacher.phone,
+          branch: teacher.branch,
+          egitim: teacher.egitim || "",
+          ozgecmis: teacher.ozgecmis || ""
+        });
         
         // Conditional storage based on "Remember Me"
         const storage = rememberMe ? localStorage : sessionStorage;
@@ -216,6 +234,45 @@ export default function ProfilPage() {
       }
     } catch (err) {
       showMsg("Bağlantı hatası oluştu.", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // TEACHER PROFILE UPDATE
+  const handleTeacherUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!teacherProfile) return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/profil/ogretmen", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: teacherProfile.email,
+          name: teacherEditForm.name,
+          phone: teacherEditForm.phone,
+          branch: teacherEditForm.branch,
+          egitim: teacherEditForm.egitim,
+          ozgecmis: teacherEditForm.ozgecmis
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        const updated = data.teacher;
+        setTeacherProfile(updated);
+        
+        // Sync updated profile to active storage
+        const storage = localStorage.getItem("derslinex_role") ? localStorage : sessionStorage;
+        storage.setItem("derslinex_user", JSON.stringify(updated));
+        
+        setEditingTeacher(false);
+        showMsg("Profil bilgileriniz başarıyla güncellendi!", "success");
+      } else {
+        showMsg(data.error || "Profil güncellenemedi.", "error");
+      }
+    } catch (err) {
+      showMsg("Bağlantı hatası.", "error");
     } finally {
       setLoading(false);
     }
@@ -764,40 +821,151 @@ export default function ProfilPage() {
 
             {/* TEACHER VIEW */}
             {teacherProfile && (
-              teacherProfile.status === "Beklemede" ? (
-                <div className="bg-white rounded-3xl border border-amber-200 bg-amber-50/20 p-8 sm:p-10 shadow-sm text-center">
-                  <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
-                    ⏳
-                  </div>
-                  <h3 className="text-xl font-black text-[#1E3A8A] mb-2">Başvurunuz Alındı!</h3>
-                  <p className="text-sm text-gray-600 font-bold max-w-lg mx-auto leading-relaxed">
-                    Kayıt ve başvuru bilgileriniz başarıyla sisteme alınmıştır. Sistem yöneticilerimiz başvurunuzu inceledikten sonra en kısa sürede sizinle iletişime geçecektir. Teşekkür ederiz.
-                  </p>
-                </div>
-              ) : (
-                <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 sm:p-8 shadow-sm">
-                  <h3 className="text-lg font-black text-[#1E3A8A] mb-4">Öğrencilerden Gelen Görüşler & Talepler</h3>
-                  {teacherFeedbacks.length === 0 ? (
-                    <p className="text-sm text-gray-500 font-semibold">Henüz size iletilen bir görüş veya randevu talebi bulunmamaktadır.</p>
-                  ) : (
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      {teacherFeedbacks.map((f) => (
-                        <div key={f.id} className="p-4 bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl relative shadow-xs">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="font-black text-sm text-[#1E3A8A]">{f.studentName}</span>
-                            <span className="text-amber-500 font-bold text-xs">{f.rating} ★</span>
-                          </div>
-                          <p className="text-gray-655 text-xs font-semibold leading-relaxed mb-3">{f.content}</p>
-                          <div className="flex justify-between items-center text-[10px] text-gray-400">
-                            <span>{f.studentEmail || "E-posta Gizli"}</span>
-                            <span>{new Date(f.createdAt).toLocaleDateString("tr-TR")}</span>
-                          </div>
+              <div className="space-y-6">
+                <div className="grid md:grid-cols-12 gap-8">
+                  {/* Left Column: Teacher Edit Card */}
+                  <div className="md:col-span-4 space-y-6">
+                    <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 shadow-sm">
+                      <div className="flex justify-between items-center mb-6 pb-2 border-b border-[#FAF8F5]">
+                        <h3 className="text-base font-black text-[#1E3A8A]">Profil Bilgilerim</h3>
+                        {!editingTeacher ? (
+                          <button
+                            onClick={() => setEditingTeacher(true)}
+                            className="text-xs bg-[#FAF8F5] hover:bg-[#FAF0E3] text-[#B45309] font-black px-3.5 py-1.5 rounded-lg border border-[#EFECE6] transition"
+                          >
+                            ✏️ Düzenle
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setEditingTeacher(false);
+                              setTeacherEditForm({
+                                name: teacherProfile.name,
+                                phone: teacherProfile.phone,
+                                branch: teacherProfile.branch,
+                                egitim: teacherProfile.egitim || "",
+                                ozgecmis: teacherProfile.ozgecmis || ""
+                              });
+                            }}
+                            className="text-xs bg-[#FAF8F5] hover:bg-gray-100 text-gray-500 font-black px-3.5 py-1.5 rounded-lg border border-[#EFECE6] transition"
+                          >
+                            Vazgeç
+                          </button>
+                        )}
+                      </div>
+
+                      {!editingTeacher ? (
+                        <div className="space-y-4 text-sm font-semibold text-gray-700">
+                          <div><span className="text-gray-400 block text-xs">Ad Soyad</span>{teacherProfile.name}</div>
+                          <div><span className="text-gray-400 block text-xs">Telefon</span>{teacherProfile.phone}</div>
+                          <div><span className="text-gray-400 block text-xs">Branş</span>{teacherProfile.branch}</div>
+                          <div><span className="text-gray-400 block text-xs">Eğitim</span>{teacherProfile.egitim || "Girilmemiş"}</div>
+                          <div><span className="text-gray-400 block text-xs">Hakkımda</span>{teacherProfile.ozgecmis || "Girilmemiş"}</div>
+                          <div><span className="text-gray-400 block text-xs">E-posta</span>{teacherProfile.email}</div>
                         </div>
-                      ))}
+                      ) : (
+                        <form onSubmit={handleTeacherUpdate} className="space-y-4">
+                          <div>
+                            <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Ad Soyad</label>
+                            <input
+                              type="text"
+                              value={teacherEditForm.name}
+                              onChange={(e) => setTeacherEditForm({ ...teacherEditForm, name: e.target.value })}
+                              required
+                              className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Telefon</label>
+                            <input
+                              type="text"
+                              value={teacherEditForm.phone}
+                              onChange={(e) => setTeacherEditForm({ ...teacherEditForm, phone: e.target.value })}
+                              required
+                              className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Branş</label>
+                            <input
+                              type="text"
+                              value={teacherEditForm.branch}
+                              onChange={(e) => setTeacherEditForm({ ...teacherEditForm, branch: e.target.value })}
+                              required
+                              className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Eğitim Mezuniyet Bilgisi</label>
+                            <input
+                              type="text"
+                              value={teacherEditForm.egitim}
+                              onChange={(e) => setTeacherEditForm({ ...teacherEditForm, egitim: e.target.value })}
+                              placeholder="Örn: Boğaziçi Üniversitesi Matematik"
+                              className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Öğretmen Hakkında (Tanıtım Yazısı)</label>
+                            <textarea
+                              rows={5}
+                              value={teacherEditForm.ozgecmis}
+                              onChange={(e) => setTeacherEditForm({ ...teacherEditForm, ozgecmis: e.target.value })}
+                              placeholder="Kendinizden, ders anlatım tarzınızdan bahsedin..."
+                              className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
+                            />
+                          </div>
+                          <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-black px-5 py-3 rounded-xl text-xs transition"
+                          >
+                            Değişiklikleri Kaydet
+                          </button>
+                        </form>
+                      )}
                     </div>
-                  )}
+                  </div>
+
+                  {/* Right Column: Status Warning OR Feedback Log */}
+                  <div className="md:col-span-8 space-y-6">
+                    {teacherProfile.status === "Beklemede" ? (
+                      <div className="bg-white rounded-3xl border border-amber-200 bg-amber-50/20 p-8 sm:p-10 shadow-sm text-center">
+                        <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                          ⏳
+                        </div>
+                        <h3 className="text-xl font-black text-[#1E3A8A] mb-2">Başvurunuz Alındı!</h3>
+                        <p className="text-sm text-gray-655 font-bold max-w-lg mx-auto leading-relaxed">
+                          Bilgileriniz başarıyla kaydedilmiştir. Başvurunuz yöneticilerimiz tarafından onaylandığı an profiliniz sitede yayınlanacaktır. Bu süreçte sol taraftan profilinizi düzenlemeye ve tamamlamaya devam edebilirsiniz.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 sm:p-8 shadow-sm">
+                        <h3 className="text-lg font-black text-[#1E3A8A] mb-4">Öğrencilerden Gelen Görüşler & Talepler</h3>
+                        {teacherFeedbacks.length === 0 ? (
+                          <p className="text-sm text-gray-500 font-semibold">Henüz size iletilen bir görüş veya randevu talebi bulunmamaktadır.</p>
+                        ) : (
+                          <div className="grid sm:grid-cols-2 gap-4">
+                            {teacherFeedbacks.map((f) => (
+                              <div key={f.id} className="p-4 bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl relative shadow-xs">
+                                <div className="flex justify-between items-center mb-2">
+                                  <span className="font-black text-sm text-[#1E3A8A]">{f.studentName}</span>
+                                  <span className="text-amber-500 font-bold text-xs">{f.rating} ★</span>
+                                </div>
+                                <p className="text-gray-655 text-xs font-semibold leading-relaxed mb-3">{f.content}</p>
+                                <div className="flex justify-between items-center text-[10px] text-gray-400">
+                                  <span>{f.studentEmail || "E-posta Gizli"}</span>
+                                  <span>{new Date(f.createdAt).toLocaleDateString("tr-TR")}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )
+              </div>
             )}
           </div>
         )}
