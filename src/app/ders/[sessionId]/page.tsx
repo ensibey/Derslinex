@@ -240,6 +240,9 @@ export default function LiveSessionPage() {
     if (!userId) return;
     if (!confirm("Dersi bitirmek istediğinizden emin misiniz? Odadaki herkes çıkarılacak.")) return;
 
+    // Önce iframe'i kaldır (Jitsi sayfasının görünmesini engelle)
+    setStatus("ended");
+
     try {
       const res = await fetch(`/api/sessions/${sessionId}/end`, {
         method: "POST",
@@ -247,13 +250,16 @@ export default function LiveSessionPage() {
         body: JSON.stringify({ teacherId: userId }),
       });
       const data = await res.json();
-      if (data.success) {
-        setStudents(data.students || []);
+      if (data.success && data.students && data.students.length > 0) {
+        setStudents(data.students);
         setShowFeedback(true);
-        setStatus("ended");
+      } else {
+        // Değerlendirilecek öğrenci yoksa direkt profile git
+        router.push("/profil");
       }
     } catch {
       alert("Ders bitirilirken bir hata oluştu.");
+      router.push("/profil");
     }
   };
 
@@ -331,17 +337,12 @@ export default function LiveSessionPage() {
         />
       )}
 
-      {/* Ders bitti ekranı (feedback modal açılıncaya kadar) */}
+      {/* Ders bitti - direkt profile yönlendir */}
       {status === "ended" && !showFeedback && (
-        <div className="flex-1 flex flex-col items-center justify-center text-white gap-4">
-          <div className="text-5xl">✅</div>
+        <div className="flex-1 flex flex-col items-center justify-center text-white gap-6 bg-[#0A1628]">
+          <div className="text-6xl">✅</div>
           <h2 className="text-2xl font-black">Ders Sona Erdi</h2>
-          <button
-            onClick={() => router.push("/profil")}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-3 rounded-xl transition"
-          >
-            Profile Dön
-          </button>
+          <p className="text-indigo-300 text-sm">Profile yönlendiriliyorsunuz...</p>
         </div>
       )}
 
