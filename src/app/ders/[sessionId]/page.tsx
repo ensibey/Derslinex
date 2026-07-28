@@ -220,8 +220,8 @@ export default function LiveSessionPage() {
         return;
       }
 
-      // Daily Prebuilt URL'ye token ekle
-      const fullUrl = `${data.roomUrl}?t=${data.token}`;
+      // Jitsi Meet URL veya Daily URL
+      const fullUrl = data.token ? `${data.roomUrl}?t=${data.token}` : data.roomUrl;
       setRoomUrl(fullUrl);
       setIsOwner(data.isOwner);
       setStatus("live");
@@ -292,7 +292,7 @@ export default function LiveSessionPage() {
       {/* Üst Bar */}
       <div className="flex items-center justify-between px-5 py-3 bg-[#0F1F3D] border-b border-white/10">
         <div className="flex items-center gap-3">
-          <span className="text-white font-black text-lg">📚 Derslinex</span>
+          <span className="text-white font-black text-lg">📚 Derslinex Canlı Ders</span>
           {status === "live" && (
             <span className="flex items-center gap-1.5 bg-red-600/20 border border-red-500/40 text-red-400 text-xs font-black px-2.5 py-1 rounded-full">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
@@ -307,7 +307,7 @@ export default function LiveSessionPage() {
               onClick={handleEndSession}
               className="bg-red-600 hover:bg-red-500 text-white font-black text-sm px-5 py-2 rounded-xl transition flex items-center gap-2"
             >
-              ⏹ Dersi Bitir
+              ⏹ Dersi Bitir & Değerlendir
             </button>
           )}
           <button
@@ -319,13 +319,13 @@ export default function LiveSessionPage() {
         </div>
       </div>
 
-      {/* Daily.co Prebuilt iframe */}
+      {/* Jitsi Meet / Video Odası iframe */}
       {status === "live" && roomUrl && (
         <iframe
           ref={iframeRef}
           src={roomUrl}
           className="flex-1 w-full border-0"
-          allow="camera; microphone; fullscreen; speaker; display-capture"
+          allow="camera; microphone; fullscreen; speaker; display-capture; autoplay; clipboard-write"
           allowFullScreen
           title="Canlı Ders Odası"
         />

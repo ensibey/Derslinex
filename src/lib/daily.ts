@@ -1,107 +1,28 @@
 /**
- * Daily.co REST API yardımcısı
- * Ders odası oluşturma, token üretme ve oda silme işlemlerini kapsar.
+ * Jitsi Meet Video Odası Yardımcısı
+ * %100 Ücretsiz, Kredi Kartı veya API Anahtarı Gerektirmez.
+ * Sınırsız Süre, Ekran Paylaşımı ve Çoklu Katılımcı Desteği.
  */
-const DAILY_BASE = process.env.DAILY_API_BASE || "https://api.daily.co/v1";
 
-function getDailyKey(): string {
-  const raw = process.env.DAILY_API_KEY || "a8e51bc26699bca3a015727f92d5dbf43ccef195cfacff77d8ce376c18534ee2";
-  return raw.trim().split(/\s+/)[0];
-}
-
-function dailyHeaders() {
-  return {
-    Authorization: `Bearer ${getDailyKey()}`,
-    "Content-Type": "application/json",
-  };
-}
-
-/**
- * Daily.co'da yeni bir ders odası oluşturur.
- * @param expirySeconds  Odanın ne kadar süre sonra otomatik kapanacağı (saniye)
- * @param record         Ders kaydedilsin mi?
- */
 export async function createDailyRoom(
-  expirySeconds: number,
-  record = false
+  _expirySeconds?: number,
+  _record = false
 ): Promise<{ name: string; url: string }> {
-  const exp = Math.floor(Date.now() / 1000) + expirySeconds;
-  
-  const properties: Record<string, any> = { exp };
-  if (record) {
-    properties.enable_recording = "cloud";
-  }
-
-  let res = await fetch(`${DAILY_BASE}/rooms`, {
-    method: "POST",
-    headers: dailyHeaders(),
-    body: JSON.stringify({ properties }),
-  });
-
-  // Eğer plan cloud recording desteklemiyorsa varsayılan sade odayı aç
-  if (!res.ok && record) {
-    res = await fetch(`${DAILY_BASE}/rooms`, {
-      method: "POST",
-      headers: dailyHeaders(),
-      body: JSON.stringify({ properties: { exp } }),
-    });
-  }
-
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Daily.co createRoom hatası: ${err}`);
-  }
-
-  const data = await res.json();
-  return { name: data.name as string, url: data.url as string };
+  const roomName = `Derslinex-Session-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+  const roomUrl  = `https://meet.jit.si/${roomName}`;
+  return { name: roomName, url: roomUrl };
 }
 
-/**
- * Kullanıcı için Daily.co meeting token üretir.
- * @param roomName  Odanın adı
- * @param isOwner   Öğretmen ise true (odayı bitirebilir)
- * @param userId    Veritabanındaki kullanıcı ID'si (string olarak)
- * @param userName  Ekranda görünecek ad
- * @param ejectAt   Token geçerlilik bitiş zamanı (Unix timestamp saniye)
- */
 export async function getDailyMeetingToken(
-  roomName: string,
-  isOwner: boolean,
-  userId: string,
-  userName: string,
-  ejectAt: number
+  _roomName: string,
+  _isOwner: boolean,
+  _userId: string,
+  _userName: string,
+  _ejectAt: number
 ): Promise<string> {
-  const body = {
-    properties: {
-      room_name: roomName,
-      is_owner: isOwner,
-      user_name: userName || (isOwner ? "Öğretmen" : "Öğrenci"),
-      exp: ejectAt,
-    },
-  };
-
-  const res = await fetch(`${DAILY_BASE}/meeting-tokens`, {
-    method: "POST",
-    headers: dailyHeaders(),
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    const err = await res.text();
-    console.warn(`Daily.co meeting token warning: ${err}`);
-    return "";
-  }
-
-  const data = await res.json();
-  return (data.token as string) || "";
+  return "";
 }
 
-/**
- * Odayı siler / herkesi çıkarır (ders bitişi).
- */
-export async function endDailyRoom(roomName: string): Promise<void> {
-  await fetch(`${DAILY_BASE}/rooms/${roomName}`, {
-    method: "DELETE",
-    headers: dailyHeaders(),
-  });
+export async function endDailyRoom(_roomName: string): Promise<void> {
+  // Jitsi Meet odaları katılımcılar çıkınca otomatik sonlanır
 }
