@@ -25,23 +25,27 @@ export async function createDailyRoom(
   expirySeconds: number,
   record = false
 ): Promise<{ name: string; url: string }> {
-  const body = {
-    properties: {
-      max_participants: 20,
-      enable_prejoin_ui: false,
-      enable_knocking: false,
-      exp: Math.floor(Date.now() / 1000) + expirySeconds,
-      ...(record ? { enable_recording: "cloud" } : {}),
-      start_audio_off: false,
-      start_video_off: false,
-    },
-  };
+  const exp = Math.floor(Date.now() / 1000) + expirySeconds;
+  
+  const properties: Record<string, any> = { exp };
+  if (record) {
+    properties.enable_recording = "cloud";
+  }
 
-  const res = await fetch(`${DAILY_BASE}/rooms`, {
+  let res = await fetch(`${DAILY_BASE}/rooms`, {
     method: "POST",
     headers: dailyHeaders(),
-    body: JSON.stringify(body),
+    body: JSON.stringify({ properties }),
   });
+
+  // Eğer plan cloud recording desteklemiyorsa varsayılan sade odayı aç
+  if (!res.ok && record) {
+    res = await fetch(`${DAILY_BASE}/rooms`, {
+      method: "POST",
+      headers: dailyHeaders(),
+      body: JSON.stringify({ properties: { exp } }),
+    });
+  }
 
   if (!res.ok) {
     const err = await res.text();
