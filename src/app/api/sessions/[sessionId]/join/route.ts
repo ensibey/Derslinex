@@ -46,10 +46,10 @@ export async function POST(
       return NextResponse.json({ success: false, error: "Bu derse erişim yetkiniz yok" }, { status: 403 });
     }
 
-    // Token geçerlilik süresi: ders bitiş + 10 dk tampon
-    const ejectAt = Math.floor(
-      (new Date(session.startTime).getTime() + session.durationMinutes * 60_000 + 10 * 60_000) / 1000
-    );
+    // Token geçerlilik süresi: en az 24 saat veya ders bitiş zamanından 2 saat sonrası
+    const nowSec = Math.floor(Date.now() / 1000);
+    const startSec = Math.floor(new Date(session.startTime).getTime() / 1000);
+    const ejectAt = Math.max(nowSec + 24 * 3600, startSec + ((session.durationMinutes || 60) + 120) * 60);
 
     const token = await getDailyMeetingToken(
       session.roomName,
@@ -64,7 +64,7 @@ export async function POST(
       await prisma.sessionParticipant.update({
         where: { sessionId_studentId: { sessionId, studentId: userId } },
         data: { joinedAt: new Date() },
-      });
+      }).catch((e) => console.warn("Participant joinedAt update warning:", e));
     }
 
     // Eğer ilk katılımsa durumu LIVE yap
@@ -72,7 +72,7 @@ export async function POST(
       await prisma.liveSession.update({
         where: { id: sessionId },
         data: { status: "LIVE" },
-      });
+      }).catch((e) => console.warn("Session status LIVE update warning:", e));
     }
 
     return NextResponse.json({
@@ -82,8 +82,8 @@ export async function POST(
       roomName: session.roomName,
       isOwner: isTeacher,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Session Join Error:", error);
-    return NextResponse.json({ success: false, error: "Sunucu hatası" }, { status: 500 });
+    return NextResponse.json({ success: false, error: error?.message || "Sunucu hatası" }, { status: 500 });
   }
 }

@@ -75,9 +75,7 @@ export async function getDailyMeetingToken(
     properties: {
       room_name: roomName,
       is_owner: isOwner,
-      user_name: userName,
-      user_id: userId,
-      eject_at_room_exp: true,
+      user_name: userName || (isOwner ? "Öğretmen" : "Öğrenci"),
       exp: ejectAt,
     },
   };
@@ -90,11 +88,12 @@ export async function getDailyMeetingToken(
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`Daily.co token hatası: ${err}`);
+    console.warn(`Daily.co meeting token warning: ${err}`);
+    return "";
   }
 
   const data = await res.json();
-  return data.token as string;
+  return (data.token as string) || "";
 }
 
 /**
