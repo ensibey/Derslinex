@@ -37,8 +37,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const start = new Date(startTime);
-    // Odanın geçerlilik süresi: ders başlangıcına kadar + ders süresi + 30 dk tampon
+    // Parse input datetime-local as Turkey Local Time (+03:00)
+    const formattedStartStr = startTime.includes("+") || startTime.endsWith("Z")
+      ? startTime
+      : `${startTime}:00+03:00`;
+    const start = new Date(formattedStartStr);
+
     const nowSec = Math.floor(Date.now() / 1000);
     const startSec = Math.floor(start.getTime() / 1000);
     const expirySeconds = Math.max(startSec - nowSec + durationMinutes * 60 + 1800, 3600);

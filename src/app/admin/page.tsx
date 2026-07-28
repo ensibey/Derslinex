@@ -818,7 +818,7 @@ export default function AdminPage() {
                             </div>
                             <h4 className="font-black text-gray-900 text-base">{s.title}</h4>
                             <p className="text-xs text-gray-500 font-semibold mt-0.5">
-                              👨‍🏫 {s.teacher?.name} • {new Date(s.startTime).toLocaleString("tr-TR")} • {s.durationMinutes} dk
+                              👨‍🏫 {s.teacher?.name} • {new Date(s.startTime).toLocaleString("tr-TR", { timeZone: "Europe/Istanbul" })} • {s.durationMinutes} dk
                             </p>
                             <p className="text-xs text-indigo-600 font-bold mt-1">
                               🎓 {s.participants?.map((p: any) => p.student?.name).join(", ")}

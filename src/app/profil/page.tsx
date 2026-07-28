@@ -48,7 +48,7 @@ function SessionCard({ session, role }: { session: any; role: "student" | "teach
             <p className="text-xs text-gray-500 font-semibold mt-0.5">👨‍🏫 {session.teacher.name} — {session.teacher.branch}</p>
           )}
           <p className="text-xs text-indigo-600 font-bold mt-0.5">
-            🕐 {new Date(session.startTime).toLocaleString("tr-TR")} • {session.durationMinutes} dk
+            🕐 {new Date(session.startTime).toLocaleString("tr-TR", { timeZone: "Europe/Istanbul" })} • {session.durationMinutes} dk
           </p>
         </div>
         <div className="flex flex-col items-end gap-2">
