@@ -22,14 +22,21 @@ function useCountdown(targetDate: string | Date | null) {
   return { diff, label: `${pad(h)}:${pad(m)}:${pad(s)}`, isNow: diff <= 10 * 60_000 && diff > 0 };
 }
 
-// ─── Öğrenci Canlı Dersler Sekmesi ───────────────────────────────────────────
+// ─── Öğrenci & Öğretmen Canlı Ders Kartı ───────────────────────────────────────
 function SessionCard({ session, role }: { session: any; role: "student" | "teacher" }) {
-  const { label, isNow, diff } = useCountdown(
+  const { label, diff } = useCountdown(
     session.status === "SCHEDULED" || session.status === "LIVE" ? session.startTime : null
   );
-  const isEnded = session.status === "ENDED";
+
+  const startMs = new Date(session.startTime).getTime();
+  const endMs   = startMs + (session.durationMinutes || 60) * 60_000;
+  const nowMs   = Date.now();
+  const fifteenMinsBefore = startMs - 15 * 60_000;
+
+  const isEnded = session.status === "ENDED" || nowMs > endMs;
   const isLive  = session.status === "LIVE";
-  const isSoon  = isLive || isNow;
+  // Öğretmen her zaman girebilir, öğrenci ders başlama zamanından 15 dk önce ve ders bitene kadar girebilir
+  const canJoin = !isEnded && (isLive || role === "teacher" || nowMs >= fifteenMinsBefore);
 
   return (
     <div className="bg-white border border-[#EFECE6] rounded-2xl p-5 shadow-xs">
@@ -54,10 +61,10 @@ function SessionCard({ session, role }: { session: any; role: "student" | "teach
         <div className="flex flex-col items-end gap-2">
           {!isEnded && (
             <div className="text-right">
-              {isSoon ? (
+              {canJoin ? (
                 <Link href={`/ders/${session.id}`}>
-                  <button className="bg-red-600 hover:bg-red-500 text-white font-black text-sm px-5 py-2.5 rounded-xl transition animate-pulse">
-                    🚀 {role === "teacher" ? "Yayını Başlat" : "Derse Katıl"}
+                  <button className="bg-red-600 hover:bg-red-500 text-white font-black text-sm px-6 py-3 rounded-xl transition shadow-md animate-pulse">
+                    🚀 {role === "teacher" ? "Yayını Başlat / Katıl" : "Derse Katıl"}
                   </button>
                 </Link>
               ) : (
@@ -68,7 +75,7 @@ function SessionCard({ session, role }: { session: any; role: "student" | "teach
                     disabled
                     className="mt-2 opacity-40 cursor-not-allowed bg-gray-200 text-gray-500 font-black text-xs px-4 py-2 rounded-xl"
                   >
-                    10 dk kala aktifleşir
+                    15 dk kala aktifleşir
                   </button>
                 </div>
               )}
