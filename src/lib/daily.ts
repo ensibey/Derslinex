@@ -31,7 +31,7 @@ export async function createDailyRoom(
       enable_prejoin_ui: false,
       enable_knocking: false,
       exp: Math.floor(Date.now() / 1000) + expirySeconds,
-      enable_recording: record ? "cloud" : "none",
+      ...(record ? { enable_recording: "cloud" } : {}),
       start_audio_off: false,
       start_video_off: false,
     },
