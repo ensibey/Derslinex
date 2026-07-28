@@ -126,3 +126,60 @@ export async function GET() {
     return NextResponse.json({ success: false, error: "Sunucu hatası" }, { status: 500 });
   }
 }
+
+/**
+ * DELETE /api/admin/sessions?id=...
+ * Canlı dersi iptal eder ve katılanlara iptal maili gönderir.
+ */
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = parseInt(searchParams.get("id") || "0");
+
+    if (!id) {
+      return NextResponse.json({ success: false, error: "Geçersiz ID" }, { status: 400 });
+    }
+
+    const session = await prisma.liveSession.findUnique({
+      where: { id },
+      include: {
+        teacher: { select: { email: true, name: true } },
+        participants: { include: { student: { select: { email: true, name: true } } } },
+      },
+    });
+
+    if (!session) {
+      return NextResponse.json({ success: false, error: "Ders bulunamadı" }, { status: 404 });
+    }
+
+    // Daily.co odasını kapat/sil
+    if (session.roomName) {
+      const { endDailyRoom } = await import("@/lib/daily");
+      await endDailyRoom(session.roomName).catch((e) =>
+        console.warn("Daily.co room deletion warning:", e)
+      );
+    }
+
+    // DB'de durumu CANCELLED yap
+    await prisma.liveSession.update({
+      where: { id },
+      data: { status: "CANCELLED" },
+    });
+
+    // İptal maili gönder
+    const { sendSessionCancelledMail } = await import("@/lib/mail");
+    const mailPromises: Promise<void>[] = [
+      sendSessionCancelledMail(session.teacher.email, session.teacher.name, session.title),
+      ...session.participants.map((p) =>
+        sendSessionCancelledMail(p.student.email, p.student.name, session.title)
+      ),
+    ];
+
+    await Promise.allSettled(mailPromises);
+
+    return NextResponse.json({ success: true, message: "Canlı ders başarıyla iptal edildi." });
+  } catch (error) {
+    console.error("Admin Session Delete Error:", error);
+    return NextResponse.json({ success: false, error: "Sunucu hatası" }, { status: 500 });
+  }
+}

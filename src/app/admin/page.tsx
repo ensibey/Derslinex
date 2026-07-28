@@ -824,13 +824,37 @@ export default function AdminPage() {
                               🎓 {s.participants?.map((p: any) => p.student?.name).join(", ")}
                             </p>
                           </div>
-                          <a
-                            href={`/ders/${s.id}`}
-                            target="_blank"
-                            className="bg-[#1E3A8A] hover:bg-[#163070] text-white text-xs font-black px-4 py-2 rounded-xl transition"
-                          >
-                            🔗 Odaya Gir
-                          </a>
+                          <div className="flex items-center gap-2">
+                            {s.status !== "CANCELLED" && s.status !== "ENDED" && (
+                              <button
+                                onClick={async () => {
+                                  if (!confirm(`"${s.title}" dersini iptal etmek istediğinize emin misiniz? Katılımcılara iptal maili gönderilecektir.`)) return;
+                                  try {
+                                    const res = await fetch(`/api/admin/sessions?id=${s.id}`, { method: "DELETE" });
+                                    const data = await res.json();
+                                    if (data.success) {
+                                      showMsg("🚫 Canlı ders iptal edildi ve mailler gönderildi.", "success");
+                                      fetchData();
+                                    } else {
+                                      showMsg(data.error || "İşlem başarısız", "error");
+                                    }
+                                  } catch {
+                                    showMsg("Bağlantı hatası", "error");
+                                  }
+                                }}
+                                className="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-black px-3.5 py-2 rounded-xl transition"
+                              >
+                                🚫 Dersi İptal Et
+                              </button>
+                            )}
+                            <a
+                              href={`/ders/${s.id}`}
+                              target="_blank"
+                              className="bg-[#1E3A8A] hover:bg-[#163070] text-white text-xs font-black px-4 py-2 rounded-xl transition"
+                            >
+                              🔗 Odaya Gir
+                            </a>
+                          </div>
                         </div>
                         {s.recordingUrl && (
                           <a

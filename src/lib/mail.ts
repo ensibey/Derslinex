@@ -169,3 +169,23 @@ export async function sendSessionReminderMail(
     html:    baseTemplate("Ders Hatırlatması", body),
   });
 }
+
+export async function sendSessionCancelledMail(
+  toEmail: string,
+  toName: string,
+  sessionTitle: string
+): Promise<void> {
+  const body = `
+    <h2 style="color:#DC2626;font-size:20px;font-weight:900;margin:0 0 8px;">🚫 Canlı Ders İptal Edildi</h2>
+    <p style="color:#374151;margin:0 0 24px;">Merhaba <strong>${toName}</strong>, <strong>${sessionTitle}</strong> başlıklı canlı dersiniz yönetici tarafından iptal edilmiştir.</p>
+    <div style="background:#FEE2E2;border:1px solid #FCA5A5;border-radius:12px;padding:16px 20px;color:#991B1B;font-weight:700;font-size:14px;">
+      ℹ️ Detaylı bilgi için platformumuz üzerinden iletişime geçebilirsiniz.
+    </div>`;
+
+  await resend.emails.send({
+    from:    FROM,
+    to:      toEmail,
+    subject: `🚫 İptal Bilgilendirmesi: ${sessionTitle}`,
+    html:    baseTemplate("Ders İptal Edildi", body),
+  });
+}
