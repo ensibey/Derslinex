@@ -59,7 +59,7 @@ export const metadata: Metadata = {
   },
 };
 
-import MobileNavBar from "@/components/MobileNavBar";
+import ClientLayoutWrapper from "@/components/ClientLayoutWrapper";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -79,11 +79,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="/logo.png?v=9" sizes="180x180" />
       </head>
       <body className="bg-[#FAF8F5] text-gray-900 antialiased">
-        <Header />
-        <main className="pb-24 lg:pb-0">{children}</main>
-        <Footer className="pb-28 lg:pb-14" />
-        <MobileNavBar />
-        <WhatsAppButton />
+        <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
         <GoogleAnalytics />
         <CookieConsent />
       </body>

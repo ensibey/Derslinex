@@ -22,6 +22,21 @@ function useCountdown(targetDate: string | Date | null) {
   return { diff, label: `${pad(h)}:${pad(m)}:${pad(s)}`, isNow: diff <= 10 * 60_000 && diff > 0 };
 }
 
+// ─── Yardımcı: Google Takvim Linki ────────────────────────────────────────────
+function getGoogleCalendarUrl(title: string, startTime: string, durationMinutes: number = 60) {
+  const start = new Date(startTime);
+  const end = new Date(start.getTime() + (durationMinutes || 60) * 60_000);
+  const fmt = (d: Date) => d.toISOString().replace(/-|:|\.\d+/g, "");
+  const dates = `${fmt(start)}/${fmt(end)}`;
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: title || "Derslinex Canlı Ders",
+    dates: dates,
+    details: "Derslinex Birebir Online Ders Oturumu",
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
 // ─── Session Card (dark theme for student sidebar) ────────────────────────────
 function SessionCardDark({ session, role }: { session: any; role: "student" | "teacher" }) {
   const { label, diff } = useCountdown(
@@ -64,7 +79,9 @@ function SessionCardDark({ session, role }: { session: any; role: "student" | "t
           ) : (
             <div className="text-right flex-shrink-0">
               <div className="font-black text-sm text-indigo-300 tabular-nums">{label}</div>
-              <div className="text-[9px] text-slate-500">sonra</div>
+              <a href={getGoogleCalendarUrl(session.title, session.startTime, session.durationMinutes)} target="_blank" rel="noopener noreferrer" className="text-[9px] text-indigo-400 hover:underline block mt-0.5">
+                📅 Takvime Ekle
+              </a>
             </div>
           )
         )}
@@ -100,7 +117,7 @@ function SessionCard({ session, role }: { session: any; role: "student" | "teach
           </div>
           <h4 className="font-black text-white text-base">{session.title}</h4>
           {role === "student" && session.teacher && (
-            <p className="text-xs text-slate-400 font-semibold mt-0.5">👨🏫 {session.teacher.name} — {session.teacher.branch}</p>
+            <p className="text-xs text-slate-400 font-semibold mt-0.5">👨‍🏫 {session.teacher.name} — {session.teacher.branch}</p>
           )}
           <p className="text-xs text-indigo-400 font-bold mt-0.5">
             🕐 {new Date(session.startTime).toLocaleString("tr-TR", { timeZone: "Europe/Istanbul" })} • {session.durationMinutes} dk
@@ -108,7 +125,7 @@ function SessionCard({ session, role }: { session: any; role: "student" | "teach
         </div>
         <div className="flex flex-col items-end gap-2">
           {!isEnded && (
-            <div className="text-right">
+            <div className="text-right flex flex-col items-end gap-2">
               {canJoin ? (
                 <Link href={`/ders/${session.id}`}>
                   <button className="bg-red-600 hover:bg-red-500 text-white font-black text-sm px-6 py-3 rounded-xl transition shadow-md animate-pulse">
@@ -118,8 +135,15 @@ function SessionCard({ session, role }: { session: any; role: "student" | "teach
               ) : (
                 <div className="text-center">
                   <div className="font-black text-2xl text-indigo-300 tabular-nums">{label}</div>
-                  <div className="text-xs text-slate-500 font-semibold">sonra başlıyor</div>
-                  <button disabled className="mt-2 opacity-40 cursor-not-allowed bg-slate-700 text-slate-400 font-black text-xs px-4 py-2 rounded-xl">15 dk kala aktifleşir</button>
+                  <div className="text-xs text-slate-500 font-semibold mb-2">sonra başlıyor</div>
+                  <div className="flex items-center gap-2">
+                    <a href={getGoogleCalendarUrl(session.title, session.startTime, session.durationMinutes)} target="_blank" rel="noopener noreferrer" className="bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/30 text-indigo-300 font-black text-xs px-3 py-1.5 rounded-xl transition">
+                      📅 Google Takvim
+                    </a>
+                    <a href={`/api/sessions/${session.id}/calendar`} target="_blank" rel="noopener noreferrer" className="bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 font-black text-xs px-3 py-1.5 rounded-xl transition">
+                      📥 .ics İndir
+                    </a>
+                  </div>
                 </div>
               )}
             </div>
