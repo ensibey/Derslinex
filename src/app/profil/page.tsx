@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { hocalar } from "@/data/hocalar";
 import Link from "next/link";
+import { requestNotificationPermission, getNotificationPermission, checkAndNotifySessions } from "@/lib/web-notifications";
 
 // ─── Yardımcı: Geri Sayım ─────────────────────────────────────────────────────
 function useCountdown(targetDate: string | Date | null) {
@@ -854,12 +855,15 @@ export default function ProfilPage() {
     } catch (e) { console.error("Dashboard data fetch error:", e); }
   }, []);
 
-  // Load student sessions for sidebar preview
+  // Load student sessions for sidebar preview & trigger Web Push Notifications
   const fetchStudentSessions = useCallback(async (userId: number) => {
     try {
       const res = await fetch("/api/user/my-sessions", { headers: { "x-user-id": String(userId), "x-user-role": "student" } });
       const d = await res.json();
-      if (d.success) setStudentSessions(d.sessions || []);
+      if (d.success) {
+        setStudentSessions(d.sessions || []);
+        checkAndNotifySessions(d.sessions || []);
+      }
     } catch (e) { console.error(e); }
   }, []);
 
@@ -2337,16 +2341,29 @@ export default function ProfilPage() {
             <div className="flex flex-col xl:flex-row gap-6">
               {/* Left: Main Dashboard */}
               <div className="flex-1 space-y-6">
-                {/* Greeting */}
-                <div>
-                  <h2 className="text-2xl font-black text-white">Merhaba, {studentProfile?.name.split(" ")[0]}! 👋</h2>
-                  <p className="text-slate-400 text-sm mt-1">
-                    {new Date().toLocaleDateString("tr-TR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
-                    {" • "}
-                    <span className={`font-bold ${ studentProfile?.status === "İletişime Geçildi" ? "text-green-400" : "text-amber-400" }`}>
-                      {studentProfile?.status === "İletişime Geçildi" ? "✅ Aktif Hesap" : "⏳ Hesap Onay Bekliyor"}
-                    </span>
-                  </p>
+                {/* Greeting & Web Push Notification Permission Button */}
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-2xl font-black text-white">Merhaba, {studentProfile?.name.split(" ")[0]}! 👋</h2>
+                    <p className="text-slate-400 text-sm mt-1">
+                      {new Date().toLocaleDateString("tr-TR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+                      {" • "}
+                      <span className={`font-bold ${ studentProfile?.status === "İletişime Geçildi" ? "text-green-400" : "text-amber-400" }`}>
+                        {studentProfile?.status === "İletişime Geçildi" ? "✅ Aktif Hesap" : "⏳ Hesap Onay Bekliyor"}
+                      </span>
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={async () => {
+                      const ok = await requestNotificationPermission();
+                      if (ok) showMsg("🔔 Web Bildirimleri aktif edildi! Derslerinize 15 dk kala otomatik hatırlatma yapılacaktır.", "success");
+                      else showMsg("Tarayıcı bildirim izni verilmedi veya engellendi.", "error");
+                    }}
+                    className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 hover:bg-amber-500/30 text-amber-300 font-black text-xs px-4 py-2.5 rounded-xl transition shadow-lg flex items-center gap-2"
+                  >
+                    <span>🔔</span> Web Bildirimleri & Derse 15 Dk Kala Hatırlatıcı Aç
+                  </button>
                 </div>
 
                 {/* Stat Cards */}
