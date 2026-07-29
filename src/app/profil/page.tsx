@@ -1224,6 +1224,217 @@ function TeacherSessionsTab({ userId }: { userId: number }) {
   );
 }
 
+// ─── Student Gamification Leaderboard & Badges Component ─────────────────────
+function StudentLeaderboardTab({ currentStudentId }: { currentStudentId?: number }) {
+  const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchLeaderboard = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/student/leaderboard");
+      const data = await res.json();
+      if (data.success) {
+        setLeaderboard(data.leaderboard || []);
+      }
+    } catch (e) {
+      console.error("Leaderboard fetch error:", e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchLeaderboard();
+  }, [fetchLeaderboard]);
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <SessionCardSkeleton />
+        <SessionCardSkeleton />
+      </div>
+    );
+  }
+
+  const top3 = leaderboard.slice(0, 3);
+  const myEntry = leaderboard.find((item) => item.id === currentStudentId) || leaderboard[0];
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-gradient-to-r from-amber-500/20 via-indigo-900/40 to-[#0D1B35] border border-amber-500/30 p-6 rounded-2xl">
+        <div>
+          <h3 className="text-xl font-black text-white flex items-center gap-2">
+            <span>🏆</span> Haftanın Net Şampiyonları & Başarı Rozetleri
+          </h3>
+          <p className="text-xs text-slate-300 mt-1">Soru çözerek, deneme sınavlarında yüksek net elde ederek ve derse katılarak puan toplayın, rozetleri kazanın!</p>
+        </div>
+
+        {myEntry && (
+          <div className="bg-[#0D1B35] border border-amber-500/40 px-4 py-2.5 rounded-xl text-right">
+            <span className="text-[10px] text-amber-400 font-black uppercase tracking-wider block">BENİM SIRAM</span>
+            <span className="text-xl font-black text-white tabular-nums">#{myEntry.rank} • {myEntry.totalScore} Puan</span>
+          </div>
+        )}
+      </div>
+
+      {/* Top 3 Podium Showcase */}
+      {top3.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+          {/* 2nd Place */}
+          {top3[1] && (
+            <div className="order-2 md:order-1 bg-gradient-to-b from-slate-800 to-[#0D1B35] border border-slate-400/30 rounded-2xl p-5 text-center flex flex-col items-center justify-center space-y-3 relative shadow-xl">
+              <span className="absolute -top-3 bg-slate-400 text-slate-950 font-black text-xs px-3 py-0.5 rounded-full shadow-md">🥈 2. Sıra</span>
+              <div className="w-16 h-16 rounded-full bg-slate-700 border-2 border-slate-300 overflow-hidden flex items-center justify-center text-xl font-black text-white mt-2">
+                {top3[1].avatar ? <img src={top3[1].avatar} alt="" className="w-full h-full object-cover" /> : top3[1].name.charAt(0)}
+              </div>
+              <div>
+                <h4 className="font-black text-white text-sm">{top3[1].name}</h4>
+                <p className="text-xs text-slate-400 font-bold tabular-nums mt-0.5">{top3[1].totalScore} Puan</p>
+              </div>
+              <div className="flex gap-1">
+                {top3[1].badges?.filter((b: any) => b.unlocked).map((b: any) => (
+                  <span key={b.id} title={b.name} className="text-base">{b.icon}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 1st Place (Gold) */}
+          {top3[0] && (
+            <div className="order-1 md:order-2 bg-gradient-to-b from-amber-900/60 via-amber-950 to-[#0D1B35] border-2 border-amber-400 rounded-2xl p-6 text-center flex flex-col items-center justify-center space-y-3 relative shadow-2xl shadow-amber-500/20 scale-105">
+              <span className="absolute -top-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-black text-xs px-4 py-1 rounded-full shadow-lg border border-amber-300">👑 1. HAFTANIN ŞAMPİYONU</span>
+              <div className="w-20 h-20 rounded-full bg-amber-500 border-4 border-amber-300 overflow-hidden flex items-center justify-center text-2xl font-black text-white mt-2 shadow-lg shadow-amber-500/50">
+                {top3[0].avatar ? <img src={top3[0].avatar} alt="" className="w-full h-full object-cover" /> : top3[0].name.charAt(0)}
+              </div>
+              <div>
+                <h4 className="font-black text-white text-base">{top3[0].name}</h4>
+                <p className="text-sm text-amber-300 font-black tabular-nums mt-0.5">{top3[0].totalScore} Puan</p>
+              </div>
+              <div className="flex gap-1.5 bg-white/5 px-3 py-1 rounded-xl">
+                {top3[0].badges?.filter((b: any) => b.unlocked).map((b: any) => (
+                  <span key={b.id} title={b.name} className="text-lg">{b.icon}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 3rd Place */}
+          {top3[2] && (
+            <div className="order-3 bg-gradient-to-b from-amber-950/40 to-[#0D1B35] border border-amber-700/30 rounded-2xl p-5 text-center flex flex-col items-center justify-center space-y-3 relative shadow-xl">
+              <span className="absolute -top-3 bg-amber-700 text-white font-black text-xs px-3 py-0.5 rounded-full shadow-md">🥉 3. Sıra</span>
+              <div className="w-16 h-16 rounded-full bg-amber-900 border-2 border-amber-600 overflow-hidden flex items-center justify-center text-xl font-black text-white mt-2">
+                {top3[2].avatar ? <img src={top3[2].avatar} alt="" className="w-full h-full object-cover" /> : top3[2].name.charAt(0)}
+              </div>
+              <div>
+                <h4 className="font-black text-white text-sm">{top3[2].name}</h4>
+                <p className="text-xs text-amber-400 font-bold tabular-nums mt-0.5">{top3[2].totalScore} Puan</p>
+              </div>
+              <div className="flex gap-1">
+                {top3[2].badges?.filter((b: any) => b.unlocked).map((b: any) => (
+                  <span key={b.id} title={b.name} className="text-base">{b.icon}</span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Earned Badges Section */}
+      {myEntry && myEntry.badges && (
+        <div className="bg-[#1E293B] border border-white/10 rounded-2xl p-6 space-y-4">
+          <h4 className="font-black text-white text-base flex items-center gap-2">
+            <span>🎖️</span> Kazandığım Dijital Başarı Rozetleri ({myEntry.unlockedBadgeCount} / {myEntry.badges.length})
+          </h4>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {myEntry.badges.map((badge: any) => (
+              <div
+                key={badge.id}
+                className={`p-4 rounded-xl border flex items-start gap-3 transition-all ${
+                  badge.unlocked
+                    ? "bg-gradient-to-br from-amber-500/10 to-indigo-900/30 border-amber-500/40 text-white shadow-lg"
+                    : "bg-[#0D1B35] border-white/5 text-slate-500 opacity-60"
+                }`}
+              >
+                <span className={`text-2xl p-2 rounded-xl flex-shrink-0 ${ badge.unlocked ? "bg-amber-500/20 border border-amber-500/40" : "bg-white/5" }`}>
+                  {badge.icon}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <h5 className="font-black text-xs text-white truncate">{badge.name}</h5>
+                    {badge.unlocked && <span className="text-[10px] font-black text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded-full">KAZANILDI</span>}
+                  </div>
+                  <p className="text-[11px] text-slate-400 font-medium mt-1 leading-snug">{badge.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Full Leaderboard Table */}
+      <div className="bg-[#1E293B] border border-white/10 rounded-2xl p-6 space-y-4">
+        <h4 className="font-black text-indigo-400 text-sm uppercase tracking-wider">📊 Tüm Öğrenci Sıralaması ({leaderboard.length})</h4>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="border-b border-white/10 text-slate-400 uppercase font-black tracking-wider text-[10px]">
+                <th className="py-3 px-3">Sıra</th>
+                <th className="py-3 px-3">Öğrenci</th>
+                <th className="py-3 px-3 text-center">Çözülen Test</th>
+                <th className="py-3 px-3 text-center">Max Deneme Neti</th>
+                <th className="py-3 px-3 text-center">Kazanılan Rozetler</th>
+                <th className="py-3 px-3 text-right">Toplam Puan</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {leaderboard.map((item) => {
+                const isMe = item.id === currentStudentId;
+                return (
+                  <tr key={item.id} className={`transition-colors ${ isMe ? "bg-indigo-600/20 border-l-4 border-l-indigo-500 font-bold" : "hover:bg-white/5" }`}>
+                    <td className="py-3.5 px-3 font-black text-slate-300">
+                      {item.rank === 1 ? "🥇 1" : item.rank === 2 ? "🥈 2" : item.rank === 3 ? "🥉 3" : `#${item.rank}`}
+                    </td>
+                    <td className="py-3.5 px-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-indigo-900 border border-white/10 flex items-center justify-center font-black text-white overflow-hidden text-xs flex-shrink-0">
+                          {item.avatar ? <img src={item.avatar} alt="" className="w-full h-full object-cover" /> : item.name.charAt(0)}
+                        </div>
+                        <span className={`font-black text-white ${ isMe ? "text-indigo-300" : "" }`}>
+                          {item.name} {isMe && "(Siz)"}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-3.5 px-3 text-center text-slate-300 font-bold tabular-nums">
+                      {item.quizCount + item.trialCount} Test
+                    </td>
+                    <td className="py-3.5 px-3 text-center text-emerald-400 font-black tabular-nums">
+                      {item.maxTrialNet} Net
+                    </td>
+                    <td className="py-3.5 px-3 text-center">
+                      <div className="flex justify-center gap-1">
+                        {item.badges?.filter((b: any) => b.unlocked).map((b: any) => (
+                          <span key={b.id} title={b.name} className="text-sm">{b.icon}</span>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="py-3.5 px-3 text-right font-black text-indigo-300 text-sm tabular-nums">
+                      {item.totalScore} Puan
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Interfaces ────────────────────────────────────────────────────────────────
 interface Student { id: number; name: string; phone: string; email: string; status: string; avatar?: string | null; }
 interface Teacher { id: number; name: string; phone: string; email: string; branch: string; status: string; egitim?: string | null; ozgecmis?: string | null; linkedin?: string | null; youtube?: string | null; avatar?: string | null; }
@@ -1236,6 +1447,7 @@ const STUDENT_NAV = [
   { id: "sorucozum",     icon: "📝", label: "Soru Bankası & Test Çöz" },
   { id: "denemenet",     icon: "📊", label: "Deneme Net Takibi" },
   { id: "konutakip",     icon: "📋", label: "YKS Konu Çetelesi" },
+  { id: "liderlik",      icon: "🏆", label: "Liderlik & Rozetler" },
   { id: "mesajlar",      icon: "💬", label: "Mesajlar" },
   { id: "degerlendirme", icon: "⭐", label: "Değerlendirmeler" },
   { id: "duzenle",       icon: "⚙️", label: "Profil Düzenle" },
@@ -1295,7 +1507,7 @@ export default function ProfilPage() {
     solutionText: "",
   });
 
-  const [dashboardTab, setDashboardTab] = useState<"panel" | "duzenle" | "dersler" | "bloglar" | "faq" | "mesajlar" | "canli" | "degerlendirme" | "gorevler" | "sorular" | "sorucozum" | "denemenet" | "konutakip">("panel");
+  const [dashboardTab, setDashboardTab] = useState<"panel" | "duzenle" | "dersler" | "bloglar" | "faq" | "mesajlar" | "canli" | "degerlendirme" | "gorevler" | "sorular" | "sorucozum" | "denemenet" | "konutakip" | "liderlik">("panel");
   const [chatRooms, setChatRooms] = useState<any[]>([]);
   const [activeRoomId, setActiveRoomId] = useState<number | null>(null);
   const [activeRoomMessages, setActiveRoomMessages] = useState<any[]>([]);
@@ -2574,6 +2786,11 @@ export default function ProfilPage() {
             {/* ─── YKS KONU ÇETELESİ ─── */}
             {dashboardTab === "konutakip" && studentProfile && (
               <StudentTopicTab studentId={studentProfile.id} />
+            )}
+
+            {/* ─── LİDERLİK TABLOSU & ROZETLER ─── */}
+            {dashboardTab === "liderlik" && studentProfile && (
+              <StudentLeaderboardTab currentStudentId={studentProfile.id} />
             )}
 
             {/* ─── MESAJLAR ─── */}
