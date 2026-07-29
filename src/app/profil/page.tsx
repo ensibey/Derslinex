@@ -724,6 +724,475 @@ function StudentQuizTab({ studentId }: { studentId?: number }) {
   );
 }
 
+// ─── Student Trial Net Tracking & Analytics Component ──────────────────────────
+function StudentTrialTab({ studentId }: { studentId: number }) {
+  const [trials, setTrials] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({
+    title: "",
+    examType: "TYT",
+    turkceNet: "",
+    sosyalNet: "",
+    matematikNet: "",
+    fenNet: "",
+  });
+
+  const fetchTrials = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/student/trials?studentId=${studentId}`);
+      const data = await res.json();
+      if (data.success) {
+        setTrials(data.trials || []);
+      }
+    } catch (e) {
+      console.error("Trials fetch error:", e);
+    } finally {
+      setLoading(false);
+    }
+  }, [studentId]);
+
+  useEffect(() => {
+    fetchTrials();
+  }, [fetchTrials]);
+
+  const handleSubmitTrial = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.title.trim()) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/student/trials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          studentId,
+          title: form.title,
+          examType: form.examType,
+          turkceNet: parseFloat(form.turkceNet || "0"),
+          sosyalNet: parseFloat(form.sosyalNet || "0"),
+          matematikNet: parseFloat(form.matematikNet || "0"),
+          fenNet: parseFloat(form.fenNet || "0"),
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setShowAddForm(false);
+        setForm({ title: "", examType: "TYT", turkceNet: "", sosyalNet: "", matematikNet: "", fenNet: "" });
+        fetchTrials();
+      }
+    } catch (e) {
+      console.error("Submit trial error:", e);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const maxNet = trials.length > 0 ? Math.max(...trials.map((t) => t.toplamNet)) : 0;
+  const avgNet = trials.length > 0 ? (trials.reduce((acc, t) => acc + t.toplamNet, 0) / trials.length).toFixed(1) : 0;
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <SessionCardSkeleton />
+        <SessionCardSkeleton />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header & Stats */}
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-[#1E293B] border border-white/10 p-6 rounded-2xl">
+        <div>
+          <h3 className="text-xl font-black text-white flex items-center gap-2">
+            <span>📊</span> Deneme Sınavı Net Takibi & Gelişim Grafiği
+          </h3>
+          <p className="text-xs text-slate-400 mt-1">Girdiğiniz YKS/LGS deneme sınavlarının net sonuçlarını kaydedin ve gelişiminizi takip edin.</p>
+        </div>
+
+        <button
+          onClick={() => setShowAddForm(!showAddForm)}
+          className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-xs px-5 py-3 rounded-xl transition shadow-lg flex items-center gap-2"
+        >
+          <span>{showAddForm ? "❌ Kapat" : "➕ Yeni Deneme Ekle"}</span>
+        </button>
+      </div>
+
+      {/* Stats Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-gradient-to-br from-indigo-900/40 via-indigo-950/60 to-[#0D1B35] border border-indigo-500/30 rounded-2xl p-4 text-center">
+          <p className="text-xs text-indigo-300 font-black uppercase tracking-wider">TOPLAM DENEME</p>
+          <p className="text-3xl font-black text-white mt-1">{trials.length}</p>
+        </div>
+
+        <div className="bg-gradient-to-br from-emerald-900/40 via-emerald-950/60 to-[#0D1B35] border border-emerald-500/30 rounded-2xl p-4 text-center">
+          <p className="text-xs text-emerald-300 font-black uppercase tracking-wider">EN YÜKSEK NET</p>
+          <p className="text-3xl font-black text-emerald-400 mt-1">{maxNet} Net</p>
+        </div>
+
+        <div className="bg-gradient-to-br from-amber-900/40 via-amber-950/60 to-[#0D1B35] border border-amber-500/30 rounded-2xl p-4 text-center">
+          <p className="text-xs text-amber-300 font-black uppercase tracking-wider">ORTALAMA NET</p>
+          <p className="text-3xl font-black text-amber-400 mt-1">{avgNet} Net</p>
+        </div>
+      </div>
+
+      {/* Add Trial Form */}
+      {showAddForm && (
+        <form onSubmit={handleSubmitTrial} className="bg-[#1E293B] border border-indigo-500/30 p-6 rounded-2xl space-y-4 shadow-xl">
+          <h4 className="font-black text-white text-base">📝 Yeni Deneme Sınavı Kaydı</h4>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Deneme Yayın / Adı</label>
+              <input
+                type="text"
+                placeholder="Örn: 3D Türkiye Geneli TYT-1"
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                required
+                className="w-full bg-[#0D1B35] border border-white/10 text-white px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Sınav Türü</label>
+              <select
+                value={form.examType}
+                onChange={(e) => setForm({ ...form, examType: e.target.value })}
+                className="w-full bg-[#0D1B35] border border-white/10 text-white px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none focus:border-indigo-500"
+              >
+                <option value="TYT">TYT (Temel Yeterlilik Testi)</option>
+                <option value="AYT">AYT (Alan Yeterlilik Testi)</option>
+                <option value="LGS">LGS</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-xs font-black text-red-400 uppercase tracking-wider mb-1">Türkçe Net</label>
+              <input
+                type="number"
+                step="0.25"
+                placeholder="0.00"
+                value={form.turkceNet}
+                onChange={(e) => setForm({ ...form, turkceNet: e.target.value })}
+                className="w-full bg-[#0D1B35] border border-white/10 text-white px-3 py-2 rounded-xl text-sm font-bold focus:outline-none focus:border-red-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-black text-amber-400 uppercase tracking-wider mb-1">Sosyal Net</label>
+              <input
+                type="number"
+                step="0.25"
+                placeholder="0.00"
+                value={form.sosyalNet}
+                onChange={(e) => setForm({ ...form, sosyalNet: e.target.value })}
+                className="w-full bg-[#0D1B35] border border-white/10 text-white px-3 py-2 rounded-xl text-sm font-bold focus:outline-none focus:border-amber-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-black text-blue-400 uppercase tracking-wider mb-1">Matematik Net</label>
+              <input
+                type="number"
+                step="0.25"
+                placeholder="0.00"
+                value={form.matematikNet}
+                onChange={(e) => setForm({ ...form, matematikNet: e.target.value })}
+                className="w-full bg-[#0D1B35] border border-white/10 text-white px-3 py-2 rounded-xl text-sm font-bold focus:outline-none focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-black text-emerald-400 uppercase tracking-wider mb-1">Fen Net</label>
+              <input
+                type="number"
+                step="0.25"
+                placeholder="0.00"
+                value={form.fenNet}
+                onChange={(e) => setForm({ ...form, fenNet: e.target.value })}
+                className="w-full bg-[#0D1B35] border border-white/10 text-white px-3 py-2 rounded-xl text-sm font-bold focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setShowAddForm(false)}
+              className="bg-white/10 hover:bg-white/20 text-slate-300 font-bold text-xs px-4 py-2.5 rounded-xl transition"
+            >
+              İptal
+            </button>
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs px-6 py-2.5 rounded-xl transition shadow-md disabled:opacity-50"
+            >
+              {submitting ? "Kaydediliyor..." : "💾 Denemeyi Kaydet"}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* Trial List & Bar Charts */}
+      {trials.length === 0 ? (
+        <div className="bg-[#1E293B] border border-white/10 rounded-2xl p-12 text-center space-y-3">
+          <span className="text-4xl">📊</span>
+          <h4 className="text-white font-black text-base">Henüz Deneme Sınavı Kaydınız Yok</h4>
+          <p className="text-xs text-slate-400">"Yeni Deneme Ekle" butonuna basarak ilk deneme netlerinizi sisteme girebilirsiniz.</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <h4 className="font-black text-indigo-400 text-sm uppercase tracking-wider">📋 Kayıtlı Deneme Sınavları ({trials.length})</h4>
+          {trials.map((t) => {
+            const pct = Math.min(100, Math.max(5, (t.toplamNet / 120) * 100));
+            return (
+              <div key={t.id} className="bg-[#1E293B] border border-white/10 rounded-2xl p-5 space-y-3">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-black bg-indigo-500/20 text-indigo-300 px-2.5 py-1 rounded-lg border border-indigo-500/30">
+                      {t.examType}
+                    </span>
+                    <h5 className="font-black text-white text-base">{t.title}</h5>
+                  </div>
+                  <span className="text-2xl font-black text-emerald-400 tabular-nums">{t.toplamNet} Net</span>
+                </div>
+
+                {/* Net Visual Progress Bar */}
+                <div className="w-full bg-[#0D1B35] rounded-full h-3 overflow-hidden border border-white/5 p-0.5">
+                  <div
+                    className="bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-400 h-full rounded-full transition-all duration-500"
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+
+                {/* Subnet Pills */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                  <div className="bg-[#0D1B35] border border-white/5 p-2 rounded-xl text-center">
+                    <p className="text-[10px] text-red-400 font-bold">Türkçe</p>
+                    <p className="text-xs font-black text-white">{t.turkceNet} Net</p>
+                  </div>
+                  <div className="bg-[#0D1B35] border border-white/5 p-2 rounded-xl text-center">
+                    <p className="text-[10px] text-amber-400 font-bold">Sosyal</p>
+                    <p className="text-xs font-black text-white">{t.sosyalNet} Net</p>
+                  </div>
+                  <div className="bg-[#0D1B35] border border-white/5 p-2 rounded-xl text-center">
+                    <p className="text-[10px] text-blue-400 font-bold">Matematik</p>
+                    <p className="text-xs font-black text-white">{t.matematikNet} Net</p>
+                  </div>
+                  <div className="bg-[#0D1B35] border border-white/5 p-2 rounded-xl text-center">
+                    <p className="text-[10px] text-emerald-400 font-bold">Fen</p>
+                    <p className="text-xs font-black text-white">{t.fenNet} Net</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── YKS/LGS Topic Completion Checklist Component ─────────────────────────────
+const SAMPLE_YKS_TOPICS = [
+  {
+    subject: "TYT Matematik",
+    topics: [
+      "Temel Kavramlar",
+      "Sayı Basamakları",
+      "Bölme ve Bölünebilme",
+      "EBOB - EKOK",
+      "Rasyonel Sayılar",
+      "Basit Eşitsizlikler",
+      "Mutlak Değer",
+      "Üslü İfadeler",
+      "Köklü İfadeler",
+      "Oran - Orantı",
+      "Problemler (Yaş, İşçi, Yüzde, Kar-Zarar)",
+      "Kümeler ve Mantık",
+      "Fonksiyonlar",
+      "Polinomlar",
+    ],
+  },
+  {
+    subject: "AYT Matematik",
+    topics: [
+      "İkinci Dereceden Denklemler",
+      "Karmaşık Sayılar",
+      "Parabol",
+      "Trigonometri",
+      "Logaritma",
+      "Diziler",
+      "Limit ve Süreklilik",
+      "Türev ve Uygulamaları",
+      "İntegral",
+    ],
+  },
+  {
+    subject: "TYT Türkçe",
+    topics: [
+      "Sözcükte Anlam",
+      "Cümlede Anlam",
+      "Paragraf Bilgisi",
+      "Ses Bilgisi",
+      "Yazım Kuralları",
+      "Noktalama İşaretleri",
+      "Sözcük Türleri (İsim, Sıfat, Zamir)",
+      "Fiiller ve Fiilimsi",
+      "Cümlenin Ögeleri",
+    ],
+  },
+  {
+    subject: "TYT Fizik",
+    topics: [
+      "Fizik Bilimine Giriş",
+      "Madde ve Özellikleri",
+      "Hareket ve Kuvvet",
+      "İş, Güç ve Enerji",
+      "Isı ve Sıcaklık",
+      "Elektrostatik ve Elektrik",
+      "Optik ve Aynalar",
+      "Dalgalar",
+    ],
+  },
+];
+
+function StudentTopicTab({ studentId }: { studentId: number }) {
+  const [completedTopics, setCompletedTopics] = useState<Record<string, boolean>>({});
+  const [loading, setLoading] = useState(true);
+
+  const fetchTopicProgress = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/student/topics?studentId=${studentId}`);
+      const data = await res.json();
+      if (data.success && data.progress) {
+        const map: Record<string, boolean> = {};
+        for (const item of data.progress) {
+          map[`${item.subject}_${item.topic}`] = item.isCompleted;
+        }
+        setCompletedTopics(map);
+      }
+    } catch (e) {
+      console.error("Fetch topics error:", e);
+    } finally {
+      setLoading(false);
+    }
+  }, [studentId]);
+
+  useEffect(() => {
+    fetchTopicProgress();
+  }, [fetchTopicProgress]);
+
+  const toggleTopic = async (subject: string, topic: string) => {
+    const key = `${subject}_${topic}`;
+    const nextState = !completedTopics[key];
+
+    setCompletedTopics((prev) => ({ ...prev, [key]: nextState }));
+
+    try {
+      await fetch("/api/student/topics", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          studentId,
+          subject,
+          topic,
+          isCompleted: nextState,
+        }),
+      });
+    } catch (e) {
+      console.error("Toggle topic error:", e);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <SessionCardSkeleton />
+        <SessionCardSkeleton />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-[#1E293B] border border-white/10 p-6 rounded-2xl">
+        <h3 className="text-xl font-black text-white flex items-center gap-2">
+          <span>📋</span> YKS Konu Takip Çetelesi
+        </h3>
+        <p className="text-xs text-slate-400 mt-1">Bitirdiğiniz ve hakim olduğunuz konuları işaretleyin, müfredat tamamlama yüzdenizi canlı görün!</p>
+      </div>
+
+      {/* Subject Blocks */}
+      <div className="space-y-6">
+        {SAMPLE_YKS_TOPICS.map((subGroup) => {
+          const totalCount = subGroup.topics.length;
+          const doneCount = subGroup.topics.filter((t) => completedTopics[`${subGroup.subject}_${t}`]).length;
+          const pct = Math.round((doneCount / totalCount) * 100);
+
+          return (
+            <div key={subGroup.subject} className="bg-[#1E293B] border border-white/10 rounded-2xl p-5 space-y-4">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <h4 className="font-black text-white text-base flex items-center gap-2">
+                  <span>📚</span> {subGroup.subject}
+                </h4>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-slate-400 font-bold">
+                    {doneCount} / {totalCount} Konu (%{pct})
+                  </span>
+                  <span className="text-xs font-black bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full border border-indigo-500/30">
+                    %{pct} Tamamlandı
+                  </span>
+                </div>
+              </div>
+
+              {/* Subject Progress Bar */}
+              <div className="w-full bg-[#0D1B35] rounded-full h-2.5 overflow-hidden border border-white/5">
+                <div
+                  className="bg-gradient-to-r from-indigo-500 to-emerald-400 h-full rounded-full transition-all duration-300"
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+
+              {/* Topics Grid */}
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-2">
+                {subGroup.topics.map((topic) => {
+                  const isDone = !!completedTopics[`${subGroup.subject}_${topic}`];
+                  return (
+                    <button
+                      key={topic}
+                      onClick={() => toggleTopic(subGroup.subject, topic)}
+                      className={`p-3 rounded-xl border text-left flex items-center gap-3 transition-all text-xs font-bold ${
+                        isDone
+                          ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-300 shadow-md"
+                          : "bg-[#0D1B35] border-white/10 text-slate-300 hover:bg-white/5"
+                      }`}
+                    >
+                      <span className={`w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 text-xs font-black ${
+                        isDone ? "bg-emerald-500 border-emerald-400 text-white" : "border-slate-600 bg-white/5 text-transparent"
+                      }`}>✓</span>
+                      <span className="flex-1 truncate">{topic}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function TeacherSessionsTab({ userId }: { userId: number }) {
   const [sessions, setSessions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -765,6 +1234,8 @@ const STUDENT_NAV = [
   { id: "panel",         icon: "🏠", label: "Genel Görünüm" },
   { id: "canli",         icon: "🎥", label: "Canlı Derslerim" },
   { id: "sorucozum",     icon: "📝", label: "Soru Bankası & Test Çöz" },
+  { id: "denemenet",     icon: "📊", label: "Deneme Net Takibi" },
+  { id: "konutakip",     icon: "📋", label: "YKS Konu Çetelesi" },
   { id: "mesajlar",      icon: "💬", label: "Mesajlar" },
   { id: "degerlendirme", icon: "⭐", label: "Değerlendirmeler" },
   { id: "duzenle",       icon: "⚙️", label: "Profil Düzenle" },
@@ -824,7 +1295,7 @@ export default function ProfilPage() {
     solutionText: "",
   });
 
-  const [dashboardTab, setDashboardTab] = useState<"panel" | "duzenle" | "dersler" | "bloglar" | "faq" | "mesajlar" | "canli" | "degerlendirme" | "gorevler" | "sorular" | "sorucozum">("panel");
+  const [dashboardTab, setDashboardTab] = useState<"panel" | "duzenle" | "dersler" | "bloglar" | "faq" | "mesajlar" | "canli" | "degerlendirme" | "gorevler" | "sorular" | "sorucozum" | "denemenet" | "konutakip">("panel");
   const [chatRooms, setChatRooms] = useState<any[]>([]);
   const [activeRoomId, setActiveRoomId] = useState<number | null>(null);
   const [activeRoomMessages, setActiveRoomMessages] = useState<any[]>([]);
@@ -2093,6 +2564,16 @@ export default function ProfilPage() {
                   </div>
                 )}
               </div>
+            )}
+
+            {/* ─── DENEME NET TAKİBİ ─── */}
+            {dashboardTab === "denemenet" && studentProfile && (
+              <StudentTrialTab studentId={studentProfile.id} />
+            )}
+
+            {/* ─── YKS KONU ÇETELESİ ─── */}
+            {dashboardTab === "konutakip" && studentProfile && (
+              <StudentTopicTab studentId={studentProfile.id} />
             )}
 
             {/* ─── MESAJLAR ─── */}

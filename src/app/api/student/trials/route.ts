@@ -2,88 +2,84 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser } from "@/lib/auth-middleware";
 
-// GET /api/student/trials - fetch trial net results
+// GET /api/student/trials?studentId=123
 export async function GET(request: Request) {
   try {
-    const authUser = await getAuthUser(request);
-    if (!authUser || authUser.role !== "student") {
-      return NextResponse.json({ success: false, error: "Yetkisiz erişim" }, { status: 401 });
+    const { searchParams } = new URL(request.url);
+    const studentIdStr = searchParams.get("studentId");
+    let studentId = parseInt(studentIdStr || "0");
+
+    if (!studentId) {
+      const authUser = await getAuthUser(request);
+      if (authUser && authUser.role === "student") {
+        studentId = authUser.id;
+      }
+    }
+
+    if (!studentId) {
+      return NextResponse.json({ success: false, error: "Öğrenci ID zorunludur." }, { status: 400 });
     }
 
     const trials = await prisma.studentTrialResult.findMany({
-      where: { studentId: authUser.id },
+      where: { studentId },
       orderBy: { date: "desc" },
     });
 
     return NextResponse.json({ success: true, trials });
   } catch (error) {
-    console.error("Student Trials GET Error:", error);
+    console.error("Trials GET error:", error);
     return NextResponse.json({ success: false, error: "Sunucu hatası" }, { status: 500 });
   }
 }
 
-// POST /api/student/trials - create or save trial net result
+// POST /api/student/trials - Add new trial result
 export async function POST(request: Request) {
   try {
     const authUser = await getAuthUser(request);
-    if (!authUser || authUser.role !== "student") {
-      return NextResponse.json({ success: false, error: "Yetkisiz erişim" }, { status: 401 });
-    }
-
     const body = await request.json();
-    const { title, examType, turkceNet, sosyalNet, matematikNet, fenNet } = body;
+
+    const {
+      studentId: bodyStudentId,
+      title,
+      examType,
+      turkceNet,
+      sosyalNet,
+      matematikNet,
+      fenNet,
+    } = body;
+
+    const studentId = authUser && authUser.role === "student" ? authUser.id : (bodyStudentId ? parseInt(bodyStudentId) : null);
+
+    if (!studentId) {
+      return NextResponse.json({ success: false, error: "Oturum açmanız gerekmektedir." }, { status: 401 });
+    }
 
     if (!title) {
-      return NextResponse.json({ success: false, error: "Deneme adı zorunludur" }, { status: 400 });
+      return NextResponse.json({ success: false, error: "Deneme adı zorunludur." }, { status: 400 });
     }
 
-    const tNet = Number(turkceNet) || 0;
-    const sNet = Number(sosyalNet) || 0;
-    const mNet = Number(matematikNet) || 0;
-    const fNet = Number(fenNet) || 0;
-    const toplamNet = tNet + sNet + mNet + fNet;
+    const turkce = parseFloat(turkceNet || 0);
+    const sosyal = parseFloat(sosyalNet || 0);
+    const mat = parseFloat(matematikNet || 0);
+    const fen = parseFloat(fenNet || 0);
+    const toplamNet = turkce + sosyal + mat + fen;
 
     const trial = await prisma.studentTrialResult.create({
       data: {
-        studentId: authUser.id,
+        studentId,
         title,
         examType: examType || "TYT",
-        turkceNet: tNet,
-        sosyalNet: sNet,
-        matematikNet: mNet,
-        fenNet: fNet,
+        turkceNet: turkce,
+        sosyalNet: sosyal,
+        matematikNet: mat,
+        fenNet: fen,
         toplamNet,
       },
     });
 
     return NextResponse.json({ success: true, trial });
   } catch (error) {
-    console.error("Student Trials POST Error:", error);
-    return NextResponse.json({ success: false, error: "Sunucu hatası" }, { status: 500 });
-  }
-}
-
-// DELETE /api/student/trials?id=123
-export async function DELETE(request: Request) {
-  try {
-    const authUser = await getAuthUser(request);
-    if (!authUser || authUser.role !== "student") {
-      return NextResponse.json({ success: false, error: "Yetkisiz erişim" }, { status: 401 });
-    }
-
-    const { searchParams } = new URL(request.url);
-    const idStr = searchParams.get("id");
-    if (!idStr) {
-      return NextResponse.json({ success: false, error: "ID gereklidir" }, { status: 400 });
-    }
-
-    await prisma.studentTrialResult.delete({
-      where: { id: parseInt(idStr) },
-    });
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Student Trials DELETE Error:", error);
+    console.error("Trials POST error:", error);
     return NextResponse.json({ success: false, error: "Sunucu hatası" }, { status: 500 });
   }
 }
