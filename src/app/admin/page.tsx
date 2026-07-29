@@ -115,6 +115,7 @@ export default function AdminPage() {
   const [adminTasks, setAdminTasks] = useState<any[]>([]);
   const [questionsList, setQuestionsList] = useState<any[]>([]);
   const [contactMessages, setContactMessages] = useState<any[]>([]);
+  const [systemMetrics, setSystemMetrics] = useState<any>(null);
   const [editingQuestionId, setEditingQuestionId] = useState<number | null>(null);
   const [editQuestionForm, setEditQuestionForm] = useState<any>({});
 
@@ -146,7 +147,7 @@ export default function AdminPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [tRes, sRes, fRes, lRes, bRes, sessRes, taskRes, qRes, cRes] = await Promise.all([
+      const [tRes, sRes, fRes, lRes, bRes, sessRes, taskRes, qRes, cRes, mRes] = await Promise.all([
         fetch("/api/profil/ogretmen"),
         fetch("/api/profil/ogrenci"),
         fetch("/api/gorus"),
@@ -156,6 +157,7 @@ export default function AdminPage() {
         adminFetch("/api/admin/tasks"),
         adminFetch("/api/admin/questions"),
         adminFetch("/api/admin/contact"),
+        adminFetch("/api/admin/status"),
       ]);
 
       const tData = await tRes.json();
@@ -167,6 +169,7 @@ export default function AdminPage() {
       const taskData = await taskRes.json();
       const qData = await qRes.json();
       const cData = await cRes.json();
+      const mData = await mRes.json();
 
       if (tData.success) setTeachers(tData.teachers || []);
       if (sData.success) setStudents(sData.students || []);
@@ -177,6 +180,7 @@ export default function AdminPage() {
       if (taskData.success) setAdminTasks(taskData.tasks || []);
       if (qData.success) setQuestionsList(qData.questions || []);
       if (cData.success) setContactMessages(cData.messages || []);
+      if (mData.success) setSystemMetrics(mData.metrics || null);
     } catch (e) {
       console.error("Data fetch error", e);
     } finally {
@@ -417,6 +421,47 @@ export default function AdminPage() {
         </header>
 
         <main className="flex-1 p-4 md:p-6 overflow-y-auto space-y-6">
+          {/* Executive Analytics Metrics Row */}
+          {systemMetrics && (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+              <div className="bg-gradient-to-br from-indigo-900/40 via-indigo-950/60 to-[#0D1B35] border border-indigo-500/30 rounded-2xl p-4 shadow-xl">
+                <span className="text-[10px] font-black text-indigo-300 uppercase tracking-wider block">ÖĞRENCİ SAYISI</span>
+                <p className="text-2xl font-black text-white mt-1 tabular-nums">{systemMetrics.totalStudents}</p>
+                <span className="text-[9px] text-indigo-400 font-bold block mt-0.5">Kayıtlı Öğrenciler</span>
+              </div>
+
+              <div className="bg-gradient-to-br from-purple-900/40 via-purple-950/60 to-[#0D1B35] border border-purple-500/30 rounded-2xl p-4 shadow-xl">
+                <span className="text-[10px] font-black text-purple-300 uppercase tracking-wider block">EĞİTMEN KADROSU</span>
+                <p className="text-2xl font-black text-white mt-1 tabular-nums">{systemMetrics.totalTeachers}</p>
+                <span className="text-[9px] text-amber-400 font-bold block mt-0.5">{systemMetrics.pendingTeachers} Onay Bekliyor</span>
+              </div>
+
+              <div className="bg-gradient-to-br from-blue-900/40 via-blue-950/60 to-[#0D1B35] border border-blue-500/30 rounded-2xl p-4 shadow-xl">
+                <span className="text-[10px] font-black text-blue-300 uppercase tracking-wider block">CANLI DERSLER</span>
+                <p className="text-2xl font-black text-white mt-1 tabular-nums">{systemMetrics.totalLiveSessions}</p>
+                <span className="text-[9px] text-blue-400 font-bold block mt-0.5">Planlanan & Biten</span>
+              </div>
+
+              <div className="bg-gradient-to-br from-amber-900/40 via-amber-950/60 to-[#0D1B35] border border-amber-500/30 rounded-2xl p-4 shadow-xl">
+                <span className="text-[10px] font-black text-amber-300 uppercase tracking-wider block">SORU HAVUZU</span>
+                <p className="text-2xl font-black text-white mt-1 tabular-nums">{systemMetrics.totalQuestions}</p>
+                <span className="text-[9px] text-amber-400 font-bold block mt-0.5">Özgün Soru</span>
+              </div>
+
+              <div className="bg-gradient-to-br from-emerald-900/40 via-emerald-950/60 to-[#0D1B35] border border-emerald-500/30 rounded-2xl p-4 shadow-xl">
+                <span className="text-[10px] font-black text-emerald-300 uppercase tracking-wider block">ÇÖZÜLEN TESTLER</span>
+                <p className="text-2xl font-black text-white mt-1 tabular-nums">{systemMetrics.totalQuizResults}</p>
+                <span className="text-[9px] text-emerald-400 font-bold block mt-0.5">Öğrenci Test Çözümü</span>
+              </div>
+
+              <div className="bg-gradient-to-br from-red-900/40 via-red-950/60 to-[#0D1B35] border border-red-500/30 rounded-2xl p-4 shadow-xl">
+                <span className="text-[10px] font-black text-red-300 uppercase tracking-wider block">OKUNMAMIŞ MESAJ</span>
+                <p className="text-2xl font-black text-red-400 mt-1 tabular-nums">{systemMetrics.unreadMessages}</p>
+                <span className="text-[9px] text-slate-400 font-bold block mt-0.5">İletişim Formları</span>
+              </div>
+            </div>
+          )}
+
           {/* Glassmorphism Stat Cards Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 gap-2.5">
             {[
