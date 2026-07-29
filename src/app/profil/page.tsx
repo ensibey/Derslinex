@@ -286,6 +286,13 @@ export default function ProfilPage() {
   const [teacherPoints, setTeacherPoints] = useState<number>(0);
   const [teacherQuestions, setTeacherQuestions] = useState<any[]>([]);
   const [addingQuestion, setAddingQuestion] = useState(false);
+  const [questionFilter, setQuestionFilter] = useState({
+    subject: "tumu",
+    examType: "tumu",
+    difficulty: "tumu",
+    status: "tumu",
+    search: "",
+  });
   const [questionForm, setQuestionForm] = useState({
     subject: "Matematik",
     examType: "TYT",
@@ -1160,16 +1167,119 @@ export default function ProfilPage() {
                   </div>
                 )}
 
+                {/* Questions Filter Bar */}
+                <div className="bg-[#1E293B] rounded-2xl border border-white/5 p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-indigo-400 uppercase tracking-wider">🔍 Soruları Filtrele & Ara</span>
+                    {(questionFilter.subject !== "tumu" || questionFilter.examType !== "tumu" || questionFilter.difficulty !== "tumu" || questionFilter.status !== "tumu" || questionFilter.search) && (
+                      <button
+                        onClick={() => setQuestionFilter({ subject: "tumu", examType: "tumu", difficulty: "tumu", status: "tumu", search: "" })}
+                        className="text-[11px] font-bold text-amber-400 hover:underline"
+                      >
+                        🔄 Filtreleri Temizle
+                      </button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                    <select
+                      value={questionFilter.subject}
+                      onChange={(e) => setQuestionFilter({ ...questionFilter, subject: e.target.value })}
+                      className="bg-[#0D1B35] border border-white/10 text-white text-xs font-bold px-3 py-2 rounded-xl focus:outline-none"
+                    >
+                      <option value="tumu">Tüm Dersler</option>
+                      <option value="Matematik">Matematik</option>
+                      <option value="Fizik">Fizik</option>
+                      <option value="Kimya">Kimya</option>
+                      <option value="Biyoloji">Biyoloji</option>
+                      <option value="Türkçe">Türkçe</option>
+                      <option value="Tarih">Tarih</option>
+                      <option value="Coğrafya">Coğrafya</option>
+                      <option value="Felsefe">Felsefe</option>
+                      <option value="İngilizce">İngilizce</option>
+                    </select>
+
+                    <select
+                      value={questionFilter.examType}
+                      onChange={(e) => setQuestionFilter({ ...questionFilter, examType: e.target.value })}
+                      className="bg-[#0D1B35] border border-white/10 text-white text-xs font-bold px-3 py-2 rounded-xl focus:outline-none"
+                    >
+                      <option value="tumu">Tüm Sınavlar</option>
+                      <option value="TYT">TYT</option>
+                      <option value="AYT Sayısal">AYT Sayısal</option>
+                      <option value="AYT EA">AYT EA</option>
+                      <option value="AYT Sözel">AYT Sözel</option>
+                      <option value="LGS">LGS</option>
+                    </select>
+
+                    <select
+                      value={questionFilter.difficulty}
+                      onChange={(e) => setQuestionFilter({ ...questionFilter, difficulty: e.target.value })}
+                      className="bg-[#0D1B35] border border-white/10 text-white text-xs font-bold px-3 py-2 rounded-xl focus:outline-none"
+                    >
+                      <option value="tumu">Tüm Zorluklar</option>
+                      <option value="Kolay">Kolay</option>
+                      <option value="Orta">Orta</option>
+                      <option value="Zor">Zor</option>
+                      <option value="ÖSYM Tipi">ÖSYM Tipi</option>
+                    </select>
+
+                    <select
+                      value={questionFilter.status}
+                      onChange={(e) => setQuestionFilter({ ...questionFilter, status: e.target.value })}
+                      className="bg-[#0D1B35] border border-white/10 text-white text-xs font-bold px-3 py-2 rounded-xl focus:outline-none"
+                    >
+                      <option value="tumu">Tüm Durumlar</option>
+                      <option value="PENDING_APPROVAL">⏳ Onay Bekleyenler</option>
+                      <option value="APPROVED">✅ Onaylananlar</option>
+                      <option value="REJECTED">❌ Reddedilenler</option>
+                    </select>
+
+                    <input
+                      type="text"
+                      placeholder="Konu / Metin Ara..."
+                      value={questionFilter.search}
+                      onChange={(e) => setQuestionFilter({ ...questionFilter, search: e.target.value })}
+                      className="bg-[#0D1B35] border border-white/10 text-white text-xs font-semibold px-3 py-2 rounded-xl focus:outline-none placeholder:text-slate-500"
+                    />
+                  </div>
+                </div>
+
                 {/* Questions List */}
                 <div className="bg-[#1E293B] rounded-2xl border border-white/5 p-6">
-                  <h4 className="text-white font-black text-base mb-1">📋 Gönderdiğiniz Sorular ({teacherQuestions.length})</h4>
-                  <p className="text-slate-400 text-xs font-semibold mb-5">Soru onaylandığında hesabınıza +20 Puan eklenir.</p>
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-white font-black text-base">📋 Sorularım ({teacherQuestions.filter((q) => {
+                      if (questionFilter.subject !== "tumu" && q.subject.toLowerCase() !== questionFilter.subject.toLowerCase()) return false;
+                      if (questionFilter.examType !== "tumu" && q.examType !== questionFilter.examType) return false;
+                      if (questionFilter.difficulty !== "tumu" && q.difficulty !== questionFilter.difficulty) return false;
+                      if (questionFilter.status !== "tumu" && q.status !== questionFilter.status) return false;
+                      if (questionFilter.search.trim()) {
+                        const term = questionFilter.search.toLowerCase();
+                        const matchTopic = q.topic?.toLowerCase().includes(term);
+                        const matchText = q.questionText?.toLowerCase().includes(term);
+                        if (!matchTopic && !matchText) return false;
+                      }
+                      return true;
+                    }).length} / {teacherQuestions.length})</h4>
+                    <span className="text-xs text-slate-400 font-semibold">Onaylanan sorular: +20 Puan</span>
+                  </div>
 
                   {teacherQuestions.length === 0 ? (
                     <p className="text-slate-500 text-sm font-semibold py-8 text-center">Henüz eklediğiniz soru bulunmuyor.</p>
                   ) : (
                     <div className="space-y-4">
-                      {teacherQuestions.map((q) => (
+                      {teacherQuestions.filter((q) => {
+                        if (questionFilter.subject !== "tumu" && q.subject.toLowerCase() !== questionFilter.subject.toLowerCase()) return false;
+                        if (questionFilter.examType !== "tumu" && q.examType !== questionFilter.examType) return false;
+                        if (questionFilter.difficulty !== "tumu" && q.difficulty !== questionFilter.difficulty) return false;
+                        if (questionFilter.status !== "tumu" && q.status !== questionFilter.status) return false;
+                        if (questionFilter.search.trim()) {
+                          const term = questionFilter.search.toLowerCase();
+                          const matchTopic = q.topic?.toLowerCase().includes(term);
+                          const matchText = q.questionText?.toLowerCase().includes(term);
+                          if (!matchTopic && !matchText) return false;
+                        }
+                        return true;
+                      }).map((q) => (
                         <div key={q.id} className="p-5 bg-[#0D1B35] border border-white/10 rounded-2xl space-y-3">
                           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-2">
                             <div className="flex items-center gap-2 flex-wrap">

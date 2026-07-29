@@ -29,7 +29,7 @@ export async function GET(request: Request) {
 export async function PUT(request: Request) {
   try {
     const body = await request.json();
-    const { questionId, status, rejectionReason } = body; // status: "APPROVED" | "REJECTED" | "PENDING_APPROVAL"
+    const { questionId, status, rejectionReason } = body;
 
     if (!questionId || !status) {
       return NextResponse.json({ success: false, error: "Soru ID ve Durum zorunludur" }, { status: 400 });
@@ -68,6 +68,57 @@ export async function PUT(request: Request) {
     return NextResponse.json({ success: true, message: "Soru durumu güncellendi" });
   } catch (error) {
     console.error("Admin Questions PUT Error:", error);
+    return NextResponse.json({ success: false, error: "Sunucu hatası" }, { status: 500 });
+  }
+}
+
+// PATCH /api/admin/questions - Edit question details (subject, topic, difficulty, options, text, etc.)
+export async function PATCH(request: Request) {
+  try {
+    const body = await request.json();
+    const {
+      questionId,
+      subject,
+      examType,
+      topic,
+      difficulty,
+      questionText,
+      imageUrl,
+      optionA,
+      optionB,
+      optionC,
+      optionD,
+      optionE,
+      correctOption,
+      solutionText,
+    } = body;
+
+    if (!questionId) {
+      return NextResponse.json({ success: false, error: "Soru ID zorunludur" }, { status: 400 });
+    }
+
+    const updated = await prisma.question.update({
+      where: { id: parseInt(questionId) },
+      data: {
+        subject,
+        examType,
+        topic,
+        difficulty,
+        questionText,
+        imageUrl: imageUrl || null,
+        optionA,
+        optionB,
+        optionC,
+        optionD,
+        optionE,
+        correctOption,
+        solutionText: solutionText || null,
+      },
+    });
+
+    return NextResponse.json({ success: true, question: updated });
+  } catch (error) {
+    console.error("Admin Questions PATCH Error:", error);
     return NextResponse.json({ success: false, error: "Sunucu hatası" }, { status: 500 });
   }
 }

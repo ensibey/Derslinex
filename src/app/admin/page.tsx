@@ -69,6 +69,8 @@ export default function AdminPage() {
   const [liveSessions, setLiveSessions] = useState<any[]>([]);
   const [adminTasks, setAdminTasks] = useState<any[]>([]);
   const [questionsList, setQuestionsList] = useState<any[]>([]);
+  const [editingQuestionId, setEditingQuestionId] = useState<number | null>(null);
+  const [editQuestionForm, setEditQuestionForm] = useState<any>({});
 
   // Task Create Form
   const [taskForm, setTaskForm] = useState({
@@ -1128,55 +1130,212 @@ export default function AdminPage() {
                         </p>
                       </div>
 
-                      {/* Question Content */}
-                      <div className="space-y-3">
-                        <div className="font-bold text-gray-900 text-sm whitespace-pre-wrap leading-relaxed bg-[#FAF8F5] p-4 rounded-xl border border-[#EFECE6]">
-                          {q.questionText}
-                        </div>
-
-                        {q.imageUrl && (
-                          <div className="max-w-md my-2">
-                            <img src={q.imageUrl} alt="Soru Görseli" className="rounded-xl border border-gray-200 max-h-60 object-contain" />
+                      {/* Question Content or Edit Form */}
+                      {editingQuestionId === q.id ? (
+                        <div className="bg-[#FAF8F5] border border-[#1E3A8A]/30 rounded-2xl p-5 space-y-4">
+                          <h5 className="font-black text-[#1E3A8A] text-xs uppercase tracking-wider">✏️ Soru Düzenleme & Sınıflandırma Formu</h5>
+                          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                            <div>
+                              <label className="block text-[11px] font-black text-gray-500 uppercase tracking-wider mb-1">Ders / Branş</label>
+                              <input
+                                type="text"
+                                value={editQuestionForm.subject}
+                                onChange={(e) => setEditQuestionForm({ ...editQuestionForm, subject: e.target.value })}
+                                className="w-full bg-white border border-[#EFECE6] px-3 py-2 rounded-xl text-xs font-bold focus:outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-black text-gray-500 uppercase tracking-wider mb-1">Sınav Türü</label>
+                              <input
+                                type="text"
+                                value={editQuestionForm.examType}
+                                onChange={(e) => setEditQuestionForm({ ...editQuestionForm, examType: e.target.value })}
+                                className="w-full bg-white border border-[#EFECE6] px-3 py-2 rounded-xl text-xs font-bold focus:outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-black text-gray-500 uppercase tracking-wider mb-1">Konu Adı</label>
+                              <input
+                                type="text"
+                                value={editQuestionForm.topic}
+                                onChange={(e) => setEditQuestionForm({ ...editQuestionForm, topic: e.target.value })}
+                                className="w-full bg-white border border-[#EFECE6] px-3 py-2 rounded-xl text-xs font-bold focus:outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-black text-gray-500 uppercase tracking-wider mb-1">Zorluk Derecesi</label>
+                              <select
+                                value={editQuestionForm.difficulty}
+                                onChange={(e) => setEditQuestionForm({ ...editQuestionForm, difficulty: e.target.value })}
+                                className="w-full bg-white border border-[#EFECE6] px-3 py-2 rounded-xl text-xs font-bold focus:outline-none"
+                              >
+                                <option value="Kolay">Kolay</option>
+                                <option value="Orta">Orta</option>
+                                <option value="Zor">Zor</option>
+                                <option value="ÖSYM Tipi">ÖSYM Tipi</option>
+                              </select>
+                            </div>
                           </div>
-                        )}
 
-                        {/* Options */}
-                        <div className="grid sm:grid-cols-2 gap-2 text-xs font-semibold">
-                          {["A", "B", "C", "D", "E"].map((opt) => {
-                            const val = q[`option${opt}`];
-                            if (!val && opt !== "A" && opt !== "B") return null;
-                            const isCorrect = q.correctOption === opt;
-                            return (
-                              <div key={opt} className={`p-2.5 rounded-xl border flex items-center gap-2 ${
-                                isCorrect ? "bg-emerald-50 border-emerald-300 text-emerald-900 font-black" : "bg-gray-50 border-gray-200 text-gray-700"
-                              }`}>
-                                <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-black text-xs ${
-                                  isCorrect ? "bg-emerald-600 text-white" : "bg-gray-200 text-gray-700"
-                                }`}>{opt}</span>
-                                <span>{val}</span>
-                                {isCorrect && <span className="ml-auto text-emerald-600 font-black">✓ Doğru Şık</span>}
+                          <div>
+                            <label className="block text-[11px] font-black text-gray-500 uppercase tracking-wider mb-1">Soru Metni</label>
+                            <textarea
+                              rows={3}
+                              value={editQuestionForm.questionText}
+                              onChange={(e) => setEditQuestionForm({ ...editQuestionForm, questionText: e.target.value })}
+                              className="w-full bg-white border border-[#EFECE6] px-3 py-2 rounded-xl text-xs font-semibold focus:outline-none"
+                            />
+                          </div>
+
+                          <div className="grid sm:grid-cols-2 gap-2">
+                            {["A", "B", "C", "D", "E"].map((opt) => (
+                              <div key={opt}>
+                                <label className="block text-[10px] font-bold text-gray-400">Şık {opt}</label>
+                                <input
+                                  type="text"
+                                  value={editQuestionForm[`option${opt}`]}
+                                  onChange={(e) => setEditQuestionForm({ ...editQuestionForm, [`option${opt}`]: e.target.value })}
+                                  className="w-full bg-white border border-[#EFECE6] px-3 py-1.5 rounded-lg text-xs font-semibold focus:outline-none"
+                                />
                               </div>
-                            );
-                          })}
+                            ))}
+                          </div>
+
+                          <div className="grid sm:grid-cols-2 gap-3 pt-2">
+                            <div>
+                              <label className="block text-[11px] font-black text-emerald-700 uppercase tracking-wider mb-1">Doğru Şık</label>
+                              <select
+                                value={editQuestionForm.correctOption}
+                                onChange={(e) => setEditQuestionForm({ ...editQuestionForm, correctOption: e.target.value })}
+                                className="w-full bg-white border border-emerald-300 text-emerald-900 font-bold px-3 py-2 rounded-xl text-xs focus:outline-none"
+                              >
+                                <option value="A">A Şıkkı</option>
+                                <option value="B">B Şıkkı</option>
+                                <option value="C">C Şıkkı</option>
+                                <option value="D">D Şıkkı</option>
+                                <option value="E">E Şıkkı</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-black text-gray-500 uppercase tracking-wider mb-1">Detaylı Çözüm</label>
+                              <input
+                                type="text"
+                                value={editQuestionForm.solutionText}
+                                onChange={(e) => setEditQuestionForm({ ...editQuestionForm, solutionText: e.target.value })}
+                                className="w-full bg-white border border-[#EFECE6] px-3 py-2 rounded-xl text-xs font-semibold focus:outline-none"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex justify-end gap-2 pt-2 border-t border-[#EFECE6]">
+                            <button
+                              type="button"
+                              onClick={() => setEditingQuestionId(null)}
+                              className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs px-4 py-2 rounded-xl transition"
+                            >
+                              Vazgeç
+                            </button>
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                try {
+                                  const res = await fetch("/api/admin/questions", {
+                                    method: "PATCH",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ questionId: q.id, ...editQuestionForm }),
+                                  });
+                                  const data = await res.json();
+                                  if (data.success) {
+                                    showMsg("✅ Soru detayları ve sınıflandırması güncellendi!", "success");
+                                    setEditingQuestionId(null);
+                                    fetchData();
+                                  } else {
+                                    showMsg(data.error || "Güncellenemedi", "error");
+                                  }
+                                } catch {
+                                  showMsg("Bağlantı hatası", "error");
+                                }
+                              }}
+                              className="bg-[#1E3A8A] hover:bg-[#163070] text-white font-black text-xs px-5 py-2 rounded-xl transition shadow-xs"
+                            >
+                              💾 Kaydet & Güncelle
+                            </button>
+                          </div>
                         </div>
-
-                        {/* Solution */}
-                        {q.solutionText && (
-                          <div className="bg-amber-50/60 border border-amber-200/80 rounded-xl p-3 text-xs text-amber-900">
-                            <p className="font-black mb-1">💡 Detaylı Çözüm:</p>
-                            <p className="font-semibold whitespace-pre-wrap">{q.solutionText}</p>
+                      ) : (
+                        <div className="space-y-3">
+                          <div className="font-bold text-gray-900 text-sm whitespace-pre-wrap leading-relaxed bg-[#FAF8F5] p-4 rounded-xl border border-[#EFECE6]">
+                            {q.questionText}
                           </div>
-                        )}
 
-                        {q.rejectionReason && (
-                          <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-800 font-bold">
-                            ❌ Red Sebebi: {q.rejectionReason}
+                          {q.imageUrl && (
+                            <div className="max-w-md my-2">
+                              <img src={q.imageUrl} alt="Soru Görseli" className="rounded-xl border border-gray-200 max-h-60 object-contain" />
+                            </div>
+                          )}
+
+                          {/* Options */}
+                          <div className="grid sm:grid-cols-2 gap-2 text-xs font-semibold">
+                            {["A", "B", "C", "D", "E"].map((opt) => {
+                              const val = q[`option${opt}`];
+                              if (!val && opt !== "A" && opt !== "B") return null;
+                              const isCorrect = q.correctOption === opt;
+                              return (
+                                <div key={opt} className={`p-2.5 rounded-xl border flex items-center gap-2 ${
+                                  isCorrect ? "bg-emerald-50 border-emerald-300 text-emerald-900 font-black" : "bg-gray-50 border-gray-200 text-gray-700"
+                                }`}>
+                                  <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-black text-xs ${
+                                    isCorrect ? "bg-emerald-600 text-white" : "bg-gray-200 text-gray-700"
+                                  }`}>{opt}</span>
+                                  <span>{val}</span>
+                                  {isCorrect && <span className="ml-auto text-emerald-600 font-black">✓ Doğru Şık</span>}
+                                </div>
+                              );
+                            })}
                           </div>
-                        )}
-                      </div>
+
+                          {/* Solution */}
+                          {q.solutionText && (
+                            <div className="bg-amber-50/60 border border-amber-200/80 rounded-xl p-3 text-xs text-amber-900">
+                              <p className="font-black mb-1">💡 Detaylı Çözüm:</p>
+                              <p className="font-semibold whitespace-pre-wrap">{q.solutionText}</p>
+                            </div>
+                          )}
+
+                          {q.rejectionReason && (
+                            <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-800 font-bold">
+                              ❌ Red Sebebi: {q.rejectionReason}
+                            </div>
+                          )}
+                        </div>
+                      )}
 
                       {/* Admin Action Buttons */}
                       <div className="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
+                        <button
+                          onClick={() => {
+                            setEditingQuestionId(q.id);
+                            setEditQuestionForm({
+                              subject: q.subject,
+                              examType: q.examType,
+                              topic: q.topic || "",
+                              difficulty: q.difficulty,
+                              questionText: q.questionText,
+                              imageUrl: q.imageUrl || "",
+                              optionA: q.optionA,
+                              optionB: q.optionB,
+                              optionC: q.optionC || "",
+                              optionD: q.optionD || "",
+                              optionE: q.optionE || "",
+                              correctOption: q.correctOption,
+                              solutionText: q.solutionText || "",
+                            });
+                          }}
+                          className="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-black text-xs px-3.5 py-2 rounded-xl transition"
+                        >
+                          ✏️ Düzenle
+                        </button>
+
                         {q.status !== "APPROVED" && (
                           <button
                             onClick={async () => {

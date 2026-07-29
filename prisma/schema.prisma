@@ -77,6 +77,9 @@ model Question {
   status           String   @default("PENDING_APPROVAL") // PENDING_APPROVAL, APPROVED, REJECTED
   rejectionReason  String?
   createdAt        DateTime @default(now())
+
+  @@index([subject, topic, difficulty])
+  @@index([status])
 }
 
 model Feedback {
