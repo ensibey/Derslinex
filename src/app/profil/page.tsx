@@ -3028,26 +3028,6 @@ export default function ProfilPage() {
               </div>
             )}
 
-            {/* ─── YANLIŞ SORU DEFTERİM ─── */}
-            {dashboardTab === "yanlissorular" && (
-              <StudentWrongQuestionsTab studentId={studentProfile?.id || 1} />
-            )}
-
-            {/* ─── DENEME NET TAKİBİ ─── */}
-            {dashboardTab === "denemenet" && (
-              <StudentTrialTab studentId={studentProfile?.id || 1} />
-            )}
-
-            {/* ─── YKS KONU ÇETELESİ ─── */}
-            {dashboardTab === "konutakip" && (
-              <StudentTopicTab studentId={studentProfile?.id || 1} />
-            )}
-
-            {/* ─── LİDERLİK TABLOSU & ROZETLER ─── */}
-            {dashboardTab === "liderlik" && (
-              <StudentLeaderboardTab currentStudentId={studentProfile?.id || 1} />
-            )}
-
             {/* ─── ÖĞRETMEN KATKI ROZETLERİ ─── */}
             {dashboardTab === "gorevler" && (
               <TeacherRewardsTab teacherId={teacherProfile?.id || 1} />
@@ -3603,6 +3583,26 @@ export default function ProfilPage() {
 
           {/* ─── SORU BANKASI & TEST ÇÖZ ─── */}
           {dashboardTab === "sorucozum" && <StudentQuizTab studentId={studentProfile?.id} />}
+
+          {/* ─── YANLIŞ SORU DEFTERİM ─── */}
+          {dashboardTab === "yanlissorular" && (
+            <StudentWrongQuestionsTab studentId={studentProfile?.id || 1} />
+          )}
+
+          {/* ─── DENEME NET TAKİBİ ─── */}
+          {dashboardTab === "denemenet" && (
+            <StudentTrialTab studentId={studentProfile?.id || 1} />
+          )}
+
+          {/* ─── YKS KONU ÇETELESİ ─── */}
+          {dashboardTab === "konutakip" && (
+            <StudentTopicTab studentId={studentProfile?.id || 1} />
+          )}
+
+          {/* ─── LİDERLİK TABLOSU & ROZETLER ─── */}
+          {dashboardTab === "liderlik" && (
+            <StudentLeaderboardTab currentStudentId={studentProfile?.id || 1} />
+          )}
 
           {/* ─── PROFİL DÜZENLE ─── */}
           {dashboardTab === "duzenle" && (
