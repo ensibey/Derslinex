@@ -60,6 +60,40 @@ interface BlogPost {
   createdAt: string;
 }
 
+// ─── Brand Logo Header Component ──────────────────────────────────────────────
+function BrandLogoHeader({ subBadge = "ADMIN PANELİ" }: { subBadge?: string }) {
+  const [imgError, setImgError] = useState(false);
+
+  return (
+    <Link href="/" className="flex items-center gap-3 group">
+      <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-600 p-0.5 shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition-transform flex-shrink-0">
+        <div className="w-full h-full bg-[#0D1B35] rounded-[10px] flex items-center justify-center overflow-hidden relative">
+          {!imgError ? (
+            <img
+              src="/logo.png?v=9"
+              alt="Derslinex Logo"
+              className="w-full h-full object-contain p-1"
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center font-black text-white text-xs tracking-tighter">
+              DX
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="min-w-0">
+        <span className="text-white font-black text-base tracking-tight block leading-tight group-hover:text-indigo-300 transition-colors">
+          Derslinex
+        </span>
+        <span className="text-[9px] font-black uppercase tracking-widest text-indigo-400 block leading-tight mt-0.5">
+          {subBadge}
+        </span>
+      </div>
+    </Link>
+  );
+}
+
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<"teachers" | "students" | "lessons" | "blogs" | "feedbacks" | "sessions" | "tasks" | "questions">("teachers");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -257,27 +291,21 @@ export default function AdminPage() {
       {/* Left Sidebar (SincApp Dark Layout) */}
       <aside className={`fixed top-0 left-0 h-full w-[240px] bg-[#0D1B35] border-r border-white/5 flex flex-col z-40 transform transition-transform duration-300 ${ sidebarOpen ? "translate-x-0" : "-translate-x-full" } md:translate-x-0 md:static md:flex`}>
         <div className="px-5 py-5 border-b border-white/5 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-900/50">
-              <span className="text-white font-black text-xs">DX</span>
-            </div>
-            <div>
-              <span className="text-white font-black text-sm block">Derslinex</span>
-              <span className="text-[9px] font-black uppercase tracking-widest text-indigo-400 block">ADMIN PANELİ</span>
-            </div>
-          </Link>
+          <BrandLogoHeader subBadge="ADMIN PANELİ" />
           <button className="md:hidden text-slate-400 hover:text-white" onClick={() => setSidebarOpen(false)}>✕</button>
         </div>
 
         {/* Admin Profile Info */}
         <div className="px-4 py-4 border-b border-white/5 bg-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-black text-xs shadow-inner">
-              ⚡
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-0.5 shadow-lg shadow-indigo-500/20 flex-shrink-0">
+              <div className="w-full h-full bg-[#0D1B35] rounded-[10px] flex items-center justify-center text-white font-black text-xs">
+                ⚡
+              </div>
             </div>
             <div className="min-w-0">
               <p className="text-white font-black text-xs truncate">Sistem Yöneticisi</p>
-              <p className="text-emerald-400 text-[10px] font-bold flex items-center gap-1">
+              <p className="text-emerald-400 text-[10px] font-bold flex items-center gap-1 mt-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 Süper Admin (Canlı)
               </p>
@@ -300,12 +328,15 @@ export default function AdminPage() {
             <button
               key={t.key}
               onClick={() => { setActiveTab(t.key as any); setSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-left transition-all text-xs font-black ${
+              className={`relative w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-left transition-all text-xs font-bold overflow-hidden ${
                 activeTab === t.key
-                  ? "bg-indigo-600 text-white shadow-lg shadow-indigo-900/50 border border-indigo-400/30"
+                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-900/50 border border-indigo-400/30 font-black"
                   : "text-slate-400 hover:text-white hover:bg-white/5"
               }`}
             >
+              {activeTab === t.key && (
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-indigo-300 rounded-r-full shadow-[0_0_10px_rgba(165,180,252,0.9)]" />
+              )}
               <span className="text-base">{t.icon}</span>
               <span className="flex-1 truncate">{t.label}</span>
               <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${

@@ -37,6 +37,40 @@ function getGoogleCalendarUrl(title: string, startTime: string, durationMinutes:
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
+// ─── Brand Logo Header Component ──────────────────────────────────────────────
+function BrandLogoHeader({ subBadge = "DERSLİNEX" }: { subBadge?: string }) {
+  const [imgError, setImgError] = useState(false);
+
+  return (
+    <Link href="/" className="flex items-center gap-3 group">
+      <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-600 p-0.5 shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition-transform flex-shrink-0">
+        <div className="w-full h-full bg-[#0D1B35] rounded-[10px] flex items-center justify-center overflow-hidden relative">
+          {!imgError ? (
+            <img
+              src="/logo.png?v=9"
+              alt="Derslinex Logo"
+              className="w-full h-full object-contain p-1"
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center font-black text-white text-xs tracking-tighter">
+              DX
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="min-w-0">
+        <span className="text-white font-black text-base tracking-tight block leading-tight group-hover:text-indigo-300 transition-colors">
+          Derslinex
+        </span>
+        <span className="text-[9px] font-black uppercase tracking-widest text-indigo-400 block leading-tight mt-0.5">
+          {subBadge}
+        </span>
+      </div>
+    </Link>
+  );
+}
+
 // ─── Session Card (dark theme for student sidebar) ────────────────────────────
 function SessionCardDark({ session, role }: { session: any; role: "student" | "teacher" }) {
   const { label, diff } = useCountdown(
@@ -721,45 +755,54 @@ export default function ProfilPage() {
         
         {/* Left Sidebar */}
         <aside className={`fixed top-0 left-0 h-full w-[220px] bg-[#0D1B35] border-r border-white/5 flex flex-col z-40 transform transition-transform duration-300 ${ sidebarOpen ? "translate-x-0" : "-translate-x-full" } md:translate-x-0 md:static md:flex`}>
-          <div className="px-5 py-5 border-b border-white/5">
-            <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-black text-xs">DX</span>
-              </div>
-              <span className="text-white font-black text-sm">Derslinex</span>
-            </Link>
+          <div className="px-5 py-5 border-b border-white/5 flex items-center justify-between">
+            <BrandLogoHeader subBadge="ÖĞRETMEN PANELİ" />
+            <button className="md:hidden text-slate-400 hover:text-white" onClick={() => setSidebarOpen(false)}>✕</button>
           </div>
-          <div className="px-4 py-4 border-b border-white/5">
+          <div className="px-4 py-4 border-b border-white/5 bg-white/5">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-black text-sm flex-shrink-0 overflow-hidden">
-                {teacherProfile.avatar ? <img src={teacherProfile.avatar} alt="" className="w-full h-full object-cover" /> : teacherProfile.name.charAt(0)}
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-0.5 shadow-lg shadow-indigo-500/20 flex-shrink-0">
+                <div className="w-full h-full bg-[#0D1B35] rounded-[10px] overflow-hidden flex items-center justify-center font-black text-white text-sm">
+                  {teacherProfile.avatar ? <img src={teacherProfile.avatar} alt="" className="w-full h-full object-cover" /> : teacherProfile.name.charAt(0)}
+                </div>
               </div>
               <div className="min-w-0">
                 <p className="text-white font-black text-xs truncate">{teacherProfile.name}</p>
-                <p className="text-indigo-400 text-[10px] font-bold truncate">
-                  <span className={`inline-block w-2 h-2 rounded-full mr-1 ${ teacherProfile.status === "İletişime Geçildi" ? "bg-green-400" : "bg-amber-400" }`}></span>
+                <p className="text-indigo-400 text-[10px] font-bold truncate flex items-center gap-1 mt-0.5">
+                  <span className={`inline-block w-2 h-2 rounded-full ${ teacherProfile.status === "İletişime Geçildi" ? "bg-emerald-400 animate-pulse" : "bg-amber-400" }`}></span>
                   {teacherProfile.status === "İletişime Geçildi" ? "Öğretmen (Yayında)" : "Onay Bekliyor"}
                 </p>
               </div>
             </div>
           </div>
-          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+          <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
             {[
-              { id: "panel", label: "📊 Genel Görünüm", icon: "📊" },
-              { id: "canli", label: "🎥 Canlı Derslerim", icon: "🎥" },
-              { id: "gorevler", label: "🏆 Görevlerim & Puan", icon: "🏆" },
-              { id: "sorular", label: "📝 Soru Bankam", icon: "📝" },
-              { id: "dersler", label: "📚 Ders İlanları", icon: "📚" },
-              { id: "bloglar", label: "✍️ Blog Yazılarım", icon: "✍️" },
-              { id: "faq", label: "❓ Soru & Cevap", icon: "❓" },
-              { id: "mesajlar", label: "💬 Mesajlar", icon: "💬" },
-              { id: "duzenle", label: "⚙️ Profil Düzenle", icon: "⚙️" },
+              { id: "panel", label: "Genel Görünüm", icon: "📊" },
+              { id: "canli", label: "Canlı Derslerim", icon: "🎥" },
+              { id: "gorevler", label: "Görevlerim & Puan", icon: "🏆" },
+              { id: "sorular", label: "Soru Bankam", icon: "📝" },
+              { id: "dersler", label: "Ders İlanları", icon: "📚" },
+              { id: "bloglar", label: "Blog Yazılarım", icon: "✍️" },
+              { id: "faq", label: "Soru & Cevap", icon: "❓" },
+              { id: "mesajlar", label: "Mesajlar", icon: "💬" },
+              { id: "duzenle", label: "Profil Düzenle", icon: "⚙️" },
             ].map((item) => (
-              <button key={item.id} onClick={() => { setDashboardTab(item.id as any); setSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all text-sm font-bold ${ dashboardTab === item.id ? "bg-indigo-600 text-white shadow-lg shadow-indigo-900/50" : "text-slate-400 hover:text-white hover:bg-white/5" }`}>
+              <button
+                key={item.id}
+                onClick={() => { setDashboardTab(item.id as any); setSidebarOpen(false); }}
+                className={`relative w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-left transition-all text-xs font-bold overflow-hidden ${
+                  dashboardTab === item.id
+                    ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-900/50 border border-indigo-400/30 font-black"
+                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                {dashboardTab === item.id && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-indigo-300 rounded-r-full shadow-[0_0_10px_rgba(165,180,252,0.9)]" />
+                )}
                 <span className="text-base">{item.icon}</span>
-                <span className="text-xs">{item.label}</span>
+                <span className="flex-1 truncate">{item.label}</span>
                 {item.id === "mesajlar" && chatRooms.length > 0 && (
-                  <span className="ml-auto bg-indigo-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">{chatRooms.length}</span>
+                  <span className="bg-indigo-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">{chatRooms.length}</span>
                 )}
               </button>
             ))}
@@ -808,21 +851,52 @@ export default function ProfilPage() {
                   </div>
 
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl p-4 shadow-lg shadow-indigo-900/40">
-                      <p className="text-indigo-200 text-[10px] font-black uppercase tracking-wider">Ders İlanları</p>
-                      <p className="text-white font-black text-3xl mt-1">{teacherLessons.length}</p>
+                    <div className="relative overflow-hidden bg-gradient-to-br from-indigo-900/60 via-indigo-950/80 to-[#0B1329] border border-indigo-500/30 rounded-2xl p-4 shadow-xl shadow-indigo-950/80 hover:border-indigo-400/60 transition-all duration-300 group">
+                      <div className="absolute top-0 right-0 w-20 h-20 bg-indigo-500/10 rounded-full blur-xl group-hover:bg-indigo-500/20 transition-all" />
+                      <div className="flex items-center justify-between">
+                        <p className="text-indigo-300 text-[10px] font-black uppercase tracking-wider">DERS İLANLARI</p>
+                        <div className="w-8 h-8 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-300 text-xs font-black">📚</div>
+                      </div>
+                      <p className="text-white font-black text-3xl mt-2 tracking-tight">{teacherLessons.length}</p>
+                      <p className="text-indigo-400/80 text-[10px] mt-1 font-bold flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" /> Aktif ilanlarım
+                      </p>
                     </div>
-                    <div className="bg-gradient-to-br from-emerald-600 to-emerald-800 rounded-2xl p-4 shadow-lg shadow-emerald-900/40">
-                      <p className="text-emerald-200 text-[10px] font-black uppercase tracking-wider">Blog Yazıları</p>
-                      <p className="text-white font-black text-3xl mt-1">{teacherBlogs.length}</p>
+
+                    <div className="relative overflow-hidden bg-gradient-to-br from-emerald-900/60 via-emerald-950/80 to-[#0B1329] border border-emerald-500/30 rounded-2xl p-4 shadow-xl shadow-emerald-950/80 hover:border-emerald-400/60 transition-all duration-300 group">
+                      <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-all" />
+                      <div className="flex items-center justify-between">
+                        <p className="text-emerald-300 text-[10px] font-black uppercase tracking-wider">BLOG YAZILARI</p>
+                        <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-300 text-xs font-black">✍️</div>
+                      </div>
+                      <p className="text-white font-black text-3xl mt-2 tracking-tight">{teacherBlogs.length}</p>
+                      <p className="text-emerald-400/80 text-[10px] mt-1 font-bold flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Yayınlanan yazılar
+                      </p>
                     </div>
-                    <div className="bg-gradient-to-br from-amber-600 to-amber-800 rounded-2xl p-4 shadow-lg shadow-amber-900/40">
-                      <p className="text-amber-200 text-[10px] font-black uppercase tracking-wider">Öğrenci Görüşü</p>
-                      <p className="text-white font-black text-3xl mt-1">{teacherFeedbacks.length}</p>
+
+                    <div className="relative overflow-hidden bg-gradient-to-br from-amber-900/60 via-amber-950/80 to-[#0B1329] border border-amber-500/30 rounded-2xl p-4 shadow-xl shadow-amber-950/80 hover:border-amber-400/60 transition-all duration-300 group">
+                      <div className="absolute top-0 right-0 w-20 h-20 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition-all" />
+                      <div className="flex items-center justify-between">
+                        <p className="text-amber-300 text-[10px] font-black uppercase tracking-wider">ÖĞRENCİ GÖRÜŞÜ</p>
+                        <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-300 text-xs font-black">💬</div>
+                      </div>
+                      <p className="text-white font-black text-3xl mt-2 tracking-tight">{teacherFeedbacks.length}</p>
+                      <p className="text-amber-400/80 text-[10px] mt-1 font-bold flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" /> Gelen değerlendirme
+                      </p>
                     </div>
-                    <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-4 shadow-lg shadow-blue-900/40">
-                      <p className="text-blue-200 text-[10px] font-black uppercase tracking-wider">Sohbetler</p>
-                      <p className="text-white font-black text-3xl mt-1">{chatRooms.length}</p>
+
+                    <div className="relative overflow-hidden bg-gradient-to-br from-blue-900/60 via-blue-950/80 to-[#0B1329] border border-blue-500/30 rounded-2xl p-4 shadow-xl shadow-blue-950/80 hover:border-blue-400/60 transition-all duration-300 group">
+                      <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition-all" />
+                      <div className="flex items-center justify-between">
+                        <p className="text-blue-300 text-[10px] font-black uppercase tracking-wider">SOHBETLER</p>
+                        <div className="w-8 h-8 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-300 text-xs font-black">✉️</div>
+                      </div>
+                      <p className="text-white font-black text-3xl mt-2 tracking-tight">{chatRooms.length}</p>
+                      <p className="text-blue-400/80 text-[10px] mt-1 font-bold flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-400" /> Aktif mesajlaşma
+                      </p>
                     </div>
                   </div>
 
@@ -1632,50 +1706,51 @@ export default function ProfilPage() {
       {/* Left Sidebar */}
       <aside className={`fixed top-0 left-0 h-full w-[220px] bg-[#0D1B35] border-r border-white/5 flex flex-col z-40 transform transition-transform duration-300 ${ sidebarOpen ? "translate-x-0" : "-translate-x-full" } md:translate-x-0 md:static md:flex`}>
         {/* Logo */}
-        <div className="px-5 py-5 border-b border-white/5">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-black text-xs">DX</span>
-            </div>
-            <span className="text-white font-black text-sm">Derslinex</span>
-          </Link>
+        <div className="px-5 py-5 border-b border-white/5 flex items-center justify-between">
+          <BrandLogoHeader subBadge="ÖĞRENCİ PANELİ" />
+          <button className="md:hidden text-slate-400 hover:text-white" onClick={() => setSidebarOpen(false)}>✕</button>
         </div>
 
         {/* User info */}
-        <div className="px-4 py-4 border-b border-white/5">
+        <div className="px-4 py-4 border-b border-white/5 bg-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-black text-sm flex-shrink-0 overflow-hidden">
-              {studentProfile?.avatar ? <img src={studentProfile.avatar} alt="" className="w-full h-full object-cover" /> : studentProfile?.name.charAt(0)}
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-0.5 shadow-lg shadow-indigo-500/20 flex-shrink-0">
+              <div className="w-full h-full bg-[#0D1B35] rounded-[10px] overflow-hidden flex items-center justify-center font-black text-white text-sm">
+                {studentProfile?.avatar ? <img src={studentProfile.avatar} alt="" className="w-full h-full object-cover" /> : studentProfile?.name.charAt(0)}
+              </div>
             </div>
             <div className="min-w-0">
               <p className="text-white font-black text-xs truncate">{studentProfile?.name}</p>
-              <p className="text-indigo-400 text-[10px] font-bold truncate">
-                <span className={`inline-block w-2 h-2 rounded-full mr-1 ${ studentProfile?.status === "İletişime Geçildi" ? "bg-green-400" : "bg-amber-400" }`}></span>
-                {studentProfile?.status === "İletişime Geçildi" ? "Aktif" : "Beklemede"}
+              <p className="text-indigo-400 text-[10px] font-bold truncate flex items-center gap-1 mt-0.5">
+                <span className={`inline-block w-2 h-2 rounded-full ${ studentProfile?.status === "İletişime Geçildi" ? "bg-emerald-400 animate-pulse" : "bg-amber-400" }`}></span>
+                {studentProfile?.status === "İletişime Geçildi" ? "Aktif Hesap" : "Hesap Beklemede"}
               </p>
             </div>
           </div>
         </div>
 
         {/* Nav items */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
           {STUDENT_NAV.map((item) => (
             <button
               key={item.id}
               onClick={() => { setDashboardTab(item.id as any); setSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all text-sm font-bold ${
+              className={`relative w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-left transition-all text-xs font-bold overflow-hidden ${
                 dashboardTab === item.id
-                  ? "bg-indigo-600 text-white shadow-lg shadow-indigo-900/50"
+                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-900/50 border border-indigo-400/30 font-black"
                   : "text-slate-400 hover:text-white hover:bg-white/5"
               }`}
             >
+              {dashboardTab === item.id && (
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-indigo-300 rounded-r-full shadow-[0_0_10px_rgba(165,180,252,0.9)]" />
+              )}
               <span className="text-base">{item.icon}</span>
-              <span className="text-xs">{item.label}</span>
+              <span className="flex-1 truncate">{item.label}</span>
               {item.id === "mesajlar" && chatRooms.length > 0 && (
-                <span className="ml-auto bg-indigo-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">{chatRooms.length}</span>
+                <span className="bg-indigo-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">{chatRooms.length}</span>
               )}
               {item.id === "canli" && upcomingSessions.length > 0 && (
-                <span className="ml-auto bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">{upcomingSessions.length}</span>
+                <span className="bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">{upcomingSessions.length}</span>
               )}
             </button>
           ))}
@@ -1742,25 +1817,52 @@ export default function ProfilPage() {
 
                 {/* Stat Cards */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl p-4 shadow-lg shadow-indigo-900/40">
-                    <p className="text-indigo-200 text-[10px] font-black uppercase tracking-wider">Toplam Dersim</p>
-                    <p className="text-white font-black text-3xl mt-1">{studentSessions.length}</p>
-                    <p className="text-indigo-300 text-[10px] mt-1 font-bold">Tüm zamanlar</p>
+                  <div className="relative overflow-hidden bg-gradient-to-br from-indigo-900/60 via-indigo-950/80 to-[#0B1329] border border-indigo-500/30 rounded-2xl p-4 shadow-xl shadow-indigo-950/80 hover:border-indigo-400/60 transition-all duration-300 group">
+                    <div className="absolute top-0 right-0 w-20 h-20 bg-indigo-500/10 rounded-full blur-xl group-hover:bg-indigo-500/20 transition-all" />
+                    <div className="flex items-center justify-between">
+                      <p className="text-indigo-300 text-[10px] font-black uppercase tracking-wider">TOPLAM DERSİM</p>
+                      <div className="w-8 h-8 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-300 text-xs font-black">🎓</div>
+                    </div>
+                    <p className="text-white font-black text-3xl mt-2 tracking-tight">{studentSessions.length}</p>
+                    <p className="text-indigo-400/80 text-[10px] mt-1 font-bold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" /> Tüm zamanlar
+                    </p>
                   </div>
-                  <div className="bg-gradient-to-br from-emerald-600 to-emerald-800 rounded-2xl p-4 shadow-lg shadow-emerald-900/40">
-                    <p className="text-emerald-200 text-[10px] font-black uppercase tracking-wider">Tamamlanan</p>
-                    <p className="text-white font-black text-3xl mt-1">{pastSessions.length}</p>
-                    <p className="text-emerald-300 text-[10px] mt-1 font-bold">Biten dersler</p>
+
+                  <div className="relative overflow-hidden bg-gradient-to-br from-emerald-900/60 via-emerald-950/80 to-[#0B1329] border border-emerald-500/30 rounded-2xl p-4 shadow-xl shadow-emerald-950/80 hover:border-emerald-400/60 transition-all duration-300 group">
+                    <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-all" />
+                    <div className="flex items-center justify-between">
+                      <p className="text-emerald-300 text-[10px] font-black uppercase tracking-wider">TAMAMLANAN</p>
+                      <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-300 text-xs font-black">✅</div>
+                    </div>
+                    <p className="text-white font-black text-3xl mt-2 tracking-tight">{pastSessions.length}</p>
+                    <p className="text-emerald-400/80 text-[10px] mt-1 font-bold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Biten dersler
+                    </p>
                   </div>
-                  <div className="bg-gradient-to-br from-amber-600 to-amber-800 rounded-2xl p-4 shadow-lg shadow-amber-900/40">
-                    <p className="text-amber-200 text-[10px] font-black uppercase tracking-wider">Ort. Rating</p>
-                    <p className="text-white font-black text-3xl mt-1">{avgRating ? `${avgRating}★` : "—"}</p>
-                    <p className="text-amber-300 text-[10px] mt-1 font-bold">Öğretmen notu</p>
+
+                  <div className="relative overflow-hidden bg-gradient-to-br from-amber-900/60 via-amber-950/80 to-[#0B1329] border border-amber-500/30 rounded-2xl p-4 shadow-xl shadow-amber-950/80 hover:border-amber-400/60 transition-all duration-300 group">
+                    <div className="absolute top-0 right-0 w-20 h-20 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition-all" />
+                    <div className="flex items-center justify-between">
+                      <p className="text-amber-300 text-[10px] font-black uppercase tracking-wider">ORT. RATİNG</p>
+                      <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-300 text-xs font-black">⭐</div>
+                    </div>
+                    <p className="text-white font-black text-3xl mt-2 tracking-tight">{avgRating ? `${avgRating}★` : "—"}</p>
+                    <p className="text-amber-400/80 text-[10px] mt-1 font-bold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400" /> Öğretmen notu
+                    </p>
                   </div>
-                  <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-4 shadow-lg shadow-blue-900/40">
-                    <p className="text-blue-200 text-[10px] font-black uppercase tracking-wider">Mesajlarım</p>
-                    <p className="text-white font-black text-3xl mt-1">{chatRooms.length}</p>
-                    <p className="text-blue-300 text-[10px] mt-1 font-bold">Aktif sohbet</p>
+
+                  <div className="relative overflow-hidden bg-gradient-to-br from-blue-900/60 via-blue-950/80 to-[#0B1329] border border-blue-500/30 rounded-2xl p-4 shadow-xl shadow-blue-950/80 hover:border-blue-400/60 transition-all duration-300 group">
+                    <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition-all" />
+                    <div className="flex items-center justify-between">
+                      <p className="text-blue-300 text-[10px] font-black uppercase tracking-wider">MESAJLARIM</p>
+                      <div className="w-8 h-8 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-300 text-xs font-black">💬</div>
+                    </div>
+                    <p className="text-white font-black text-3xl mt-2 tracking-tight">{chatRooms.length}</p>
+                    <p className="text-blue-400/80 text-[10px] mt-1 font-bold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-400" /> Aktif sohbet
+                    </p>
                   </div>
                 </div>
 
