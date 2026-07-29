@@ -6,6 +6,9 @@ import Link from "next/link";
 import { requestNotificationPermission, getNotificationPermission, checkAndNotifySessions } from "@/lib/web-notifications";
 import MobileBottomDock from "@/components/MobileBottomDock";
 import { StatCardSkeleton, SessionCardSkeleton, QuestionCardSkeleton } from "@/components/SkeletonLoaders";
+import { PomodoroTimer } from "@/components/PomodoroTimer";
+import { OsymCalculator } from "@/components/OsymCalculator";
+import { VirtualStudyRooms } from "@/components/VirtualStudyRooms";
 
 // ─── Yardımcı: Geri Sayım ─────────────────────────────────────────────────────
 function useCountdown(targetDate: string | Date | null) {
@@ -1696,6 +1699,9 @@ const STUDENT_NAV = [
   { id: "sorucozum",     icon: "📝", label: "Soru Bankası & Test Çöz" },
   { id: "yanlissorular", icon: "📕", label: "Yanlış Soru Defterim" },
   { id: "denemenet",     icon: "📊", label: "Deneme Net Takibi" },
+  { id: "puanhesapla",   icon: "🧮", label: "Puan & Sıralama Simülatörü" },
+  { id: "pomodoro",      icon: "⏱️", label: "Pomodoro & Çalışma Müzikleri" },
+  { id: "kutuphane",     icon: "👥", label: "7/24 Sanal Kütüphane" },
   { id: "konutakip",     icon: "📋", label: "YKS Konu Çetelesi" },
   { id: "liderlik",      icon: "🏆", label: "Liderlik & Rozetler" },
   { id: "mesajlar",      icon: "💬", label: "Mesajlar" },
@@ -1757,7 +1763,7 @@ export default function ProfilPage() {
     solutionText: "",
   });
 
-  const [dashboardTab, setDashboardTab] = useState<"panel" | "duzenle" | "dersler" | "bloglar" | "faq" | "mesajlar" | "canli" | "degerlendirme" | "gorevler" | "sorular" | "sorucozum" | "denemenet" | "konutakip" | "liderlik" | "yanlissorular">("panel");
+  const [dashboardTab, setDashboardTab] = useState<"panel" | "duzenle" | "dersler" | "bloglar" | "faq" | "mesajlar" | "canli" | "degerlendirme" | "gorevler" | "sorular" | "sorucozum" | "denemenet" | "konutakip" | "liderlik" | "yanlissorular" | "pomodoro" | "puanhesapla" | "kutuphane">("panel");
   const [chatRooms, setChatRooms] = useState<any[]>([]);
   const [activeRoomId, setActiveRoomId] = useState<number | null>(null);
   const [activeRoomMessages, setActiveRoomMessages] = useState<any[]>([]);
@@ -3603,6 +3609,15 @@ export default function ProfilPage() {
           {dashboardTab === "liderlik" && (
             <StudentLeaderboardTab currentStudentId={studentProfile?.id || 1} />
           )}
+
+          {/* ─── PUAN & SIRALAMA SİMÜLATÖRÜ ─── */}
+          {dashboardTab === "puanhesapla" && <OsymCalculator />}
+
+          {/* ─── POMODORO & ÇALIŞMA MÜZİKLERİ ─── */}
+          {dashboardTab === "pomodoro" && <PomodoroTimer />}
+
+          {/* ─── 7/24 SANAL KÜTÜPHANE ─── */}
+          {dashboardTab === "kutuphane" && <VirtualStudyRooms />}
 
           {/* ─── PROFİL DÜZENLE ─── */}
           {dashboardTab === "duzenle" && (
