@@ -40,9 +40,10 @@ function OgretmenlerContent() {
               whatsapp: t.phone.replace(/[^0-9]/g, ""),
               puan: 4.9,
               ogrenciSayisi: 15,
+              points: t.points || 0,
               aktif: true
             }));
-          list = [...list, ...approvedDb];
+          list = [...approvedDb, ...list].sort((a: any, b: any) => (b.points || 0) - (a.points || 0));
         }
       } catch (err) {
         console.error("Dinamik öğretmenler yüklenemedi:", err);

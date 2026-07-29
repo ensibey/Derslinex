@@ -33,11 +33,25 @@ model Teacher {
   avatar       String?
   status       String            @default("Beklemede")
   isBanned     Boolean           @default(false)
+  points       Int               @default(0)
   linkedin     String?
   youtube      String?
   createdAt    DateTime          @default(now())
   liveSessions LiveSession[]
   feedbacksGiven SessionFeedback[] @relation("TeacherFeedback")
+  tasks        TeacherTask[]
+}
+
+model TeacherTask {
+  id          Int      @id @default(autoincrement())
+  teacherId   Int
+  teacher     Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  points      Int      @default(50)
+  status      String   @default("PENDING") // PENDING, SUBMITTED, COMPLETED, REJECTED
+  proof       String?
+  createdAt   DateTime @default(now())
 }
 
 model Feedback {

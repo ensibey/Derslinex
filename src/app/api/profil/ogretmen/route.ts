@@ -8,9 +8,9 @@ export async function GET(request: Request) {
     const email = searchParams.get("email");
 
     if (!email) {
-      // Return all teachers
+      // Return all teachers ordered by points (highest first) then createdAt
       const teachers = await prisma.teacher.findMany({
-        orderBy: { createdAt: "desc" },
+        orderBy: [{ points: "desc" }, { createdAt: "desc" }],
       });
       return NextResponse.json({ success: true, teachers });
     }

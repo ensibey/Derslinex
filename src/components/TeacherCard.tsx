@@ -38,8 +38,11 @@ export default function TeacherCard({ hoca }: { hoca: Hoca }) {
               <span className="text-amber-500 text-sm">★</span>
               <span className="text-xs sm:text-sm font-bold text-gray-800">{hoca.puan}</span>
               <span className="text-[10px] sm:text-xs text-gray-500 font-bold">({hoca.ogrenciSayisi}+ Öğrenci)</span>
-              <span className="text-gray-300 sm:hidden">•</span>
-              <span className="text-[10px] text-gray-500 sm:hidden font-bold">📍 {hoca.konum.split(",")[0]}</span>
+              {((hoca as any).points > 0 || (hoca as any).puanTotal > 0) && (
+                <span className="text-[10px] font-black bg-purple-100 text-purple-800 border border-purple-200 px-2 py-0.5 rounded-full shadow-xs">
+                  🏆 {(hoca as any).points || (hoca as any).puanTotal} Puan
+                </span>
+              )}
             </div>
           </div>
         </div>

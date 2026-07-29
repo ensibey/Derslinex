@@ -282,7 +282,10 @@ export default function ProfilPage() {
   const [blogForm, setBlogForm] = useState({ title: "", category: "YKS Bilgi", content: "" });
   const [faqForm, setFaqForm] = useState({ question: "", answer: "" });
 
-  const [dashboardTab, setDashboardTab] = useState<"panel" | "duzenle" | "dersler" | "bloglar" | "faq" | "mesajlar" | "canli" | "degerlendirme">("panel");
+  const [teacherTasks, setTeacherTasks] = useState<any[]>([]);
+  const [teacherPoints, setTeacherPoints] = useState<number>(0);
+
+  const [dashboardTab, setDashboardTab] = useState<"panel" | "duzenle" | "dersler" | "bloglar" | "faq" | "mesajlar" | "canli" | "degerlendirme" | "gorevler">("panel");
   const [chatRooms, setChatRooms] = useState<any[]>([]);
   const [activeRoomId, setActiveRoomId] = useState<number | null>(null);
   const [activeRoomMessages, setActiveRoomMessages] = useState<any[]>([]);
@@ -302,17 +305,23 @@ export default function ProfilPage() {
 
   const fetchTeacherDashboardData = useCallback(async (teacherId: number) => {
     try {
-      const [lRes, bRes, fRes] = await Promise.all([
+      const [lRes, bRes, fRes, tTaskRes] = await Promise.all([
         fetch(`/api/profil/ogretmen/dersler?teacherId=${teacherId}`),
         fetch(`/api/blog/yazar?authorId=${teacherId}`),
         fetch(`/api/profil/ogretmen/faq?teacherId=${teacherId}`),
+        fetch(`/api/profil/ogretmen/gorevler?teacherId=${teacherId}`),
       ]);
       const lData = await lRes.json();
       const bData = await bRes.json();
       const fData = await fRes.json();
+      const tTaskData = await tTaskRes.json();
       if (lData.success) setTeacherLessons(lData.lessons || []);
       if (bData.success) setTeacherBlogs(bData.posts || []);
       if (fData.success) setTeacherFaqs(fData.faqs || []);
+      if (tTaskData.success) {
+        setTeacherTasks(tTaskData.tasks || []);
+        setTeacherPoints(tTaskData.points || 0);
+      }
     } catch (e) { console.error("Dashboard data fetch error:", e); }
   }, []);
 
@@ -664,7 +673,20 @@ export default function ProfilPage() {
                       <div><label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Uzmanlık Branşınız</label><input type="text" required placeholder="Matematik, Fizik vb." value={teacherForm.branch} onChange={(e) => setTeacherForm({ ...teacherForm, branch: e.target.value })} className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none" /></div>
                     </>
                   )}
-                  <div><label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">E-posta Adresi</label><input type="email" required value={teacherForm.email} onChange={(e) => setTeacherForm({ ...teacherForm, email: e.target.value })} className="w-full bg-  // ─── TEACHER DASHBOARD (SincApp-style dark sidebar layout) ───────────────────
+                  <div><label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">E-posta Adresi</label><input type="email" required value={teacherForm.email} onChange={(e) => setTeacherForm({ ...teacherForm, email: e.target.value })} className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none" /></div>
+                  <div><label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Şifre</label><input type="password" required value={teacherForm.password} onChange={(e) => setTeacherForm({ ...teacherForm, password: e.target.value })} className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none" /></div>
+                  <div className="flex items-center gap-2 pt-1"><input type="checkbox" id="teacherRemember" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 rounded" /><label htmlFor="teacherRemember" className="text-xs text-gray-500 font-bold select-none cursor-pointer">Beni Hatırla</label></div>
+                  <button type="submit" disabled={loading} className="w-full bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-black py-3.5 rounded-xl text-sm transition-all">{loading ? "İşlem yapılıyor..." : authMode === "login" ? "Giriş Yap" : "Başvuru Yap & Kaydol"}</button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── TEACHER DASHBOARD (SincApp-style dark sidebar layout) ───────────────────
   if (teacherProfile) {
     return (
       <div className="flex min-h-screen bg-[#0A1628] font-sans">
@@ -698,6 +720,7 @@ export default function ProfilPage() {
             {[
               { id: "panel", label: "📊 Genel Görünüm", icon: "📊" },
               { id: "canli", label: "🎥 Canlı Derslerim", icon: "🎥" },
+              { id: "gorevler", label: "🏆 Görevlerim & Puan", icon: "🏆" },
               { id: "dersler", label: "📚 Ders İlanları", icon: "📚" },
               { id: "bloglar", label: "✍️ Blog Yazılarım", icon: "✍️" },
               { id: "faq", label: "❓ Soru & Cevap", icon: "❓" },
@@ -840,6 +863,91 @@ export default function ProfilPage() {
 
             {/* ─── CANLI DERSLER ─── */}
             {dashboardTab === "canli" && <div className="max-w-3xl"><TeacherSessionsTab userId={teacherProfile.id} /></div>}
+
+            {/* ─── GÖREVLER & PUAN ─── */}
+            {dashboardTab === "gorevler" && (
+              <div className="max-w-3xl space-y-6">
+                {/* Points Status Header */}
+                <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900 rounded-2xl border border-indigo-500/30 p-6 shadow-xl relative overflow-hidden">
+                  <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                      <span className="text-xs font-black bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 px-3 py-1 rounded-full uppercase tracking-wider">
+                        {teacherPoints >= 300 ? "🏆 Zirve Eğitmen" : teacherPoints >= 100 ? "🌟 Yükselen Eğitmen" : "🌱 Başlangıç Düzeyi"}
+                      </span>
+                      <h3 className="text-2xl font-black text-white mt-2">Toplam Kazanılan Puan: {teacherPoints} Puan</h3>
+                      <p className="text-xs text-indigo-200 font-medium mt-1">
+                        Puanınız arttıkça profiliniz <strong>/ogretmenler</strong> sayfasında üst sıralara yükselir ve öğrencilere ilk sırada önerilir!
+                      </p>
+                    </div>
+                    <div className="text-4xl sm:text-5xl">🏆</div>
+                  </div>
+                </div>
+
+                {/* Task List */}
+                <div className="bg-[#1E293B] rounded-2xl border border-white/5 p-6">
+                  <h4 className="text-white font-black text-base mb-1">📋 Size Atanan Görevler ({teacherTasks.length})</h4>
+                  <p className="text-slate-400 text-xs font-semibold mb-5">Görevleri tamamlayıp admin onayına gönderin, puan kazanın!</p>
+
+                  {teacherTasks.length === 0 ? (
+                    <p className="text-slate-500 text-sm font-semibold py-8 text-center">Henüz size atanan bir görev bulunmuyor.</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {teacherTasks.map((t) => (
+                        <div key={t.id} className="p-4 bg-[#0D1B35] border border-white/10 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
+                                t.status === "COMPLETED" ? "bg-emerald-500/20 text-emerald-400" :
+                                t.status === "SUBMITTED" ? "bg-amber-500/20 text-amber-400 animate-pulse" :
+                                t.status === "REJECTED" ? "bg-red-500/20 text-red-400" :
+                                "bg-blue-500/20 text-blue-400"
+                              }`}>
+                                {t.status === "COMPLETED" ? "✅ Tamamlandı" :
+                                 t.status === "SUBMITTED" ? "⏳ Admin Onayı Bekleniyor" :
+                                 t.status === "REJECTED" ? "❌ Reddedildi" :
+                                 "🎯 Bekliyor"}
+                              </span>
+                              <span className="text-[10px] font-black bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">⭐ +{t.points} Puan</span>
+                            </div>
+                            <h5 className="font-black text-sm text-white">{t.title}</h5>
+                            {t.description && <p className="text-xs text-slate-400 font-semibold mt-1 leading-relaxed">{t.description}</p>}
+                            {t.proof && <p className="text-[11px] text-amber-300 font-medium mt-1 bg-amber-500/10 p-1.5 rounded-lg border border-amber-500/20">📌 İlettiğiniz Not: {t.proof}</p>}
+                          </div>
+
+                          {t.status === "PENDING" && (
+                            <button
+                              onClick={async () => {
+                                const proofNote = prompt("Görevi tamamladığınıza dair kısa bir kanıt veya not ekleyin (Opsiyonel):", "Görev tamamlandı.");
+                                if (proofNote === null) return;
+                                try {
+                                  const res = await fetch("/api/profil/ogretmen/gorevler", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ taskId: t.id, proof: proofNote }),
+                                  });
+                                  const data = await res.json();
+                                  if (data.success) {
+                                    showMsg("✅ Görev tamamlandı olarak admin onayına gönderildi!", "success");
+                                    fetchTeacherDashboardData(teacherProfile.id);
+                                  } else {
+                                    showMsg(data.error || "İşlem başarısız", "error");
+                                  }
+                                } catch {
+                                  showMsg("Bağlantı hatası", "error");
+                                }
+                              }}
+                              className="bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs px-4 py-2.5 rounded-xl transition flex-shrink-0"
+                            >
+                              🚀 Tamamladım Diyerek Onaya Gönder
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* ─── DERS İLANLARI ─── */}
             {dashboardTab === "dersler" && (

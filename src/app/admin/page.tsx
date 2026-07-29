@@ -22,6 +22,7 @@ interface Teacher {
   ozgecmis: string | null;
   status: string;
   isBanned: boolean;
+  points?: number;
   createdAt: string;
 }
 
@@ -59,13 +60,23 @@ interface BlogPost {
 }
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<"teachers" | "students" | "lessons" | "blogs" | "feedbacks" | "sessions">("teachers");
+  const [activeTab, setActiveTab] = useState<"teachers" | "students" | "lessons" | "blogs" | "feedbacks" | "sessions" | "tasks">("teachers");
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [liveSessions, setLiveSessions] = useState<any[]>([]);
+  const [adminTasks, setAdminTasks] = useState<any[]>([]);
+
+  // Task Create Form
+  const [taskForm, setTaskForm] = useState({
+    teacherId: "",
+    title: "",
+    description: "",
+    points: 50,
+  });
+  const [taskCreating, setTaskCreating] = useState(false);
 
   // Session Create Form
   const [sessionForm, setSessionForm] = useState({
@@ -86,13 +97,14 @@ export default function AdminPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [tRes, sRes, fRes, lRes, bRes, sessRes] = await Promise.all([
+      const [tRes, sRes, fRes, lRes, bRes, sessRes, taskRes] = await Promise.all([
         fetch("/api/profil/ogretmen"),
         fetch("/api/profil/ogrenci"),
         fetch("/api/gorus"),
         fetch("/api/admin/lessons"),
         fetch("/api/admin/blogs"),
         fetch("/api/admin/sessions"),
+        fetch("/api/admin/tasks"),
       ]);
 
       const tData = await tRes.json();
@@ -101,6 +113,7 @@ export default function AdminPage() {
       const lData = await lRes.json();
       const bData = await bRes.json();
       const sessData = await sessRes.json();
+      const taskData = await taskRes.json();
 
       if (tData.success) setTeachers(tData.teachers || []);
       if (sData.success) setStudents(sData.students || []);
@@ -108,6 +121,7 @@ export default function AdminPage() {
       if (lData.success) setLessons(lData.lessons || []);
       if (bData.success) setBlogs(bData.posts || []);
       if (sessData.success) setLiveSessions(sessData.sessions || []);
+      if (taskData.success) setAdminTasks(taskData.tasks || []);
     } catch (e) {
       console.error("Data fetch error", e);
     } finally {
@@ -305,6 +319,7 @@ export default function AdminPage() {
             { key: "blogs", label: "Bloglar", count: blogs.length, icon: "✍️" },
             { key: "feedbacks", label: "Görüşler", count: feedbacks.length, icon: "💬" },
             { key: "sessions", label: "Canlı Dersler", count: liveSessions.length, icon: "🎥" },
+            { key: "tasks", label: "Görev & Puan", count: adminTasks.length, icon: "🏆" },
           ].map((t) => (
             <button
               key={t.key}
@@ -865,6 +880,203 @@ export default function AdminPage() {
                             📹 Ders Kaydını İzle
                           </a>
                         )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* TASKS TAB */}
+          {activeTab === "tasks" && (
+            <div className="p-6 space-y-8">
+              {/* Task Creation Form */}
+              <div className="bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl p-6">
+                <h3 className="text-base font-black text-[#1E3A8A] mb-4 flex items-center gap-2">
+                  <span>🏆</span> Öğretmene Yeni Görev & Puan Atama
+                </h3>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">Öğretmen Seçin</label>
+                    <select
+                      value={taskForm.teacherId}
+                      onChange={(e) => setTaskForm({ ...taskForm, teacherId: e.target.value })}
+                      className="w-full bg-white border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
+                    >
+                      <option value="">Seçiniz...</option>
+                      {teachers.map((t) => (
+                        <option key={t.id} value={t.id}>{t.name} ({t.branch}) — Mevcut: {t.points || 0} Puan</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">Görev Başlığı</label>
+                    <input
+                      type="text"
+                      placeholder="Örn: 2 Adet Blog Yazısı Yaz"
+                      value={taskForm.title}
+                      onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
+                      className="w-full bg-white border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">Ödül Puanı</label>
+                    <input
+                      type="number"
+                      placeholder="Örn: 100"
+                      value={taskForm.points}
+                      onChange={(e) => setTaskForm({ ...taskForm, points: parseInt(e.target.value) || 50 })}
+                      className="w-full bg-white border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
+                    />
+                  </div>
+                  <div className="sm:col-span-4">
+                    <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">Açıklama (Opsiyonel)</label>
+                    <input
+                      type="text"
+                      placeholder="Görev detayları..."
+                      value={taskForm.description}
+                      onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })}
+                      className="w-full bg-white border border-[#EFECE6] px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none"
+                    />
+                  </div>
+                </div>
+                <button
+                  onClick={async () => {
+                    if (!taskForm.teacherId || !taskForm.title) {
+                      showMsg("Lütfen öğretmen ve görev başlığını giriniz.", "error");
+                      return;
+                    }
+                    setTaskCreating(true);
+                    try {
+                      const res = await fetch("/api/admin/tasks", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(taskForm),
+                      });
+                      const data = await res.json();
+                      if (data.success) {
+                        showMsg("🏆 Görev başarıyla öğretmene atandı!", "success");
+                        setTaskForm({ teacherId: "", title: "", description: "", points: 50 });
+                        fetchData();
+                      } else {
+                        showMsg(data.error || "Görev atanamadı", "error");
+                      }
+                    } catch {
+                      showMsg("Bağlantı hatası", "error");
+                    } finally {
+                      setTaskCreating(false);
+                    }
+                  }}
+                  disabled={taskCreating}
+                  className="mt-4 bg-[#1E3A8A] hover:bg-[#163070] text-white font-black py-2.5 px-6 rounded-xl text-xs transition disabled:opacity-60"
+                >
+                  {taskCreating ? "Atanıyor..." : "➕ Görevi Atayarak Gönder"}
+                </button>
+              </div>
+
+              {/* Task List */}
+              <div>
+                <h3 className="text-lg font-black text-[#1E3A8A] mb-4">📋 Atanan Görevler & Başvurular ({adminTasks.length})</h3>
+                {adminTasks.length === 0 ? (
+                  <p className="text-gray-400 font-semibold text-sm py-8 text-center">Henüz öğretmen görevi atanmadı.</p>
+                ) : (
+                  <div className="space-y-4">
+                    {adminTasks.map((task: any) => (
+                      <div key={task.id} className="bg-white border border-[#EFECE6] rounded-2xl p-5 flex flex-wrap justify-between items-center gap-4 shadow-sm">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className={`text-xs font-black px-2.5 py-0.5 rounded-full ${
+                              task.status === "COMPLETED" ? "bg-emerald-100 text-emerald-700" :
+                              task.status === "SUBMITTED" ? "bg-amber-100 text-amber-700 animate-pulse" :
+                              task.status === "REJECTED" ? "bg-red-100 text-red-700" :
+                              "bg-blue-100 text-blue-700"
+                            }`}>
+                              {task.status === "COMPLETED" ? "✅ Tamamlandı (+ " + task.points + " Puan verildi)" :
+                               task.status === "SUBMITTED" ? "⏳ Öğretmen Tamamladı (Onay Bekliyor)" :
+                               task.status === "REJECTED" ? "❌ Reddedildi" :
+                               "⏳ Devam Ediyor"}
+                            </span>
+                            <span className="text-xs font-black bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">⭐ {task.points} Puan</span>
+                          </div>
+                          <h4 className="font-black text-gray-900 text-base">{task.title}</h4>
+                          <p className="text-xs text-gray-500 font-bold mt-0.5">
+                            👨‍🏫 Öğretmen: {task.teacher?.name} ({task.teacher?.branch}) — Toplam Puanı: <span className="text-indigo-600 font-black">{task.teacher?.points || 0} Puan</span>
+                          </p>
+                          {task.description && <p className="text-xs text-gray-600 mt-1 font-semibold">{task.description}</p>}
+                          {task.proof && <p className="text-xs text-amber-700 font-bold mt-1.5 bg-amber-50 p-2 rounded-lg border border-amber-200">📌 Kanıt/Not: {task.proof}</p>}
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {task.status !== "COMPLETED" && (
+                            <button
+                              onClick={async () => {
+                                try {
+                                  const res = await fetch("/api/admin/tasks", {
+                                    method: "PUT",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ taskId: task.id, status: "COMPLETED" }),
+                                  });
+                                  const data = await res.json();
+                                  if (data.success) {
+                                    showMsg(`✅ Görev onaylandı ve öğretmene +${task.points} puan verildi!`, "success");
+                                    fetchData();
+                                  } else {
+                                    showMsg(data.error || "İşlem başarısız", "error");
+                                  }
+                                } catch {
+                                  showMsg("Bağlantı hatası", "error");
+                                }
+                              }}
+                              className="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs px-3.5 py-2 rounded-xl transition shadow-xs"
+                            >
+                              ✅ Onayla & Puan Ver
+                            </button>
+                          )}
+
+                          {task.status === "SUBMITTED" && (
+                            <button
+                              onClick={async () => {
+                                try {
+                                  const res = await fetch("/api/admin/tasks", {
+                                    method: "PUT",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ taskId: task.id, status: "REJECTED" }),
+                                  });
+                                  const data = await res.json();
+                                  if (data.success) {
+                                    showMsg("Görev reddedildi.", "error");
+                                    fetchData();
+                                  }
+                                } catch {
+                                  showMsg("Bağlantı hatası", "error");
+                                }
+                              }}
+                              className="bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs font-bold px-3 py-2 rounded-xl transition"
+                            >
+                              ❌ Reddet
+                            </button>
+                          )}
+
+                          <button
+                            onClick={async () => {
+                              if (!confirm("Bu görevi silmek istediğinize emin misiniz?")) return;
+                              try {
+                                const res = await fetch(`/api/admin/tasks?id=${task.id}`, { method: "DELETE" });
+                                const data = await res.json();
+                                if (data.success) {
+                                  showMsg("Görev silindi.", "success");
+                                  fetchData();
+                                }
+                              } catch {
+                                showMsg("Bağlantı hatası", "error");
+                              }
+                            }}
+                            className="text-xs text-red-500 hover:text-red-700 font-bold px-2 py-1"
+                          >
+                            🗑️ Sil
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
