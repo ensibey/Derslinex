@@ -4,6 +4,8 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { hocalar } from "@/data/hocalar";
 import Link from "next/link";
 import { requestNotificationPermission, getNotificationPermission, checkAndNotifySessions } from "@/lib/web-notifications";
+import MobileBottomDock from "@/components/MobileBottomDock";
+import { StatCardSkeleton, SessionCardSkeleton, QuestionCardSkeleton } from "@/components/SkeletonLoaders";
 
 // ─── Yardımcı: Geri Sayım ─────────────────────────────────────────────────────
 function useCountdown(targetDate: string | Date | null) {
@@ -235,7 +237,12 @@ function StudentSessionsTab({ userId }: { userId: number }) {
   }, [userId]);
   const upcoming = sessions.filter((s) => s.status !== "ENDED" && s.status !== "CANCELLED");
   const past = sessions.filter((s) => s.status === "ENDED");
-  if (loading) return <div className="py-12 text-center text-slate-500 font-semibold">Yükleniyor...</div>;
+  if (loading) return (
+    <div className="space-y-4">
+      <SessionCardSkeleton />
+      <SessionCardSkeleton />
+    </div>
+  );
   return (
     <div className="space-y-8">
       <div>
@@ -728,7 +735,12 @@ function TeacherSessionsTab({ userId }: { userId: number }) {
   }, [userId]);
   const upcoming = sessions.filter((s) => s.status !== "ENDED" && s.status !== "CANCELLED");
   const past = sessions.filter((s) => s.status === "ENDED");
-  if (loading) return <div className="py-12 text-center text-gray-400 font-semibold">Yükleniyor...</div>;
+  if (loading) return (
+    <div className="space-y-4">
+      <SessionCardSkeleton />
+      <SessionCardSkeleton />
+    </div>
+  );
   return (
     <div className="space-y-8">
       <div>
@@ -2699,6 +2711,11 @@ export default function ProfilPage() {
 
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation Dock */}
+      {(studentProfile || teacherProfile) && (
+        <MobileBottomDock activeTab={dashboardTab} onTabChange={(tabId) => setDashboardTab(tabId)} />
+      )}
     </div>
   );
 }
