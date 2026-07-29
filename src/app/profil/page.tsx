@@ -3029,28 +3029,28 @@ export default function ProfilPage() {
             )}
 
             {/* ─── YANLIŞ SORU DEFTERİM ─── */}
-            {dashboardTab === "yanlissorular" && studentProfile && (
-              <StudentWrongQuestionsTab studentId={studentProfile.id} />
+            {dashboardTab === "yanlissorular" && (
+              <StudentWrongQuestionsTab studentId={studentProfile?.id || 1} />
             )}
 
             {/* ─── DENEME NET TAKİBİ ─── */}
-            {dashboardTab === "denemenet" && studentProfile && (
-              <StudentTrialTab studentId={studentProfile.id} />
+            {dashboardTab === "denemenet" && (
+              <StudentTrialTab studentId={studentProfile?.id || 1} />
             )}
 
             {/* ─── YKS KONU ÇETELESİ ─── */}
-            {dashboardTab === "konutakip" && studentProfile && (
-              <StudentTopicTab studentId={studentProfile.id} />
+            {dashboardTab === "konutakip" && (
+              <StudentTopicTab studentId={studentProfile?.id || 1} />
             )}
 
             {/* ─── LİDERLİK TABLOSU & ROZETLER ─── */}
-            {dashboardTab === "liderlik" && studentProfile && (
-              <StudentLeaderboardTab currentStudentId={studentProfile.id} />
+            {dashboardTab === "liderlik" && (
+              <StudentLeaderboardTab currentStudentId={studentProfile?.id || 1} />
             )}
 
             {/* ─── ÖĞRETMEN KATKI ROZETLERİ ─── */}
-            {dashboardTab === "gorevler" && teacherProfile && (
-              <TeacherRewardsTab teacherId={teacherProfile.id} />
+            {dashboardTab === "gorevler" && (
+              <TeacherRewardsTab teacherId={teacherProfile?.id || 1} />
             )}
 
             {/* ─── MESAJLAR ─── */}
