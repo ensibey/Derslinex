@@ -43,6 +43,8 @@ model Teacher {
   feedbacksGiven SessionFeedback[] @relation("TeacherFeedback")
   tasks        TeacherTask[]
   questions    Question[]
+  studentFeedbacks Feedback[]
+  lessonOffers LessonOffer[]
 }
 
 model TeacherTask {
@@ -101,10 +103,13 @@ model Feedback {
   studentName  String
   studentEmail String?
   teacherId    Int
+  teacher      Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
   teacherName  String
   content      String
   rating       Int      @default(5)
   createdAt    DateTime @default(now())
+
+  @@index([teacherId])
 }
 
 model LessonOffer {
@@ -114,7 +119,10 @@ model LessonOffer {
   format      String
   description String?
   teacherId   Int
+  teacher     Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
+
+  @@index([teacherId])
 }
 
 model BlogPost {

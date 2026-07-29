@@ -11,6 +11,11 @@ function hashPassword(password) {
 }
 
 async function main() {
+  if (process.env.NODE_ENV === "production") {
+    console.error("Güvenlik Uyarısı: Test hesapları seeding betiği canlı (production) ortamda çalıştırılamaz!");
+    process.exit(1);
+  }
+
   console.log("Deneme hesapları oluşturuluyor...");
 
   // 1. Deneme Öğrenci Hesabı
