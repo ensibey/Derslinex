@@ -1,23 +1,23 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getAuthUser } from "@/lib/auth-middleware";
 
 /**
  * GET /api/user/my-sessions
- * Headers: x-user-id, x-user-role ("student" | "teacher")
- * Giriş yapmış kullanıcının atandığı ders oturumlarını getirir.
+ * Verified via HttpOnly derslinex_token JWT or Auth headers.
  */
 export async function GET(request: Request) {
   try {
-    const headers = request.headers;
-    const userId = parseInt(headers.get("x-user-id") || "0");
-    const role   = headers.get("x-user-role") as "student" | "teacher" | null;
+    const user = await getAuthUser(request);
 
-    if (!userId || !role) {
+    if (!user) {
       return NextResponse.json(
-        { success: false, error: "Yetkilendirme başlıkları eksik" },
+        { success: false, error: "Yetkilendirme oturumu geçersiz veya süresi dolmuş" },
         { status: 401 }
       );
     }
+
+    const { id: userId, role } = user;
 
     if (role === "teacher") {
       const sessions = await prisma.liveSession.findMany({
@@ -56,8 +56,8 @@ export async function GET(request: Request) {
       const sessions = participations.map((p) => ({
         ...p.session,
         participation: {
-          joinedAt:   p.joinedAt,
-          leftAt:     p.leftAt,
+          joinedAt: p.joinedAt,
+          leftAt: p.leftAt,
           isAttended: p.isAttended,
         },
         myFeedback: p.session.feedbacks[0] ?? null,

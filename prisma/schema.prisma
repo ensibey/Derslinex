@@ -82,6 +82,17 @@ model Question {
   @@index([status])
 }
 
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  email     String
+  token     String   @unique
+  role      String   @default("student")
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token])
+}
+
 model Feedback {
   id           Int      @id @default(autoincrement())
   studentName  String

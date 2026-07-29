@@ -189,3 +189,27 @@ export async function sendSessionCancelledMail(
     html:    baseTemplate("Ders İptal Edildi", body),
   });
 }
+
+export async function sendPasswordResetMail(
+  toEmail: string,
+  resetUrl: string
+): Promise<void> {
+  const body = `
+    <h2 style="color:#1E3A8A;font-size:20px;font-weight:900;margin:0 0 8px;">🔑 Şifre Sıfırlama Talebi</h2>
+    <p style="color:#374151;margin:0 0 24px;">Hesabınız için şifre sıfırlama talebinde bulundunuz. Aşağıdaki butona tıklayarak yeni şifrenizi belirleyebilirsiniz.</p>
+    <div style="margin-bottom:28px;">
+      <a href="${resetUrl}" style="display:inline-block;background:#1E3A8A;color:#fff;font-weight:900;font-size:14px;text-decoration:none;padding:14px 28px;border-radius:12px;">🔑 Şifremi Sıfırla</a>
+    </div>
+    <p style="color:#6B7280;font-size:12px;">Bu talebi siz yapmadıysanız bu e-postayı dikkate almayabilirsiniz. Bağlantı 1 saat boyunca geçerlidir.</p>`;
+
+  try {
+    await resend.emails.send({
+      from:    FROM,
+      to:      toEmail,
+      subject: `🔑 Derslinex Şifre Sıfırlama Bağlantısı`,
+      html:    baseTemplate("Şifre Sıfırlama", body),
+    });
+  } catch (err) {
+    console.error("Mail send error:", err);
+  }
+}

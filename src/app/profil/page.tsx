@@ -249,6 +249,294 @@ function StudentSessionsTab({ userId }: { userId: number }) {
   );
 }
 
+function StudentQuizTab() {
+  const [questions, setQuestions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({
+    subject: "tumu",
+    examType: "tumu",
+    difficulty: "tumu",
+    topic: "",
+  });
+
+  const [userAnswers, setUserAnswers] = useState<Record<number, { selectedOption: string; isCorrect: boolean; showSolution: boolean }>>({});
+
+  const fetchQuestions = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (filters.subject !== "tumu") params.set("subject", filters.subject);
+      if (filters.examType !== "tumu") params.set("examType", filters.examType);
+      if (filters.difficulty !== "tumu") params.set("difficulty", filters.difficulty);
+      if (filters.topic.trim()) params.set("topic", filters.topic);
+
+      const res = await fetch(`/api/student/questions?${params.toString()}`);
+      const data = await res.json();
+      if (data.success) {
+        setQuestions(data.questions || []);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }, [filters]);
+
+  useEffect(() => {
+    fetchQuestions();
+  }, [fetchQuestions]);
+
+  const handleSelectOption = (questionId: number, opt: string, correctOpt: string) => {
+    const isCorrect = opt === correctOpt;
+    setUserAnswers((prev) => ({
+      ...prev,
+      [questionId]: {
+        selectedOption: opt,
+        isCorrect,
+        showSolution: prev[questionId]?.showSolution || false,
+      },
+    }));
+  };
+
+  const toggleSolution = (questionId: number) => {
+    setUserAnswers((prev) => ({
+      ...prev,
+      [questionId]: {
+        ...prev[questionId],
+        selectedOption: prev[questionId]?.selectedOption || "",
+        isCorrect: prev[questionId]?.isCorrect || false,
+        showSolution: !prev[questionId]?.showSolution,
+      },
+    }));
+  };
+
+  const answeredCount = Object.keys(userAnswers).length;
+  const correctCount = Object.values(userAnswers).filter((a) => a.isCorrect).length;
+
+  return (
+    <div className="space-y-6">
+      {/* Header & Stats */}
+      <div className="bg-[#1E293B] border border-white/5 rounded-2xl p-6 flex flex-wrap items-center justify-between gap-4 shadow-xl">
+        <div>
+          <h3 className="text-lg font-black text-white flex items-center gap-2">
+            <span>📝</span> Soru Bankası & İnteraktif Test Çözümü
+          </h3>
+          <p className="text-xs text-slate-400 font-semibold mt-1">
+            Öğretmenler tarafından onaylanan ÖSYM tipi soruları çözün, kendinizi test edin ve çözümleri inceleyin.
+          </p>
+        </div>
+
+        {answeredCount > 0 && (
+          <div className="flex items-center gap-3 bg-[#0D1B35] border border-white/10 px-4 py-2 rounded-xl">
+            <div className="text-center">
+              <span className="text-[10px] text-slate-400 font-bold uppercase block">Çözülen</span>
+              <span className="text-sm font-black text-white">{answeredCount}</span>
+            </div>
+            <div className="w-px h-6 bg-white/10" />
+            <div className="text-center">
+              <span className="text-[10px] text-emerald-400 font-bold uppercase block">Doğru</span>
+              <span className="text-sm font-black text-emerald-400">{correctCount}</span>
+            </div>
+            <div className="w-px h-6 bg-white/10" />
+            <div className="text-center">
+              <span className="text-[10px] text-indigo-400 font-bold uppercase block">Başarı Oranı</span>
+              <span className="text-sm font-black text-indigo-400">%{Math.round((correctCount / answeredCount) * 100)}</span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Filter Bar */}
+      <div className="bg-[#1E293B] rounded-2xl border border-white/5 p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-black text-indigo-400 uppercase tracking-wider">🎯 Konu & Zorluk Filtreleri</span>
+          {(filters.subject !== "tumu" || filters.examType !== "tumu" || filters.difficulty !== "tumu" || filters.topic) && (
+            <button
+              onClick={() => setFilters({ subject: "tumu", examType: "tumu", difficulty: "tumu", topic: "" })}
+              className="text-[11px] font-bold text-amber-400 hover:underline"
+            >
+              🔄 Filtreleri Temizle
+            </button>
+          )}
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <select
+            value={filters.subject}
+            onChange={(e) => setFilters({ ...filters, subject: e.target.value })}
+            className="bg-[#0D1B35] border border-white/10 text-white text-xs font-bold px-3 py-2 rounded-xl focus:outline-none"
+          >
+            <option value="tumu">Tüm Dersler</option>
+            <option value="Matematik">Matematik</option>
+            <option value="Fizik">Fizik</option>
+            <option value="Kimya">Kimya</option>
+            <option value="Biyoloji">Biyoloji</option>
+            <option value="Türkçe">Türkçe</option>
+            <option value="Tarih">Tarih</option>
+            <option value="Coğrafya">Coğrafya</option>
+            <option value="Felsefe">Felsefe</option>
+            <option value="İngilizce">İngilizce</option>
+          </select>
+
+          <select
+            value={filters.examType}
+            onChange={(e) => setFilters({ ...filters, examType: e.target.value })}
+            className="bg-[#0D1B35] border border-white/10 text-white text-xs font-bold px-3 py-2 rounded-xl focus:outline-none"
+          >
+            <option value="tumu">Tüm Sınav Türleri</option>
+            <option value="TYT">TYT</option>
+            <option value="AYT Sayısal">AYT Sayısal</option>
+            <option value="AYT EA">AYT EA</option>
+            <option value="AYT Sözel">AYT Sözel</option>
+            <option value="LGS">LGS</option>
+          </select>
+
+          <select
+            value={filters.difficulty}
+            onChange={(e) => setFilters({ ...filters, difficulty: e.target.value })}
+            className="bg-[#0D1B35] border border-white/10 text-white text-xs font-bold px-3 py-2 rounded-xl focus:outline-none"
+          >
+            <option value="tumu">Tüm Zorluklar</option>
+            <option value="Kolay">Kolay</option>
+            <option value="Orta">Orta</option>
+            <option value="Zor">Zor</option>
+            <option value="ÖSYM Tipi">ÖSYM Tipi</option>
+          </select>
+
+          <input
+            type="text"
+            placeholder="Konu Adında Ara..."
+            value={filters.topic}
+            onChange={(e) => setFilters({ ...filters, topic: e.target.value })}
+            className="bg-[#0D1B35] border border-white/10 text-white text-xs font-semibold px-3 py-2 rounded-xl focus:outline-none placeholder:text-slate-500"
+          />
+        </div>
+      </div>
+
+      {/* Questions List */}
+      {loading ? (
+        <div className="py-12 text-center text-slate-500 font-semibold">Sorular yükleniyor...</div>
+      ) : questions.length === 0 ? (
+        <div className="bg-[#1E293B] rounded-2xl p-12 text-center text-slate-500 font-semibold border border-white/5">
+          Seçtiğiniz kriterlere uygun onaylanmış soru bulunamadı.
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {questions.map((q, idx) => {
+            const answerState = userAnswers[q.id];
+            const hasAnswered = !!answerState?.selectedOption;
+
+            return (
+              <div key={q.id} className="bg-[#1E293B] border border-white/10 rounded-2xl p-6 space-y-4 shadow-xl relative">
+                {/* Badges */}
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-3">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-black text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-0.5 rounded-full">
+                      Soru #{idx + 1}
+                    </span>
+                    <span className="text-xs font-bold bg-blue-500/20 text-blue-300 px-2.5 py-0.5 rounded-full">
+                      📚 {q.subject} ({q.examType})
+                    </span>
+                    {q.topic && (
+                      <span className="text-xs font-semibold bg-white/5 text-slate-300 px-2.5 py-0.5 rounded-full">
+                        🏷️ {q.topic}
+                      </span>
+                    )}
+                    <span className="text-xs font-black bg-purple-500/20 text-purple-300 px-2.5 py-0.5 rounded-full">
+                      ⚡ {q.difficulty}
+                    </span>
+                  </div>
+                  {q.teacher && (
+                    <span className="text-[11px] text-slate-400 font-semibold">
+                      👨‍🏫 Hazırlayan: <strong className="text-white">{q.teacher.name}</strong>
+                    </span>
+                  )}
+                </div>
+
+                {/* Question Text */}
+                <div className="font-bold text-white text-base leading-relaxed whitespace-pre-wrap bg-[#0D1B35] p-5 rounded-2xl border border-white/5">
+                  {q.questionText}
+                </div>
+
+                {q.imageUrl && (
+                  <div className="max-w-lg my-3">
+                    <img src={q.imageUrl} alt="Soru Görseli" className="rounded-2xl border border-white/10 max-h-72 object-contain" />
+                  </div>
+                )}
+
+                {/* Interactive Options A-E */}
+                <div className="grid sm:grid-cols-2 gap-3 pt-2">
+                  {["A", "B", "C", "D", "E"].map((opt) => {
+                    const optVal = q[`option${opt}`];
+                    if (!optVal && opt !== "A" && opt !== "B") return null;
+
+                    const isSelected = answerState?.selectedOption === opt;
+                    const isCorrectOpt = q.correctOption === opt;
+
+                    let btnStyle = "bg-[#0D1B35] border-white/10 text-slate-300 hover:bg-white/5";
+                    if (hasAnswered) {
+                      if (isCorrectOpt) {
+                        btnStyle = "bg-emerald-500/20 border-emerald-500/50 text-emerald-300 font-black shadow-lg shadow-emerald-900/30";
+                      } else if (isSelected && !isCorrectOpt) {
+                        btnStyle = "bg-red-500/20 border-red-500/50 text-red-300 font-bold";
+                      }
+                    }
+
+                    return (
+                      <button
+                        key={opt}
+                        onClick={() => handleSelectOption(q.id, opt, q.correctOption)}
+                        className={`p-3.5 rounded-xl border text-left flex items-start gap-3 transition-all text-xs ${btnStyle}`}
+                      >
+                        <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-black text-xs flex-shrink-0 ${
+                          hasAnswered && isCorrectOpt ? "bg-emerald-500 text-white" :
+                          hasAnswered && isSelected ? "bg-red-500 text-white" :
+                          "bg-white/10 text-slate-200"
+                        }`}>{opt}</span>
+                        <span className="flex-1 mt-0.5 leading-relaxed">{optVal}</span>
+                        {hasAnswered && isCorrectOpt && <span className="text-emerald-400 font-black">✓ Doğru</span>}
+                        {hasAnswered && isSelected && !isCorrectOpt && <span className="text-red-400 font-bold">✕ Yanlış</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Feedback Result & Solution Button */}
+                {hasAnswered && (
+                  <div className="pt-2 border-t border-white/5 flex items-center justify-between flex-wrap gap-3">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs font-black px-3 py-1 rounded-xl ${ answerState.isCorrect ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-red-500/20 text-red-400 border border-red-500/30" }`}>
+                        {answerState.isCorrect ? "🎉 Tebrikler! Doğru Cevap" : `❌ Yanlış Cevap. Doğru Şık: ${q.correctOption}`}
+                      </span>
+                    </div>
+
+                    {q.solutionText && (
+                      <button
+                        onClick={() => toggleSolution(q.id)}
+                        className="bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 font-bold text-xs px-4 py-2 rounded-xl transition"
+                      >
+                        {answerState.showSolution ? "💡 Çözümü Gizle" : "💡 Detaylı Çözümü Göster"}
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {/* Solution Content */}
+                {answerState?.showSolution && q.solutionText && (
+                  <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 text-xs text-amber-300 space-y-1">
+                    <p className="font-black text-amber-400 uppercase tracking-wider">💡 Detaylı Çözüm:</p>
+                    <p className="font-semibold whitespace-pre-wrap leading-relaxed">{q.solutionText}</p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function TeacherSessionsTab({ userId }: { userId: number }) {
   const [sessions, setSessions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -284,6 +572,7 @@ interface Feedback { id: number; studentName: string; studentEmail: string | nul
 const STUDENT_NAV = [
   { id: "panel",         icon: "🏠", label: "Genel Görünüm" },
   { id: "canli",         icon: "🎥", label: "Canlı Derslerim" },
+  { id: "sorucozum",     icon: "📝", label: "Soru Bankası & Test Çöz" },
   { id: "mesajlar",      icon: "💬", label: "Mesajlar" },
   { id: "degerlendirme", icon: "⭐", label: "Değerlendirmeler" },
   { id: "duzenle",       icon: "⚙️", label: "Profil Düzenle" },
@@ -343,7 +632,7 @@ export default function ProfilPage() {
     solutionText: "",
   });
 
-  const [dashboardTab, setDashboardTab] = useState<"panel" | "duzenle" | "dersler" | "bloglar" | "faq" | "mesajlar" | "canli" | "degerlendirme" | "gorevler" | "sorular">("panel");
+  const [dashboardTab, setDashboardTab] = useState<"panel" | "duzenle" | "dersler" | "bloglar" | "faq" | "mesajlar" | "canli" | "degerlendirme" | "gorevler" | "sorular" | "sorucozum">("panel");
   const [chatRooms, setChatRooms] = useState<any[]>([]);
   const [activeRoomId, setActiveRoomId] = useState<number | null>(null);
   const [activeRoomMessages, setActiveRoomMessages] = useState<any[]>([]);
@@ -2079,6 +2368,9 @@ export default function ProfilPage() {
               </div>
             </div>
           )}
+
+          {/* ─── SORU BANKASI & TEST ÇÖZ ─── */}
+          {dashboardTab === "sorucozum" && <StudentQuizTab />}
 
           {/* ─── PROFİL DÜZENLE ─── */}
           {dashboardTab === "duzenle" && (
