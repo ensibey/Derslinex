@@ -284,8 +284,25 @@ export default function ProfilPage() {
 
   const [teacherTasks, setTeacherTasks] = useState<any[]>([]);
   const [teacherPoints, setTeacherPoints] = useState<number>(0);
+  const [teacherQuestions, setTeacherQuestions] = useState<any[]>([]);
+  const [addingQuestion, setAddingQuestion] = useState(false);
+  const [questionForm, setQuestionForm] = useState({
+    subject: "Matematik",
+    examType: "TYT",
+    topic: "",
+    difficulty: "Orta",
+    questionText: "",
+    imageUrl: "",
+    optionA: "",
+    optionB: "",
+    optionC: "",
+    optionD: "",
+    optionE: "",
+    correctOption: "A",
+    solutionText: "",
+  });
 
-  const [dashboardTab, setDashboardTab] = useState<"panel" | "duzenle" | "dersler" | "bloglar" | "faq" | "mesajlar" | "canli" | "degerlendirme" | "gorevler">("panel");
+  const [dashboardTab, setDashboardTab] = useState<"panel" | "duzenle" | "dersler" | "bloglar" | "faq" | "mesajlar" | "canli" | "degerlendirme" | "gorevler" | "sorular">("panel");
   const [chatRooms, setChatRooms] = useState<any[]>([]);
   const [activeRoomId, setActiveRoomId] = useState<number | null>(null);
   const [activeRoomMessages, setActiveRoomMessages] = useState<any[]>([]);
@@ -305,16 +322,18 @@ export default function ProfilPage() {
 
   const fetchTeacherDashboardData = useCallback(async (teacherId: number) => {
     try {
-      const [lRes, bRes, fRes, tTaskRes] = await Promise.all([
+      const [lRes, bRes, fRes, tTaskRes, qRes] = await Promise.all([
         fetch(`/api/profil/ogretmen/dersler?teacherId=${teacherId}`),
         fetch(`/api/blog/yazar?authorId=${teacherId}`),
         fetch(`/api/profil/ogretmen/faq?teacherId=${teacherId}`),
         fetch(`/api/profil/ogretmen/gorevler?teacherId=${teacherId}`),
+        fetch(`/api/questions?teacherId=${teacherId}`),
       ]);
       const lData = await lRes.json();
       const bData = await bRes.json();
       const fData = await fRes.json();
       const tTaskData = await tTaskRes.json();
+      const qData = await qRes.json();
       if (lData.success) setTeacherLessons(lData.lessons || []);
       if (bData.success) setTeacherBlogs(bData.posts || []);
       if (fData.success) setTeacherFaqs(fData.faqs || []);
@@ -322,6 +341,7 @@ export default function ProfilPage() {
         setTeacherTasks(tTaskData.tasks || []);
         setTeacherPoints(tTaskData.points || 0);
       }
+      if (qData.success) setTeacherQuestions(qData.questions || []);
     } catch (e) { console.error("Dashboard data fetch error:", e); }
   }, []);
 
@@ -721,6 +741,7 @@ export default function ProfilPage() {
               { id: "panel", label: "📊 Genel Görünüm", icon: "📊" },
               { id: "canli", label: "🎥 Canlı Derslerim", icon: "🎥" },
               { id: "gorevler", label: "🏆 Görevlerim & Puan", icon: "🏆" },
+              { id: "sorular", label: "📝 Soru Bankam", icon: "📝" },
               { id: "dersler", label: "📚 Ders İlanları", icon: "📚" },
               { id: "bloglar", label: "✍️ Blog Yazılarım", icon: "✍️" },
               { id: "faq", label: "❓ Soru & Cevap", icon: "❓" },
@@ -940,6 +961,255 @@ export default function ProfilPage() {
                             >
                               🚀 Tamamladım Diyerek Onaya Gönder
                             </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* ─── SORU BANKAM & SORU EKLE ─── */}
+            {dashboardTab === "sorular" && (
+              <div className="max-w-3xl space-y-6">
+                {/* Top Info Bar */}
+                <div className="bg-[#1E293B] rounded-2xl border border-white/5 p-6 flex flex-wrap justify-between items-center gap-4">
+                  <div>
+                    <h3 className="text-white font-black text-lg flex items-center gap-2">
+                      <span>📝</span> Soru Bankam & Soru Ekle
+                    </h3>
+                    <p className="text-slate-400 text-xs font-semibold mt-1">
+                      Platforma soru hazırlayarak katkıda bulunun. Onaylanan her soru için **+20 Puan** kazanın!
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setAddingQuestion(!addingQuestion)}
+                    className="bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs px-5 py-3 rounded-xl transition shadow-lg shadow-indigo-900/50"
+                  >
+                    {addingQuestion ? "✕ İptal Et" : "➕ Yeni Soru Ekle"}
+                  </button>
+                </div>
+
+                {/* New Question Form */}
+                {addingQuestion && (
+                  <div className="bg-[#1E293B] rounded-2xl border border-indigo-500/30 p-6 space-y-4 shadow-xl">
+                    <h4 className="text-indigo-400 font-black text-sm uppercase tracking-wider">✏️ Yeni Soru Hazırlama Formu</h4>
+                    
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                      <div>
+                        <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-1.5">Ders / Branş</label>
+                        <input
+                          type="text"
+                          value={questionForm.subject}
+                          onChange={(e) => setQuestionForm({ ...questionForm, subject: e.target.value })}
+                          className="w-full bg-[#0D1B35] border border-white/10 text-white px-4 py-2.5 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-1.5">Sınav Türü</label>
+                        <select
+                          value={questionForm.examType}
+                          onChange={(e) => setQuestionForm({ ...questionForm, examType: e.target.value })}
+                          className="w-full bg-[#0D1B35] border border-white/10 text-white px-4 py-2.5 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500"
+                        >
+                          <option value="TYT">TYT</option>
+                          <option value="AYT Sayısal">AYT Sayısal</option>
+                          <option value="AYT EA">AYT Eşit Ağırlık</option>
+                          <option value="AYT Sözel">AYT Sözel</option>
+                          <option value="LGS">LGS</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-1.5">Konu Adı</label>
+                        <input
+                          type="text"
+                          placeholder="Örn: Türev / Paragraf"
+                          value={questionForm.topic}
+                          onChange={(e) => setQuestionForm({ ...questionForm, topic: e.target.value })}
+                          className="w-full bg-[#0D1B35] border border-white/10 text-white px-4 py-2.5 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-1.5">Zorluk Derecesi</label>
+                        <select
+                          value={questionForm.difficulty}
+                          onChange={(e) => setQuestionForm({ ...questionForm, difficulty: e.target.value })}
+                          className="w-full bg-[#0D1B35] border border-white/10 text-white px-4 py-2.5 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500"
+                        >
+                          <option value="Kolay">Kolay</option>
+                          <option value="Orta">Orta</option>
+                          <option value="Zor">Zor</option>
+                          <option value="ÖSYM Tipi">ÖSYM Tipi</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-1.5">Soru Metni</label>
+                      <textarea
+                        rows={4}
+                        placeholder="Soru metnini yazınız..."
+                        value={questionForm.questionText}
+                        onChange={(e) => setQuestionForm({ ...questionForm, questionText: e.target.value })}
+                        className="w-full bg-[#0D1B35] border border-white/10 text-white px-4 py-2.5 rounded-xl text-xs font-semibold focus:outline-none focus:border-indigo-500 placeholder:text-slate-600"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-1.5">Soru Görseli / Grafik URL (Opsiyonel)</label>
+                      <input
+                        type="url"
+                        placeholder="https://..."
+                        value={questionForm.imageUrl}
+                        onChange={(e) => setQuestionForm({ ...questionForm, imageUrl: e.target.value })}
+                        className="w-full bg-[#0D1B35] border border-white/10 text-white px-4 py-2.5 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500 placeholder:text-slate-600"
+                      />
+                    </div>
+
+                    {/* Options A-E */}
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      {["A", "B", "C", "D", "E"].map((opt) => (
+                        <div key={opt}>
+                          <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-1">Şık {opt}</label>
+                          <input
+                            type="text"
+                            placeholder={`${opt} Şıkkı seçeneği`}
+                            value={(questionForm as any)[`option${opt}`]}
+                            onChange={(e) => setQuestionForm({ ...questionForm, [`option${opt}`]: e.target.value })}
+                            className="w-full bg-[#0D1B35] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-semibold focus:outline-none focus:border-indigo-500"
+                          />
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-4 pt-2 border-t border-white/10">
+                      <div>
+                        <label className="block text-xs font-black text-emerald-400 uppercase tracking-wider mb-1.5">Doğru Cevap Şıkkı</label>
+                        <select
+                          value={questionForm.correctOption}
+                          onChange={(e) => setQuestionForm({ ...questionForm, correctOption: e.target.value })}
+                          className="w-full bg-[#0D1B35] border border-emerald-500/40 text-emerald-300 font-black px-4 py-2.5 rounded-xl text-xs focus:outline-none"
+                        >
+                          <option value="A">A Şıkkı</option>
+                          <option value="B">B Şıkkı</option>
+                          <option value="C">C Şıkkı</option>
+                          <option value="D">D Şıkkı</option>
+                          <option value="E">E Şıkkı</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-1.5">Detaylı Adım Adım Çözüm</label>
+                        <input
+                          type="text"
+                          placeholder="Çözüm adımları..."
+                          value={questionForm.solutionText}
+                          onChange={(e) => setQuestionForm({ ...questionForm, solutionText: e.target.value })}
+                          className="w-full bg-[#0D1B35] border border-white/10 text-white px-4 py-2.5 rounded-xl text-xs font-semibold focus:outline-none focus:border-indigo-500"
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={async () => {
+                        if (!questionForm.subject || !questionForm.questionText || !questionForm.optionA || !questionForm.optionB) {
+                          showMsg("Lütfen ders, soru metni ve A/B şıklarını doldurunuz.", "error");
+                          return;
+                        }
+                        setLoading(true);
+                        try {
+                          const res = await fetch("/api/questions", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ ...questionForm, teacherId: teacherProfile.id }),
+                          });
+                          const data = await res.json();
+                          if (data.success) {
+                            showMsg("✅ Sorunuz başarıyla kaydedildi ve admin onayına gönderildi!", "success");
+                            setAddingQuestion(false);
+                            setQuestionForm({
+                              subject: teacherProfile.branch || "Matematik",
+                              examType: "TYT",
+                              topic: "",
+                              difficulty: "Orta",
+                              questionText: "",
+                              imageUrl: "",
+                              optionA: "",
+                              optionB: "",
+                              optionC: "",
+                              optionD: "",
+                              optionE: "",
+                              correctOption: "A",
+                              solutionText: "",
+                            });
+                            fetchTeacherDashboardData(teacherProfile.id);
+                          } else {
+                            showMsg(data.error || "Soru kaydedilemedi", "error");
+                          }
+                        } catch {
+                          showMsg("Bağlantı hatası", "error");
+                        } finally {
+                          setLoading(false);
+                        }
+                      }}
+                      disabled={loading}
+                      className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs py-3.5 rounded-xl transition shadow-lg shadow-emerald-900/50"
+                    >
+                      {loading ? "Gönderiliyor..." : "🚀 Soruyu Kaydet & Admin Onayına Gönder (+20 Puan Ödüllü)"}
+                    </button>
+                  </div>
+                )}
+
+                {/* Questions List */}
+                <div className="bg-[#1E293B] rounded-2xl border border-white/5 p-6">
+                  <h4 className="text-white font-black text-base mb-1">📋 Gönderdiğiniz Sorular ({teacherQuestions.length})</h4>
+                  <p className="text-slate-400 text-xs font-semibold mb-5">Soru onaylandığında hesabınıza +20 Puan eklenir.</p>
+
+                  {teacherQuestions.length === 0 ? (
+                    <p className="text-slate-500 text-sm font-semibold py-8 text-center">Henüz eklediğiniz soru bulunmuyor.</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {teacherQuestions.map((q) => (
+                        <div key={q.id} className="p-5 bg-[#0D1B35] border border-white/10 rounded-2xl space-y-3">
+                          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-2">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
+                                q.status === "APPROVED" ? "bg-emerald-500/20 text-emerald-400" :
+                                q.status === "REJECTED" ? "bg-red-500/20 text-red-400" :
+                                "bg-amber-500/20 text-amber-400 animate-pulse"
+                              }`}>
+                                {q.status === "APPROVED" ? "✅ Onaylandı (+ " + q.points + " Puan Alındı)" :
+                                 q.status === "REJECTED" ? "❌ Reddedildi" :
+                                 "⏳ Admin Onayında"}
+                              </span>
+                              <span className="text-[10px] font-black bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full">📚 {q.subject} ({q.examType})</span>
+                              {q.topic && <span className="text-[10px] font-semibold bg-white/5 text-slate-400 px-2 py-0.5 rounded-full">🏷️ {q.topic}</span>}
+                            </div>
+                            <span className="text-[10px] text-slate-500 font-bold">{new Date(q.createdAt).toLocaleDateString("tr-TR")}</span>
+                          </div>
+
+                          <p className="text-xs text-white font-bold whitespace-pre-wrap">{q.questionText}</p>
+
+                          {/* Options preview */}
+                          <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 text-[11px]">
+                            {["A", "B", "C", "D", "E"].map((opt) => {
+                              const val = q[`option${opt}`];
+                              if (!val) return null;
+                              const isCorrect = q.correctOption === opt;
+                              return (
+                                <div key={opt} className={`p-1.5 rounded-lg border text-center font-bold ${
+                                  isCorrect ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-300" : "bg-white/5 border-white/5 text-slate-400"
+                                }`}>
+                                  {opt}: {val}
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {q.rejectionReason && (
+                            <p className="text-xs text-red-400 font-semibold bg-red-500/10 p-2 rounded-lg border border-red-500/20">
+                              ❌ Red Nedeni: {q.rejectionReason}
+                            </p>
                           )}
                         </div>
                       ))}

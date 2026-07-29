@@ -60,7 +60,7 @@ interface BlogPost {
 }
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<"teachers" | "students" | "lessons" | "blogs" | "feedbacks" | "sessions" | "tasks">("teachers");
+  const [activeTab, setActiveTab] = useState<"teachers" | "students" | "lessons" | "blogs" | "feedbacks" | "sessions" | "tasks" | "questions">("teachers");
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
@@ -68,6 +68,7 @@ export default function AdminPage() {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [liveSessions, setLiveSessions] = useState<any[]>([]);
   const [adminTasks, setAdminTasks] = useState<any[]>([]);
+  const [questionsList, setQuestionsList] = useState<any[]>([]);
 
   // Task Create Form
   const [taskForm, setTaskForm] = useState({
@@ -97,7 +98,7 @@ export default function AdminPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [tRes, sRes, fRes, lRes, bRes, sessRes, taskRes] = await Promise.all([
+      const [tRes, sRes, fRes, lRes, bRes, sessRes, taskRes, qRes] = await Promise.all([
         fetch("/api/profil/ogretmen"),
         fetch("/api/profil/ogrenci"),
         fetch("/api/gorus"),
@@ -105,6 +106,7 @@ export default function AdminPage() {
         fetch("/api/admin/blogs"),
         fetch("/api/admin/sessions"),
         fetch("/api/admin/tasks"),
+        fetch("/api/admin/questions"),
       ]);
 
       const tData = await tRes.json();
@@ -114,6 +116,7 @@ export default function AdminPage() {
       const bData = await bRes.json();
       const sessData = await sessRes.json();
       const taskData = await taskRes.json();
+      const qData = await qRes.json();
 
       if (tData.success) setTeachers(tData.teachers || []);
       if (sData.success) setStudents(sData.students || []);
@@ -122,6 +125,7 @@ export default function AdminPage() {
       if (bData.success) setBlogs(bData.posts || []);
       if (sessData.success) setLiveSessions(sessData.sessions || []);
       if (taskData.success) setAdminTasks(taskData.tasks || []);
+      if (qData.success) setQuestionsList(qData.questions || []);
     } catch (e) {
       console.error("Data fetch error", e);
     } finally {
@@ -320,6 +324,7 @@ export default function AdminPage() {
             { key: "feedbacks", label: "Görüşler", count: feedbacks.length, icon: "💬" },
             { key: "sessions", label: "Canlı Dersler", count: liveSessions.length, icon: "🎥" },
             { key: "tasks", label: "Görev & Puan", count: adminTasks.length, icon: "🏆" },
+            { key: "questions", label: "Soru Havuzu", count: questionsList.length, icon: "📝" },
           ].map((t) => (
             <button
               key={t.key}
@@ -1082,6 +1087,171 @@ export default function AdminPage() {
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* QUESTIONS TAB */}
+          {activeTab === "questions" && (
+            <div className="p-6 space-y-6">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#EFECE6] pb-4">
+                <div>
+                  <h3 className="text-lg font-black text-[#1E3A8A]">📝 Öğretmen Soru Havuzu & İnceleme ({questionsList.length})</h3>
+                  <p className="text-xs text-gray-500 font-semibold mt-0.5">Öğretmenler tarafından yazılan soruları inceleyin, onaylayarak öğretmene +20 puan tanımlayın.</p>
+                </div>
+              </div>
+
+              {questionsList.length === 0 ? (
+                <p className="text-gray-400 font-semibold text-sm py-12 text-center">Henüz soru havuzuna soru eklenmedi.</p>
+              ) : (
+                <div className="space-y-6">
+                  {questionsList.map((q: any) => (
+                    <div key={q.id} className="bg-white border border-[#EFECE6] rounded-2xl p-6 shadow-sm space-y-4">
+                      {/* Header */}
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-3">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`text-xs font-black px-2.5 py-0.5 rounded-full ${
+                            q.status === "APPROVED" ? "bg-emerald-100 text-emerald-700" :
+                            q.status === "REJECTED" ? "bg-red-100 text-red-700" :
+                            "bg-amber-100 text-amber-700 animate-pulse"
+                          }`}>
+                            {q.status === "APPROVED" ? "✅ Onaylandı (+ " + q.points + " Puan verildi)" :
+                             q.status === "REJECTED" ? "❌ Reddedildi" :
+                             "⏳ İnceleme Bekliyor"}
+                          </span>
+                          <span className="text-xs font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">📚 {q.subject}</span>
+                          <span className="text-xs font-bold bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">🎯 {q.examType}</span>
+                          {q.topic && <span className="text-xs font-bold bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">🏷️ {q.topic}</span>}
+                          <span className="text-xs font-black bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full">⚡ {q.difficulty}</span>
+                        </div>
+                        <p className="text-xs font-bold text-gray-500">
+                          👨‍🏫 Yazarlar: <span className="text-gray-900 font-black">{q.teacher?.name} ({q.teacher?.branch})</span>
+                        </p>
+                      </div>
+
+                      {/* Question Content */}
+                      <div className="space-y-3">
+                        <div className="font-bold text-gray-900 text-sm whitespace-pre-wrap leading-relaxed bg-[#FAF8F5] p-4 rounded-xl border border-[#EFECE6]">
+                          {q.questionText}
+                        </div>
+
+                        {q.imageUrl && (
+                          <div className="max-w-md my-2">
+                            <img src={q.imageUrl} alt="Soru Görseli" className="rounded-xl border border-gray-200 max-h-60 object-contain" />
+                          </div>
+                        )}
+
+                        {/* Options */}
+                        <div className="grid sm:grid-cols-2 gap-2 text-xs font-semibold">
+                          {["A", "B", "C", "D", "E"].map((opt) => {
+                            const val = q[`option${opt}`];
+                            if (!val && opt !== "A" && opt !== "B") return null;
+                            const isCorrect = q.correctOption === opt;
+                            return (
+                              <div key={opt} className={`p-2.5 rounded-xl border flex items-center gap-2 ${
+                                isCorrect ? "bg-emerald-50 border-emerald-300 text-emerald-900 font-black" : "bg-gray-50 border-gray-200 text-gray-700"
+                              }`}>
+                                <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-black text-xs ${
+                                  isCorrect ? "bg-emerald-600 text-white" : "bg-gray-200 text-gray-700"
+                                }`}>{opt}</span>
+                                <span>{val}</span>
+                                {isCorrect && <span className="ml-auto text-emerald-600 font-black">✓ Doğru Şık</span>}
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Solution */}
+                        {q.solutionText && (
+                          <div className="bg-amber-50/60 border border-amber-200/80 rounded-xl p-3 text-xs text-amber-900">
+                            <p className="font-black mb-1">💡 Detaylı Çözüm:</p>
+                            <p className="font-semibold whitespace-pre-wrap">{q.solutionText}</p>
+                          </div>
+                        )}
+
+                        {q.rejectionReason && (
+                          <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-800 font-bold">
+                            ❌ Red Sebebi: {q.rejectionReason}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Admin Action Buttons */}
+                      <div className="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
+                        {q.status !== "APPROVED" && (
+                          <button
+                            onClick={async () => {
+                              try {
+                                const res = await fetch("/api/admin/questions", {
+                                  method: "PUT",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({ questionId: q.id, status: "APPROVED" }),
+                                });
+                                const data = await res.json();
+                                if (data.success) {
+                                  showMsg(`✅ Soru onaylandı ve öğretmene +${q.points} puan tanımlandı!`, "success");
+                                  fetchData();
+                                } else {
+                                  showMsg(data.error || "İşlem başarısız", "error");
+                                }
+                              } catch {
+                                showMsg("Bağlantı hatası", "error");
+                              }
+                            }}
+                            className="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs px-4 py-2 rounded-xl transition shadow-xs"
+                          >
+                            ✅ Soruyu Onayla & +{q.points} Puan Ver
+                          </button>
+                        )}
+
+                        {q.status === "PENDING_APPROVAL" && (
+                          <button
+                            onClick={async () => {
+                              const reason = prompt("Lütfen red sebebini / düzeltme isteğinizi yazın:", "Soruda imla veya şık hatası bulunmaktadır.");
+                              if (reason === null) return;
+                              try {
+                                const res = await fetch("/api/admin/questions", {
+                                  method: "PUT",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({ questionId: q.id, status: "REJECTED", rejectionReason: reason }),
+                                });
+                                const data = await res.json();
+                                if (data.success) {
+                                  showMsg("Soru reddedildi.", "error");
+                                  fetchData();
+                                }
+                              } catch {
+                                showMsg("Bağlantı hatası", "error");
+                              }
+                            }}
+                            className="bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs px-3.5 py-2 rounded-xl transition"
+                          >
+                            ❌ Reddet
+                          </button>
+                        )}
+
+                        <button
+                          onClick={async () => {
+                            if (!confirm("Bu soruyu silmek istediğinize emin misiniz?")) return;
+                            try {
+                              const res = await fetch(`/api/admin/questions?id=${q.id}`, { method: "DELETE" });
+                              const data = await res.json();
+                              if (data.success) {
+                                showMsg("Soru silindi.", "success");
+                                fetchData();
+                              }
+                            } catch {
+                              showMsg("Bağlantı hatası", "error");
+                            }
+                          }}
+                          className="text-xs text-red-500 hover:text-red-700 font-bold px-2 py-1"
+                        >
+                          🗑️ Sil
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
