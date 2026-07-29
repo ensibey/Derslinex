@@ -725,6 +725,32 @@ export default function ProfilPage() {
 
   useEffect(() => {
     if (!activeRoomId) return;
+
+    // Connect real-time Server-Sent Events (SSE) stream for instant messages
+    let eventSource: EventSource | null = null;
+    try {
+      eventSource = new EventSource(`/api/chat/stream?roomId=${activeRoomId}`);
+      eventSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === "INIT") {
+            setActiveRoomMessages(data.messages || []);
+          } else if (data.type === "NEW_MESSAGES") {
+            setActiveRoomMessages((prev) => {
+              const existingIds = new Set(prev.map((m) => m.id));
+              const fresh = data.messages.filter((m: any) => !existingIds.has(m.id));
+              return [...prev, ...fresh];
+            });
+          }
+        } catch (e) {
+          console.error("SSE parse error", e);
+        }
+      };
+    } catch (err) {
+      console.error("EventSource error, fallback to fetch", err);
+    }
+
+    // Fallback polling
     const fetchMessages = async () => {
       try {
         const res = await fetch(`/api/chat/messages?roomId=${activeRoomId}`);
@@ -734,7 +760,11 @@ export default function ProfilPage() {
     };
     fetchMessages();
     const interval = setInterval(fetchMessages, 3000);
-    return () => clearInterval(interval);
+
+    return () => {
+      if (eventSource) eventSource.close();
+      clearInterval(interval);
+    };
   }, [activeRoomId]);
 
   useEffect(() => {

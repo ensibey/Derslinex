@@ -2,9 +2,19 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { verifyPassword } from "@/lib/auth";
 import { signToken } from "@/lib/auth-jwt";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   try {
+    const ip = getClientIp(request);
+    const rateLimit = checkRateLimit(`login-ogrenci-${ip}`, 8, 60_000); // 8 requests per minute max
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { success: false, error: "Çok fazla hatalı giriş denemesi yaptınız. Lütfen 1 dakika sonra tekrar deneyin." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { email, password } = body;
 

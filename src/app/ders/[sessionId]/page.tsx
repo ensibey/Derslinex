@@ -102,68 +102,228 @@ function FeedbackModal({
                 </div>
               </div>
 
-              {/* Yıldız Derecelendirme */}
+              {/* Rating */}
               <div>
-                <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Performans Puanı</label>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Performans Puanı (1-5)</label>
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
                       key={star}
                       type="button"
                       onClick={() => update(student.id, "rating", star)}
-                      className={`text-2xl transition-transform hover:scale-110 ${
-                        feedbacks[student.id]?.rating >= star ? "text-amber-400" : "text-gray-300"
-                      }`}
+                      className={`text-2xl transition ${star <= feedbacks[student.id]?.rating ? "opacity-100 scale-110" : "opacity-30"}`}
                     >
-                      ★
+                      ⭐
                     </button>
                   ))}
-                  <span className="ml-2 text-sm font-bold text-gray-600">
-                    {feedbacks[student.id]?.rating}/5
-                  </span>
                 </div>
               </div>
 
-              {/* Yorum */}
+              {/* Comment */}
               <div>
-                <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Öğrenci Notu / Yorum</label>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Öğretmen Notu / Yorumu</label>
                 <textarea
                   rows={2}
-                  placeholder="Bu ders için öğrenci hakkında notunuzu yazın..."
-                  value={feedbacks[student.id]?.comment || ""}
+                  value={feedbacks[student.id]?.comment}
                   onChange={(e) => update(student.id, "comment", e.target.value)}
-                  className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-xl px-4 py-2.5 text-sm font-semibold resize-none focus:outline-none focus:border-[#1E3A8A]/50"
+                  placeholder="Öğrencinin ders performansı, eksikleri..."
+                  className="w-full bg-[#FAF8F5] border border-[#EFECE6] rounded-xl p-3 text-sm focus:outline-none focus:border-[#1E3A8A]"
                 />
               </div>
 
-              {/* Ödev */}
-              <label className="flex items-center gap-3 cursor-pointer">
+              {/* Homework Checkbox */}
+              <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={feedbacks[student.id]?.homeworkGiven || false}
+                  checked={feedbacks[student.id]?.homeworkGiven}
                   onChange={(e) => update(student.id, "homeworkGiven", e.target.checked)}
-                  className="w-5 h-5 accent-[#1E3A8A]"
+                  className="w-4 h-4 text-[#1E3A8A] rounded accent-[#1E3A8A]"
                 />
-                <span className="text-sm font-bold text-gray-700">Ödev verildi</span>
+                <span className="text-sm font-bold text-gray-700">📚 Bu öğrenciye ödev verildi</span>
               </label>
             </div>
           ))}
         </div>
 
-        <div className="p-6 border-t border-[#EFECE6] flex gap-3">
+        <div className="p-6 border-t border-[#EFECE6] flex justify-end gap-3">
           <button
             onClick={handleSubmit}
             disabled={saving}
-            className="flex-1 bg-[#1E3A8A] hover:bg-[#163070] text-white font-black py-3.5 rounded-xl transition disabled:opacity-60"
+            className="bg-[#1E3A8A] hover:bg-indigo-900 text-white font-black px-8 py-3.5 rounded-xl transition shadow-lg shadow-indigo-900/20 disabled:opacity-50"
           >
-            {saving ? "Kaydediliyor..." : "💾 Değerlendirmeleri Kaydet"}
+            {saving ? "Kaydediliyor..." : "💾 Değerlendirmeleri Kaydet ve Bitir"}
           </button>
-          <button
-            onClick={onDone}
-            className="px-6 border border-[#EFECE6] text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition"
-          >
-            Geç
-          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── İnteraktif Dijital Beyaz Tahta Modalı ─────────────────────────────────────
+function WhiteboardModal({ onClose }: { onClose: () => void }) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [color, setColor] = useState("#FFFFFF");
+  const [lineWidth, setLineWidth] = useState(4);
+  const [isEraser, setIsEraser] = useState(false);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    canvas.width = window.innerWidth * 0.85;
+    canvas.height = window.innerHeight * 0.75;
+
+    ctx.fillStyle = "#0D1B35";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }, []);
+
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+
+    ctx.beginPath();
+    ctx.moveTo(clientX - rect.left, clientY - rect.top);
+    setIsDrawing(true);
+  };
+
+  const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    if (!isDrawing) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+
+    ctx.strokeStyle = isEraser ? "#0D1B35" : color;
+    ctx.lineWidth = isEraser ? lineWidth * 4 : lineWidth;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    ctx.lineTo(clientX - rect.left, clientY - rect.top);
+    ctx.stroke();
+  };
+
+  const stopDrawing = () => {
+    setIsDrawing(false);
+  };
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.fillStyle = "#0D1B35";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  };
+
+  const downloadCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const link = document.createElement("a");
+    link.download = `derslinex-tahta-${Date.now()}.png`;
+    link.href = canvas.toDataURL();
+    link.click();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+      <div className="bg-[#0A1628] border border-indigo-500/30 rounded-3xl p-5 shadow-2xl space-y-4 max-w-5xl w-full">
+        {/* Toolbar */}
+        <div className="flex items-center justify-between flex-wrap gap-3 border-b border-white/10 pb-3">
+          <div className="flex items-center gap-2">
+            <span className="text-white font-black text-base flex items-center gap-2">
+              🎨 İnteraktif Dijital Beyaz Tahta
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3 flex-wrap">
+            <button
+              onClick={() => setIsEraser(false)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-black transition border ${ !isEraser ? "bg-indigo-600 text-white border-indigo-400" : "bg-[#1E293B] text-slate-400 border-white/10" }`}
+            >
+              ✏️ Kalem
+            </button>
+            <button
+              onClick={() => setIsEraser(true)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-black transition border ${ isEraser ? "bg-amber-600 text-white border-amber-400" : "bg-[#1E293B] text-slate-400 border-white/10" }`}
+            >
+              🧹 Silgi
+            </button>
+
+            {!isEraser && (
+              <div className="flex items-center gap-1.5 bg-[#0D1B35] p-1.5 rounded-xl border border-white/10">
+                {["#FFFFFF", "#EF4444", "#F59E0B", "#10B981", "#3B82F6", "#06B6D4", "#EC4899"].map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => setColor(c)}
+                    style={{ backgroundColor: c }}
+                    className={`w-6 h-6 rounded-lg border-2 transition ${ color === c ? "scale-110 border-white" : "border-transparent opacity-80" }`}
+                  />
+                ))}
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 bg-[#0D1B35] px-3 py-1.5 rounded-xl border border-white/10 text-xs font-bold text-slate-300">
+              <span>Kalınlık:</span>
+              <input
+                type="range"
+                min="2"
+                max="20"
+                value={lineWidth}
+                onChange={(e) => setLineWidth(Number(e.target.value))}
+                className="w-20 accent-indigo-500"
+              />
+            </div>
+
+            <button
+              onClick={clearCanvas}
+              className="bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 text-xs font-black px-3 py-1.5 rounded-xl transition"
+            >
+              🗑️ Temizle
+            </button>
+
+            <button
+              onClick={downloadCanvas}
+              className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-black px-3 py-1.5 rounded-xl transition"
+            >
+              💾 Kaydet
+            </button>
+
+            <button
+              onClick={onClose}
+              className="bg-white/10 hover:bg-white/20 text-white font-black text-xs px-3 py-1.5 rounded-xl transition"
+            >
+              ✕ Kapat
+            </button>
+          </div>
+        </div>
+
+        {/* Canvas Area */}
+        <div className="flex items-center justify-center bg-[#0D1B35] rounded-2xl border border-white/10 overflow-hidden cursor-crosshair relative">
+          <canvas
+            ref={canvasRef}
+            onMouseDown={startDrawing}
+            onMouseMove={draw}
+            onMouseUp={stopDrawing}
+            onMouseLeave={stopDrawing}
+            onTouchStart={startDrawing}
+            onTouchMove={draw}
+            onTouchEnd={stopDrawing}
+            className="w-full h-[65vh] touch-none"
+          />
         </div>
       </div>
     </div>
@@ -185,9 +345,9 @@ export default function LiveSessionPage() {
   const [sessionTitle, setSessionTitle] = useState("Canlı Ders");
   const [students, setStudents] = useState<Student[]>([]);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [showWhiteboard, setShowWhiteboard] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // Kullanıcıyı storage'dan oku ve odaya bağlan
   const joinSession = useCallback(async () => {
     const rawUser  = localStorage.getItem("derslinex_user")  || sessionStorage.getItem("derslinex_user");
     const rawRole  = localStorage.getItem("derslinex_role")  || sessionStorage.getItem("derslinex_role");
@@ -220,7 +380,6 @@ export default function LiveSessionPage() {
         return;
       }
 
-      // Jitsi Meet URL veya Daily URL
       const fullUrl = data.token ? `${data.roomUrl}?t=${data.token}` : data.roomUrl;
       setRoomUrl(fullUrl);
       setIsOwner(data.isOwner);
@@ -235,12 +394,10 @@ export default function LiveSessionPage() {
     joinSession();
   }, [joinSession]);
 
-  // Öğretmen "Dersi Bitir" butonuna bastığında
   const handleEndSession = async () => {
     if (!userId) return;
     if (!confirm("Dersi bitirmek istediğinizden emin misiniz? Odadaki herkes çıkarılacak.")) return;
 
-    // Önce iframe'i kaldır (Jitsi sayfasının görünmesini engelle)
     setStatus("ended");
 
     try {
@@ -254,7 +411,6 @@ export default function LiveSessionPage() {
         setStudents(data.students);
         setShowFeedback(true);
       } else {
-        // Değerlendirilecek öğrenci yoksa direkt profile git
         router.push("/profil");
       }
     } catch {
@@ -263,7 +419,6 @@ export default function LiveSessionPage() {
     }
   };
 
-  // ─── Yükleniyor Ekranı ─────────────────────────────────────────────────────
   if (status === "loading" || status === "joining") {
     return (
       <div className="min-h-screen bg-[#0A1628] flex flex-col items-center justify-center text-white gap-4">
@@ -275,7 +430,6 @@ export default function LiveSessionPage() {
     );
   }
 
-  // ─── Hata Ekranı ───────────────────────────────────────────────────────────
   if (status === "error") {
     return (
       <div className="min-h-screen bg-[#0A1628] flex flex-col items-center justify-center text-white gap-6 px-4">
@@ -292,7 +446,6 @@ export default function LiveSessionPage() {
     );
   }
 
-  // ─── Canlı Ders / Biten Ders Ekranı ───────────────────────────────────────
   return (
     <div className="min-h-screen bg-[#0A1628] flex flex-col">
       {/* Üst Bar */}
@@ -307,7 +460,15 @@ export default function LiveSessionPage() {
           )}
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-indigo-300 text-sm font-bold hidden sm:block">{sessionTitle}</span>
+          {status === "live" && (
+            <button
+              onClick={() => setShowWhiteboard(true)}
+              className="bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-indigo-900/50"
+            >
+              🎨 Dijital Beyaz Tahta
+            </button>
+          )}
+
           {isOwner && status === "live" && (
             <button
               onClick={handleEndSession}
@@ -336,6 +497,9 @@ export default function LiveSessionPage() {
           title="Canlı Ders Odası"
         />
       )}
+
+      {/* Dijital Beyaz Tahta Modalı */}
+      {showWhiteboard && <WhiteboardModal onClose={() => setShowWhiteboard(false)} />}
 
       {/* Ders bitti - direkt profile yönlendir */}
       {status === "ended" && !showFeedback && (
