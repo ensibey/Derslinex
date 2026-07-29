@@ -1435,6 +1435,255 @@ function StudentLeaderboardTab({ currentStudentId }: { currentStudentId?: number
   );
 }
 
+// ─── Student Wrong Questions Notebook Component ─────────────────────────────
+function StudentWrongQuestionsTab({ studentId }: { studentId: number }) {
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [retryMap, setRetryMap] = useState<Record<number, string>>({});
+  const [retryResults, setRetryResults] = useState<Record<number, boolean>>({});
+
+  const fetchWrongQuestions = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/student/wrong-questions?studentId=${studentId}`);
+      const data = await res.json();
+      if (data.success) {
+        setItems(data.wrongQuestions || []);
+      }
+    } catch (e) {
+      console.error("Wrong questions fetch error:", e);
+    } finally {
+      setLoading(false);
+    }
+  }, [studentId]);
+
+  useEffect(() => {
+    fetchWrongQuestions();
+  }, [fetchWrongQuestions]);
+
+  const handleRetrySelect = (attemptId: number, option: string) => {
+    setRetryMap({ ...retryMap, [attemptId]: option });
+  };
+
+  const handleCheckRetry = (attemptId: number, correctOption: string) => {
+    const selected = retryMap[attemptId];
+    if (!selected) return;
+    setRetryResults({ ...retryResults, [attemptId]: selected === correctOption });
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <SessionCardSkeleton />
+        <SessionCardSkeleton />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-[#1E293B] border border-white/10 p-6 rounded-2xl flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h3 className="text-xl font-black text-white flex items-center gap-2">
+            <span>📕</span> Yanlış Soru Tekrar Defterim
+          </h3>
+          <p className="text-xs text-slate-400 mt-1">Daha önce testlerde yanlış yaptığınız sorular burada birikir. Şıkları tekrar inceleyip eksiklerinizi kapatın!</p>
+        </div>
+        <span className="text-xs font-black bg-red-500/20 text-red-300 border border-red-500/30 px-3 py-1.5 rounded-full">
+          {items.length} Yanlış Soru
+        </span>
+      </div>
+
+      {items.length === 0 ? (
+        <div className="bg-[#1E293B] border border-white/10 rounded-2xl p-12 text-center space-y-3">
+          <span className="text-4xl">🎉</span>
+          <h4 className="text-white font-black text-base">Harika! Hiç Yanlış Sorunuz Yok</h4>
+          <p className="text-xs text-slate-400">Çözdüğünüz testlerdeki tüm soruları doğru yanıtladınız veya henüz teste girmediniz.</p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {items.map((item, index) => {
+            const q = item.question;
+            const selectedOpt = retryMap[item.attemptId];
+            const evalDone = retryResults[item.attemptId] !== undefined;
+            const isCorrectRetry = retryResults[item.attemptId];
+
+            return (
+              <div key={item.attemptId} className="bg-[#1E293B] border border-white/10 rounded-2xl p-6 space-y-4 shadow-lg">
+                <div className="flex items-center justify-between border-b border-white/5 pb-3 flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black bg-indigo-500/20 text-indigo-300 px-2.5 py-0.5 rounded-full">
+                      Soru #{index + 1}
+                    </span>
+                    <span className="text-xs font-bold bg-blue-500/20 text-blue-300 px-2.5 py-0.5 rounded-full">
+                      {q.subject} • {q.examType}
+                    </span>
+                    {q.topic && <span className="text-xs font-medium text-slate-400">({q.topic})</span>}
+                  </div>
+                  <span className="text-[10px] text-red-400 font-bold bg-red-500/10 px-2.5 py-0.5 rounded-full">
+                    Siz: {item.selectedOption} şıkkını işaretlemiştiniz
+                  </span>
+                </div>
+
+                {/* Question Content */}
+                <div className="bg-[#0D1B35] border border-white/5 p-4 rounded-xl space-y-3 text-slate-200 text-sm leading-relaxed">
+                  <p className="font-bold">{q.questionText}</p>
+                  {q.imageUrl && <img src={q.imageUrl} alt="Soru görseli" className="max-h-60 rounded-lg object-contain border border-white/10" />}
+                </div>
+
+                {/* Options Grid */}
+                <div className="grid sm:grid-cols-2 gap-3">
+                  {["A", "B", "C", "D", "E"].map((opt) => {
+                    const optText = q[`option${opt}`];
+                    if (!optText) return null;
+
+                    const isPreviousWrong = item.selectedOption === opt;
+                    const isCorrectOpt = q.correctOption === opt;
+                    const isRetrySelected = selectedOpt === opt;
+
+                    let style = "bg-[#0D1B35] border-white/10 text-slate-300 hover:bg-white/5";
+
+                    if (evalDone) {
+                      if (isCorrectOpt) style = "bg-emerald-500/20 border-emerald-500/50 text-emerald-300 font-black";
+                      else if (isRetrySelected && !isCorrectOpt) style = "bg-red-500/20 border-red-500/50 text-red-300 font-bold";
+                    } else if (isRetrySelected) {
+                      style = "bg-indigo-600/30 border-indigo-500 text-white font-black";
+                    }
+
+                    return (
+                      <button
+                        key={opt}
+                        disabled={evalDone}
+                        onClick={() => handleRetrySelect(item.attemptId, opt)}
+                        className={`p-3.5 rounded-xl border text-left flex items-start gap-3 transition-all text-xs ${style}`}
+                      >
+                        <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-black text-xs flex-shrink-0 ${
+                          isCorrectOpt && evalDone ? "bg-emerald-500 text-white" :
+                          isPreviousWrong ? "bg-red-500/80 text-white" : "bg-white/10 text-slate-200"
+                        }`}>{opt}</span>
+                        <span className="flex-1 mt-0.5 leading-relaxed">{optText}</span>
+                        {isPreviousWrong && <span className="text-[10px] text-red-400 font-bold">Önceki Yanlışınız</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Submit & Solution Section */}
+                <div className="flex items-center justify-between border-t border-white/5 pt-3 flex-wrap gap-3">
+                  {evalDone ? (
+                    <div className="space-y-1">
+                      <span className={`text-xs font-black px-3 py-1 rounded-xl inline-block ${ isCorrectRetry ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-red-500/20 text-red-400 border border-red-500/30" }`}>
+                        {isCorrectRetry ? "🎉 Tebrikler! Doğru Seçenek: " + q.correctOption : "❌ Tekrar Yanlış. Doğru Cevap: " + q.correctOption}
+                      </span>
+                      {q.solutionText && <p className="text-xs text-indigo-300 font-semibold mt-1">💡 Çözüm: {q.solutionText}</p>}
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleCheckRetry(item.attemptId, q.correctOption)}
+                      disabled={!selectedOpt}
+                      className="bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs px-5 py-2.5 rounded-xl transition disabled:opacity-40"
+                    >
+                      🔄 Yeniden Çöz ve Kontrol Et
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Teacher Gamification & Rewards Component ─────────────────────────────────
+function TeacherRewardsTab({ teacherId }: { teacherId: number }) {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchRewards = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/teacher/rewards?teacherId=${teacherId}`);
+      const d = await res.json();
+      if (d.success) {
+        setData(d);
+      }
+    } catch (e) {
+      console.error("Teacher rewards fetch error:", e);
+    } finally {
+      setLoading(false);
+    }
+  }, [teacherId]);
+
+  useEffect(() => {
+    fetchRewards();
+  }, [fetchRewards]);
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <SessionCardSkeleton />
+        <SessionCardSkeleton />
+      </div>
+    );
+  }
+
+  const stats = data?.stats;
+  const badges = data?.badges || [];
+
+  return (
+    <div className="space-y-6">
+      {/* Header & Score */}
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-gradient-to-r from-indigo-900/60 via-purple-950 to-[#0D1B35] border border-indigo-500/30 p-6 rounded-2xl">
+        <div>
+          <h3 className="text-xl font-black text-white flex items-center gap-2">
+            <span>🎖️</span> Eğitmen Katkı Puanı & Rozet Paneli
+          </h3>
+          <p className="text-xs text-slate-300 mt-1">Soru bankasına katkı sağlayarak, materyal paylaşarak ve canlı ders oluşturarak platform puanı kazanın!</p>
+        </div>
+
+        <div className="bg-[#0D1B35] border border-amber-500/40 px-5 py-3 rounded-xl text-right">
+          <span className="text-[10px] text-amber-400 font-black uppercase tracking-wider block">EĞİTMEN PUANIM</span>
+          <span className="text-2xl font-black text-white tabular-nums">{stats?.points || 0} Katkı Puanı</span>
+        </div>
+      </div>
+
+      {/* Badges Grid */}
+      <div className="bg-[#1E293B] border border-white/10 rounded-2xl p-6 space-y-4">
+        <h4 className="font-black text-white text-base flex items-center gap-2">
+          <span>🏆</span> Eğitmen Başarı Rozetlerim ({stats?.unlockedBadgeCount || 0} / {badges.length})
+        </h4>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {badges.map((badge: any) => (
+            <div
+              key={badge.id}
+              className={`p-4 rounded-xl border flex items-start gap-3 transition-all ${
+                badge.unlocked
+                  ? "bg-gradient-to-br from-amber-500/10 to-indigo-900/30 border-amber-500/40 text-white shadow-lg"
+                  : "bg-[#0D1B35] border-white/5 text-slate-500 opacity-60"
+              }`}
+            >
+              <span className={`text-3xl p-2.5 rounded-xl flex-shrink-0 ${ badge.unlocked ? "bg-amber-500/20 border border-amber-500/40" : "bg-white/5" }`}>
+                {badge.icon}
+              </span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <h5 className="font-black text-sm text-white truncate">{badge.name}</h5>
+                  {badge.unlocked && <span className="text-[10px] font-black text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded-full">KAZANILDI</span>}
+                </div>
+                <p className="text-xs text-slate-400 font-medium mt-1 leading-relaxed">{badge.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Interfaces ────────────────────────────────────────────────────────────────
 interface Student { id: number; name: string; phone: string; email: string; status: string; avatar?: string | null; }
 interface Teacher { id: number; name: string; phone: string; email: string; branch: string; status: string; egitim?: string | null; ozgecmis?: string | null; linkedin?: string | null; youtube?: string | null; avatar?: string | null; }
@@ -1445,6 +1694,7 @@ const STUDENT_NAV = [
   { id: "panel",         icon: "🏠", label: "Genel Görünüm" },
   { id: "canli",         icon: "🎥", label: "Canlı Derslerim" },
   { id: "sorucozum",     icon: "📝", label: "Soru Bankası & Test Çöz" },
+  { id: "yanlissorular", icon: "📕", label: "Yanlış Soru Defterim" },
   { id: "denemenet",     icon: "📊", label: "Deneme Net Takibi" },
   { id: "konutakip",     icon: "📋", label: "YKS Konu Çetelesi" },
   { id: "liderlik",      icon: "🏆", label: "Liderlik & Rozetler" },
@@ -1507,7 +1757,7 @@ export default function ProfilPage() {
     solutionText: "",
   });
 
-  const [dashboardTab, setDashboardTab] = useState<"panel" | "duzenle" | "dersler" | "bloglar" | "faq" | "mesajlar" | "canli" | "degerlendirme" | "gorevler" | "sorular" | "sorucozum" | "denemenet" | "konutakip" | "liderlik">("panel");
+  const [dashboardTab, setDashboardTab] = useState<"panel" | "duzenle" | "dersler" | "bloglar" | "faq" | "mesajlar" | "canli" | "degerlendirme" | "gorevler" | "sorular" | "sorucozum" | "denemenet" | "konutakip" | "liderlik" | "yanlissorular">("panel");
   const [chatRooms, setChatRooms] = useState<any[]>([]);
   const [activeRoomId, setActiveRoomId] = useState<number | null>(null);
   const [activeRoomMessages, setActiveRoomMessages] = useState<any[]>([]);
@@ -2778,6 +3028,11 @@ export default function ProfilPage() {
               </div>
             )}
 
+            {/* ─── YANLIŞ SORU DEFTERİM ─── */}
+            {dashboardTab === "yanlissorular" && studentProfile && (
+              <StudentWrongQuestionsTab studentId={studentProfile.id} />
+            )}
+
             {/* ─── DENEME NET TAKİBİ ─── */}
             {dashboardTab === "denemenet" && studentProfile && (
               <StudentTrialTab studentId={studentProfile.id} />
@@ -2791,6 +3046,11 @@ export default function ProfilPage() {
             {/* ─── LİDERLİK TABLOSU & ROZETLER ─── */}
             {dashboardTab === "liderlik" && studentProfile && (
               <StudentLeaderboardTab currentStudentId={studentProfile.id} />
+            )}
+
+            {/* ─── ÖĞRETMEN KATKI ROZETLERİ ─── */}
+            {dashboardTab === "gorevler" && teacherProfile && (
+              <TeacherRewardsTab teacherId={teacherProfile.id} />
             )}
 
             {/* ─── MESAJLAR ─── */}
