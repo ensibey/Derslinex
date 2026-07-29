@@ -9,6 +9,8 @@ import { StatCardSkeleton, SessionCardSkeleton, QuestionCardSkeleton } from "@/c
 import { PomodoroTimer } from "@/components/PomodoroTimer";
 import { OsymCalculator } from "@/components/OsymCalculator";
 import { VirtualStudyRooms } from "@/components/VirtualStudyRooms";
+import { ScratchpadModal } from "@/components/ScratchpadModal";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 // ─── Yardımcı: Geri Sayım ─────────────────────────────────────────────────────
 function useCountdown(targetDate: string | Date | null) {
@@ -279,6 +281,7 @@ function StudentQuizTab({ studentId }: { studentId?: number }) {
   // Submitted evaluation result from server
   const [evalResult, setEvalResult] = useState<any>(null);
   const [showSolutions, setShowSolutions] = useState<Record<number, boolean>>({});
+  const [scratchpadText, setScratchpadText] = useState<string | null>(null);
 
   const fetchQuestions = useCallback(async () => {
     setLoading(true);
@@ -603,6 +606,13 @@ function StudentQuizTab({ studentId }: { studentId?: number }) {
                         <span className="bg-indigo-600 text-white font-black text-xs px-3 py-1 rounded-xl">
                           Soru #{idx + 1}
                         </span>
+                        <button
+                          type="button"
+                          onClick={() => setScratchpadText(q.questionText)}
+                          className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 font-black text-xs px-2.5 py-0.5 rounded-full transition flex items-center gap-1"
+                        >
+                          ✏️ İşlem Karala
+                        </button>
                         <span className="text-xs font-bold bg-blue-500/20 text-blue-300 px-2.5 py-0.5 rounded-full">
                           📚 {q.subject} ({q.examType})
                         </span>
@@ -718,6 +728,13 @@ function StudentQuizTab({ studentId }: { studentId?: number }) {
                     {submitting ? "Değerlendiriliyor..." : "🚀 Testi Bitir & Sunucuda Netini Hesapla"}
                   </button>
                 </div>
+              )}
+
+              {scratchpadText && (
+                <ScratchpadModal
+                  questionText={scratchpadText}
+                  onClose={() => setScratchpadText(null)}
+                />
               )}
             </div>
           )}
@@ -3301,6 +3318,7 @@ export default function ProfilPage() {
             >
               👥 Sanal Kütüphane
             </button>
+            <ThemeToggle />
 
             {message && (
               <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold ${ message.type === "success" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-red-500/20 text-red-400 border border-red-500/30" }`}>

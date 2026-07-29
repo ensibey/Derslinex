@@ -5,6 +5,7 @@ import TeacherCard from "@/components/TeacherCard";
 import { waLink } from "@/lib/utils";
 import React, { Suspense } from "react";
 import Link from "next/link";
+import { SessionCardSkeleton } from "@/components/SkeletonLoaders";
 
 function OgretmenlerContent() {
   const searchParams = useSearchParams();
@@ -13,6 +14,7 @@ function OgretmenlerContent() {
   const yks = searchParams.get("yks") || undefined;
 
   const [allOgretmenler, setAllOgretmenler] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     // Load static and dynamic teachers
@@ -47,6 +49,8 @@ function OgretmenlerContent() {
         }
       } catch (err) {
         console.error("Dinamik öğretmenler yüklenemedi:", err);
+      } finally {
+        setLoading(false);
       }
       setAllOgretmenler(list);
     };
@@ -149,7 +153,13 @@ function OgretmenlerContent() {
         </p>
 
         {/* Grid */}
-        {filtrelenmis.length > 0 ? (
+        {loading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((n) => (
+              <SessionCardSkeleton key={n} />
+            ))}
+          </div>
+        ) : filtrelenmis.length > 0 ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtrelenmis.map((h) => <TeacherCard key={h.id} hoca={h} />)}
           </div>

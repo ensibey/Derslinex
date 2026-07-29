@@ -516,7 +516,16 @@ export default function LiveSessionPage() {
   const [showFeedback, setShowFeedback] = useState(false);
   const [showWhiteboard, setShowWhiteboard] = useState(false);
   const [showResources, setShowResources] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
+  const [notesText, setNotesText] = useState("");
   const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  useEffect(() => {
+    if (sessionId) {
+      const saved = localStorage.getItem(`derslinex_notes_${sessionId}`);
+      if (saved) setNotesText(saved);
+    }
+  }, [sessionId]);
 
   const joinSession = useCallback(async () => {
     const rawUser  = localStorage.getItem("derslinex_user")  || sessionStorage.getItem("derslinex_user");
@@ -633,6 +642,14 @@ export default function LiveSessionPage() {
           {status === "live" && (
             <>
               <button
+                onClick={() => setShowNotes(!showNotes)}
+                className={`font-black text-xs px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow-lg ${
+                  showNotes ? "bg-amber-500 text-white" : "bg-amber-600/20 hover:bg-amber-600/40 text-amber-300 border border-amber-500/30"
+                }`}
+              >
+                📝 Ders Notlarım
+              </button>
+              <button
                 onClick={() => setShowResources(true)}
                 className="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-emerald-900/50"
               >
@@ -664,17 +681,65 @@ export default function LiveSessionPage() {
         </div>
       </div>
 
-      {/* Jitsi Meet / Video Odası iframe */}
-      {status === "live" && roomUrl && (
-        <iframe
-          ref={iframeRef}
-          src={roomUrl}
-          className="flex-1 w-full border-0"
-          allow="camera; microphone; fullscreen; speaker; display-capture; autoplay; clipboard-write"
-          allowFullScreen
-          title="Canlı Ders Odası"
-        />
-      )}
+      {/* Main Video & Side Notes Split Layout */}
+      <div className="flex-1 flex overflow-hidden relative">
+        {status === "live" && roomUrl && (
+          <iframe
+            ref={iframeRef}
+            src={roomUrl}
+            className="flex-1 w-full border-0 h-full"
+            allow="camera; microphone; fullscreen; speaker; display-capture; autoplay; clipboard-write"
+            allowFullScreen
+            title="Canlı Ders Odası"
+          />
+        )}
+
+        {/* Collapsible Live Study Notes Side Drawer */}
+        {showNotes && (
+          <div className="w-80 md:w-96 bg-[#0F1F3D] border-l border-white/10 flex flex-col h-full shadow-2xl z-20">
+            <div className="p-4 border-b border-white/10 flex items-center justify-between bg-[#0A1628]">
+              <h3 className="font-black text-white text-sm flex items-center gap-2">
+                <span>📝</span> Canlı Ders Notlarım
+              </h3>
+              <button onClick={() => setShowNotes(false)} className="text-slate-400 hover:text-white text-xs font-bold">
+                ✕
+              </button>
+            </div>
+
+            <div className="flex-1 p-4 flex flex-col gap-3 overflow-hidden">
+              <span className="text-[10px] text-slate-400 font-bold">
+                * Aldığınız notlar otomatik olarak cihazınıza kaydedilir.
+              </span>
+
+              <textarea
+                value={notesText}
+                onChange={(e) => {
+                  setNotesText(e.target.value);
+                  localStorage.setItem(`derslinex_notes_${sessionId}`, e.target.value);
+                }}
+                placeholder="Ders esnasında aldığınız önemli notlar, formüller ve ödevler..."
+                className="flex-1 bg-[#0A1628] border border-white/10 rounded-xl p-3 text-xs font-semibold text-white focus:outline-none focus:border-amber-500 leading-relaxed resize-none"
+              />
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    const blob = new Blob([notesText], { type: "text/plain;charset=utf-8" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `ders_notlari_${sessionId}.txt`;
+                    a.click();
+                  }}
+                  className="flex-1 bg-amber-600 hover:bg-amber-500 text-white font-black py-2 rounded-xl text-xs transition flex items-center justify-center gap-1"
+                >
+                  💾 Notları İndir (.txt)
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Dijital Beyaz Tahta Modalı */}
       {showWhiteboard && <WhiteboardModal onClose={() => setShowWhiteboard(false)} />}
