@@ -83,9 +83,9 @@ function SessionCardDark({ session, role }: { session: any; role: "student" | "t
   const endMs = startMs + (session.durationMinutes || 60) * 60_000;
   const nowMs = Date.now();
   const fifteenMinsBefore = startMs - 15 * 60_000;
-  const isEnded = session.status === "ENDED" || nowMs > endMs;
+  const isEnded = session.status === "ENDED" || (session.status !== "LIVE" && nowMs > endMs);
   const isLive = session.status === "LIVE";
-  const canJoin = !isEnded && (isLive || role === "teacher" || nowMs >= fifteenMinsBefore);
+  const canJoin = session.status === "LIVE" || (!isEnded && (role === "teacher" || nowMs >= fifteenMinsBefore));
 
   return (
     <div className="bg-white/5 border border-white/10 rounded-xl p-3 hover:bg-white/10 transition">
@@ -136,9 +136,9 @@ function SessionCard({ session, role }: { session: any; role: "student" | "teach
   const endMs = startMs + (session.durationMinutes || 60) * 60_000;
   const nowMs = Date.now();
   const fifteenMinsBefore = startMs - 15 * 60_000;
-  const isEnded = session.status === "ENDED" || nowMs > endMs;
+  const isEnded = session.status === "ENDED" || (session.status !== "LIVE" && nowMs > endMs);
   const isLive = session.status === "LIVE";
-  const canJoin = !isEnded && (isLive || role === "teacher" || nowMs >= fifteenMinsBefore);
+  const canJoin = session.status === "LIVE" || (!isEnded && (role === "teacher" || nowMs >= fifteenMinsBefore));
 
   return (
     <div className="bg-[#1E293B] border border-white/10 rounded-2xl p-5">
