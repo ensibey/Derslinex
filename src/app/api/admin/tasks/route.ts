@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { verifyAdminAuth } from "@/lib/adminAuth";
 
 // GET /api/admin/tasks
 export async function GET(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(request.url);
     const teacherId = searchParams.get("teacherId");
@@ -30,6 +34,9 @@ export async function GET(request: Request) {
 
 // POST /api/admin/tasks - Assign new task to teacher
 export async function POST(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { teacherId, title, description, points } = body;
@@ -57,6 +64,9 @@ export async function POST(request: Request) {
 
 // PUT /api/admin/tasks - Approve/Reject task and award points
 export async function PUT(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { taskId, status } = body; // status: "COMPLETED" | "REJECTED" | "PENDING"
@@ -101,6 +111,9 @@ export async function PUT(request: Request) {
 
 // DELETE /api/admin/tasks
 export async function DELETE(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(request.url);
     const idStr = searchParams.get("id");

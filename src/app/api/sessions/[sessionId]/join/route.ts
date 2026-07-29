@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getDailyMeetingToken } from "@/lib/daily";
+import { getAuthUser } from "@/lib/auth-middleware";
 
 /**
  * POST /api/sessions/[sessionId]/join
@@ -12,13 +13,32 @@ export async function POST(
   { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
+    const authUser = await getAuthUser(request);
     const { sessionId: rawId } = await params;
     const sessionId = parseInt(rawId);
     const body = await request.json();
-    const { userId, role, userName }: { userId: number; role: "student" | "teacher"; userName: string } = body;
+    const { userId: bodyUserId, role: bodyRole, userName }: { userId: number; role: "student" | "teacher"; userName: string } = body;
 
-    if (!userId || !role) {
-      return NextResponse.json({ success: false, error: "Eksik parametreler" }, { status: 400 });
+    if (!authUser) {
+      return NextResponse.json({ success: false, error: "Derse katılmak için oturum açmanız gerekmektedir." }, { status: 401 });
+    }
+
+    const userId = authUser.id;
+    const role = authUser.role;
+
+    // Verify user in DB and check ban status
+    if (role === "student") {
+      const dbStudent = await prisma.student.findUnique({ where: { id: userId } });
+      if (!dbStudent || dbStudent.isBanned) {
+        return NextResponse.json({ success: false, error: "Öğrenci hesabı bulunamadı veya erişime engellendi." }, { status: 403 });
+      }
+    } else if (role === "teacher") {
+      const dbTeacher = await prisma.teacher.findUnique({ where: { id: userId } });
+      if (!dbTeacher || dbTeacher.isBanned) {
+        return NextResponse.json({ success: false, error: "Öğretmen hesabı bulunamadı veya erişime engellendi." }, { status: 403 });
+      }
+    } else {
+      return NextResponse.json({ success: false, error: "Geçersiz rol" }, { status: 400 });
     }
 
     const session = await prisma.liveSession.findUnique({

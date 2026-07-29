@@ -330,6 +330,175 @@ function WhiteboardModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+// ─── Ders Materyalleri Modalı ────────────────────────────────────────────────
+interface ResourceItem {
+  id: number;
+  title: string;
+  fileUrl: string;
+  createdAt: string;
+}
+
+function ResourcesModal({
+  sessionId,
+  isOwner,
+  onClose,
+}: {
+  sessionId: string;
+  isOwner: boolean;
+  onClose: () => void;
+}) {
+  const [resources, setResources] = useState<ResourceItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [title, setTitle] = useState("");
+  const [fileUrl, setFileUrl] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [msg, setMsg] = useState("");
+
+  const fetchResources = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/sessions/${sessionId}/resources`);
+      const data = await res.json();
+      if (data.success) {
+        setResources(data.resources || []);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setLoading(false);
+    }
+  }, [sessionId]);
+
+  useEffect(() => {
+    fetchResources();
+  }, [fetchResources]);
+
+  const handleAdd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim() || !fileUrl.trim()) return;
+    setSubmitting(true);
+    setMsg("");
+    try {
+      const res = await fetch(`/api/sessions/${sessionId}/resources`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: title.trim(), fileUrl: fileUrl.trim() }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setMsg("✅ Materyal eklendi!");
+        setTitle("");
+        setFileUrl("");
+        fetchResources();
+      } else {
+        setMsg(data.error || "Ekleme başarısız.");
+      }
+    } catch {
+      setMsg("Bağlantı hatası.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm("Bu materyali silmek istediğinize emin misiniz?")) return;
+    try {
+      const res = await fetch(`/api/sessions/${sessionId}/resources?resourceId=${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchResources();
+      }
+    } catch {
+      // ignore
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="bg-[#0F1F3D] border border-white/10 text-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[85vh]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#162A52]">
+          <h3 className="text-lg font-black flex items-center gap-2">
+            <span>📁</span> Ders Materyalleri & Kaynaklar
+          </h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-white font-bold text-lg">✕</button>
+        </div>
+
+        <div className="p-6 overflow-y-auto space-y-6 flex-1">
+          {isOwner && (
+            <form onSubmit={handleAdd} className="bg-white/5 border border-white/10 p-4 rounded-2xl space-y-3">
+              <h4 className="text-xs font-black text-emerald-400 uppercase tracking-wider">Yeni Materyal / PDF Ekle</h4>
+              {msg && <p className="text-xs font-bold text-indigo-300">{msg}</p>}
+              <input
+                type="text"
+                placeholder="Materyal Başlığı (örn: Üslü Sayılar Ödev PDF)"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-indigo-400"
+              />
+              <input
+                type="url"
+                placeholder="Dosya Bağlantısı (URL / Google Drive / PDF linki)"
+                value={fileUrl}
+                onChange={(e) => setFileUrl(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-indigo-400"
+              />
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs py-2.5 rounded-xl transition disabled:opacity-50"
+              >
+                {submitting ? "Yükleniyor..." : "➕ Materyali Derse Ekle"}
+              </button>
+            </form>
+          )}
+
+          <div>
+            <h4 className="text-xs font-black text-gray-400 uppercase tracking-wider mb-3">Mevcut Materyaller ({resources.length})</h4>
+            {loading ? (
+              <p className="text-xs text-gray-400">Yükleniyor...</p>
+            ) : resources.length === 0 ? (
+              <div className="text-center py-8 bg-white/5 rounded-2xl border border-white/5">
+                <p className="text-3xl mb-2">📄</p>
+                <p className="text-xs text-gray-400">Henüz bu ders için eklenmiş bir materyal bulunmuyor.</p>
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                {resources.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between bg-white/5 hover:bg-white/10 border border-white/10 p-3.5 rounded-2xl transition">
+                    <div className="min-w-0 flex-1 pr-3">
+                      <p className="font-bold text-xs text-white truncate">{item.title}</p>
+                      <p className="text-[10px] text-gray-400 mt-0.5">{new Date(item.createdAt).toLocaleDateString("tr-TR")}</p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <a
+                        href={item.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs px-3 py-1.5 rounded-xl transition flex items-center gap-1"
+                      >
+                        <span>📥</span> İndir
+                      </a>
+                      {isOwner && (
+                        <button
+                          onClick={() => handleDelete(item.id)}
+                          className="bg-red-500/20 hover:bg-red-500/30 text-red-300 text-xs font-bold px-2.5 py-1.5 rounded-xl transition"
+                        >
+                          🗑
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Ana Canlı Ders Sayfası ───────────────────────────────────────────────────
 
 export default function LiveSessionPage() {
@@ -346,6 +515,7 @@ export default function LiveSessionPage() {
   const [students, setStudents] = useState<Student[]>([]);
   const [showFeedback, setShowFeedback] = useState(false);
   const [showWhiteboard, setShowWhiteboard] = useState(false);
+  const [showResources, setShowResources] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const joinSession = useCallback(async () => {
@@ -461,12 +631,20 @@ export default function LiveSessionPage() {
         </div>
         <div className="flex items-center gap-3">
           {status === "live" && (
-            <button
-              onClick={() => setShowWhiteboard(true)}
-              className="bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-indigo-900/50"
-            >
-              🎨 Dijital Beyaz Tahta
-            </button>
+            <>
+              <button
+                onClick={() => setShowResources(true)}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-emerald-900/50"
+              >
+                📁 Ders Materyalleri
+              </button>
+              <button
+                onClick={() => setShowWhiteboard(true)}
+                className="bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-indigo-900/50"
+              >
+                🎨 Dijital Beyaz Tahta
+              </button>
+            </>
           )}
 
           {isOwner && status === "live" && (
@@ -500,6 +678,9 @@ export default function LiveSessionPage() {
 
       {/* Dijital Beyaz Tahta Modalı */}
       {showWhiteboard && <WhiteboardModal onClose={() => setShowWhiteboard(false)} />}
+
+      {/* Ders Materyalleri Modalı */}
+      {showResources && <ResourcesModal sessionId={sessionId} isOwner={isOwner} onClose={() => setShowResources(false)} />}
 
       {/* Ders bitti - direkt profile yönlendir */}
       {status === "ended" && !showFeedback && (

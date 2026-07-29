@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getAuthUser } from "@/lib/auth-middleware";
 
 // Helper function to generate safe slug
 function slugify(text: string) {
@@ -38,6 +39,7 @@ export async function GET(request: Request) {
 // POST: Publish a new blog post
 export async function POST(request: Request) {
   try {
+    const user = await getAuthUser(request);
     const body = await request.json();
     const { authorId, authorName, title, content, category } = body;
 
@@ -45,9 +47,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Gerekli alanlar eksik" }, { status: 400 });
     }
 
+    const targetAuthorId = parseInt(authorId);
+    if (user && user.role === "teacher" && user.id !== targetAuthorId && process.env.NODE_ENV === "production") {
+      return NextResponse.json({ success: false, error: "Başkası adına blog yazamazsınız." }, { status: 403 });
+    }
+
     // Verify teacher is approved
     const teacher = await prisma.teacher.findUnique({
-      where: { id: parseInt(authorId) },
+      where: { id: targetAuthorId },
     });
 
     if (!teacher) {
@@ -75,7 +82,7 @@ export async function POST(request: Request) {
         slug,
         content,
         category,
-        authorId: parseInt(authorId),
+        authorId: targetAuthorId,
         authorName,
       },
     });
@@ -98,6 +105,16 @@ export async function DELETE(request: Request) {
     }
 
     const id = parseInt(idStr);
+
+    const post = await prisma.blogPost.findUnique({ where: { id } });
+    if (!post) {
+      return NextResponse.json({ success: false, error: "Blog yazısı bulunamadı." }, { status: 404 });
+    }
+
+    const user = await getAuthUser(request);
+    if (user && user.role === "teacher" && user.id !== post.authorId && process.env.NODE_ENV === "production") {
+      return NextResponse.json({ success: false, error: "Bu yazıyı silme yetkiniz yok." }, { status: 403 });
+    }
 
     await prisma.blogPost.delete({
       where: { id },

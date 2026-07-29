@@ -1,10 +1,17 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 // POST /api/auth/reset-password
 export async function POST(request: Request) {
   try {
+    const ip = getClientIp(request);
+    const rateLimit = checkRateLimit(`reset-pw-${ip}`, 5, 60_000);
+    if (!rateLimit.success) {
+      return NextResponse.json({ success: false, error: "Çok fazla işlem denemesi yaptınız. Lütfen bekleyin." }, { status: 429 });
+    }
+
     const { token, newPassword } = await request.json();
 
     if (!token || !newPassword) {

@@ -19,6 +19,30 @@ export async function GET(request: Request) {
 
     const { id: userId, role } = user;
 
+    // Auto-update session statuses based on current time
+    const now = new Date();
+    const allSessions = await prisma.liveSession.findMany({
+      where: { status: { in: ["SCHEDULED", "LIVE"] } },
+    });
+
+    for (const sess of allSessions) {
+      const start = new Date(sess.startTime).getTime();
+      const end = start + (sess.durationMinutes || 60) * 60_000;
+      const nowMs = now.getTime();
+
+      if (nowMs >= end && sess.status !== "ENDED") {
+        await prisma.liveSession.update({
+          where: { id: sess.id },
+          data: { status: "ENDED" },
+        });
+      } else if (nowMs >= start - 15 * 60_000 && nowMs < end && sess.status === "SCHEDULED") {
+        await prisma.liveSession.update({
+          where: { id: sess.id },
+          data: { status: "LIVE" },
+        });
+      }
+    }
+
     if (role === "teacher") {
       const sessions = await prisma.liveSession.findMany({
         where: { teacherId: userId },

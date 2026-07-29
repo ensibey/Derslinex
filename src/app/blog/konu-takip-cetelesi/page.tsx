@@ -8,27 +8,50 @@ export default function KonuTakipPage() {
   const [selectedDersIdx, setSelectedDersIdx] = useState(0);
   const [completedList, setCompletedList] = useState<{ [key: string]: boolean }>({});
 
-  // Tarayıcı yerel depolamasından (localStorage) işaretli konuları yükle
+  // Tarayıcı yerel depolamasından veya API'den işaretli konuları yükle
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("derslinex_konu_cetelesi");
-      if (saved) {
-        setCompletedList(JSON.parse(saved));
+    const fetchDBTopics = async () => {
+      try {
+        const res = await fetch("/api/student/topics");
+        const data = await res.json();
+        if (data.success && data.progress && data.progress.length > 0) {
+          const map: { [key: string]: boolean } = {};
+          data.progress.forEach((p: any) => {
+            if (p.isCompleted) {
+              map[`${p.subject}-${p.topic}`] = true;
+            }
+          });
+          setCompletedList(map);
+          return;
+        }
+      } catch (e) {
+        console.error("DB topics fetch error:", e);
       }
-    } catch (e) {
-      console.error("Local storage load error:", e);
-    }
+
+      try {
+        const saved = localStorage.getItem("derslinex_konu_cetelesi");
+        if (saved) {
+          setCompletedList(JSON.parse(saved));
+        }
+      } catch (e) {
+        console.error("Local storage load error:", e);
+      }
+    };
+
+    fetchDBTopics();
   }, []);
 
   const currentDers = konuTakipVerisi[selectedDersIdx];
 
-  // İşaretleme durumunu değiştir ve localStorage'a kaydet
-  const handleToggle = (konu: string) => {
+  // İşaretleme durumunu değiştir ve localStorage + DB'ye kaydet
+  const handleToggle = async (konu: string) => {
     const key = `${currentDers.id}-${konu}`;
+    const nextState = !completedList[key];
+
     setCompletedList((prev) => {
       const updated = {
         ...prev,
-        [key]: !prev[key]
+        [key]: nextState
       };
       try {
         localStorage.setItem("derslinex_konu_cetelesi", JSON.stringify(updated));
@@ -37,6 +60,20 @@ export default function KonuTakipPage() {
       }
       return updated;
     });
+
+    try {
+      await fetch("/api/student/topics", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject: currentDers.id,
+          topic: konu,
+          isCompleted: nextState,
+        }),
+      });
+    } catch (e) {
+      console.warn("API topic toggle warning:", e);
+    }
   };
 
   // Tamamlanma oranını hesapla

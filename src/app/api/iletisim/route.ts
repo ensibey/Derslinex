@@ -1,8 +1,16 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 // Yasal Gereklilikler ve Bot Korumalı İletişim Formu API Uç Noktası
 export async function POST(request: Request) {
   try {
+    const ip = getClientIp(request);
+    const rateLimit = checkRateLimit(`contact-form-${ip}`, 5, 60_000);
+    if (!rateLimit.success) {
+      return NextResponse.json({ success: false, error: "Çok fazla iletişim mesajı gönderdiniz. Lütfen bekleyin." }, { status: 429 });
+    }
+
     const body = await request.json();
     const { name, email, phone, message, honey } = body;
 
@@ -22,15 +30,18 @@ export async function POST(request: Request) {
       );
     }
 
-    // Gerçek e-posta veya veri tabanı entegrasyonu için geliştirme günlüğü simülasyonu
-    console.log(" Yeni Derslinex İletişim Formu Talebi Alındı!");
-    console.log(`İsim: ${name}`);
-    console.log(`E-posta: ${email}`);
-    console.log(`Telefon: ${phone || "Belirtilmemiş"}`);
-    console.log(`Mesaj: ${message}`);
+    // Save message to database
+    await prisma.contactMessage.create({
+      data: {
+        name,
+        email,
+        phone: phone || null,
+        message,
+        status: "UNREAD",
+      },
+    });
 
-    // [Resend / Nodemailer Entegrasyon Noktası]
-    // Gelecekte e-posta bildirimlerini aktif etmek için buraya Resend SDK'sı bağlanacaktır.
+    console.log("✅ İletişim Formu Veritabanına Kaydedildi:", { name, email });
 
     return NextResponse.json({
       success: true,

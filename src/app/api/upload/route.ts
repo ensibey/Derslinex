@@ -2,10 +2,26 @@ import { NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import crypto from "crypto";
+import { getAuthUser } from "@/lib/auth-middleware";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+
+const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".pdf"];
+const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
 
 // POST /api/upload
 export async function POST(request: Request) {
   try {
+    const user = await getAuthUser(request);
+    if (!user) {
+      return NextResponse.json({ success: false, error: "Yetkisiz erişim. Oturum açmanız gerekmektedir." }, { status: 401 });
+    }
+
+    const ip = getClientIp(request);
+    const rateLimit = checkRateLimit(`upload-${user.id}-${ip}`, 10, 60_000);
+    if (!rateLimit.success) {
+      return NextResponse.json({ success: false, error: "Çok fazla dosya yükleme isteği gönderdiniz. Lütfen bekleyin." }, { status: 429 });
+    }
+
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
 
@@ -18,13 +34,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Dosya boyutu maksimum 10MB olabilir." }, { status: 400 });
     }
 
+    const rawExt = path.extname(file.name).toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(rawExt)) {
+      return NextResponse.json(
+        { success: false, error: `Geçersiz dosya uzantısı. İzin verilenler: ${ALLOWED_EXTENSIONS.join(", ")}` },
+        { status: 400 }
+      );
+    }
+
+    if (file.type && !ALLOWED_MIME_TYPES.includes(file.type)) {
+      return NextResponse.json(
+        { success: false, error: "Geçersiz dosya türü. Yalnızca görsel veya PDF yüklenebilir." },
+        { status: 400 }
+      );
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
     // Create unique filename
-    const ext = path.extname(file.name) || ".png";
-    const filename = `${Date.now()}-${crypto.randomBytes(4).toString("hex")}${ext}`;
-
+    const filename = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}${rawExt}`;
     const uploadsDir = path.join(process.cwd(), "public", "uploads");
 
     try {

@@ -1,6 +1,13 @@
 import crypto from "crypto";
 
-const JWT_SECRET = process.env.JWT_SECRET || "derslinex_super_secret_jwt_key_2026_safe";
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    return "derslinex_default_jwt_secret_key_2026_safe";
+  }
+  return secret;
+}
+
 
 function base64url(str: string) {
   return Buffer.from(str)
@@ -19,7 +26,7 @@ export async function signToken(payload: { id: number; email: string; role: "stu
   const encodedPayload = base64url(JSON.stringify(fullPayload));
 
   const signature = crypto
-    .createHmac("sha256", JWT_SECRET)
+    .createHmac("sha256", getJwtSecret())
     .update(`${encodedHeader}.${encodedPayload}`)
     .digest("base64")
     .replace(/=/g, "")
@@ -35,7 +42,7 @@ export async function verifyToken(token: string) {
     if (!headerB64 || !payloadB64 || !signatureB64) return null;
 
     const expectedSignature = crypto
-      .createHmac("sha256", JWT_SECRET)
+      .createHmac("sha256", getJwtSecret())
       .update(`${headerB64}.${payloadB64}`)
       .digest("base64")
       .replace(/=/g, "")

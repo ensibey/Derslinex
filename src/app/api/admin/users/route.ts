@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { verifyAdminAuth } from "@/lib/adminAuth";
 
 // POST: Ban/unban user
 export async function POST(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { id, role, action } = body;
@@ -37,6 +41,9 @@ export async function POST(request: Request) {
 
 // DELETE: Delete user completely
 export async function DELETE(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(request.url);
     const idStr = searchParams.get("id");
@@ -49,18 +56,36 @@ export async function DELETE(request: Request) {
     const userId = parseInt(idStr);
 
     if (role === "student") {
-      // Cascade delete student reviews/feedbacks (optional, let's keep database integrity)
-      await prisma.feedback.deleteMany({
-        where: { studentEmail: { not: null } }, // Or delete based on matching logic, but to prevent crash we can just delete student model.
-      });
-      await prisma.student.delete({
-        where: { id: userId },
-      });
+      const student = await prisma.student.findUnique({ where: { id: userId } });
+      if (student) {
+        if (student.email) {
+          await prisma.feedback.deleteMany({ where: { studentEmail: student.email } }).catch(() => {});
+        }
+        await prisma.sessionParticipant.deleteMany({ where: { studentId: userId } }).catch(() => {});
+        await prisma.sessionFeedback.deleteMany({ where: { studentId: userId } }).catch(() => {});
+        await prisma.studentQuestionAttempt.deleteMany({ where: { studentId: userId } }).catch(() => {});
+        await prisma.studentQuizResult.deleteMany({ where: { studentId: userId } }).catch(() => {});
+        await prisma.studentTrialResult.deleteMany({ where: { studentId: userId } }).catch(() => {});
+        await prisma.studentTopicProgress.deleteMany({ where: { studentId: userId } }).catch(() => {});
+        await prisma.chatRoom.deleteMany({ where: { studentId: userId } }).catch(() => {});
+        await prisma.chatMessage.deleteMany({ where: { senderRole: "student", senderId: userId } }).catch(() => {});
+        
+        await prisma.student.delete({
+          where: { id: userId },
+        });
+      }
     } else if (role === "teacher") {
-      // Delete lessons and blogs and feedback for this teacher
-      await prisma.lessonOffer.deleteMany({ where: { teacherId: userId } });
-      await prisma.blogPost.deleteMany({ where: { authorId: userId } });
-      await prisma.feedback.deleteMany({ where: { teacherId: userId } });
+      await prisma.lessonOffer.deleteMany({ where: { teacherId: userId } }).catch(() => {});
+      await prisma.blogPost.deleteMany({ where: { authorId: userId } }).catch(() => {});
+      await prisma.feedback.deleteMany({ where: { teacherId: userId } }).catch(() => {});
+      await prisma.teacherTask.deleteMany({ where: { teacherId: userId } }).catch(() => {});
+      await prisma.question.deleteMany({ where: { teacherId: userId } }).catch(() => {});
+      await prisma.teacherFAQ.deleteMany({ where: { teacherId: userId } }).catch(() => {});
+      await prisma.sessionFeedback.deleteMany({ where: { teacherId: userId } }).catch(() => {});
+      await prisma.liveSession.deleteMany({ where: { teacherId: userId } }).catch(() => {});
+      await prisma.chatRoom.deleteMany({ where: { teacherId: userId } }).catch(() => {});
+      await prisma.chatMessage.deleteMany({ where: { senderRole: "teacher", senderId: userId } }).catch(() => {});
+
       await prisma.teacher.delete({
         where: { id: userId },
       });

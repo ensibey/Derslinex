@@ -3,6 +3,15 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 
+const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_SECRET || "derslinex_admin_secret_2026";
+
+function adminFetch(url: string, options: RequestInit = {}) {
+  const headers = new Headers(options.headers || {});
+  headers.set("x-admin-key", ADMIN_SECRET);
+  return fetch(url, { ...options, headers });
+}
+
+
 interface Student {
   id: number;
   name: string;
@@ -95,7 +104,7 @@ function BrandLogoHeader({ subBadge = "ADMIN PANELİ" }: { subBadge?: string }) 
 }
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<"teachers" | "students" | "lessons" | "blogs" | "feedbacks" | "sessions" | "tasks" | "questions">("teachers");
+  const [activeTab, setActiveTab] = useState<"teachers" | "students" | "lessons" | "blogs" | "feedbacks" | "sessions" | "tasks" | "questions" | "contact">("teachers");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
@@ -105,6 +114,7 @@ export default function AdminPage() {
   const [liveSessions, setLiveSessions] = useState<any[]>([]);
   const [adminTasks, setAdminTasks] = useState<any[]>([]);
   const [questionsList, setQuestionsList] = useState<any[]>([]);
+  const [contactMessages, setContactMessages] = useState<any[]>([]);
   const [editingQuestionId, setEditingQuestionId] = useState<number | null>(null);
   const [editQuestionForm, setEditQuestionForm] = useState<any>({});
 
@@ -136,15 +146,16 @@ export default function AdminPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [tRes, sRes, fRes, lRes, bRes, sessRes, taskRes, qRes] = await Promise.all([
+      const [tRes, sRes, fRes, lRes, bRes, sessRes, taskRes, qRes, cRes] = await Promise.all([
         fetch("/api/profil/ogretmen"),
         fetch("/api/profil/ogrenci"),
         fetch("/api/gorus"),
-        fetch("/api/admin/lessons"),
-        fetch("/api/admin/blogs"),
-        fetch("/api/admin/sessions"),
-        fetch("/api/admin/tasks"),
-        fetch("/api/admin/questions"),
+        adminFetch("/api/admin/lessons"),
+        adminFetch("/api/admin/blogs"),
+        adminFetch("/api/admin/sessions"),
+        adminFetch("/api/admin/tasks"),
+        adminFetch("/api/admin/questions"),
+        adminFetch("/api/admin/contact"),
       ]);
 
       const tData = await tRes.json();
@@ -155,6 +166,7 @@ export default function AdminPage() {
       const sessData = await sessRes.json();
       const taskData = await taskRes.json();
       const qData = await qRes.json();
+      const cData = await cRes.json();
 
       if (tData.success) setTeachers(tData.teachers || []);
       if (sData.success) setStudents(sData.students || []);
@@ -164,6 +176,7 @@ export default function AdminPage() {
       if (sessData.success) setLiveSessions(sessData.sessions || []);
       if (taskData.success) setAdminTasks(taskData.tasks || []);
       if (qData.success) setQuestionsList(qData.questions || []);
+      if (cData.success) setContactMessages(cData.messages || []);
     } catch (e) {
       console.error("Data fetch error", e);
     } finally {
@@ -183,7 +196,7 @@ export default function AdminPage() {
   const handleUpdateStatus = async (id: number, type: "teacher" | "student", currentStatus: string) => {
     try {
       const nextStatus = currentStatus === "İletişime Geçildi" ? "Beklemede" : "İletişime Geçildi";
-      const res = await fetch("/api/admin/users", {
+      const res = await adminFetch("/api/admin/users", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, type, action: "status", value: nextStatus }),
@@ -202,7 +215,7 @@ export default function AdminPage() {
 
   const handleBanToggle = async (id: number, type: "teacher" | "student", isBanned: boolean) => {
     try {
-      const res = await fetch("/api/admin/users", {
+      const res = await adminFetch("/api/admin/users", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, type, action: "ban", value: !isBanned }),
@@ -222,7 +235,7 @@ export default function AdminPage() {
   const handleDeleteUser = async (id: number, type: "teacher" | "student") => {
     if (!confirm("Bu kullanıcıyı silmek istediğinize emin misiniz? Bu işlem geri alınamaz!")) return;
     try {
-      const res = await fetch(`/api/admin/users?id=${id}&type=${type}`, { method: "DELETE" });
+      const res = await adminFetch(`/api/admin/users?id=${id}&role=${type}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success) {
         showMsg("Kullanıcı silindi.", "success");
@@ -238,7 +251,7 @@ export default function AdminPage() {
   const handleDeleteLesson = async (id: number) => {
     if (!confirm("Bu ders ilanını silmek istediğinize emin misiniz?")) return;
     try {
-      const res = await fetch(`/api/admin/lessons?id=${id}`, { method: "DELETE" });
+      const res = await adminFetch(`/api/admin/lessons?id=${id}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success) {
         showMsg("Ders ilanı silindi.", "success");
@@ -254,7 +267,7 @@ export default function AdminPage() {
   const handleDeleteBlog = async (id: number) => {
     if (!confirm("Bu blog makalesini silmek istediğinize emin misiniz?")) return;
     try {
-      const res = await fetch(`/api/admin/blogs?id=${id}`, { method: "DELETE" });
+      const res = await adminFetch(`/api/admin/blogs?id=${id}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success) {
         showMsg("Blog makalesi silindi.", "success");
@@ -318,6 +331,7 @@ export default function AdminPage() {
           {[
             { key: "teachers", label: "Öğretmenler", count: teachers.length, icon: "👨‍🏫" },
             { key: "students", label: "Öğrenciler", count: students.length, icon: "🎓" },
+            { key: "contact", label: "İletişim Mesajları", count: contactMessages.length, icon: "📬" },
             { key: "questions", label: "Soru Havuzu", count: questionsList.length, icon: "📝" },
             { key: "tasks", label: "Görev & Puan", count: adminTasks.length, icon: "🏆" },
             { key: "lessons", label: "Özel Dersler", count: lessons.length, icon: "📚" },
@@ -373,6 +387,26 @@ export default function AdminPage() {
               </div>
             )}
             <button
+              onClick={async () => {
+                if (!confirm("Örnek öğretmen verilerini veritabanına aktarmak istediğinizden emin misiniz?")) return;
+                try {
+                  const res = await adminFetch("/api/admin/seed", { method: "POST" });
+                  const data = await res.json();
+                  if (data.success) {
+                    showMsg(`✅ ${data.message || "Örnek veriler başarıyla yüklendi!"}`, "success");
+                    fetchData();
+                  } else {
+                    showMsg(data.error || "Seed hatası", "error");
+                  }
+                } catch {
+                  showMsg("Bağlantı hatası", "error");
+                }
+              }}
+              className="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 font-bold px-3 py-1.5 rounded-xl transition text-xs flex items-center gap-1.5"
+            >
+              <span>🌱</span> Örnek Veri Yükle
+            </button>
+            <button
               onClick={fetchData}
               disabled={loading}
               className="bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 font-bold px-3.5 py-1.5 rounded-xl transition text-xs flex items-center gap-1.5"
@@ -384,22 +418,23 @@ export default function AdminPage() {
 
         <main className="flex-1 p-4 md:p-6 overflow-y-auto space-y-6">
           {/* Glassmorphism Stat Cards Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 gap-2.5">
             {[
               { label: "Öğretmen", val: teachers.length, icon: "👨‍🏫", color: "from-blue-500/20 to-indigo-500/20 border-blue-500/30" },
               { label: "Öğrenci", val: students.length, icon: "🎓", color: "from-purple-500/20 to-pink-500/20 border-purple-500/30" },
+              { label: "Mesajlar", val: contactMessages.length, icon: "📬", color: "from-emerald-500/20 to-teal-500/20 border-emerald-500/30" },
               { label: "Soru Havuzu", val: questionsList.length, icon: "📝", color: "from-amber-500/20 to-orange-500/20 border-amber-500/30" },
-              { label: "Görevler", val: adminTasks.length, icon: "🏆", color: "from-emerald-500/20 to-teal-500/20 border-emerald-500/30" },
+              { label: "Görevler", val: adminTasks.length, icon: "🏆", color: "from-yellow-500/20 to-amber-500/20 border-yellow-500/30" },
               { label: "İlanlar", val: lessons.length, icon: "📚", color: "from-cyan-500/20 to-blue-500/20 border-cyan-500/30" },
               { label: "Bloglar", val: blogs.length, icon: "✍️", color: "from-rose-500/20 to-red-500/20 border-rose-500/30" },
               { label: "Canlı Ders", val: liveSessions.length, icon: "🎥", color: "from-indigo-500/20 to-violet-500/20 border-indigo-500/30" },
               { label: "Görüşler", val: feedbacks.length, icon: "💬", color: "from-sky-500/20 to-indigo-500/20 border-sky-500/30" },
             ].map((s) => (
-              <div key={s.label} className={`bg-gradient-to-br ${s.color} border rounded-2xl p-3 backdrop-blur-md hover:scale-105 transition-transform duration-200`}>
+              <div key={s.label} className={`bg-gradient-to-br ${s.color} border rounded-2xl p-2.5 backdrop-blur-md hover:scale-105 transition-transform duration-200`}>
                 <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider block">{s.label}</span>
-                <span className="text-lg font-black text-white mt-1 flex items-center justify-between">
+                <span className="text-base font-black text-white mt-1 flex items-center justify-between">
                   <span>{s.val}</span>
-                  <span className="text-sm opacity-80">{s.icon}</span>
+                  <span className="text-xs opacity-80">{s.icon}</span>
                 </span>
               </div>
             ))}
@@ -674,7 +709,7 @@ export default function AdminPage() {
                             </div>
                             <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
                               <button type="button" onClick={() => setEditingQuestionId(null)} className="bg-white/5 hover:bg-white/10 text-slate-300 font-bold text-xs px-4 py-2 rounded-xl transition">Vazgeç</button>
-                              <button type="button" onClick={async () => { try { const res = await fetch("/api/admin/questions", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ questionId: q.id, ...editQuestionForm }) }); const data = await res.json(); if (data.success) { showMsg("✅ Soru detayları ve sınıflandırması güncellendi!", "success"); setEditingQuestionId(null); fetchData(); } else { showMsg(data.error || "Güncellenemedi", "error"); } } catch { showMsg("Bağlantı hatası", "error"); } }} className="bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs px-5 py-2 rounded-xl transition">💾 Kaydet & Güncelle</button>
+                              <button type="button" onClick={async () => { try { const res = await adminFetch("/api/admin/questions", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ questionId: q.id, ...editQuestionForm }) }); const data = await res.json(); if (data.success) { showMsg("✅ Soru detayları ve sınıflandırması güncellendi!", "success"); setEditingQuestionId(null); fetchData(); } else { showMsg(data.error || "Güncellenemedi", "error"); } } catch { showMsg("Bağlantı hatası", "error"); } }} className="bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs px-5 py-2 rounded-xl transition">💾 Kaydet & Güncelle</button>
                             </div>
                           </div>
                         ) : (
@@ -721,16 +756,16 @@ export default function AdminPage() {
                             ✏️ Düzenle
                           </button>
                           {q.status !== "APPROVED" && (
-                            <button onClick={async () => { try { const res = await fetch("/api/admin/questions", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ questionId: q.id, status: "APPROVED" }) }); const data = await res.json(); if (data.success) { showMsg(`✅ Soru onaylandı ve öğretmene +${q.points} puan tanımlandı!`, "success"); fetchData(); } else { showMsg(data.error || "İşlem başarısız", "error"); } } catch { showMsg("Bağlantı hatası", "error"); } }} className="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs px-4 py-2 rounded-xl transition">
+                            <button onClick={async () => { try { const res = await adminFetch("/api/admin/questions", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ questionId: q.id, status: "APPROVED" }) }); const data = await res.json(); if (data.success) { showMsg(`✅ Soru onaylandı ve öğretmene +${q.points} puan tanımlandı!`, "success"); fetchData(); } else { showMsg(data.error || "İşlem başarısız", "error"); } } catch { showMsg("Bağlantı hatası", "error"); } }} className="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs px-4 py-2 rounded-xl transition">
                               ✅ Soruyu Onayla & +{q.points} Puan Ver
                             </button>
                           )}
                           {q.status === "PENDING_APPROVAL" && (
-                            <button onClick={async () => { const reason = prompt("Lütfen red sebebini yazın:", "Soruda hatalı şık veya metin bulunmaktadır."); if (reason === null) return; try { const res = await fetch("/api/admin/questions", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ questionId: q.id, status: "REJECTED", rejectionReason: reason }) }); const data = await res.json(); if (data.success) { showMsg("Soru reddedildi.", "error"); fetchData(); } } catch { showMsg("Bağlantı hatası", "error"); } }} className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold text-xs px-3.5 py-2 rounded-xl transition">
+                            <button onClick={async () => { const reason = prompt("Lütfen red sebebini yazın:", "Soruda hatalı şık veya metin bulunmaktadır."); if (reason === null) return; try { const res = await adminFetch("/api/admin/questions", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ questionId: q.id, status: "REJECTED", rejectionReason: reason }) }); const data = await res.json(); if (data.success) { showMsg("Soru reddedildi.", "error"); fetchData(); } } catch { showMsg("Bağlantı hatası", "error"); } }} className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold text-xs px-3.5 py-2 rounded-xl transition">
                               ❌ Reddet
                             </button>
                           )}
-                          <button onClick={async () => { if (!confirm("Bu soruyu silmek istediğinize emin misiniz?")) return; try { const res = await fetch(`/api/admin/questions?id=${q.id}`, { method: "DELETE" }); const data = await res.json(); if (data.success) { showMsg("Soru silindi.", "success"); fetchData(); } } catch { showMsg("Bağlantı hatası", "error"); } }} className="text-xs text-red-400 hover:text-red-300 font-bold px-2 py-1">
+                          <button onClick={async () => { if (!confirm("Bu soruyu silmek istediğinize emin misiniz?")) return; try { const res = await adminFetch(`/api/admin/questions?id=${q.id}`, { method: "DELETE" }); const data = await res.json(); if (data.success) { showMsg("Soru silindi.", "success"); fetchData(); } } catch { showMsg("Bağlantı hatası", "error"); } }} className="text-xs text-red-400 hover:text-red-300 font-bold px-2 py-1">
                             🗑️ Sil
                           </button>
                         </div>
@@ -772,7 +807,7 @@ export default function AdminPage() {
                       <input type="text" placeholder="Görev detayları..." value={taskForm.description} onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })} className="w-full bg-[#1E293B] border border-white/10 text-white px-4 py-2.5 rounded-xl text-xs font-bold focus:outline-none placeholder:text-slate-600" />
                     </div>
                   </div>
-                  <button onClick={async () => { if (!taskForm.teacherId || !taskForm.title) { showMsg("Lütfen öğretmen ve görev başlığını giriniz.", "error"); return; } setTaskCreating(true); try { const res = await fetch("/api/admin/tasks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(taskForm) }); const data = await res.json(); if (data.success) { showMsg("🏆 Görev başarıyla öğretmene atandı!", "success"); setTaskForm({ teacherId: "", title: "", description: "", points: 50 }); fetchData(); } else { showMsg(data.error || "Görev atanamadı", "error"); } } catch { showMsg("Bağlantı hatası", "error"); } finally { setTaskCreating(false); } }} disabled={taskCreating} className="mt-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black py-2.5 px-6 rounded-xl text-xs transition disabled:opacity-60">
+                  <button onClick={async () => { if (!taskForm.teacherId || !taskForm.title) { showMsg("Lütfen öğretmen ve görev başlığını giriniz.", "error"); return; } setTaskCreating(true); try { const res = await adminFetch("/api/admin/tasks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(taskForm) }); const data = await res.json(); if (data.success) { showMsg("🏆 Görev başarıyla öğretmene atandı!", "success"); setTaskForm({ teacherId: "", title: "", description: "", points: 50 }); fetchData(); } else { showMsg(data.error || "Görev atanamadı", "error"); } } catch { showMsg("Bağlantı hatası", "error"); } finally { setTaskCreating(false); } }} disabled={taskCreating} className="mt-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black py-2.5 px-6 rounded-xl text-xs transition disabled:opacity-60">
                     {taskCreating ? "Atanıyor..." : "➕ Görevi Atayarak Gönder"}
                   </button>
                 </div>
@@ -802,16 +837,16 @@ export default function AdminPage() {
                           </div>
                           <div className="flex items-center gap-2">
                             {task.status !== "COMPLETED" && (
-                              <button onClick={async () => { try { const res = await fetch("/api/admin/tasks", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ taskId: task.id, status: "COMPLETED" }) }); const data = await res.json(); if (data.success) { showMsg(`✅ Görev onaylandı ve öğretmene +${task.points} puan verildi!`, "success"); fetchData(); } else { showMsg(data.error || "İşlem başarısız", "error"); } } catch { showMsg("Bağlantı hatası", "error"); } }} className="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs px-3.5 py-2 rounded-xl transition shadow-xs">
+                              <button onClick={async () => { try { const res = await adminFetch("/api/admin/tasks", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ taskId: task.id, status: "COMPLETED" }) }); const data = await res.json(); if (data.success) { showMsg(`✅ Görev onaylandı ve öğretmene +${task.points} puan verildi!`, "success"); fetchData(); } else { showMsg(data.error || "İşlem başarısız", "error"); } } catch { showMsg("Bağlantı hatası", "error"); } }} className="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs px-3.5 py-2 rounded-xl transition shadow-xs">
                                 ✅ Onayla & Puan Ver
                               </button>
                             )}
                             {task.status === "SUBMITTED" && (
-                              <button onClick={async () => { try { const res = await fetch("/api/admin/tasks", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ taskId: task.id, status: "REJECTED" }) }); const data = await res.json(); if (data.success) { showMsg("Görev reddedildi.", "error"); fetchData(); } } catch { showMsg("Bağlantı hatası", "error"); } }} className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-bold px-3 py-2 rounded-xl transition">
+                              <button onClick={async () => { try { const res = await adminFetch("/api/admin/tasks", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ taskId: task.id, status: "REJECTED" }) }); const data = await res.json(); if (data.success) { showMsg("Görev reddedildi.", "error"); fetchData(); } } catch { showMsg("Bağlantı hatası", "error"); } }} className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-bold px-3 py-2 rounded-xl transition">
                                 ❌ Reddet
                               </button>
                             )}
-                            <button onClick={async () => { if (!confirm("Bu görevi silmek istediğinize emin misiniz?")) return; try { const res = await fetch(`/api/admin/tasks?id=${task.id}`, { method: "DELETE" }); const data = await res.json(); if (data.success) { showMsg("Görev silindi.", "success"); fetchData(); } } catch { showMsg("Bağlantı hatası", "error"); } }} className="text-xs text-red-400 hover:text-red-300 font-bold px-2 py-1">
+                            <button onClick={async () => { if (!confirm("Bu görevi silmek istediğinize emin misiniz?")) return; try { const res = await adminFetch(`/api/admin/tasks?id=${task.id}`, { method: "DELETE" }); const data = await res.json(); if (data.success) { showMsg("Görev silindi.", "success"); fetchData(); } } catch { showMsg("Bağlantı hatası", "error"); } }} className="text-xs text-red-400 hover:text-red-300 font-bold px-2 py-1">
                               🗑️ Sil
                             </button>
                           </div>
@@ -1013,7 +1048,7 @@ export default function AdminPage() {
                       }
                       setSessionCreating(true);
                       try {
-                        const res = await fetch("/api/admin/sessions", {
+                        const res = await adminFetch("/api/admin/sessions", {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
                           body: JSON.stringify({
@@ -1075,7 +1110,7 @@ export default function AdminPage() {
                                 onClick={async () => {
                                   if (!confirm(`"${s.title}" dersini iptal etmek istediğinize emin misiniz? Katılımcılara iptal maili gönderilecektir.`)) return;
                                   try {
-                                    const res = await fetch(`/api/admin/sessions?id=${s.id}`, { method: "DELETE" });
+                                    const res = await adminFetch(`/api/admin/sessions?id=${s.id}`, { method: "DELETE" });
                                     const data = await res.json();
                                     if (data.success) {
                                       showMsg("🚫 Canlı ders iptal edildi ve mailler gönderildi.", "success");
@@ -1105,6 +1140,75 @@ export default function AdminPage() {
                     </div>
                   )}
                 </div>
+              </div>
+            )}
+
+            {/* CONTACT MESSAGES TAB */}
+            {activeTab === "contact" && (
+              <div className="p-6">
+                {contactMessages.length === 0 ? (
+                  <p className="text-center py-12 text-slate-500 font-semibold">
+                    Henüz iletişim formundan gönderilmiş bir mesaj bulunmamaktadır.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {contactMessages.map((m) => (
+                      <div key={m.id} className="p-5 bg-[#0D1B35] border border-white/10 rounded-2xl shadow-xl space-y-3">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <span className="font-black text-sm text-white block">{m.name}</span>
+                            <span className="text-xs text-indigo-400 font-semibold">{m.email} {m.phone ? `• ${m.phone}` : ""}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={`text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider ${
+                              m.status === "UNREAD" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                            }`}>
+                              {m.status === "UNREAD" ? "Okunmadı" : "Okundu / Yanıtlandı"}
+                            </span>
+                            <button
+                              onClick={async () => {
+                                const nextStatus = m.status === "UNREAD" ? "READ" : "UNREAD";
+                                const res = await adminFetch("/api/admin/contact", {
+                                  method: "PATCH",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({ id: m.id, status: nextStatus }),
+                                });
+                                const data = await res.json();
+                                if (data.success) {
+                                  showMsg("Mesaj durumu güncellendi.", "success");
+                                  fetchData();
+                                }
+                              }}
+                              className="text-xs text-indigo-400 hover:text-indigo-300 font-bold px-2 py-1 bg-white/5 rounded-lg"
+                            >
+                              {m.status === "UNREAD" ? "Okundu İşaretle" : "Okunmadı Yap"}
+                            </button>
+                            <button
+                              onClick={async () => {
+                                if (!confirm("Bu mesajı silmek istediğinize emin misiniz?")) return;
+                                const res = await adminFetch(`/api/admin/contact?id=${m.id}`, { method: "DELETE" });
+                                const data = await res.json();
+                                if (data.success) {
+                                  showMsg("Mesaj silindi.", "success");
+                                  fetchData();
+                                }
+                              }}
+                              className="text-xs text-red-400 hover:text-red-300 font-bold px-2 py-1"
+                            >
+                              Sil
+                            </button>
+                          </div>
+                        </div>
+                        <p className="text-slate-200 text-xs font-semibold leading-relaxed p-3 bg-[#1E293B] rounded-xl border border-white/5 whitespace-pre-wrap">
+                          {m.message}
+                        </p>
+                        <div className="text-[10px] text-slate-500 font-bold text-right">
+                          Tarih: {new Date(m.createdAt).toLocaleString("tr-TR")}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 

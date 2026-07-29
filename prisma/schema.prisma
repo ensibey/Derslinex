@@ -19,6 +19,8 @@ model Student {
   createdAt    DateTime             @default(now())
   sessions     SessionParticipant[]
   feedbacks    SessionFeedback[]    @relation("StudentFeedback")
+  quizResults  StudentQuizResult[]
+  attempts     StudentQuestionAttempt[]
 }
 
 model Teacher {
@@ -77,6 +79,7 @@ model Question {
   status           String   @default("PENDING_APPROVAL") // PENDING_APPROVAL, APPROVED, REJECTED
   rejectionReason  String?
   createdAt        DateTime @default(now())
+  attempts         StudentQuestionAttempt[]
 
   @@index([subject, topic, difficulty])
   @@index([status])
@@ -222,4 +225,76 @@ model SessionFeedback {
 
   @@unique([sessionId, studentId])
 }
+
+model StudentQuizResult {
+  id             Int                      @id @default(autoincrement())
+  studentId      Int
+  student        Student                  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  examType       String                   @default("TYT")
+  subject        String
+  totalQuestions Int
+  correctCount   Int
+  wrongCount     Int
+  emptyCount     Int
+  netScore       Float
+  totalPoints    Int
+  createdAt      DateTime                 @default(now())
+  attempts       StudentQuestionAttempt[]
+
+  @@index([studentId])
+}
+
+model StudentQuestionAttempt {
+  id             Int               @id @default(autoincrement())
+  quizResultId   Int
+  quizResult     StudentQuizResult @relation(fields: [quizResultId], references: [id], onDelete: Cascade)
+  studentId      Int
+  student        Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  questionId     Int
+  question       Question          @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedOption String
+  isCorrect      Boolean
+  createdAt      DateTime          @default(now())
+
+  @@index([studentId, questionId])
+}
+
+model ContactMessage {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String
+  status    String   @default("UNREAD") // UNREAD, READ, REPLIED
+  createdAt DateTime @default(now())
+}
+
+model StudentTrialResult {
+  id           Int      @id @default(autoincrement())
+  studentId    Int
+  title        String
+  examType     String   @default("TYT")
+  turkceNet    Float    @default(0)
+  sosyalNet    Float    @default(0)
+  matematikNet Float    @default(0)
+  fenNet       Float    @default(0)
+  toplamNet    Float    @default(0)
+  date         DateTime @default(now())
+
+  @@index([studentId])
+}
+
+model StudentTopicProgress {
+  id          Int      @id @default(autoincrement())
+  studentId   Int
+  subject     String
+  topic       String
+  isCompleted Boolean  @default(false)
+  updatedAt   DateTime @updatedAt
+
+  @@unique([studentId, subject, topic])
+  @@index([studentId])
+}
+
 

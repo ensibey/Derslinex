@@ -2,9 +2,13 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { hocalar } from "@/data/hocalar";
 import { hashPassword } from "@/lib/auth";
+import { verifyAdminAuth } from "@/lib/adminAuth";
 
 // POST /api/admin/seed
-export async function POST() {
+export async function POST(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
   try {
     let seededCount = 0;
     const defaultPassword = hashPassword("derslinex123");

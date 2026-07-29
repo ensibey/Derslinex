@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { verifyAdminAuth } from "@/lib/adminAuth";
 
 // GET /api/admin/questions
 export async function GET(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
@@ -27,6 +31,9 @@ export async function GET(request: Request) {
 
 // PUT /api/admin/questions - Approve or Reject question
 export async function PUT(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { questionId, status, rejectionReason } = body;
@@ -74,6 +81,9 @@ export async function PUT(request: Request) {
 
 // PATCH /api/admin/questions - Edit question details (subject, topic, difficulty, options, text, etc.)
 export async function PATCH(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const {
@@ -125,6 +135,9 @@ export async function PATCH(request: Request) {
 
 // DELETE /api/admin/questions
 export async function DELETE(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(request.url);
     const idStr = searchParams.get("id");

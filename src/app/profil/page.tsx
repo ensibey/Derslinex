@@ -249,9 +249,13 @@ function StudentSessionsTab({ userId }: { userId: number }) {
   );
 }
 
-function StudentQuizTab() {
+function StudentQuizTab({ studentId }: { studentId?: number }) {
   const [questions, setQuestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [activeView, setActiveView] = useState<"quiz" | "history">("quiz");
+  const [pastResults, setPastResults] = useState<any[]>([]);
+
   const [filters, setFilters] = useState({
     subject: "tumu",
     examType: "tumu",
@@ -259,7 +263,11 @@ function StudentQuizTab() {
     topic: "",
   });
 
-  const [userAnswers, setUserAnswers] = useState<Record<number, { selectedOption: string; isCorrect: boolean; showSolution: boolean }>>({});
+  // Local selected options: { [questionId]: selectedOption }
+  const [selectedOptions, setSelectedOptions] = useState<Record<number, string>>({});
+  // Submitted evaluation result from server
+  const [evalResult, setEvalResult] = useState<any>(null);
+  const [showSolutions, setShowSolutions] = useState<Record<number, boolean>>({});
 
   const fetchQuestions = useCallback(async () => {
     setLoading(true);
@@ -282,255 +290,426 @@ function StudentQuizTab() {
     }
   }, [filters]);
 
+  const fetchPastResults = useCallback(async () => {
+    if (!studentId) return;
+    try {
+      const res = await fetch(`/api/student/questions/submit?studentId=${studentId}`);
+      const data = await res.json();
+      if (data.success) {
+        setPastResults(data.quizResults || []);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, [studentId]);
+
   useEffect(() => {
     fetchQuestions();
   }, [fetchQuestions]);
 
-  const handleSelectOption = (questionId: number, opt: string, correctOpt: string) => {
-    const isCorrect = opt === correctOpt;
-    setUserAnswers((prev) => ({
+  useEffect(() => {
+    if (activeView === "history") {
+      fetchPastResults();
+    }
+  }, [activeView, fetchPastResults]);
+
+  const handleSelectOption = (questionId: number, opt: string) => {
+    if (evalResult) return; // Prevent changing after submission
+    setSelectedOptions((prev) => ({
       ...prev,
-      [questionId]: {
-        selectedOption: opt,
-        isCorrect,
-        showSolution: prev[questionId]?.showSolution || false,
-      },
+      [questionId]: prev[questionId] === opt ? "" : opt,
     }));
   };
 
-  const toggleSolution = (questionId: number) => {
-    setUserAnswers((prev) => ({
-      ...prev,
-      [questionId]: {
-        ...prev[questionId],
-        selectedOption: prev[questionId]?.selectedOption || "",
-        isCorrect: prev[questionId]?.isCorrect || false,
-        showSolution: !prev[questionId]?.showSolution,
-      },
-    }));
+  const handleSubmitQuiz = async () => {
+    if (!studentId) {
+      alert("Lütfen önce giriş yapın.");
+      return;
+    }
+    if (questions.length === 0) return;
+
+    setSubmitting(true);
+    try {
+      const payloadAnswers = questions.map((q) => ({
+        questionId: q.id,
+        selectedOption: selectedOptions[q.id] || "",
+      }));
+
+      const res = await fetch("/api/student/questions/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          studentId,
+          examType: filters.examType !== "tumu" ? filters.examType : "TYT",
+          subject: filters.subject !== "tumu" ? filters.subject : "Genel",
+          answers: payloadAnswers,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setEvalResult(data.result);
+      } else {
+        alert(data.error || "Değerlendirme sırasında bir hata oluştu.");
+      }
+    } catch (e) {
+      console.error("Submit error", e);
+      alert("Sunucuya bağlanılamadı.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const answeredCount = Object.keys(userAnswers).length;
-  const correctCount = Object.values(userAnswers).filter((a) => a.isCorrect).length;
+  const resetQuiz = () => {
+    setSelectedOptions({});
+    setEvalResult(null);
+    setShowSolutions({});
+    fetchQuestions();
+  };
+
+  const answeredCount = Object.values(selectedOptions).filter((v) => v !== "").length;
 
   return (
     <div className="space-y-6">
-      {/* Header & Stats */}
+      {/* Header & Mode Switcher */}
       <div className="bg-[#1E293B] border border-white/5 rounded-2xl p-6 flex flex-wrap items-center justify-between gap-4 shadow-xl">
         <div>
           <h3 className="text-lg font-black text-white flex items-center gap-2">
-            <span>📝</span> Soru Bankası & İnteraktif Test Çözümü
+            <span>📝</span> Soru Bankası & Sunucu Korumalı Net Takibi
           </h3>
           <p className="text-xs text-slate-400 font-semibold mt-1">
-            Öğretmenler tarafından onaylanan ÖSYM tipi soruları çözün, kendinizi test edin ve çözümleri inceleyin.
+            ÖSYM standartlarında hazırlanan soruları çözün, cevaplarınızı sunucuda doğrulatın ve net durumunuzu kaydedin.
           </p>
         </div>
 
-        {answeredCount > 0 && (
-          <div className="flex items-center gap-3 bg-[#0D1B35] border border-white/10 px-4 py-2 rounded-xl">
-            <div className="text-center">
-              <span className="text-[10px] text-slate-400 font-bold uppercase block">Çözülen</span>
-              <span className="text-sm font-black text-white">{answeredCount}</span>
-            </div>
-            <div className="w-px h-6 bg-white/10" />
-            <div className="text-center">
-              <span className="text-[10px] text-emerald-400 font-bold uppercase block">Doğru</span>
-              <span className="text-sm font-black text-emerald-400">{correctCount}</span>
-            </div>
-            <div className="w-px h-6 bg-white/10" />
-            <div className="text-center">
-              <span className="text-[10px] text-indigo-400 font-bold uppercase block">Başarı Oranı</span>
-              <span className="text-sm font-black text-indigo-400">%{Math.round((correctCount / answeredCount) * 100)}</span>
-            </div>
-          </div>
-        )}
+        <div className="flex items-center gap-2 bg-[#0D1B35] p-1 rounded-xl border border-white/10">
+          <button
+            onClick={() => setActiveView("quiz")}
+            className={`px-4 py-2 rounded-lg text-xs font-black transition ${
+              activeView === "quiz" ? "bg-indigo-600 text-white shadow-md" : "text-slate-400 hover:text-white"
+            }`}
+          >
+            ✏️ Soru Çöz
+          </button>
+          <button
+            onClick={() => setActiveView("history")}
+            className={`px-4 py-2 rounded-lg text-xs font-black transition ${
+              activeView === "history" ? "bg-indigo-600 text-white shadow-md" : "text-slate-400 hover:text-white"
+            }`}
+          >
+            📊 Geçmiş Net Takibim ({pastResults.length})
+          </button>
+        </div>
       </div>
 
-      {/* Filter Bar */}
-      <div className="bg-[#1E293B] rounded-2xl border border-white/5 p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-black text-indigo-400 uppercase tracking-wider">🎯 Konu & Zorluk Filtreleri</span>
-          {(filters.subject !== "tumu" || filters.examType !== "tumu" || filters.difficulty !== "tumu" || filters.topic) && (
-            <button
-              onClick={() => setFilters({ subject: "tumu", examType: "tumu", difficulty: "tumu", topic: "" })}
-              className="text-[11px] font-bold text-amber-400 hover:underline"
-            >
-              🔄 Filtreleri Temizle
-            </button>
+      {activeView === "history" ? (
+        /* History View */
+        <div className="space-y-4">
+          <h4 className="text-sm font-black text-white flex items-center gap-2">
+            <span>📊</span> Tamamlanan Testler ve Net Skorlarınız
+          </h4>
+
+          {pastResults.length === 0 ? (
+            <div className="bg-[#1E293B] border border-white/5 rounded-2xl p-12 text-center text-slate-400">
+              <span className="text-4xl block mb-3">📈</span>
+              <p className="font-bold text-sm text-white">Henüz kaydedilmiş test sonucunuz bulunmuyor.</p>
+              <p className="text-xs text-slate-400 mt-1">Soru bankasından test çözerek netlerinizi takip edebilirsiniz.</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-4">
+              {pastResults.map((r: any) => (
+                <div key={r.id} className="bg-[#1E293B] border border-white/5 rounded-2xl p-5 space-y-3 hover:border-indigo-500/30 transition">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-xl">
+                      📚 {r.subject} ({r.examType})
+                    </span>
+                    <span className="text-[11px] font-bold text-slate-400">
+                      📅 {new Date(r.createdAt).toLocaleString("tr-TR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-4 gap-2 bg-[#0D1B35] p-3 rounded-xl border border-white/5 text-center">
+                    <div>
+                      <span className="text-[10px] text-slate-400 font-bold block">NET</span>
+                      <span className="text-base font-black text-amber-400">{r.netScore}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-emerald-400 font-bold block">Doğru</span>
+                      <span className="text-base font-black text-emerald-400">{r.correctCount}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-red-400 font-bold block">Yanlış</span>
+                      <span className="text-base font-black text-red-400">{r.wrongCount}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 font-bold block">Boş</span>
+                      <span className="text-base font-black text-slate-300">{r.emptyCount}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <select
-            value={filters.subject}
-            onChange={(e) => setFilters({ ...filters, subject: e.target.value })}
-            className="bg-[#0D1B35] border border-white/10 text-white text-xs font-bold px-3 py-2 rounded-xl focus:outline-none"
-          >
-            <option value="tumu">Tüm Dersler</option>
-            <option value="Matematik">Matematik</option>
-            <option value="Fizik">Fizik</option>
-            <option value="Kimya">Kimya</option>
-            <option value="Biyoloji">Biyoloji</option>
-            <option value="Türkçe">Türkçe</option>
-            <option value="Tarih">Tarih</option>
-            <option value="Coğrafya">Coğrafya</option>
-            <option value="Felsefe">Felsefe</option>
-            <option value="İngilizce">İngilizce</option>
-          </select>
-
-          <select
-            value={filters.examType}
-            onChange={(e) => setFilters({ ...filters, examType: e.target.value })}
-            className="bg-[#0D1B35] border border-white/10 text-white text-xs font-bold px-3 py-2 rounded-xl focus:outline-none"
-          >
-            <option value="tumu">Tüm Sınav Türleri</option>
-            <option value="TYT">TYT</option>
-            <option value="AYT Sayısal">AYT Sayısal</option>
-            <option value="AYT EA">AYT EA</option>
-            <option value="AYT Sözel">AYT Sözel</option>
-            <option value="LGS">LGS</option>
-          </select>
-
-          <select
-            value={filters.difficulty}
-            onChange={(e) => setFilters({ ...filters, difficulty: e.target.value })}
-            className="bg-[#0D1B35] border border-white/10 text-white text-xs font-bold px-3 py-2 rounded-xl focus:outline-none"
-          >
-            <option value="tumu">Tüm Zorluklar</option>
-            <option value="Kolay">Kolay</option>
-            <option value="Orta">Orta</option>
-            <option value="Zor">Zor</option>
-            <option value="ÖSYM Tipi">ÖSYM Tipi</option>
-          </select>
-
-          <input
-            type="text"
-            placeholder="Konu Adında Ara..."
-            value={filters.topic}
-            onChange={(e) => setFilters({ ...filters, topic: e.target.value })}
-            className="bg-[#0D1B35] border border-white/10 text-white text-xs font-semibold px-3 py-2 rounded-xl focus:outline-none placeholder:text-slate-500"
-          />
-        </div>
-      </div>
-
-      {/* Questions List */}
-      {loading ? (
-        <div className="py-12 text-center text-slate-500 font-semibold">Sorular yükleniyor...</div>
-      ) : questions.length === 0 ? (
-        <div className="bg-[#1E293B] rounded-2xl p-12 text-center text-slate-500 font-semibold border border-white/5">
-          Seçtiğiniz kriterlere uygun onaylanmış soru bulunamadı.
-        </div>
       ) : (
+        /* Quiz Active View */
         <div className="space-y-6">
-          {questions.map((q, idx) => {
-            const answerState = userAnswers[q.id];
-            const hasAnswered = !!answerState?.selectedOption;
-
-            return (
-              <div key={q.id} className="bg-[#1E293B] border border-white/10 rounded-2xl p-6 space-y-4 shadow-xl relative">
-                {/* Badges */}
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-3">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-black text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-0.5 rounded-full">
-                      Soru #{idx + 1}
-                    </span>
-                    <span className="text-xs font-bold bg-blue-500/20 text-blue-300 px-2.5 py-0.5 rounded-full">
-                      📚 {q.subject} ({q.examType})
-                    </span>
-                    {q.topic && (
-                      <span className="text-xs font-semibold bg-white/5 text-slate-300 px-2.5 py-0.5 rounded-full">
-                        🏷️ {q.topic}
-                      </span>
-                    )}
-                    <span className="text-xs font-black bg-purple-500/20 text-purple-300 px-2.5 py-0.5 rounded-full">
-                      ⚡ {q.difficulty}
-                    </span>
-                  </div>
-                  {q.teacher && (
-                    <span className="text-[11px] text-slate-400 font-semibold">
-                      👨‍🏫 Hazırlayan: <strong className="text-white">{q.teacher.name}</strong>
-                    </span>
-                  )}
+          {/* Evaluation Result Header if Submitted */}
+          {evalResult && (
+            <div className="bg-gradient-to-r from-indigo-900/80 via-purple-900/80 to-slate-900 border border-indigo-500/40 rounded-2xl p-6 shadow-2xl space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <span className="text-xs font-black uppercase tracking-widest text-emerald-400 bg-emerald-500/20 px-3 py-1 rounded-full">
+                    ✅ TEST TAMAMLANDI & DEĞERLENDİRİLDİ
+                  </span>
+                  <h4 className="text-2xl font-black text-white mt-2">
+                    Netiniz: <span className="text-amber-400">{evalResult.netScore} NET</span>
+                  </h4>
+                  <p className="text-xs text-slate-300 font-semibold mt-0.5">
+                    Sonuçlarınız veritabanınıza başarıyla kaydedildi.
+                  </p>
                 </div>
 
-                {/* Question Text */}
-                <div className="font-bold text-white text-base leading-relaxed whitespace-pre-wrap bg-[#0D1B35] p-5 rounded-2xl border border-white/5">
-                  {q.questionText}
+                <button
+                  onClick={resetQuiz}
+                  className="bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs px-5 py-2.5 rounded-xl transition shadow-lg"
+                >
+                  🔄 Yeni Teste Başla
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-[#0D1B35]/80 p-4 rounded-xl border border-white/10 text-center">
+                <div>
+                  <span className="text-xs text-emerald-400 font-bold block">Doğru Sayısı</span>
+                  <span className="text-xl font-black text-emerald-400">{evalResult.correctCount}</span>
                 </div>
-
-                {q.imageUrl && (
-                  <div className="max-w-lg my-3">
-                    <img src={q.imageUrl} alt="Soru Görseli" className="rounded-2xl border border-white/10 max-h-72 object-contain" />
-                  </div>
-                )}
-
-                {/* Interactive Options A-E */}
-                <div className="grid sm:grid-cols-2 gap-3 pt-2">
-                  {["A", "B", "C", "D", "E"].map((opt) => {
-                    const optVal = q[`option${opt}`];
-                    if (!optVal && opt !== "A" && opt !== "B") return null;
-
-                    const isSelected = answerState?.selectedOption === opt;
-                    const isCorrectOpt = q.correctOption === opt;
-
-                    let btnStyle = "bg-[#0D1B35] border-white/10 text-slate-300 hover:bg-white/5";
-                    if (hasAnswered) {
-                      if (isCorrectOpt) {
-                        btnStyle = "bg-emerald-500/20 border-emerald-500/50 text-emerald-300 font-black shadow-lg shadow-emerald-900/30";
-                      } else if (isSelected && !isCorrectOpt) {
-                        btnStyle = "bg-red-500/20 border-red-500/50 text-red-300 font-bold";
-                      }
-                    }
-
-                    return (
-                      <button
-                        key={opt}
-                        onClick={() => handleSelectOption(q.id, opt, q.correctOption)}
-                        className={`p-3.5 rounded-xl border text-left flex items-start gap-3 transition-all text-xs ${btnStyle}`}
-                      >
-                        <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-black text-xs flex-shrink-0 ${
-                          hasAnswered && isCorrectOpt ? "bg-emerald-500 text-white" :
-                          hasAnswered && isSelected ? "bg-red-500 text-white" :
-                          "bg-white/10 text-slate-200"
-                        }`}>{opt}</span>
-                        <span className="flex-1 mt-0.5 leading-relaxed">{optVal}</span>
-                        {hasAnswered && isCorrectOpt && <span className="text-emerald-400 font-black">✓ Doğru</span>}
-                        {hasAnswered && isSelected && !isCorrectOpt && <span className="text-red-400 font-bold">✕ Yanlış</span>}
-                      </button>
-                    );
-                  })}
+                <div>
+                  <span className="text-xs text-red-400 font-bold block">Yanlış Sayısı</span>
+                  <span className="text-xl font-black text-red-400">{evalResult.wrongCount}</span>
                 </div>
+                <div>
+                  <span className="text-xs text-slate-400 font-bold block">Boş Bırakılan</span>
+                  <span className="text-xl font-black text-slate-300">{evalResult.emptyCount}</span>
+                </div>
+                <div>
+                  <span className="text-xs text-purple-400 font-bold block">Kazanılan Puan</span>
+                  <span className="text-xl font-black text-purple-300">+{evalResult.totalPoints} AP</span>
+                </div>
+              </div>
+            </div>
+          )}
 
-                {/* Feedback Result & Solution Button */}
-                {hasAnswered && (
-                  <div className="pt-2 border-t border-white/5 flex items-center justify-between flex-wrap gap-3">
-                    <div className="flex items-center gap-2">
-                      <span className={`text-xs font-black px-3 py-1 rounded-xl ${ answerState.isCorrect ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-red-500/20 text-red-400 border border-red-500/30" }`}>
-                        {answerState.isCorrect ? "🎉 Tebrikler! Doğru Cevap" : `❌ Yanlış Cevap. Doğru Şık: ${q.correctOption}`}
-                      </span>
-                    </div>
-
-                    {q.solutionText && (
-                      <button
-                        onClick={() => toggleSolution(q.id)}
-                        className="bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 font-bold text-xs px-4 py-2 rounded-xl transition"
-                      >
-                        {answerState.showSolution ? "💡 Çözümü Gizle" : "💡 Detaylı Çözümü Göster"}
-                      </button>
-                    )}
-                  </div>
-                )}
-
-                {/* Solution Content */}
-                {answerState?.showSolution && q.solutionText && (
-                  <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 text-xs text-amber-300 space-y-1">
-                    <p className="font-black text-amber-400 uppercase tracking-wider">💡 Detaylı Çözüm:</p>
-                    <p className="font-semibold whitespace-pre-wrap leading-relaxed">{q.solutionText}</p>
-                  </div>
+          {/* Filter Bar */}
+          {!evalResult && (
+            <div className="bg-[#1E293B] rounded-2xl border border-white/5 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black text-indigo-400 uppercase tracking-wider">🎯 Konu & Zorluk Filtreleri</span>
+                {(filters.subject !== "tumu" || filters.examType !== "tumu" || filters.difficulty !== "tumu" || filters.topic) && (
+                  <button
+                    onClick={() => setFilters({ subject: "tumu", examType: "tumu", difficulty: "tumu", topic: "" })}
+                    className="text-[11px] font-bold text-amber-400 hover:underline"
+                  >
+                    🔄 Filtreleri Temizle
+                  </button>
                 )}
               </div>
-            );
-          })}
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <select
+                  value={filters.subject}
+                  onChange={(e) => setFilters({ ...filters, subject: e.target.value })}
+                  className="bg-[#0D1B35] border border-white/10 text-white text-xs font-bold px-3 py-2 rounded-xl focus:outline-none"
+                >
+                  <option value="tumu">Tüm Dersler</option>
+                  <option value="Matematik">Matematik</option>
+                  <option value="Fizik">Fizik</option>
+                  <option value="Kimya">Kimya</option>
+                  <option value="Biyoloji">Biyoloji</option>
+                  <option value="Türkçe">Türkçe</option>
+                  <option value="Tarih">Tarih</option>
+                  <option value="Coğrafya">Coğrafya</option>
+                  <option value="Felsefe">Felsefe</option>
+                  <option value="İngilizce">İngilizce</option>
+                </select>
+
+                <select
+                  value={filters.examType}
+                  onChange={(e) => setFilters({ ...filters, examType: e.target.value })}
+                  className="bg-[#0D1B35] border border-white/10 text-white text-xs font-bold px-3 py-2 rounded-xl focus:outline-none"
+                >
+                  <option value="tumu">Tüm Sınav Türleri</option>
+                  <option value="TYT">TYT</option>
+                  <option value="AYT Sayısal">AYT Sayısal</option>
+                  <option value="AYT EA">AYT EA</option>
+                  <option value="AYT Sözel">AYT Sözel</option>
+                  <option value="LGS">LGS</option>
+                </select>
+
+                <select
+                  value={filters.difficulty}
+                  onChange={(e) => setFilters({ ...filters, difficulty: e.target.value })}
+                  className="bg-[#0D1B35] border border-white/10 text-white text-xs font-bold px-3 py-2 rounded-xl focus:outline-none"
+                >
+                  <option value="tumu">Tüm Zorluklar</option>
+                  <option value="Kolay">Kolay</option>
+                  <option value="Orta">Orta</option>
+                  <option value="Zor">Zor</option>
+                  <option value="ÖSYM Tipi">ÖSYM Tipi</option>
+                </select>
+
+                <input
+                  type="text"
+                  placeholder="Konu Ara..."
+                  value={filters.topic}
+                  onChange={(e) => setFilters({ ...filters, topic: e.target.value })}
+                  className="bg-[#0D1B35] border border-white/10 text-white text-xs font-bold px-3 py-2 rounded-xl focus:outline-none placeholder-slate-500"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Question List */}
+          {loading ? (
+            <div className="bg-[#1E293B] rounded-2xl p-12 border border-white/5 text-center text-slate-400 font-bold">
+              Sorular yükleniyor...
+            </div>
+          ) : questions.length === 0 ? (
+            <div className="bg-[#1E293B] rounded-2xl p-12 border border-white/5 text-center text-slate-400 space-y-2">
+              <span className="text-3xl block">🔍</span>
+              <p className="font-bold text-white">Seçilen kriterlere uygun soru bulunamadı.</p>
+              <p className="text-xs">Filtreleri değiştirerek tekrar deneyebilirsiniz.</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {questions.map((q, idx) => {
+                const userSelected = selectedOptions[q.id] || "";
+                const detail = evalResult?.details?.find((d: any) => d.questionId === q.id);
+
+                return (
+                  <div key={q.id} className="bg-[#1E293B] border border-white/5 rounded-2xl p-6 space-y-4 shadow-xl">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="bg-indigo-600 text-white font-black text-xs px-3 py-1 rounded-xl">
+                          Soru #{idx + 1}
+                        </span>
+                        <span className="text-xs font-bold bg-blue-500/20 text-blue-300 px-2.5 py-0.5 rounded-full">
+                          📚 {q.subject} ({q.examType})
+                        </span>
+                        {q.topic && (
+                          <span className="text-xs font-semibold bg-white/5 text-slate-300 px-2.5 py-0.5 rounded-full">
+                            🏷️ {q.topic}
+                          </span>
+                        )}
+                        <span className="text-xs font-black bg-purple-500/20 text-purple-300 px-2.5 py-0.5 rounded-full">
+                          ⚡ {q.difficulty}
+                        </span>
+                      </div>
+                      {q.teacher && (
+                        <span className="text-[11px] text-slate-400 font-semibold">
+                          👨‍🏫 Hazırlayan: <strong className="text-white">{q.teacher.name}</strong>
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="font-bold text-white text-base leading-relaxed whitespace-pre-wrap bg-[#0D1B35] p-5 rounded-2xl border border-white/5">
+                      {q.questionText}
+                    </div>
+
+                    {q.imageUrl && (
+                      <div className="max-w-lg my-3">
+                        <img src={q.imageUrl} alt="Soru Görseli" className="rounded-2xl border border-white/10 max-h-72 object-contain" />
+                      </div>
+                    )}
+
+                    {/* Options A-E */}
+                    <div className="grid sm:grid-cols-2 gap-3 pt-2">
+                      {["A", "B", "C", "D", "E"].map((opt) => {
+                        const optVal = q[`option${opt}`];
+                        if (!optVal || typeof optVal !== "string" || !optVal.trim()) return null;
+
+                        const isChosen = userSelected === opt;
+                        const isCorrectOption = detail?.correctOption === opt;
+
+                        let btnStyle = "bg-[#0D1B35] border-white/10 text-slate-300 hover:bg-white/5";
+
+                        if (evalResult) {
+                          if (isCorrectOption) {
+                            btnStyle = "bg-emerald-500/20 border-emerald-500/50 text-emerald-300 font-black shadow-lg";
+                          } else if (isChosen && !isCorrectOption) {
+                            btnStyle = "bg-red-500/20 border-red-500/50 text-red-300 font-bold";
+                          }
+                        } else if (isChosen) {
+                          btnStyle = "bg-indigo-600/30 border-indigo-500 text-white font-black shadow-md";
+                        }
+
+                        return (
+                          <button
+                            key={opt}
+                            disabled={!!evalResult}
+                            onClick={() => handleSelectOption(q.id, opt)}
+                            className={`p-3.5 rounded-xl border text-left flex items-start gap-3 transition-all text-xs ${btnStyle}`}
+                          >
+                            <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-black text-xs flex-shrink-0 ${
+                              evalResult && isCorrectOption ? "bg-emerald-500 text-white" :
+                              evalResult && isChosen ? "bg-red-500 text-white" :
+                              isChosen ? "bg-indigo-600 text-white" : "bg-white/10 text-slate-200"
+                            }`}>{opt}</span>
+                            <span className="flex-1 mt-0.5 leading-relaxed">{optVal}</span>
+                            {evalResult && isCorrectOption && <span className="text-emerald-400 font-black">✓ Doğru</span>}
+                            {evalResult && isChosen && !isCorrectOption && <span className="text-red-400 font-bold">✕ Yanlış</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Evaluation Details per Question */}
+                    {evalResult && detail && (
+                      <div className="pt-2 border-t border-white/5 flex items-center justify-between flex-wrap gap-3">
+                        <span className={`text-xs font-black px-3 py-1 rounded-xl ${ detail.isCorrect ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-red-500/20 text-red-400 border border-red-500/30" }`}>
+                          {detail.isCorrect ? "🎉 Doğru Yanıt!" : `❌ Yanlış. Doğru Cevap: ${detail.correctOption}`}
+                        </span>
+
+                        {detail.solutionText && (
+                          <button
+                            onClick={() => setShowSolutions((p) => ({ ...p, [q.id]: !p[q.id] }))}
+                            className="bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 font-bold text-xs px-4 py-2 rounded-xl transition"
+                          >
+                            {showSolutions[q.id] ? "💡 Çözümü Gizle" : "💡 Detaylı Çözümü Göster"}
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    {showSolutions[q.id] && detail?.solutionText && (
+                      <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 text-xs text-amber-300 space-y-1">
+                        <p className="font-black text-amber-400 uppercase tracking-wider">💡 Detaylı Çözüm:</p>
+                        <p className="font-semibold whitespace-pre-wrap leading-relaxed">{detail.solutionText}</p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
+              {/* Submit Quiz Floating/Bottom Bar */}
+              {!evalResult && questions.length > 0 && (
+                <div className="bg-[#1E293B] border border-indigo-500/30 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 sticky bottom-4 shadow-2xl z-20">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-slate-300 font-bold">
+                      İşaretlenen: <strong className="text-amber-400">{answeredCount}</strong> / {questions.length} Soru
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={handleSubmitQuiz}
+                    disabled={submitting}
+                    className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm px-6 py-3 rounded-xl transition shadow-lg flex items-center gap-2 disabled:opacity-50"
+                  >
+                    {submitting ? "Değerlendiriliyor..." : "🚀 Testi Bitir & Sunucuda Netini Hesapla"}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -1037,9 +1216,18 @@ export default function ProfilPage() {
                       <div><label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Telefon</label><input type="text" required placeholder="05xx xxx xx xx" value={studentForm.phone} onChange={(e) => setStudentForm({ ...studentForm, phone: e.target.value })} className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none" /></div>
                     </div>
                   )}
-                  <div><label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">E-posta Adresi</label><input type="email" required value={studentForm.email} onChange={(e) => setStudentForm({ ...studentForm, email: e.target.value })} className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none" /></div>
                   <div><label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Şifre</label><input type="password" required value={studentForm.password} onChange={(e) => setStudentForm({ ...studentForm, password: e.target.value })} className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none" /></div>
-                  <div className="flex items-center gap-2 pt-1"><input type="checkbox" id="studentRemember" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 rounded" /><label htmlFor="studentRemember" className="text-xs text-gray-500 font-bold select-none cursor-pointer">Beni Hatırla</label></div>
+                  <div className="flex items-center justify-between pt-1">
+                    <div className="flex items-center gap-2">
+                      <input type="checkbox" id="studentRemember" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 rounded" />
+                      <label htmlFor="studentRemember" className="text-xs text-gray-500 font-bold select-none cursor-pointer">Beni Hatırla</label>
+                    </div>
+                    {authMode === "login" && (
+                      <Link href="/sifremi-unuttum" className="text-xs text-[#B45309] font-black hover:underline">
+                        Şifremi Unuttum?
+                      </Link>
+                    )}
+                  </div>
                   <button type="submit" disabled={loading} className="w-full bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-black py-3.5 rounded-xl text-sm transition-all">{loading ? "İşlem yapılıyor..." : authMode === "login" ? "Giriş Yap" : "Kayıt Ol"}</button>
                 </form>
               ) : (
@@ -1055,7 +1243,17 @@ export default function ProfilPage() {
                   )}
                   <div><label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">E-posta Adresi</label><input type="email" required value={teacherForm.email} onChange={(e) => setTeacherForm({ ...teacherForm, email: e.target.value })} className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none" /></div>
                   <div><label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Şifre</label><input type="password" required value={teacherForm.password} onChange={(e) => setTeacherForm({ ...teacherForm, password: e.target.value })} className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none" /></div>
-                  <div className="flex items-center gap-2 pt-1"><input type="checkbox" id="teacherRemember" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 rounded" /><label htmlFor="teacherRemember" className="text-xs text-gray-500 font-bold select-none cursor-pointer">Beni Hatırla</label></div>
+                  <div className="flex items-center justify-between pt-1">
+                    <div className="flex items-center gap-2">
+                      <input type="checkbox" id="teacherRemember" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 rounded" />
+                      <label htmlFor="teacherRemember" className="text-xs text-gray-500 font-bold select-none cursor-pointer">Beni Hatırla</label>
+                    </div>
+                    {authMode === "login" && (
+                      <Link href="/sifremi-unuttum" className="text-xs text-[#B45309] font-black hover:underline">
+                        Şifremi Unuttum?
+                      </Link>
+                    )}
+                  </div>
                   <button type="submit" disabled={loading} className="w-full bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-black py-3.5 rounded-xl text-sm transition-all">{loading ? "İşlem yapılıyor..." : authMode === "login" ? "Giriş Yap" : "Başvuru Yap & Kaydol"}</button>
                 </form>
               )}
@@ -1952,8 +2150,25 @@ export default function ProfilPage() {
                       <div className="flex-1 w-full space-y-2">
                         <div className="flex items-center gap-2">
                           <label className="cursor-pointer bg-[#1E293B] hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-xl text-xs font-black text-slate-300 transition">
-                            <span>📁 Fotoğraf Seç</span>
-                            <input type="file" accept="image/*" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) { const reader = new FileReader(); reader.onloadend = () => setTeacherEditForm({ ...teacherEditForm, avatar: reader.result as string }); reader.readAsDataURL(file); }}} />
+                            <span>📁 Yükle</span>
+                            <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                try {
+                                  const formData = new FormData();
+                                  formData.append("file", file);
+                                  const res = await fetch("/api/upload", { method: "POST", body: formData });
+                                  const data = await res.json();
+                                  if (data.success && data.url) {
+                                    setTeacherEditForm({ ...teacherEditForm, avatar: data.url });
+                                    return;
+                                  }
+                                } catch {}
+                                const reader = new FileReader();
+                                reader.onloadend = () => setTeacherEditForm({ ...teacherEditForm, avatar: reader.result as string });
+                                reader.readAsDataURL(file);
+                              }
+                            }} />
                           </label>
                           {teacherEditForm.avatar && <button type="button" onClick={() => setTeacherEditForm({ ...teacherEditForm, avatar: "" })} className="text-xs text-red-400 hover:text-red-300 font-bold">Kaldır</button>}
                         </div>
@@ -2400,7 +2615,7 @@ export default function ProfilPage() {
           )}
 
           {/* ─── SORU BANKASI & TEST ÇÖZ ─── */}
-          {dashboardTab === "sorucozum" && <StudentQuizTab />}
+          {dashboardTab === "sorucozum" && <StudentQuizTab studentId={studentProfile?.id} />}
 
           {/* ─── PROFİL DÜZENLE ─── */}
           {dashboardTab === "duzenle" && (
@@ -2416,8 +2631,25 @@ export default function ProfilPage() {
                     <div className="flex-1 w-full space-y-2">
                       <div className="flex items-center gap-2">
                         <label className="cursor-pointer bg-[#1E293B] hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-xl text-xs font-black text-slate-300 transition">
-                          <span>📁 Fotoğraf Seç</span>
-                          <input type="file" accept="image/*" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) { const reader = new FileReader(); reader.onloadend = () => setStudentEditForm({ ...studentEditForm, avatar: reader.result as string }); reader.readAsDataURL(file); }}} />
+                          <span>📁 Yükle</span>
+                          <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              try {
+                                const formData = new FormData();
+                                formData.append("file", file);
+                                const res = await fetch("/api/upload", { method: "POST", body: formData });
+                                const data = await res.json();
+                                if (data.success && data.url) {
+                                  setStudentEditForm({ ...studentEditForm, avatar: data.url });
+                                  return;
+                                }
+                              } catch {}
+                              const reader = new FileReader();
+                              reader.onloadend = () => setStudentEditForm({ ...studentEditForm, avatar: reader.result as string });
+                              reader.readAsDataURL(file);
+                            }
+                          }} />
                         </label>
                         {studentEditForm.avatar && <button type="button" onClick={() => setStudentEditForm({ ...studentEditForm, avatar: "" })} className="text-xs text-red-400 hover:text-red-300 font-bold">Kaldır</button>}
                       </div>
@@ -2453,3 +2685,5 @@ export default function ProfilPage() {
     </div>
   );
 }
+
+

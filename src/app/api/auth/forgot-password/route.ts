@@ -2,10 +2,17 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import crypto from "crypto";
 import { sendPasswordResetMail } from "@/lib/mail";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 // POST /api/auth/forgot-password
 export async function POST(request: Request) {
   try {
+    const ip = getClientIp(request);
+    const rateLimit = checkRateLimit(`forgot-pw-${ip}`, 3, 60_000);
+    if (!rateLimit.success) {
+      return NextResponse.json({ success: false, error: "Çok fazla şifre sıfırlama isteğinde bulundunuz. Lütfen 1 dakika bekleyin." }, { status: 429 });
+    }
+
     const { email, role } = await request.json(); // role: "student" | "teacher"
 
     if (!email) {

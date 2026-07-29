@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { verifyAdminAuth } from "@/lib/adminAuth";
 
 // GET: Fetch all blog posts in database
-export async function GET() {
+export async function GET(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
   try {
     const posts = await prisma.blogPost.findMany({
       orderBy: { createdAt: "desc" },
@@ -16,6 +20,9 @@ export async function GET() {
 
 // DELETE: Delete a blog post
 export async function DELETE(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(request.url);
     const idStr = searchParams.get("id");

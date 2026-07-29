@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { verifyAdminAuth } from "@/lib/adminAuth";
 
 // POST: update student or teacher status (e.g. "Beklemede", "İletişime Geçildi")
 export async function POST(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { id, role, status } = body;

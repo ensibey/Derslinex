@@ -43,8 +43,6 @@ export async function GET(request: Request) {
         optionC: true,
         optionD: true,
         optionE: true,
-        correctOption: true,
-        solutionText: true,
         teacher: {
           select: {
             name: true,

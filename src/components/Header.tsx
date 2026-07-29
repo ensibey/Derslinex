@@ -10,6 +10,7 @@ const navLinks = [
   { href: "/dersler", label: "Dersler" },
   { href: "/yks-hazirlik", label: "YKS Hazırlık" },
   { href: "/lgs-hazirlik", label: "LGS Hazırlık" },
+  { href: "/blog", label: "Blog" },
   { href: "/iletisim", label: "İletişim" },
 ];
 

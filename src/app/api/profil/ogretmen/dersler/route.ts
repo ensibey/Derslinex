@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getAuthUser } from "@/lib/auth-middleware";
 
 // GET: Get all lessons for a specific teacher
 export async function GET(request: Request) {
@@ -27,6 +28,7 @@ export async function GET(request: Request) {
 // POST: Create a new lesson offer
 export async function POST(request: Request) {
   try {
+    const user = await getAuthUser(request);
     const body = await request.json();
     const { teacherId, title, price, format, description } = body;
 
@@ -34,9 +36,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Gerekli alanlar eksik" }, { status: 400 });
     }
 
-    // Verify teacher exists and is approved
+    const targetTeacherId = parseInt(teacherId);
+
+    // Verify requesting user is teacher and matches teacherId (or in dev mode)
+    if (user && user.role === "teacher" && user.id !== targetTeacherId && process.env.NODE_ENV === "production") {
+      return NextResponse.json({ success: false, error: "Başkası adına ders açamazsınız." }, { status: 403 });
+    }
+
     const teacher = await prisma.teacher.findUnique({
-      where: { id: parseInt(teacherId) },
+      where: { id: targetTeacherId },
     });
 
     if (!teacher) {
@@ -49,7 +57,7 @@ export async function POST(request: Request) {
 
     const newOffer = await prisma.lessonOffer.create({
       data: {
-        teacherId: parseInt(teacherId),
+        teacherId: targetTeacherId,
         title,
         price: parseFloat(price),
         format,
@@ -76,6 +84,16 @@ export async function DELETE(request: Request) {
 
     const id = parseInt(idStr);
 
+    const lesson = await prisma.lessonOffer.findUnique({ where: { id } });
+    if (!lesson) {
+      return NextResponse.json({ success: false, error: "Ders bulunamadı." }, { status: 404 });
+    }
+
+    const user = await getAuthUser(request);
+    if (user && user.role === "teacher" && user.id !== lesson.teacherId && process.env.NODE_ENV === "production") {
+      return NextResponse.json({ success: false, error: "Bu dersi silme yetkiniz yok." }, { status: 403 });
+    }
+
     await prisma.lessonOffer.delete({
       where: { id },
     });
@@ -86,3 +104,4 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ success: false, error: "Sunucu hatası" }, { status: 500 });
   }
 }
+

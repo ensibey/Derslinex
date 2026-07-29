@@ -20,16 +20,40 @@ export default function DenemeNetTakipPage() {
   const [sosyal, setSosyal] = useState<number>(0);
   const [fen, setFen] = useState<number>(0);
 
-  // Load from localStorage
+  // Load from localStorage or API
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("derslinex_deneme_takip");
-      if (saved) {
-        setDenemeler(JSON.parse(saved));
+    const fetchDBTrials = async () => {
+      try {
+        const res = await fetch("/api/student/trials");
+        const data = await res.json();
+        if (data.success && data.trials && data.trials.length > 0) {
+          const formatted = data.trials.map((t: any) => ({
+            id: String(t.id),
+            ad: t.title,
+            turkce: t.turkceNet,
+            matematik: t.matematikNet,
+            sosyal: t.sosyalNet,
+            fen: t.fenNet,
+            tarih: new Date(t.date).toLocaleDateString("tr-TR"),
+          }));
+          setDenemeler(formatted);
+          return;
+        }
+      } catch (e) {
+        console.error("DB trials fetch error:", e);
       }
-    } catch (e) {
-      console.error("Local storage load error:", e);
-    }
+
+      try {
+        const saved = localStorage.getItem("derslinex_deneme_takip");
+        if (saved) {
+          setDenemeler(JSON.parse(saved));
+        }
+      } catch (e) {
+        console.error("Local storage load error:", e);
+      }
+    };
+
+    fetchDBTrials();
   }, []);
 
   const saveToLocalStorage = (list: DenemeKaydi[]) => {
@@ -40,7 +64,7 @@ export default function DenemeNetTakipPage() {
     }
   };
 
-  const handleAddDeneme = (e: React.FormEvent) => {
+  const handleAddDeneme = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!ad) return;
 
@@ -49,6 +73,41 @@ export default function DenemeNetTakipPage() {
     const mNet = Math.min(40, Math.max(0, matematik));
     const sNet = Math.min(20, Math.max(0, sosyal));
     const fNet = Math.min(20, Math.max(0, fen));
+
+    // Try posting to DB API
+    try {
+      const res = await fetch("/api/student/trials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: ad,
+          examType: "TYT",
+          turkceNet: tNet,
+          sosyalNet: sNet,
+          matematikNet: mNet,
+          fenNet: fNet,
+        }),
+      });
+      const data = await res.json();
+      if (data.success && data.trial) {
+        const dbRecord: DenemeKaydi = {
+          id: String(data.trial.id),
+          ad: data.trial.title,
+          turkce: data.trial.turkceNet,
+          matematik: data.trial.matematikNet,
+          sosyal: data.trial.sosyalNet,
+          fen: data.trial.fenNet,
+          tarih: new Date(data.trial.date).toLocaleDateString("tr-TR"),
+        };
+        const updated = [dbRecord, ...denemeler];
+        setDenemeler(updated);
+        saveToLocalStorage(updated);
+        setAd(""); setTurkce(0); setMatematik(0); setSosyal(0); setFen(0);
+        return;
+      }
+    } catch (e) {
+      console.warn("API trial save warning, fallback to localStorage:", e);
+    }
 
     const yeniKayit: DenemeKaydi = {
       id: Math.random().toString(36).substring(2, 9),
@@ -72,7 +131,12 @@ export default function DenemeNetTakipPage() {
     setFen(0);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
+    try {
+      await fetch(`/api/student/trials?id=${id}`, { method: "DELETE" });
+    } catch (e) {
+      console.warn("API trial delete warning:", e);
+    }
     const updated = denemeler.filter((item) => item.id !== id);
     setDenemeler(updated);
     saveToLocalStorage(updated);
@@ -189,6 +253,91 @@ export default function DenemeNetTakipPage() {
           <div className="lg:col-span-3 space-y-6">
             {denemeler.length > 0 ? (
               <>
+                {/* Visual SVG Net Progress Chart */}
+                <div className="bg-white border border-[#EFECE6] rounded-3xl p-6 shadow-sm space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xs font-black text-[#1E3A8A] uppercase tracking-wider">📈 NET GELİŞİM ÇİZGİSİ (ZAMAN İÇİNDE)</h3>
+                    <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">
+                      Son Deneme: {denemeler[0] ? calculateTotalNet(denemeler[0]) : 0} Net
+                    </span>
+                  </div>
+
+                  <div className="bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl p-4 overflow-hidden">
+                    {(() => {
+                      const chronological = [...denemeler].reverse();
+                      const maxNet = Math.max(120, ...chronological.map((d) => calculateTotalNet(d)));
+                      const points = chronological.map((d, index) => {
+                        const total = calculateTotalNet(d);
+                        const x = chronological.length === 1 ? 50 : (index / (chronological.length - 1)) * 90 + 5;
+                        const y = 85 - (total / maxNet) * 70;
+                        return { x, y, total, title: d.ad, date: d.tarih };
+                      });
+
+                      const polylineString = points.map((p) => `${p.x},${p.y}`).join(" ");
+
+                      return (
+                        <div className="relative w-full h-44">
+                          <svg className="w-full h-full overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
+                            {/* Grid Lines */}
+                            <line x1="0" y1="15" x2="100" y2="15" stroke="#E5E7EB" strokeWidth="0.5" strokeDasharray="2,2" />
+                            <line x1="0" y1="50" x2="100" y2="50" stroke="#E5E7EB" strokeWidth="0.5" strokeDasharray="2,2" />
+                            <line x1="0" y1="85" x2="100" y2="85" stroke="#E5E7EB" strokeWidth="0.5" />
+
+                            {/* Area Gradient */}
+                            {points.length > 1 && (
+                              <polygon
+                                points={`5,85 ${polylineString} ${points[points.length - 1].x},85`}
+                                fill="rgba(180, 83, 9, 0.12)"
+                              />
+                            )}
+
+                            {/* Line */}
+                            {points.length > 1 && (
+                              <polyline
+                                fill="none"
+                                stroke="#B45309"
+                                strokeWidth="2.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                points={polylineString}
+                              />
+                            )}
+
+                            {/* Data Points */}
+                            {points.map((p, idx) => (
+                              <g key={idx} className="group cursor-pointer">
+                                <circle
+                                  cx={p.x}
+                                  cy={p.y}
+                                  r="3"
+                                  fill="#1E3A8A"
+                                  stroke="#B45309"
+                                  strokeWidth="1.5"
+                                  className="transition-transform duration-200 hover:r-5"
+                                />
+                                <text
+                                  x={p.x}
+                                  y={p.y - 5}
+                                  fontSize="4"
+                                  fontWeight="bold"
+                                  fill="#1E3A8A"
+                                  textAnchor="middle"
+                                >
+                                  {p.total}
+                                </text>
+                              </g>
+                            ))}
+                          </svg>
+                          <div className="flex justify-between items-center text-[9px] font-bold text-gray-400 mt-2 px-1">
+                            <span>Eski ({chronological[0]?.tarih})</span>
+                            <span>En Yeni ({chronological[chronological.length - 1]?.tarih})</span>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </div>
+
                 {/* Stats summary cards */}
                 <div className="bg-white border border-[#EFECE6] rounded-3xl p-6 shadow-sm space-y-4">
                   <h3 className="text-xs font-black text-[#1E3A8A] uppercase tracking-wider">📊 NET ORTALAMALARINIZ</h3>

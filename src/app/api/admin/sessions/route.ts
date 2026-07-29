@@ -2,12 +2,16 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { createDailyRoom } from "@/lib/daily";
 import { sendSessionAssignedMail } from "@/lib/mail";
+import { verifyAdminAuth } from "@/lib/adminAuth";
 
 /**
  * POST /api/admin/sessions/create
  * Admin tarafından yeni bir canlı ders oluşturur.
  */
 export async function POST(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const {
@@ -111,7 +115,10 @@ export async function POST(request: Request) {
  * GET /api/admin/sessions
  * Tüm oturumları listeler.
  */
-export async function GET() {
+export async function GET(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
   try {
     const sessions = await prisma.liveSession.findMany({
       orderBy: { startTime: "desc" },
@@ -136,6 +143,9 @@ export async function GET() {
  * Canlı dersi iptal eder ve katılanlara iptal maili gönderir.
  */
 export async function DELETE(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(request.url);
     const id = parseInt(searchParams.get("id") || "0");

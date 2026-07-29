@@ -11,6 +11,7 @@
   "dependencies": {
     "@daily-co/daily-js": "^0.91.0",
     "@prisma/client": "^6.19.3",
+    "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
     "dotenv": "^17.4.2",
     "next": "15.5.20",
@@ -21,6 +22,7 @@
     "resend": "^6.18.0"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

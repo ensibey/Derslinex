@@ -8,9 +8,15 @@ import { prisma } from "@/lib/db";
  */
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const { searchParams } = new URL(request.url);
+    const secret = searchParams.get("secret") || request.headers.get("x-webhook-secret");
+    const expectedSecret = process.env.DAILY_WEBHOOK_SECRET || (process.env.NODE_ENV === "development" ? "derslinex_webhook_secret_2026" : undefined);
 
-    // Daily.co webhook yapısı
+    if (!expectedSecret || secret !== expectedSecret) {
+      return NextResponse.json({ success: false, error: "Yetkisiz webhook çağrısı" }, { status: 401 });
+    }
+
+    const body = await request.json();
     const { event_type, payload } = body;
 
     if (event_type !== "recording.ready") {
@@ -27,7 +33,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // roomName ile oturumu bul
     const session = await prisma.liveSession.findFirst({
       where: { roomName },
     });

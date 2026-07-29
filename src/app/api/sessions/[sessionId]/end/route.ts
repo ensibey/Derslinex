@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { endDailyRoom } from "@/lib/daily";
+import { getAuthUser } from "@/lib/auth-middleware";
 
 /**
  * POST /api/sessions/[sessionId]/end
@@ -13,9 +14,19 @@ export async function POST(
   { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
+    const authUser = await getAuthUser(request);
     const { sessionId: rawId } = await params;
     const sessionId = parseInt(rawId);
-    const { teacherId }: { teacherId: number } = await request.json();
+    if (!authUser || authUser.role !== "teacher") {
+      return NextResponse.json({ success: false, error: "Dersi bitirmek için öğretmen oturumu gereklidir." }, { status: 401 });
+    }
+
+    const teacherId = authUser.id;
+
+    const teacher = await prisma.teacher.findUnique({ where: { id: teacherId } });
+    if (!teacher || teacher.isBanned) {
+      return NextResponse.json({ success: false, error: "Geçersiz veya engellenmiş öğretmen hesabı" }, { status: 403 });
+    }
 
     const session = await prisma.liveSession.findUnique({
       where: { id: sessionId },
@@ -27,7 +38,7 @@ export async function POST(
     }
 
     if (session.teacherId !== teacherId) {
-      return NextResponse.json({ success: false, error: "Yalnızca öğretmen dersi bitirebilir" }, { status: 403 });
+      return NextResponse.json({ success: false, error: "Yalnızca bu dersin öğretmeni dersi bitirebilir" }, { status: 403 });
     }
 
     if (session.status === "ENDED") {

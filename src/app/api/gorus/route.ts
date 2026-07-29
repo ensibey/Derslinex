@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { verifyAdminAuth } from "@/lib/adminAuth";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 // GET: get feedbacks (filtered by teacherId if provided)
 export async function GET(request: Request) {
@@ -30,6 +32,12 @@ export async function GET(request: Request) {
 // POST: submit a feedback/gorus
 export async function POST(request: Request) {
   try {
+    const ip = getClientIp(request);
+    const rateLimit = checkRateLimit(`gorus-submit-${ip}`, 5, 60_000);
+    if (!rateLimit.success) {
+      return NextResponse.json({ success: false, error: "Çok fazla görüş gönderdiniz. Lütfen bekleyin." }, { status: 429 });
+    }
+
     const body = await request.json();
     const { studentName, studentEmail, teacherId, teacherName, content, rating } = body;
 
@@ -57,6 +65,9 @@ export async function POST(request: Request) {
 
 // DELETE: delete a feedback/gorus (admin only)
 export async function DELETE(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(request.url);
     const idStr = searchParams.get("id");
@@ -75,3 +86,4 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ success: false, error: "Sunucu hatası" }, { status: 500 });
   }
 }
+

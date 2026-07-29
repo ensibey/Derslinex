@@ -1,22 +1,49 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { verifyAdminAuth } from "@/lib/adminAuth";
+import { getAuthUser } from "@/lib/auth-middleware";
 
-// GET: get student profile by email
+// GET: get student profile by email (or all if admin)
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const email = searchParams.get("email");
 
     if (!email) {
-      // If no email, return all students (useful for admin)
+      // Require admin auth to list all students
+      const adminErr = verifyAdminAuth(request);
+      if (adminErr) {
+        return NextResponse.json({ success: false, error: "Tüm kullanıcıları listelemek için admin yetkisi gereklidir." }, { status: 401 });
+      }
+
       const students = await prisma.student.findMany({
         orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          name: true,
+          phone: true,
+          email: true,
+          avatar: true,
+          status: true,
+          isBanned: true,
+          createdAt: true,
+        },
       });
       return NextResponse.json({ success: true, students });
     }
 
     const student = await prisma.student.findFirst({
       where: { email },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        email: true,
+        avatar: true,
+        status: true,
+        isBanned: true,
+        createdAt: true,
+      },
     });
 
     return NextResponse.json({ success: true, student });
@@ -26,9 +53,14 @@ export async function GET(request: Request) {
   }
 }
 
-// POST: create or update student profile
+// POST: update student profile
 export async function POST(request: Request) {
   try {
+    const authUser = await getAuthUser(request);
+    if (!authUser) {
+      return NextResponse.json({ success: false, error: "Yetkisiz erişim. Oturum açmanız gerekmektedir." }, { status: 401 });
+    }
+
     const body = await request.json();
     const { name, phone, email, avatar } = body;
 
@@ -36,20 +68,33 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Tüm alanlar zorunludur" }, { status: 400 });
     }
 
-    // Check if exists
+    // Only allow user to update their own profile
+    if (authUser.role === "student" && authUser.email !== email) {
+      return NextResponse.json({ success: false, error: "Başka bir kullanıcının profilini değiştirme yetkiniz yok." }, { status: 403 });
+    }
+
     const existing = await prisma.student.findFirst({
       where: { email },
     });
 
-    let student;
-    if (existing) {
-      student = await prisma.student.update({
-        where: { id: existing.id },
-        data: { name, phone, avatar },
-      });
-    } else {
+    if (!existing) {
       return NextResponse.json({ success: false, error: "Öğrenci bulunamadı" }, { status: 404 });
     }
+
+    const student = await prisma.student.update({
+      where: { id: existing.id },
+      data: { name, phone, avatar },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        email: true,
+        avatar: true,
+        status: true,
+        isBanned: true,
+        createdAt: true,
+      },
+    });
 
     return NextResponse.json({ success: true, student });
   } catch (error) {

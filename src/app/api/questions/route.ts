@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getAuthUser } from "@/lib/auth-middleware";
 
 // GET /api/questions?teacherId=...
 export async function GET(request: Request) {
@@ -26,9 +27,10 @@ export async function GET(request: Request) {
 // POST /api/questions - Submit new question
 export async function POST(request: Request) {
   try {
+    const authUser = await getAuthUser(request);
     const body = await request.json();
     const {
-      teacherId,
+      teacherId: bodyTeacherId,
       subject,
       examType,
       topic,
@@ -45,13 +47,19 @@ export async function POST(request: Request) {
       points,
     } = body;
 
+    const teacherId = authUser && authUser.role === "teacher" ? authUser.id : (bodyTeacherId ? parseInt(bodyTeacherId) : null);
+
+    if (!teacherId) {
+      return NextResponse.json({ success: false, error: "Soru yüklemek için öğretmen oturumu gereklidir." }, { status: 401 });
+    }
+
     if (!teacherId || !subject || !questionText || !optionA || !optionB || !correctOption) {
       return NextResponse.json({ success: false, error: "Ders, soru metni, A/B şıkları ve doğru cevap zorunludur" }, { status: 400 });
     }
 
     const question = await prisma.question.create({
       data: {
-        teacherId: parseInt(teacherId),
+        teacherId,
         subject,
         examType: examType || "TYT",
         topic: topic || null,
