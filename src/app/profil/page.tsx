@@ -3281,12 +3281,34 @@ export default function ProfilPage() {
               {STUDENT_NAV.find(n => n.id === dashboardTab)?.icon} {STUDENT_NAV.find(n => n.id === dashboardTab)?.label || "Genel Görünüm"}
             </h1>
           </div>
-          {message && (
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold ${ message.type === "success" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-red-500/20 text-red-400 border border-red-500/30" }`}>
-              {message.text}
-              <button onClick={() => setMessage(null)} className="opacity-60 hover:opacity-100">✕</button>
-            </div>
-          )}
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setDashboardTab("pomodoro")}
+              className="hidden sm:flex items-center gap-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 font-black text-xs px-3 py-1.5 rounded-xl transition"
+            >
+              ⏱️ Pomodoro Sayacı
+            </button>
+            <button
+              onClick={() => setDashboardTab("puanhesapla")}
+              className="hidden sm:flex items-center gap-1.5 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 font-black text-xs px-3 py-1.5 rounded-xl transition"
+            >
+              🧮 Puan Simülatörü
+            </button>
+            <button
+              onClick={() => setDashboardTab("kutuphane")}
+              className="hidden md:flex items-center gap-1.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/30 font-black text-xs px-3 py-1.5 rounded-xl transition"
+            >
+              👥 Sanal Kütüphane
+            </button>
+
+            {message && (
+              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold ${ message.type === "success" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-red-500/20 text-red-400 border border-red-500/30" }`}>
+                {message.text}
+                <button onClick={() => setMessage(null)} className="opacity-60 hover:opacity-100">✕</button>
+              </div>
+            )}
+          </div>
         </header>
 
         {/* Page Content */}
