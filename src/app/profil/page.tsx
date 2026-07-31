@@ -2238,9 +2238,6 @@ export default function ProfilPage() {
                   {role === "student" ? "Öğrenci" : "Öğretmen"}{" "}
                   {authMode === "login" ? "Giriş Paneli" : "Kayıt Paneli"}
                 </h3>
-                <p className="text-slate-500 text-[10px] font-bold mt-0.5 uppercase tracking-wider">
-                  {authMode === "login" ? "Hesabınıza güvenle erişin" : "Yeni hesap oluşturun"}
-                </p>
               </div>
             </div>
 
