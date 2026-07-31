@@ -148,9 +148,9 @@ export default function AdminPage() {
     setLoading(true);
     try {
       const [tRes, sRes, fRes, lRes, bRes, sessRes, taskRes, qRes, cRes, mRes] = await Promise.all([
-        fetch("/api/profil/ogretmen"),
-        fetch("/api/profil/ogrenci"),
-        fetch("/api/gorus"),
+        adminFetch("/api/profil/ogretmen"),
+        adminFetch("/api/profil/ogrenci"),
+        adminFetch("/api/gorus"),
         adminFetch("/api/admin/lessons"),
         adminFetch("/api/admin/blogs"),
         adminFetch("/api/admin/sessions"),
