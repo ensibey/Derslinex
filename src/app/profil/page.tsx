@@ -2516,12 +2516,15 @@ export default function ProfilPage() {
                 {dashboardTab === "panel" ? "Genel Görünüm" : dashboardTab === "canli" ? "Canlı Derslerim" : dashboardTab === "dersler" ? "Özel Ders İlanlarım" : dashboardTab === "bloglar" ? "Blog Paylaşımlarım" : dashboardTab === "faq" ? "Sıkça Sorulan Sorular" : dashboardTab === "mesajlar" ? "Mesajlarım" : "Profil Düzenleme"}
               </h1>
             </div>
-            {message && (
-              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold ${ message.type === "success" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-red-500/20 text-red-400 border border-red-500/30" }`}>
-                <span>{message.text}</span>
-                <button onClick={() => setMessage(null)} className="opacity-60 hover:opacity-100">✕</button>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              {message && (
+                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold ${ message.type === "success" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-red-500/20 text-red-400 border border-red-500/30" }`}>
+                  <span>{message.text}</span>
+                  <button onClick={() => setMessage(null)} className="opacity-60 hover:opacity-100">✕</button>
+                </div>
+              )}
+            </div>
           </header>
 
           <main className="flex-1 p-4 md:p-6 overflow-y-auto space-y-6">
