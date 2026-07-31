@@ -3918,26 +3918,26 @@ export default function ProfilPage() {
           )}
 
           {/* ─── SORU BANKASI & TEST ÇÖZ ─── */}
-          {dashboardTab === "sorucozum" && <StudentQuizTab studentId={studentProfile?.id} />}
+          {dashboardTab === "sorucozum" && studentProfile && <StudentQuizTab studentId={studentProfile.id} />}
 
           {/* ─── YANLIŞ SORU DEFTERİM ─── */}
-          {dashboardTab === "yanlissorular" && (
-            <StudentWrongQuestionsTab studentId={studentProfile?.id || 1} />
+          {dashboardTab === "yanlissorular" && studentProfile && (
+            <StudentWrongQuestionsTab studentId={studentProfile.id} />
           )}
 
           {/* ─── DENEME NET TAKİBİ ─── */}
-          {dashboardTab === "denemenet" && (
-            <StudentTrialTab studentId={studentProfile?.id || 1} />
+          {dashboardTab === "denemenet" && studentProfile && (
+            <StudentTrialTab studentId={studentProfile.id} />
           )}
 
           {/* ─── YKS KONU ÇETELESİ ─── */}
-          {dashboardTab === "konutakip" && (
-            <StudentTopicTab studentId={studentProfile?.id || 1} />
+          {dashboardTab === "konutakip" && studentProfile && (
+            <StudentTopicTab studentId={studentProfile.id} />
           )}
 
           {/* ─── LİDERLİK TABLOSU & ROZETLER ─── */}
-          {dashboardTab === "liderlik" && (
-            <StudentLeaderboardTab currentStudentId={studentProfile?.id || 1} />
+          {dashboardTab === "liderlik" && studentProfile && (
+            <StudentLeaderboardTab currentStudentId={studentProfile.id} />
           )}
 
           {/* ─── PUAN & SIRALAMA SİMÜLATÖRÜ ─── */}
