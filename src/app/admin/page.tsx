@@ -70,7 +70,7 @@ interface BlogPost {
 }
 
 // ─── Brand Logo Header Component ──────────────────────────────────────────────
-function BrandLogoHeader({ subBadge = "ADMIN PANELİ" }: { subBadge?: string }) {
+function BrandLogoHeader({ subBadge = "ADMİN PANELİ" }: { subBadge?: string }) {
   const [imgError, setImgError] = useState(false);
 
   return (
@@ -310,7 +310,7 @@ export default function AdminPage() {
       {/* Left Sidebar (SincApp Dark Layout) */}
       <aside className={`fixed top-0 left-0 h-full w-[240px] bg-[#0D1B35] border-r border-white/5 flex flex-col z-40 transform transition-transform duration-300 ${ sidebarOpen ? "translate-x-0" : "-translate-x-full" } md:translate-x-0 md:static md:flex`}>
         <div className="px-5 py-5 border-b border-white/5 flex items-center justify-between">
-          <BrandLogoHeader subBadge="ADMIN PANELİ" />
+          <BrandLogoHeader subBadge="ADMİN PANELİ" />
           <button className="md:hidden text-slate-400 hover:text-white" onClick={() => setSidebarOpen(false)}>✕</button>
         </div>
 
