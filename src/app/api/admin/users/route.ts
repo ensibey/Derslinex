@@ -47,6 +47,57 @@ export async function GET(request: Request) {
   }
 }
 
+// PUT: Update status or ban toggle
+export async function PUT(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
+  try {
+    const body = await request.json();
+    const { id, type, role, action, value } = body;
+
+    const userRole = type || role;
+    const userId = parseInt(id);
+
+    if (!userId || !userRole || !action) {
+      return NextResponse.json({ success: false, error: "Eksik parametreler" }, { status: 400 });
+    }
+
+    if (userRole === "student") {
+      if (action === "status") {
+        await prisma.student.update({
+          where: { id: userId },
+          data: { status: value },
+        });
+      } else if (action === "ban") {
+        await prisma.student.update({
+          where: { id: userId },
+          data: { isBanned: Boolean(value) },
+        });
+      }
+    } else if (userRole === "teacher") {
+      if (action === "status") {
+        await prisma.teacher.update({
+          where: { id: userId },
+          data: { status: value },
+        });
+      } else if (action === "ban") {
+        await prisma.teacher.update({
+          where: { id: userId },
+          data: { isBanned: Boolean(value) },
+        });
+      }
+    } else {
+      return NextResponse.json({ success: false, error: "Geçersiz rol" }, { status: 400 });
+    }
+
+    return NextResponse.json({ success: true, message: "Kullanıcı başarıyla güncellendi." });
+  } catch (error) {
+    console.error("Admin Users PUT Hatası:", error);
+    return NextResponse.json({ success: false, error: "Sunucu hatası" }, { status: 500 });
+  }
+}
+
 // POST: Ban/unban user
 export async function POST(request: Request) {
   const authError = verifyAdminAuth(request);
@@ -54,21 +105,23 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { id, role, action } = body;
+    const { id, role, type, action, value } = body;
 
-    if (!id || !role || !action) {
+    const userRole = type || role;
+    const userId = parseInt(id);
+
+    if (!userId || !userRole) {
       return NextResponse.json({ success: false, error: "Eksik parametre" }, { status: 400 });
     }
 
-    const userId = parseInt(id);
-    const setBanned = action === "ban";
+    const setBanned = action === "ban" ? Boolean(value) : true;
 
-    if (role === "student") {
+    if (userRole === "student") {
       await prisma.student.update({
         where: { id: userId },
         data: { isBanned: setBanned },
       });
-    } else if (role === "teacher") {
+    } else if (userRole === "teacher") {
       await prisma.teacher.update({
         where: { id: userId },
         data: { isBanned: setBanned },
