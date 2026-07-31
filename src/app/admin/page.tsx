@@ -301,7 +301,7 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#0A1628] font-sans text-slate-100">
+    <div className="bg-mesh flex min-h-screen bg-[#0A1628] font-sans text-slate-100">
       {/* Mobile Overlay */}
       {sidebarOpen && <div className="fixed inset-0 bg-black/60 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />}
 
@@ -313,19 +313,22 @@ export default function AdminPage() {
         </div>
 
         {/* Admin Profile Info */}
-        <div className="px-4 py-4 border-b border-white/5 bg-white/5">
+        <div className="px-4 py-5 border-b border-white/5 bg-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-0.5 shadow-lg shadow-indigo-500/20 flex-shrink-0">
-              <div className="w-full h-full bg-[#0D1B35] rounded-[10px] flex items-center justify-center text-white font-black text-xs">
-                ⚡
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-500 via-orange-500 to-amber-500 p-0.5 shadow-lg shadow-rose-500/25 flex-shrink-0">
+              <div className="w-full h-full bg-[#0D1B35] rounded-[14px] flex items-center justify-center text-2xl">
+                🛡️
               </div>
             </div>
             <div className="min-w-0">
-              <p className="text-white font-black text-xs truncate">Sistem Yöneticisi</p>
-              <p className="text-emerald-400 text-[10px] font-bold flex items-center gap-1 mt-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Süper Admin (Canlı)
+              <p className="text-white font-black text-sm truncate">Sistem Yöneticisi</p>
+              <p className="text-rose-400 text-[10px] font-bold flex items-center gap-1 mt-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+                Süper Admin · Canlı
               </p>
+              <div className="mt-2 h-1 bg-white/5 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-rose-500 to-orange-400 rounded-full" style={{width: '100%'}} />
+              </div>
             </div>
           </div>
         </div>
@@ -348,12 +351,12 @@ export default function AdminPage() {
               onClick={() => { setActiveTab(t.key as any); setSidebarOpen(false); }}
               className={`relative w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-left transition-all text-xs font-bold overflow-hidden ${
                 activeTab === t.key
-                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-900/50 border border-indigo-400/30 font-black"
+                  ? "bg-gradient-to-r from-rose-600 to-orange-600 text-white shadow-lg shadow-rose-900/50 border border-rose-400/30 font-black"
                   : "text-slate-400 hover:text-white hover:bg-white/5"
               }`}
             >
               {activeTab === t.key && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-indigo-300 rounded-r-full shadow-[0_0_10px_rgba(165,180,252,0.9)]" />
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-rose-300 rounded-r-full shadow-[0_0_10px_rgba(251,113,133,0.9)]" />
               )}
               <span className="text-base">{t.icon}</span>
               <span className="flex-1 truncate">{t.label}</span>

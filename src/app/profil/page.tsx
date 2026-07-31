@@ -2150,87 +2150,261 @@ export default function ProfilPage() {
   // ─── AUTH FORM ─────────────────────────────────────────────────────────────────
   if (!studentProfile && !teacherProfile) {
     return (
-      <div className="bg-[#FAF8F5] min-h-screen py-16 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-10">
-            <span className="text-[#B45309] text-xs font-black uppercase tracking-widest block mb-2">DERSLİNEX PORTALI</span>
-            <h1 className="text-4xl sm:text-5xl font-black text-[#1E3A8A] leading-tight">Profil & Giriş Sistemi</h1>
-            <p className="text-gray-500 font-semibold mt-2">Öğrenci veya öğretmen hesabı oluşturarak derslerinizi, görüş ve randevu taleplerinizi yönetin.</p>
+      <div className="bg-mesh min-h-screen bg-[#0A1628] flex items-center justify-center py-16 px-4 relative overflow-hidden">
+        {/* Animated background glow orbs */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" style={{animation: 'meshFloat1 15s ease-in-out infinite'}} />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-600/8 rounded-full blur-3xl pointer-events-none" style={{animation: 'meshFloat2 20s ease-in-out infinite'}} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-radial from-indigo-500/5 to-transparent rounded-full blur-2xl pointer-events-none" />
+
+        <div className="max-w-lg w-full relative z-10">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 px-4 py-1.5 rounded-full mb-5">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+              <span className="text-indigo-300 text-[10px] font-black uppercase tracking-widest">Derslinex Portalı</span>
+            </div>
+            <h1 className="text-4xl sm:text-5xl font-black text-white leading-tight tracking-tight">
+              Hesabına{" "}
+              <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                Giriş Yap
+              </span>
+            </h1>
+            <p className="text-slate-400 font-medium mt-3 text-sm leading-relaxed">
+              Öğrenci veya öğretmen hesabıyla derslerini, notlarını<br className="hidden sm:block" /> ve randevularını buradan yönet.
+            </p>
           </div>
+
+          {/* Alert Message */}
           {message && (
-            <div className={`mb-6 p-4 rounded-xl text-sm font-bold border flex items-center justify-between ${ message.type === "success" ? "bg-emerald-50 text-emerald-800 border-emerald-200" : "bg-rose-50 text-rose-800 border-rose-200" }`}>
+            <div className={`mb-5 p-4 rounded-2xl text-sm font-bold border flex items-center justify-between ${
+              message.type === "success"
+                ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/20"
+                : "bg-red-500/10 text-red-300 border-red-500/20"
+            }`}>
               <span>{message.text}</span>
-              <button className="text-xs opacity-60 hover:opacity-100" onClick={() => setMessage(null)}>✕</button>
+              <button className="text-xs opacity-60 hover:opacity-100 transition-opacity ml-3" onClick={() => setMessage(null)}>✕</button>
             </div>
           )}
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 bg-white/70 backdrop-blur border border-[#EFECE6] p-1.5 rounded-2xl shadow-sm">
-              <button onClick={() => { setRole("student"); setAuthMode("login"); }} className={`py-3 px-4 text-xs sm:text-sm font-black rounded-xl transition-all duration-200 ${ role === "student" ? "bg-[#1E3A8A] text-white shadow-sm" : "text-gray-600 hover:bg-white" }`}>🎓 Öğrenci Giriş/Kayıt</button>
-              <button onClick={() => { setRole("teacher"); setAuthMode("login"); }} className={`py-3 px-4 text-xs sm:text-sm font-black rounded-xl transition-all duration-200 ${ role === "teacher" ? "bg-[#1E3A8A] text-white shadow-sm" : "text-gray-600 hover:bg-white" }`}>👨🏫 Öğretmen Giriş/Kayıt</button>
+
+          {/* Glassmorphism Card */}
+          <div className="bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-3xl p-7 shadow-2xl shadow-black/40">
+
+            {/* Role Tab Switcher */}
+            <div className="grid grid-cols-2 bg-white/[0.04] border border-white/8 p-1 rounded-2xl mb-6">
+              <button
+                onClick={() => { setRole("student"); setAuthMode("login"); }}
+                className={`py-2.5 px-4 text-xs sm:text-sm font-black rounded-xl transition-all duration-250 btn-press ${
+                  role === "student"
+                    ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-900/50"
+                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                }`}
+              >🎓 Öğrenci</button>
+              <button
+                onClick={() => { setRole("teacher"); setAuthMode("login"); }}
+                className={`py-2.5 px-4 text-xs sm:text-sm font-black rounded-xl transition-all duration-250 btn-press ${
+                  role === "teacher"
+                    ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-900/50"
+                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                }`}
+              >👨‍🏫 Öğretmen</button>
             </div>
-            <div className="text-center">
-              <span className="text-xs text-gray-500 font-bold">
-                {authMode === "login" ? "Hesabınız yok mu?" : "Zaten üye misiniz?"}{" "}
-                <button onClick={() => setAuthMode(authMode === "login" ? "register" : "login")} className="text-[#B45309] font-black underline ml-1 hover:text-[#92400E]">
-                  {authMode === "login" ? "Kayıt Olun" : "Giriş Yapın"}
-                </button>
+
+            {/* Login / Register Toggle */}
+            <div className="flex items-center justify-center gap-1 mb-5">
+              <span className="text-xs text-slate-500 font-bold">
+                {authMode === "login" ? "Hesabınız yok mu?" : "Zaten üye misiniz?"}
               </span>
+              <button
+                onClick={() => setAuthMode(authMode === "login" ? "register" : "login")}
+                className={`text-xs font-black underline ml-1 transition-colors ${
+                  role === "teacher" ? "text-emerald-400 hover:text-emerald-300" : "text-indigo-400 hover:text-indigo-300"
+                }`}
+              >
+                {authMode === "login" ? "Kayıt Olun" : "Giriş Yapın"}
+              </button>
             </div>
-            <div className="bg-white rounded-3xl border border-[#EFECE6] p-6 sm:p-8 shadow-sm">
-              <h3 className="text-lg font-black text-[#1E3A8A] mb-6 text-center">
-                {role === "student" ? "🎓 Öğrenci" : "👨🏫 Öğretmen"}{" "}{authMode === "login" ? "Giriş Paneli" : "Kayıt Paneli"}
-              </h3>
-              {role === "student" ? (
-                <form onSubmit={handleStudentAuth} className="space-y-4">
-                  {authMode === "register" && (
+
+            {/* Form Header */}
+            <div className="flex items-center gap-3 mb-5 pb-5 border-b border-white/8">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${
+                role === "teacher"
+                  ? "bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30"
+                  : "bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30"
+              }`}>
+                {role === "student" ? "🎓" : "👨‍🏫"}
+              </div>
+              <div>
+                <h3 className="text-white font-black text-sm">
+                  {role === "student" ? "Öğrenci" : "Öğretmen"}{" "}
+                  {authMode === "login" ? "Giriş Paneli" : "Kayıt Paneli"}
+                </h3>
+                <p className="text-slate-500 text-[10px] font-bold mt-0.5 uppercase tracking-wider">
+                  {authMode === "login" ? "Hesabınıza güvenle erişin" : "Yeni hesap oluşturun"}
+                </p>
+              </div>
+            </div>
+
+            {/* Student Form */}
+            {role === "student" ? (
+              <form onSubmit={handleStudentAuth} className="space-y-4">
+                {authMode === "register" && (
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Adı Soyadı</label>
+                      <input
+                        type="text" required
+                        value={studentForm.name}
+                        onChange={(e) => setStudentForm({ ...studentForm, name: e.target.value })}
+                        className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                        placeholder="Ad Soyad"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Telefon</label>
+                      <input
+                        type="text" required
+                        placeholder="05xx xxx xx xx"
+                        value={studentForm.phone}
+                        onChange={(e) => setStudentForm({ ...studentForm, phone: e.target.value })}
+                        className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                )}
+                <div>
+                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">E-posta Adresi</label>
+                  <input
+                    type="email" required
+                    value={studentForm.email}
+                    onChange={(e) => setStudentForm({ ...studentForm, email: e.target.value })}
+                    className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                    placeholder="ornek@email.com"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Şifre</label>
+                  <input
+                    type="password" required
+                    value={studentForm.password}
+                    onChange={(e) => setStudentForm({ ...studentForm, password: e.target.value })}
+                    className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                    placeholder="••••••••"
+                  />
+                </div>
+                <div className="flex items-center justify-between pt-1">
+                  <div className="flex items-center gap-2">
+                    <input type="checkbox" id="studentRemember" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 rounded accent-indigo-500" />
+                    <label htmlFor="studentRemember" className="text-xs text-slate-500 font-bold select-none cursor-pointer">Beni Hatırla</label>
+                  </div>
+                  {authMode === "login" && (
+                    <Link href="/sifremi-unuttum" className="text-xs text-indigo-400 font-black hover:text-indigo-300 transition-colors">
+                      Şifremi Unuttum?
+                    </Link>
+                  )}
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="btn-press w-full bg-gradient-to-r from-indigo-600 via-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black py-3.5 rounded-xl text-sm transition-all duration-200 shadow-lg shadow-indigo-900/50 hover:shadow-indigo-500/30 hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      İşlem yapılıyor...
+                    </span>
+                  ) : authMode === "login" ? "🚀 Giriş Yap" : "✨ Hesap Oluştur"}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleTeacherAuth} className="space-y-4">
+                {authMode === "register" && (
+                  <>
                     <div className="grid sm:grid-cols-2 gap-4">
-                      <div><label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Adı Soyadı</label><input type="text" required value={studentForm.name} onChange={(e) => setStudentForm({ ...studentForm, name: e.target.value })} className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none" /></div>
-                      <div><label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Telefon</label><input type="text" required placeholder="05xx xxx xx xx" value={studentForm.phone} onChange={(e) => setStudentForm({ ...studentForm, phone: e.target.value })} className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none" /></div>
-                    </div>
-                  )}
-                  <div><label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Şifre</label><input type="password" required value={studentForm.password} onChange={(e) => setStudentForm({ ...studentForm, password: e.target.value })} className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none" /></div>
-                  <div className="flex items-center justify-between pt-1">
-                    <div className="flex items-center gap-2">
-                      <input type="checkbox" id="studentRemember" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 rounded" />
-                      <label htmlFor="studentRemember" className="text-xs text-gray-500 font-bold select-none cursor-pointer">Beni Hatırla</label>
-                    </div>
-                    {authMode === "login" && (
-                      <Link href="/sifremi-unuttum" className="text-xs text-[#B45309] font-black hover:underline">
-                        Şifremi Unuttum?
-                      </Link>
-                    )}
-                  </div>
-                  <button type="submit" disabled={loading} className="w-full bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-black py-3.5 rounded-xl text-sm transition-all">{loading ? "İşlem yapılıyor..." : authMode === "login" ? "Giriş Yap" : "Kayıt Ol"}</button>
-                </form>
-              ) : (
-                <form onSubmit={handleTeacherAuth} className="space-y-4">
-                  {authMode === "register" && (
-                    <>
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        <div><label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Adı Soyadı</label><input type="text" required value={teacherForm.name} onChange={(e) => setTeacherForm({ ...teacherForm, name: e.target.value })} className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none" /></div>
-                        <div><label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Telefon</label><input type="text" required placeholder="05xx xxx xx xx" value={teacherForm.phone} onChange={(e) => setTeacherForm({ ...teacherForm, phone: e.target.value })} className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none" /></div>
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Adı Soyadı</label>
+                        <input
+                          type="text" required
+                          value={teacherForm.name}
+                          onChange={(e) => setTeacherForm({ ...teacherForm, name: e.target.value })}
+                          className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                          placeholder="Ad Soyad"
+                        />
                       </div>
-                      <div><label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Uzmanlık Branşınız</label><input type="text" required placeholder="Matematik, Fizik vb." value={teacherForm.branch} onChange={(e) => setTeacherForm({ ...teacherForm, branch: e.target.value })} className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none" /></div>
-                    </>
-                  )}
-                  <div><label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">E-posta Adresi</label><input type="email" required value={teacherForm.email} onChange={(e) => setTeacherForm({ ...teacherForm, email: e.target.value })} className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none" /></div>
-                  <div><label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Şifre</label><input type="password" required value={teacherForm.password} onChange={(e) => setTeacherForm({ ...teacherForm, password: e.target.value })} className="w-full bg-[#FAF8F5] border border-[#EFECE6] px-4 py-3 rounded-xl text-sm font-bold focus:outline-none" /></div>
-                  <div className="flex items-center justify-between pt-1">
-                    <div className="flex items-center gap-2">
-                      <input type="checkbox" id="teacherRemember" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 rounded" />
-                      <label htmlFor="teacherRemember" className="text-xs text-gray-500 font-bold select-none cursor-pointer">Beni Hatırla</label>
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Telefon</label>
+                        <input
+                          type="text" required
+                          placeholder="05xx xxx xx xx"
+                          value={teacherForm.phone}
+                          onChange={(e) => setTeacherForm({ ...teacherForm, phone: e.target.value })}
+                          className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                        />
+                      </div>
                     </div>
-                    {authMode === "login" && (
-                      <Link href="/sifremi-unuttum" className="text-xs text-[#B45309] font-black hover:underline">
-                        Şifremi Unuttum?
-                      </Link>
-                    )}
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Uzmanlık Branşınız</label>
+                      <input
+                        type="text" required
+                        placeholder="Matematik, Fizik, İngilizce vb."
+                        value={teacherForm.branch}
+                        onChange={(e) => setTeacherForm({ ...teacherForm, branch: e.target.value })}
+                        className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                      />
+                    </div>
+                  </>
+                )}
+                <div>
+                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">E-posta Adresi</label>
+                  <input
+                    type="email" required
+                    value={teacherForm.email}
+                    onChange={(e) => setTeacherForm({ ...teacherForm, email: e.target.value })}
+                    className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                    placeholder="ornek@email.com"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Şifre</label>
+                  <input
+                    type="password" required
+                    value={teacherForm.password}
+                    onChange={(e) => setTeacherForm({ ...teacherForm, password: e.target.value })}
+                    className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                    placeholder="••••••••"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between pt-1">
+                  <div className="flex items-center gap-2">
+                    <input type="checkbox" id="teacherRemember" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 rounded accent-emerald-500" />
+                    <label htmlFor="teacherRemember" className="text-xs text-slate-500 font-bold select-none cursor-pointer">Beni Hatırla</label>
                   </div>
-                  <button type="submit" disabled={loading} className="w-full bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-black py-3.5 rounded-xl text-sm transition-all">{loading ? "İşlem yapılıyor..." : authMode === "login" ? "Giriş Yap" : "Başvuru Yap & Kaydol"}</button>
-                </form>
-              )}
-            </div>
+                  {authMode === "login" && (
+                    <Link href="/sifremi-unuttum" className="text-xs text-emerald-400 font-black hover:text-emerald-300 transition-colors">
+                      Şifremi Unuttum?
+                    </Link>
+                  )}
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="btn-press w-full bg-gradient-to-r from-emerald-600 via-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black py-3.5 rounded-xl text-sm transition-all duration-200 shadow-lg shadow-emerald-900/50 hover:shadow-emerald-500/30 hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      İşlem yapılıyor...
+                    </span>
+                  ) : authMode === "login" ? "🚀 Giriş Yap" : "✨ Başvuru Yap & Kaydol"}
+                </button>
+              </form>
+            )}
           </div>
+
+          {/* Footer note */}
+          <p className="text-center text-slate-600 text-[10px] font-bold mt-5 uppercase tracking-wider">
+            © 2026 Derslinex · Tüm Hakları Saklıdır
+          </p>
         </div>
       </div>
     );
@@ -2239,7 +2413,7 @@ export default function ProfilPage() {
   // ─── TEACHER DASHBOARD (SincApp-style dark sidebar layout) ───────────────────
   if (teacherProfile) {
     return (
-      <div className="flex min-h-screen bg-[#0A1628] font-sans">
+      <div className="bg-mesh flex min-h-screen bg-[#0A1628] font-sans">
         {sidebarOpen && <div className="fixed inset-0 bg-black/60 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />}
         
         {/* Left Sidebar */}
@@ -2248,19 +2422,22 @@ export default function ProfilPage() {
             <BrandLogoHeader subBadge="ÖĞRETMEN PANELİ" />
             <button className="md:hidden text-slate-400 hover:text-white" onClick={() => setSidebarOpen(false)}>✕</button>
           </div>
-          <div className="px-4 py-4 border-b border-white/5 bg-white/5">
+          <div className="px-4 py-5 border-b border-white/5 bg-white/5">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-0.5 shadow-lg shadow-indigo-500/20 flex-shrink-0">
-                <div className="w-full h-full bg-[#0D1B35] rounded-[10px] overflow-hidden flex items-center justify-center font-black text-white text-sm">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 p-0.5 shadow-lg shadow-emerald-500/25 flex-shrink-0">
+                <div className="w-full h-full bg-[#0D1B35] rounded-[14px] overflow-hidden flex items-center justify-center font-black text-white text-lg">
                   {teacherProfile.avatar ? <img src={teacherProfile.avatar} alt="" className="w-full h-full object-cover" /> : teacherProfile.name.charAt(0)}
                 </div>
               </div>
               <div className="min-w-0">
-                <p className="text-white font-black text-xs truncate">{teacherProfile.name}</p>
-                <p className="text-indigo-400 text-[10px] font-bold truncate flex items-center gap-1 mt-0.5">
-                  <span className={`inline-block w-2 h-2 rounded-full ${ teacherProfile.status === "İletişime Geçildi" ? "bg-emerald-400 animate-pulse" : "bg-amber-400" }`}></span>
-                  {teacherProfile.status === "İletişime Geçildi" ? "Öğretmen (Yayında)" : "Onay Bekliyor"}
+                <p className="text-white font-black text-sm truncate">{teacherProfile.name}</p>
+                <p className="text-emerald-400 text-[10px] font-bold truncate flex items-center gap-1 mt-0.5">
+                  <span className={`inline-block w-2 h-2 rounded-full pulse-glow-emerald ${ teacherProfile.status === "İletişime Geçildi" ? "bg-emerald-400" : "bg-amber-400" }`}></span>
+                  {teacherProfile.status === "İletişime Geçildi" ? "👨‍🏫 Öğretmen · Yayında" : "⏳ Onay Bekliyor"}
                 </p>
+                <div className="mt-2 h-1 bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full" style={{width: '75%'}} />
+                </div>
               </div>
             </div>
           </div>
@@ -2281,17 +2458,17 @@ export default function ProfilPage() {
                 onClick={() => { setDashboardTab(item.id as any); setSidebarOpen(false); }}
                 className={`relative w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-left transition-all text-xs font-bold overflow-hidden ${
                   dashboardTab === item.id
-                    ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-900/50 border border-indigo-400/30 font-black"
+                    ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-900/50 border border-emerald-400/30 font-black"
                     : "text-slate-400 hover:text-white hover:bg-white/5"
                 }`}
               >
                 {dashboardTab === item.id && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-indigo-300 rounded-r-full shadow-[0_0_10px_rgba(165,180,252,0.9)]" />
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-emerald-300 rounded-r-full shadow-[0_0_10px_rgba(52,211,153,0.9)]" />
                 )}
                 <span className="text-base">{item.icon}</span>
                 <span className="flex-1 truncate">{item.label}</span>
                 {item.id === "mesajlar" && chatRooms.length > 0 && (
-                  <span className="bg-indigo-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">{chatRooms.length}</span>
+                  <span className="bg-emerald-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">{chatRooms.length}</span>
                 )}
               </button>
             ))}
@@ -3210,7 +3387,7 @@ export default function ProfilPage() {
 
   // ─── STUDENT DASHBOARD (SincApp-style dark sidebar layout) ───────────────────
   return (
-    <div className="flex min-h-screen bg-[#0A1628] font-sans">
+    <div className="bg-mesh flex min-h-screen bg-[#0A1628] font-sans">
       {/* Mobile overlay */}
       {sidebarOpen && <div className="fixed inset-0 bg-black/60 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />}
 
@@ -3223,19 +3400,23 @@ export default function ProfilPage() {
         </div>
 
         {/* User info */}
-        <div className="px-4 py-4 border-b border-white/5 bg-white/5">
+        <div className="px-4 py-5 border-b border-white/5 bg-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-0.5 shadow-lg shadow-indigo-500/20 flex-shrink-0">
-              <div className="w-full h-full bg-[#0D1B35] rounded-[10px] overflow-hidden flex items-center justify-center font-black text-white text-sm">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-0.5 shadow-lg shadow-indigo-500/25 flex-shrink-0">
+              <div className="w-full h-full bg-[#0D1B35] rounded-[14px] overflow-hidden flex items-center justify-center font-black text-white text-lg">
                 {studentProfile?.avatar ? <img src={studentProfile.avatar} alt="" className="w-full h-full object-cover" /> : studentProfile?.name.charAt(0)}
               </div>
             </div>
             <div className="min-w-0">
-              <p className="text-white font-black text-xs truncate">{studentProfile?.name}</p>
+              <p className="text-white font-black text-sm truncate">{studentProfile?.name}</p>
               <p className="text-indigo-400 text-[10px] font-bold truncate flex items-center gap-1 mt-0.5">
                 <span className={`inline-block w-2 h-2 rounded-full ${ studentProfile?.status === "İletişime Geçildi" ? "bg-emerald-400 animate-pulse" : "bg-amber-400" }`}></span>
-                {studentProfile?.status === "İletişime Geçildi" ? "Aktif Hesap" : "Hesap Beklemede"}
+                {studentProfile?.status === "İletişime Geçildi" ? "🎓 Öğrenci · Aktif" : "⏳ Beklemede"}
               </p>
+              <div className="mt-2 h-1 bg-white/5 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-400 rounded-full" style={{width: `${Math.min(100, (pastSessions.length / 10) * 100)}%`}} />
+              </div>
+              <p className="text-slate-600 text-[9px] font-bold mt-0.5">{pastSessions.length} ders tamamlandı</p>
             </div>
           </div>
         </div>
@@ -3414,63 +3595,83 @@ export default function ProfilPage() {
                 </div>
 
                 {/* Özet */}
-                <div className="bg-[#1E293B] rounded-2xl p-5 border border-white/5">
-                  <h3 className="text-white font-black text-sm mb-4 flex items-center gap-2">📊 Özet</h3>
+                <div className="bg-gradient-to-br from-indigo-900/20 via-[#1E293B] to-[#1E293B] rounded-2xl p-5 border border-indigo-500/15">
+                  <h3 className="text-white font-black text-sm mb-4 flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-indigo-500/20 flex items-center justify-center text-xs">📊</span>
+                    Hesap Özeti
+                  </h3>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
-                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${ upcomingSessions.length > 0 ? "bg-green-400" : "bg-slate-600" }`}></span>
-                      <span className="text-slate-300 text-sm font-semibold">
+                      <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${ upcomingSessions.length > 0 ? "bg-green-400 shadow-[0_0_6px_rgba(74,222,128,0.6)]" : "bg-slate-600" }`}></span>
+                      <span className="text-slate-200 text-sm font-semibold flex-1">
                         {upcomingSessions.length > 0 ? `${upcomingSessions.length} yaklaşan canlı dersiniz var` : "Yaklaşan canlı dersiniz bulunmuyor"}
                       </span>
+                      {upcomingSessions.length > 0 && <span className="text-[9px] bg-green-500/20 text-green-400 border border-green-500/30 px-2 py-0.5 rounded-full font-black">YAKLAŞIYOR</span>}
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${ chatRooms.length > 0 ? "bg-blue-400" : "bg-slate-600" }`}></span>
-                      <span className="text-slate-300 text-sm font-semibold">
+                      <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${ chatRooms.length > 0 ? "bg-blue-400 shadow-[0_0_6px_rgba(96,165,250,0.6)]" : "bg-slate-600" }`}></span>
+                      <span className="text-slate-200 text-sm font-semibold">
                         {chatRooms.length > 0 ? `${chatRooms.length} aktif sohbet odanız var` : "Aktif sohbet odanız bulunmuyor"}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${ studentFeedbacks.length > 0 ? "bg-amber-400" : "bg-slate-600" }`}></span>
-                      <span className="text-slate-300 text-sm font-semibold">
+                      <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${ studentFeedbacks.length > 0 ? "bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.6)]" : "bg-slate-600" }`}></span>
+                      <span className="text-slate-200 text-sm font-semibold">
                         {studentFeedbacks.length > 0 ? `${studentFeedbacks.length} değerlendirme gönderildi` : "Henüz değerlendirme göndermediniz"}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${ pastSessions.some(s => s.myFeedback?.homeworkGiven) ? "bg-purple-400" : "bg-slate-600" }`}></span>
-                      <span className="text-slate-300 text-sm font-semibold">
+                      <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${ pastSessions.some(s => s.myFeedback?.homeworkGiven) ? "bg-purple-400 shadow-[0_0_6px_rgba(192,132,252,0.6)]" : "bg-slate-600" }`}></span>
+                      <span className="text-slate-200 text-sm font-semibold">
                         {pastSessions.filter(s => s.myFeedback?.homeworkGiven).length > 0 ? `${pastSessions.filter(s => s.myFeedback?.homeworkGiven).length} bekleyen ödeviniz var` : "Bekleyen ödeviniz yok"}
                       </span>
+                    </div>
+                  </div>
+                  {/* Ders tamamlama progress */}
+                  <div className="mt-4 pt-4 border-t border-white/5">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-slate-500 text-[10px] font-black uppercase tracking-wider">Ders İlerlemesi</span>
+                      <span className="text-indigo-400 text-[10px] font-black">{pastSessions.length}/10 ders</span>
+                    </div>
+                    <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-indigo-500 to-purple-400 rounded-full transition-all duration-700"
+                        style={{width: `${Math.min(100, (pastSessions.length / 10) * 100)}%`}}
+                      />
                     </div>
                   </div>
                 </div>
 
                 {/* Quick Action Cards */}
                 <div>
-                  <h3 className="text-white font-black text-sm mb-3">⚡ Hızlı Erişim</h3>
+                  <h3 className="text-white font-black text-sm mb-3 flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-lg bg-amber-500/20 flex items-center justify-center text-xs">⚡</span>
+                    Hızlı Erişim
+                  </h3>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {[
-                      { icon: "🎥", label: "Canlı Derslerim", sub: `${upcomingSessions.length} yaklaşan`, tab: "canli", color: "from-red-600/20 to-red-900/20 border-red-500/20 hover:border-red-500/40" },
-                      { icon: "💬", label: "Öğretmenimle Konuş", sub: `${chatRooms.length} sohbet`, tab: "mesajlar", color: "from-blue-600/20 to-blue-900/20 border-blue-500/20 hover:border-blue-500/40" },
-                      { icon: "⭐", label: "Değerlendirme Yap", sub: "Görüş gönder", tab: "degerlendirme", color: "from-amber-600/20 to-amber-900/20 border-amber-500/20 hover:border-amber-500/40" },
-                      { icon: "⚙️", label: "Profilimi Düzenle", sub: "Bilgileri güncelle", tab: "duzenle", color: "from-slate-600/20 to-slate-900/20 border-slate-500/20 hover:border-slate-500/40" },
+                      { icon: "🎥", label: "Canlı Derslerim", sub: `${upcomingSessions.length} yaklaşan`, tab: "canli", color: "from-red-600/30 to-red-900/40 border-red-500/30 hover:border-red-500/60 hover:shadow-[0_4px_20px_rgba(239,68,68,0.2)]" },
+                      { icon: "💬", label: "Öğretmenimle Konuş", sub: `${chatRooms.length} sohbet`, tab: "mesajlar", color: "from-blue-600/30 to-blue-900/40 border-blue-500/30 hover:border-blue-500/60 hover:shadow-[0_4px_20px_rgba(59,130,246,0.2)]" },
+                      { icon: "⭐", label: "Değerlendirme Yap", sub: "Görüş gönder", tab: "degerlendirme", color: "from-amber-600/30 to-amber-900/40 border-amber-500/30 hover:border-amber-500/60 hover:shadow-[0_4px_20px_rgba(245,158,11,0.2)]" },
+                      { icon: "⚙️", label: "Profilimi Düzenle", sub: "Bilgileri güncelle", tab: "duzenle", color: "from-slate-600/30 to-slate-900/40 border-slate-500/30 hover:border-slate-400/60 hover:shadow-[0_4px_20px_rgba(100,116,139,0.2)]" },
                     ].map((card) => (
                       <button
                         key={card.tab}
                         onClick={() => setDashboardTab(card.tab as any)}
-                        className={`bg-gradient-to-br ${card.color} border rounded-2xl p-4 text-left transition-all hover:scale-105 group`}
+                        className={`card-hover bg-gradient-to-br ${card.color} border rounded-2xl p-4 text-left transition-all hover:scale-[1.02] group`}
                       >
-                        <span className="text-2xl block mb-2">{card.icon}</span>
+                        <span className="text-3xl block mb-3">{card.icon}</span>
                         <p className="text-white font-black text-xs">{card.label}</p>
                         <p className="text-slate-400 text-[10px] font-bold mt-0.5">{card.sub}</p>
                       </button>
                     ))}
-                    <Link href="/ogretmenler" className={`bg-gradient-to-br from-purple-600/20 to-purple-900/20 border border-purple-500/20 hover:border-purple-500/40 rounded-2xl p-4 text-left transition-all hover:scale-105`}>
-                      <span className="text-2xl block mb-2">📚</span>
+                    <Link href="/ogretmenler" className={`card-hover bg-gradient-to-br from-purple-600/30 to-purple-900/40 border border-purple-500/30 hover:border-purple-500/60 hover:shadow-[0_4px_20px_rgba(168,85,247,0.2)] rounded-2xl p-4 text-left transition-all hover:scale-[1.02]`}>
+                      <span className="text-3xl block mb-3">📚</span>
                       <p className="text-white font-black text-xs">Ders Bul</p>
                       <p className="text-slate-400 text-[10px] font-bold mt-0.5">Öğretmenleri gör</p>
                     </Link>
-                    <Link href="/blog" className={`bg-gradient-to-br from-emerald-600/20 to-emerald-900/20 border border-emerald-500/20 hover:border-emerald-500/40 rounded-2xl p-4 text-left transition-all hover:scale-105`}>
-                      <span className="text-2xl block mb-2">📰</span>
+                    <Link href="/blog" className={`card-hover bg-gradient-to-br from-emerald-600/30 to-emerald-900/40 border border-emerald-500/30 hover:border-emerald-500/60 hover:shadow-[0_4px_20px_rgba(16,185,129,0.2)] rounded-2xl p-4 text-left transition-all hover:scale-[1.02]`}>
+                      <span className="text-3xl block mb-3">📰</span>
                       <p className="text-white font-black text-xs">Blog Oku</p>
                       <p className="text-slate-400 text-[10px] font-bold mt-0.5">Bilgi kazan</p>
                     </Link>

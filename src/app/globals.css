@@ -34,3 +34,143 @@ html.light-theme video,
 html.light-theme iframe {
   filter: invert(1.08) hue-rotate(180deg);
 }
+
+/* ─── Shimmer Animation (Modern Skeleton) ──────────────────────────────────── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.10) 40%,
+    rgba(255, 255, 255, 0.03) 80%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* ─── Animated Mesh Background ────────────────────────────────────────────── */
+@keyframes meshFloat1 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.06; }
+  33% { transform: translate(40px, -30px) scale(1.15); opacity: 0.10; }
+  66% { transform: translate(-20px, 25px) scale(0.92); opacity: 0.07; }
+}
+
+@keyframes meshFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.05; }
+  33% { transform: translate(-30px, 40px) scale(1.1); opacity: 0.09; }
+  66% { transform: translate(35px, -15px) scale(0.95); opacity: 0.06; }
+}
+
+.bg-mesh::before {
+  content: '';
+  position: fixed;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%);
+  filter: blur(60px);
+  animation: meshFloat1 18s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+  top: -100px;
+  left: -150px;
+}
+
+.bg-mesh::after {
+  content: '';
+  position: fixed;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.09) 0%, transparent 70%);
+  filter: blur(80px);
+  animation: meshFloat2 22s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+  bottom: -100px;
+  right: -100px;
+  animation-delay: -10s;
+}
+
+/* ─── Tab Content Fade-In Animation ───────────────────────────────────────── */
+@keyframes tabFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.tab-content {
+  animation: tabFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─── Button Press Effect ──────────────────────────────────────────────────── */
+.btn-press {
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.btn-press:active {
+  transform: scale(0.96);
+}
+
+/* ─── Input Focus Glow ─────────────────────────────────────────────────────── */
+.input-glow {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-glow:focus {
+  outline: none;
+  border-color: rgba(99, 102, 241, 0.6) !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15), 0 0 20px rgba(99, 102, 241, 0.08);
+}
+
+/* ─── Count-up Number Animation ───────────────────────────────────────────── */
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.count-up {
+  animation: countUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─── Card Hover Lift ──────────────────────────────────────────────────────── */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-3px);
+}
+
+/* ─── Pulse Glow (Canlı Ders) ──────────────────────────────────────────────── */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+}
+
+.pulse-glow-red {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* ─── Emerald Pulse Glow (Teacher sidebar) ─────────────────────────────────── */
+@keyframes pulseGlowEmerald {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+}
+
+.pulse-glow-emerald {
+  animation: pulseGlowEmerald 2s ease-in-out infinite;
+}
+
+/* ─── Glow text effect ─────────────────────────────────────────────────────── */
+.text-glow-indigo {
+  text-shadow: 0 0 20px rgba(99, 102, 241, 0.6), 0 0 40px rgba(99, 102, 241, 0.3);
+}
+
+.text-glow-emerald {
+  text-shadow: 0 0 20px rgba(16, 185, 129, 0.6), 0 0 40px rgba(16, 185, 129, 0.3);
+}
+
