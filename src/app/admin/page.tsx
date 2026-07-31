@@ -147,9 +147,8 @@ export default function AdminPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [tRes, sRes, fRes, lRes, bRes, sessRes, taskRes, qRes, cRes, mRes] = await Promise.all([
-        adminFetch("/api/profil/ogretmen"),
-        adminFetch("/api/profil/ogrenci"),
+      const [uRes, fRes, lRes, bRes, sessRes, taskRes, qRes, cRes, mRes] = await Promise.all([
+        adminFetch("/api/admin/users"),
         adminFetch("/api/gorus"),
         adminFetch("/api/admin/lessons"),
         adminFetch("/api/admin/blogs"),
@@ -160,8 +159,8 @@ export default function AdminPage() {
         adminFetch("/api/admin/status"),
       ]);
 
-      const tData = await tRes.json();
-      const sData = await sRes.json();
+
+      const uData = await uRes.json();
       const fData = await fRes.json();
       const lData = await lRes.json();
       const bData = await bRes.json();
@@ -171,8 +170,11 @@ export default function AdminPage() {
       const cData = await cRes.json();
       const mData = await mRes.json();
 
-      if (tData.success) setTeachers(tData.teachers || []);
-      if (sData.success) setStudents(sData.students || []);
+      if (uData.success) {
+        if (uData.teachers) setTeachers(uData.teachers);
+        if (uData.students) setStudents(uData.students);
+      }
+
       if (fData.success) setFeedbacks(fData.feedbacks || []);
       if (lData.success) setLessons(lData.lessons || []);
       if (bData.success) setBlogs(bData.posts || []);

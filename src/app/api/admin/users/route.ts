@@ -2,6 +2,51 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { verifyAdminAuth } from "@/lib/adminAuth";
 
+// GET: Fetch all students & teachers for admin panel
+export async function GET(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
+  try {
+    const students = await prisma.student.findMany({
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        email: true,
+        avatar: true,
+        status: true,
+        isBanned: true,
+        createdAt: true,
+      },
+    });
+
+    const teachers = await prisma.teacher.findMany({
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        email: true,
+        branch: true,
+        egitim: true,
+        ozgecmis: true,
+        avatar: true,
+        status: true,
+        isBanned: true,
+        points: true,
+        createdAt: true,
+      },
+    });
+
+    return NextResponse.json({ success: true, students, teachers });
+  } catch (error) {
+    console.error("Admin Users GET Hatası:", error);
+    return NextResponse.json({ success: false, error: "Sunucu hatası" }, { status: 500 });
+  }
+}
+
 // POST: Ban/unban user
 export async function POST(request: Request) {
   const authError = verifyAdminAuth(request);
