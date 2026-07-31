@@ -113,7 +113,8 @@ export function PomodoroTimer() {
   const progressPercent = ((totalDuration - timeLeft) / totalDuration) * 100;
 
   return (
-    <div className="bg-[#1E293B] border border-white/10 rounded-2xl p-6 shadow-xl space-y-6">
+    <div className="pomodoro-container bg-[#1E293B] border border-white/10 rounded-2xl p-6 shadow-xl space-y-6">
+
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-xl">
