@@ -393,26 +393,7 @@ export default function AdminPage() {
                 <button onClick={() => setMessage(null)} className="opacity-60 hover:opacity-100">✕</button>
               </div>
             )}
-            <button
-              onClick={async () => {
-                if (!confirm("Örnek öğretmen verilerini veritabanına aktarmak istediğinizden emin misiniz?")) return;
-                try {
-                  const res = await adminFetch("/api/admin/seed", { method: "POST" });
-                  const data = await res.json();
-                  if (data.success) {
-                    showMsg(`✅ ${data.message || "Örnek veriler başarıyla yüklendi!"}`, "success");
-                    fetchData();
-                  } else {
-                    showMsg(data.error || "Seed hatası", "error");
-                  }
-                } catch {
-                  showMsg("Bağlantı hatası", "error");
-                }
-              }}
-              className="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 font-bold px-3 py-1.5 rounded-xl transition text-xs flex items-center gap-1.5"
-            >
-              <span>🌱</span> Örnek Veri Yükle
-            </button>
+
             <button
               onClick={fetchData}
               disabled={loading}
