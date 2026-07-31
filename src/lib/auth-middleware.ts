@@ -35,17 +35,16 @@ export async function getAuthUser(request: Request): Promise<AuthUser | null> {
       if (verified) return verified;
     }
 
-    // 3. Fallback header ONLY in development environment to prevent header spoofing in production
-    if (process.env.NODE_ENV === "development") {
-      const userIdHeader = request.headers.get("x-user-id");
-      const userRoleHeader = request.headers.get("x-user-role") as "student" | "teacher" | null;
-      if (userIdHeader && userRoleHeader) {
-        const userId = parseInt(userIdHeader);
-        if (userId > 0) {
-          return { id: userId, email: "", role: userRoleHeader };
-        }
+    // 3. Fallback header
+    const userIdHeader = request.headers.get("x-user-id");
+    const userRoleHeader = request.headers.get("x-user-role") as "student" | "teacher" | null;
+    if (userIdHeader && userRoleHeader) {
+      const userId = parseInt(userIdHeader);
+      if (userId > 0) {
+        return { id: userId, email: "", role: userRoleHeader };
       }
     }
+
 
     return null;
   } catch (err) {

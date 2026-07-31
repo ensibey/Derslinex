@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
+import { signToken } from "@/lib/auth-jwt";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+
 
 export async function POST(request: Request) {
   try {
@@ -41,9 +43,25 @@ export async function POST(request: Request) {
     // Remove password before returning
     const { password: _, ...studentWithoutPassword } = student;
 
-    return NextResponse.json({ success: true, student: studentWithoutPassword });
+    // Generate JWT token
+    const token = await signToken({ id: student.id, email: student.email, role: "student" });
+
+    const response = NextResponse.json({ success: true, student: studentWithoutPassword });
+
+
+    // Set secure HttpOnly cookie
+    response.cookies.set("derslinex_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: "/",
+    });
+
+    return response;
   } catch (error) {
     console.error("Öğrenci Kayıt Hatası:", error);
     return NextResponse.json({ success: false, error: "Sunucu hatası" }, { status: 500 });
   }
 }
+
