@@ -104,37 +104,51 @@ export default function Header() {
               WhatsApp ile Ders Al
             </a>
 
-            {/* Profile Avatar Trigger Button */}
-            <Link
-              href="/profil"
-              className="group/avatar flex items-center gap-1.5 focus:outline-none"
-              aria-label="Profil Sayfası"
-            >
-              <div className="w-10 h-10 rounded-full bg-gradient-to-b from-[#1E3A8A] to-indigo-800 flex items-center justify-center text-white font-black overflow-hidden border border-[#EFECE6] shadow-xs group-hover/avatar:scale-105 transition-all">
-                {user?.avatar ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={user.avatar} alt="Profil" className="w-full h-full object-cover" />
-                ) : user?.name ? (
-                  user.name.charAt(0).toUpperCase()
-                ) : (
-                  "👤"
-                )}
-              </div>
-            </Link>
+            {/* Profile / Login Trigger Button */}
+            {user ? (
+              <Link
+                href="/profil"
+                className="flex items-center gap-2.5 bg-white border border-[#1E3A8A]/20 hover:border-[#1E3A8A] px-3.5 py-1.5 rounded-xl transition-all shadow-xs hover:shadow-md group"
+                aria-label="Profil Sayfası"
+              >
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#1E3A8A] to-indigo-800 flex items-center justify-center text-white font-black overflow-hidden flex-shrink-0">
+                  {user?.avatar ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={user.avatar} alt="Profil" className="w-full h-full object-cover" />
+                  ) : (
+                    user.name.charAt(0).toUpperCase()
+                  )}
+                </div>
+                <div className="flex flex-col text-left">
+                  <span className="text-xs font-black text-[#1E3A8A] truncate max-w-[110px] leading-tight">
+                    {user.name.split(" ")[0]}
+                  </span>
+                  <span className="text-[9px] font-bold text-[#B45309] uppercase tracking-wider leading-tight">
+                    {role === "teacher" ? "Öğretmen" : "Öğrenci"}
+                  </span>
+                </div>
+              </Link>
+            ) : (
+              <Link
+                href="/profil"
+                className="inline-flex items-center gap-2 bg-[#1E3A8A] hover:bg-[#152860] text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md group"
+              >
+                <span className="text-xs bg-white/20 group-hover:bg-white/30 rounded-lg p-1 transition-colors">👤</span>
+                <span>Giriş Yap / Kayıt</span>
+              </Link>
+            )}
           </div>
 
           {/* Mobile menu & avatar trigger button */}
-          <div className="lg:hidden flex items-center gap-3">
-            {user && (
-              <Link href="/profil" className="w-8 h-8 rounded-full bg-gradient-to-b from-[#1E3A8A] to-indigo-800 flex items-center justify-center text-white font-black overflow-hidden border border-[#EFECE6]">
-                {user.avatar ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={user.avatar} alt="Profil" className="w-full h-full object-cover" />
-                ) : (
-                  user.name.charAt(0).toUpperCase()
-                )}
-              </Link>
-            )}
+          <div className="lg:hidden flex items-center gap-2">
+            <Link
+              href="/profil"
+              className="inline-flex items-center gap-1.5 bg-[#1E3A8A] text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-all"
+            >
+              <span>👤</span>
+              <span>{user ? user.name.split(" ")[0] : "Giriş"}</span>
+            </Link>
+
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="p-2 rounded-md text-gray-600 hover:bg-gray-100"
