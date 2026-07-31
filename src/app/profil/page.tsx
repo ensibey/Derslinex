@@ -1314,7 +1314,7 @@ function StudentLeaderboardTab({ currentStudentId }: { currentStudentId?: number
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-gradient-to-r from-amber-500/20 via-indigo-900/40 to-[#0D1B35] border border-amber-500/30 p-6 rounded-2xl">
+      <div className="leaderboard-banner flex flex-wrap items-center justify-between gap-4 bg-[#0D1B35] border border-amber-500/30 p-6 rounded-2xl">
         <div>
           <h3 className="text-xl font-black text-white flex items-center gap-2">
             <span>🏆</span> Haftanın Net Şampiyonları & Başarı Rozetleri
@@ -1323,7 +1323,7 @@ function StudentLeaderboardTab({ currentStudentId }: { currentStudentId?: number
         </div>
 
         {myEntry && (
-          <div className="bg-[#0D1B35] border border-amber-500/40 px-4 py-2.5 rounded-xl text-right">
+          <div className="my-rank-box bg-[#0D1B35] border border-amber-500/40 px-4 py-2.5 rounded-xl text-right">
             <span className="text-[10px] text-amber-400 font-black uppercase tracking-wider block">BENİM SIRAM</span>
             <span className="text-xl font-black text-white tabular-nums">#{myEntry.rank} • {myEntry.totalScore} Puan</span>
           </div>
@@ -1335,7 +1335,7 @@ function StudentLeaderboardTab({ currentStudentId }: { currentStudentId?: number
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
           {/* 2nd Place */}
           {top3[1] && (
-            <div className="order-2 md:order-1 bg-gradient-to-b from-slate-800 to-[#0D1B35] border border-slate-400/30 rounded-2xl p-5 text-center flex flex-col items-center justify-center space-y-3 relative shadow-xl">
+            <div className="podium-card-2 order-2 md:order-1 bg-[#0D1B35] border border-slate-400/30 rounded-2xl p-5 text-center flex flex-col items-center justify-center space-y-3 relative shadow-xl">
               <span className="absolute -top-3 bg-slate-400 text-slate-950 font-black text-xs px-3 py-0.5 rounded-full shadow-md">🥈 2. Sıra</span>
               <div className="w-16 h-16 rounded-full bg-slate-700 border-2 border-slate-300 overflow-hidden flex items-center justify-center text-xl font-black text-white mt-2">
                 {top3[1].avatar ? <img src={top3[1].avatar} alt="" className="w-full h-full object-cover" /> : top3[1].name.charAt(0)}
@@ -1354,7 +1354,7 @@ function StudentLeaderboardTab({ currentStudentId }: { currentStudentId?: number
 
           {/* 1st Place (Gold) */}
           {top3[0] && (
-            <div className="order-1 md:order-2 bg-gradient-to-b from-amber-900/60 via-amber-950 to-[#0D1B35] border-2 border-amber-400 rounded-2xl p-6 text-center flex flex-col items-center justify-center space-y-3 relative shadow-2xl shadow-amber-500/20 scale-105">
+            <div className="podium-card-1 order-1 md:order-2 bg-[#0D1B35] border-2 border-amber-400 rounded-2xl p-6 text-center flex flex-col items-center justify-center space-y-3 relative shadow-2xl shadow-amber-500/20 scale-105">
               <span className="absolute -top-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-black text-xs px-4 py-1 rounded-full shadow-lg border border-amber-300">👑 1. HAFTANIN ŞAMPİYONU</span>
               <div className="w-20 h-20 rounded-full bg-amber-500 border-4 border-amber-300 overflow-hidden flex items-center justify-center text-2xl font-black text-white mt-2 shadow-lg shadow-amber-500/50">
                 {top3[0].avatar ? <img src={top3[0].avatar} alt="" className="w-full h-full object-cover" /> : top3[0].name.charAt(0)}
@@ -1373,7 +1373,7 @@ function StudentLeaderboardTab({ currentStudentId }: { currentStudentId?: number
 
           {/* 3rd Place */}
           {top3[2] && (
-            <div className="order-3 bg-gradient-to-b from-amber-950/40 to-[#0D1B35] border border-amber-700/30 rounded-2xl p-5 text-center flex flex-col items-center justify-center space-y-3 relative shadow-xl">
+            <div className="podium-card-3 order-3 bg-[#0D1B35] border border-amber-700/30 rounded-2xl p-5 text-center flex flex-col items-center justify-center space-y-3 relative shadow-xl">
               <span className="absolute -top-3 bg-amber-700 text-white font-black text-xs px-3 py-0.5 rounded-full shadow-md">🥉 3. Sıra</span>
               <div className="w-16 h-16 rounded-full bg-amber-900 border-2 border-amber-600 overflow-hidden flex items-center justify-center text-xl font-black text-white mt-2">
                 {top3[2].avatar ? <img src={top3[2].avatar} alt="" className="w-full h-full object-cover" /> : top3[2].name.charAt(0)}
@@ -1394,7 +1394,7 @@ function StudentLeaderboardTab({ currentStudentId }: { currentStudentId?: number
 
       {/* Earned Badges Section */}
       {myEntry && myEntry.badges && (
-        <div className="bg-[#1E293B] border border-white/10 rounded-2xl p-6 space-y-4">
+        <div className="leaderboard-badges-container bg-[#1E293B] border border-white/10 rounded-2xl p-6 space-y-4">
           <h4 className="font-black text-white text-base flex items-center gap-2">
             <span>🎖️</span> Kazandığım Dijital Başarı Rozetleri ({myEntry.unlockedBadgeCount} / {myEntry.badges.length})
           </h4>
@@ -1426,7 +1426,7 @@ function StudentLeaderboardTab({ currentStudentId }: { currentStudentId?: number
       )}
 
       {/* Full Leaderboard Table */}
-      <div className="bg-[#1E293B] border border-white/10 rounded-2xl p-6 space-y-4">
+      <div className="leaderboard-table-container bg-[#1E293B] border border-white/10 rounded-2xl p-6 space-y-4">
         <h4 className="font-black text-indigo-400 text-sm uppercase tracking-wider">📊 Tüm Öğrenci Sıralaması ({leaderboard.length})</h4>
 
         <div className="overflow-x-auto">
