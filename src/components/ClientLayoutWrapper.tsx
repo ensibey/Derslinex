@@ -11,6 +11,8 @@ export default function ClientLayoutWrapper({ children }: { children: React.Reac
   const isDashboardRoute =
     pathname?.startsWith("/profil") ||
     pathname?.startsWith("/admin") ||
+    pathname?.startsWith("/sifremi-unuttum") ||
+    pathname?.startsWith("/sifremi-sifirla") ||
     pathname?.startsWith("/ders/");
 
   if (isDashboardRoute) {

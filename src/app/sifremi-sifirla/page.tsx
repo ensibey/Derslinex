@@ -60,7 +60,7 @@ function ResetPasswordContent() {
   };
 
   return (
-    <div className="w-full max-w-md bg-[#0D1B35] border border-white/10 rounded-3xl p-8 shadow-2xl space-y-6">
+    <div className="w-full max-w-md bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative z-10 space-y-6">
       <div className="text-center space-y-2">
         <Link href="/" className="inline-flex items-center gap-2">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-600 p-0.5 shadow-lg shadow-indigo-500/30">
@@ -129,10 +129,11 @@ function ResetPasswordContent() {
 
 export default function SifremiSifirlaPage() {
   return (
-    <div className="min-h-screen bg-[#0A1628] flex items-center justify-center p-4 font-sans text-slate-100">
+    <div className="bg-mesh min-h-screen bg-[#0A1628] flex items-center justify-center p-4 font-sans text-slate-100 relative overflow-hidden">
       <Suspense fallback={<div className="text-white font-bold">Yükleniyor...</div>}>
         <ResetPasswordContent />
       </Suspense>
     </div>
   );
 }
+
