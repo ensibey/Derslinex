@@ -31,12 +31,15 @@ export async function POST(request: Request) {
     }
 
     if (!userExists) {
-      // Return success to avoid email enumeration
-      return NextResponse.json({
-        success: true,
-        message: "Eğer e-posta adresi sistemimizde kayıtlı ise sıfırlama bağlantısı gönderilmiştir.",
-      });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Bu e-posta adresine ait kayıtlı bir kullanıcı bulunamadı.",
+        },
+        { status: 404 }
+      );
     }
+
 
     // Generate token
     const token = crypto.randomBytes(32).toString("hex");
