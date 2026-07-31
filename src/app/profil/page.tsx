@@ -2450,22 +2450,19 @@ export default function ProfilPage() {
             <BrandLogoHeader subBadge="ÖĞRETMEN PANELİ" />
             <button className="md:hidden text-slate-400 hover:text-white" onClick={() => setSidebarOpen(false)}>✕</button>
           </div>
-          <div className="px-4 py-5 border-b border-white/5 bg-white/5">
+          <div className="px-4 py-4 border-b border-white/5 bg-white/5">
             <div className="flex items-center gap-3">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 p-0.5 shadow-lg shadow-emerald-500/25 flex-shrink-0">
-                <div className="w-full h-full bg-[#0D1B35] rounded-[14px] overflow-hidden flex items-center justify-center font-black text-white text-lg">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 p-0.5 shadow-md flex-shrink-0">
+                <div className="w-full h-full bg-[#0D1B35] rounded-[9px] overflow-hidden flex items-center justify-center font-black text-white text-base">
                   {teacherProfile.avatar ? <img src={teacherProfile.avatar} alt="" className="w-full h-full object-cover" /> : teacherProfile.name.charAt(0)}
                 </div>
               </div>
-              <div className="min-w-0">
-                <p className="text-white font-black text-sm truncate">{teacherProfile.name}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-white font-black text-xs truncate">{teacherProfile.name}</p>
                 <p className="text-emerald-400 text-[10px] font-bold truncate flex items-center gap-1 mt-0.5">
-                  <span className={`inline-block w-2 h-2 rounded-full pulse-glow-emerald ${ teacherProfile.status === "İletişime Geçildi" ? "bg-emerald-400" : "bg-amber-400" }`}></span>
+                  <span className={`inline-block w-1.5 h-1.5 rounded-full pulse-glow-emerald ${ teacherProfile.status === "İletişime Geçildi" ? "bg-emerald-400" : "bg-amber-400" }`}></span>
                   {teacherProfile.status === "İletişime Geçildi" ? "👨‍🏫 Öğretmen · Yayında" : "⏳ Onay Bekliyor"}
                 </p>
-                <div className="mt-2 h-1 bg-white/5 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full" style={{width: '75%'}} />
-                </div>
               </div>
             </div>
           </div>
@@ -3428,23 +3425,19 @@ export default function ProfilPage() {
         </div>
 
         {/* User info */}
-        <div className="px-4 py-5 border-b border-white/5 bg-white/5">
+        <div className="px-4 py-4 border-b border-white/5 bg-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-0.5 shadow-lg shadow-indigo-500/25 flex-shrink-0">
-              <div className="w-full h-full bg-[#0D1B35] rounded-[14px] overflow-hidden flex items-center justify-center font-black text-white text-lg">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-0.5 shadow-md flex-shrink-0">
+              <div className="w-full h-full bg-[#0D1B35] rounded-[9px] overflow-hidden flex items-center justify-center font-black text-white text-base">
                 {studentProfile?.avatar ? <img src={studentProfile.avatar} alt="" className="w-full h-full object-cover" /> : studentProfile?.name.charAt(0)}
               </div>
             </div>
-            <div className="min-w-0">
-              <p className="text-white font-black text-sm truncate">{studentProfile?.name}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-white font-black text-xs truncate">{studentProfile?.name}</p>
               <p className="text-indigo-400 text-[10px] font-bold truncate flex items-center gap-1 mt-0.5">
-                <span className={`inline-block w-2 h-2 rounded-full ${ studentProfile?.status === "İletişime Geçildi" ? "bg-emerald-400 animate-pulse" : "bg-amber-400" }`}></span>
+                <span className={`inline-block w-1.5 h-1.5 rounded-full ${ studentProfile?.status === "İletişime Geçildi" ? "bg-emerald-400 animate-pulse" : "bg-amber-400" }`}></span>
                 {studentProfile?.status === "İletişime Geçildi" ? "🎓 Öğrenci · Aktif" : "⏳ Beklemede"}
               </p>
-              <div className="mt-2 h-1 bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-400 rounded-full" style={{width: `${Math.min(100, (pastSessions.length / 10) * 100)}%`}} />
-              </div>
-              <p className="text-slate-600 text-[9px] font-bold mt-0.5">{pastSessions.length} ders tamamlandı</p>
             </div>
           </div>
         </div>
@@ -3455,14 +3448,14 @@ export default function ProfilPage() {
             <button
               key={item.id}
               onClick={() => { setDashboardTab(item.id as any); setSidebarOpen(false); }}
-              className={`relative w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-left transition-all text-xs font-bold overflow-hidden ${
+              className={`relative w-full flex items-center gap-3 py-2.5 rounded-xl text-left transition-all text-xs font-bold overflow-hidden ${
                 dashboardTab === item.id
-                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-900/50 border border-indigo-400/30 font-black"
-                  : "text-slate-400 hover:text-white hover:bg-white/5"
+                  ? "pl-4 pr-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-900/50 border border-indigo-400/30 font-black"
+                  : "px-3.5 text-slate-400 hover:text-white hover:bg-white/5"
               }`}
             >
               {dashboardTab === item.id && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-indigo-300 rounded-r-full shadow-[0_0_10px_rgba(165,180,252,0.9)]" />
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-indigo-300 rounded-r-full shadow-[0_0_8px_rgba(165,180,252,0.9)]" />
               )}
               <span className="text-base">{item.icon}</span>
               <span className="flex-1 truncate">{item.label}</span>
