@@ -243,7 +243,10 @@ html.light-theme button[title*="Gece"]:hover,
 html.light-theme button[title*="Gündüz"]:hover {
   background-color: #E2E8F0 !important;
   color: #000000 !important;
+}
+
 /* ─── Light Mode ÖSYM / LGS Results Card Overrides ────────────────────────── */
+
 html.light-theme .osym-result-card {
   background: #FFFFFF !important;
   border-color: #E2E8F0 !important;

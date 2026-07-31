@@ -13,9 +13,13 @@ export default function TeacherCard({ hoca }: { hoca: Hoca }) {
   return (
     <div className="bg-white/85 backdrop-blur-md rounded-3xl shadow-premium border border-[#EFECE6]/65 hover:border-[#F5D0A9]/80 hover:bg-white/95 hover:shadow-md transition-all duration-300 overflow-hidden group relative">
       {/* Active Indicator Tag */}
-      <div className="absolute top-4 right-4 flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-100 text-[9px] font-black px-2.5 py-0.5 rounded-full shadow-sm z-10">
-        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-        <span>Aktif</span>
+      <div className={`absolute top-4 right-4 flex items-center gap-1 text-[9px] font-black px-2.5 py-0.5 rounded-full shadow-sm z-10 ${
+        hoca.aktif !== false
+          ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+          : "bg-slate-100 text-slate-500 border border-slate-200"
+      }`}>
+        <span className={`w-1.5 h-1.5 rounded-full ${hoca.aktif !== false ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`} />
+        <span>{hoca.aktif !== false ? "Aktif" : "Çevrimdışı"}</span>
       </div>
       <div className="p-4 sm:p-6">
         <div className="flex items-start gap-3 sm:gap-4">
