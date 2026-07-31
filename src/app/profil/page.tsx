@@ -3623,7 +3623,8 @@ export default function ProfilPage() {
                 </div>
 
                 {/* Özet */}
-                <div className="bg-gradient-to-br from-indigo-900/20 via-[#1E293B] to-[#1E293B] rounded-2xl p-5 border border-indigo-500/15">
+                <div className="bg-[#1E293B] rounded-2xl p-5 border border-white/10 shadow-xl">
+
                   <h3 className="text-white font-black text-sm mb-4 flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-indigo-500/20 flex items-center justify-center text-xs">📊</span>
                     Hesap Özeti

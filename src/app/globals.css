@@ -220,13 +220,45 @@ html.light-theme textarea::placeholder {
   color: #94A3B8 !important;
 }
 
-/* ─── Borders & Dividers ─────────────────────────────────────────────────── */
+/* ─── Light Mode Quick Access Tiles & Buttons ──────────────────────────────── */
+html.light-theme .card-hover.bg-gradient-to-br {
+  background: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04) !important;
+}
+
+html.light-theme .card-hover.bg-gradient-to-br:hover {
+  background: #F8FAFC !important;
+  border-color: #CBD5E1 !important;
+  transform: translateY(-2px);
+}
+
+html.light-theme .card-hover.bg-gradient-to-br .text-white {
+  color: #0F172A !important;
+}
+
+html.light-theme .card-hover.bg-gradient-to-br .text-slate-400 {
+  color: #64748B !important;
+}
+
+/* ─── Light Mode Inactive Status Dots & Progress Bar Tracks ──────────────── */
+html.light-theme .bg-slate-600 {
+  background-color: #CBD5E1 !important;
+}
+
+html.light-theme .bg-white\/5,
+html.light-theme .bg-white\/10 {
+  background-color: #F1F5F9 !important;
+}
+
+/* ─── Light Mode Borders & Dividers ─────────────────────────────────────────── */
 html.light-theme .border-white\/5,
 html.light-theme .border-white\/10,
 html.light-theme .border-white\/15,
 html.light-theme .border-white\/20 {
   border-color: #E2E8F0 !important;
 }
+
 
 
 
