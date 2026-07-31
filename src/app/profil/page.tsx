@@ -2533,16 +2533,46 @@ export default function ProfilPage() {
             {dashboardTab === "panel" && (
               <div className="flex flex-col xl:flex-row gap-6">
                 <div className="flex-1 space-y-6">
-                  <div>
-                    <h2 className="text-2xl font-black text-white">Tekrar hoş geldiniz, {teacherProfile.name.split(" ")[0]} Hocam! 👋</h2>
-                    <p className="text-slate-400 text-sm mt-1">
-                      {new Date().toLocaleDateString("tr-TR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
-                      {" • "}
-                      <span className={`font-bold ${teacherProfile.status === "İletişime Geçildi" ? "text-green-400" : "text-amber-400"}`}>
-                        {teacherProfile.status === "İletişime Geçildi" ? "✅ Profil Onaylandı & Yayında" : "⏳ Profil Başvurusu İnceleniyor"}
-                      </span>
-                    </p>
+                {/* Teacher Hero Header Banner */}
+                <div className="teacher-hero-card bg-gradient-to-r from-emerald-900/80 via-teal-900/60 to-[#0D1B35] border border-emerald-500/30 rounded-2xl p-6 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -z-0 pointer-events-none" />
+                  
+                  <div className="flex items-center gap-4 relative z-10">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 p-0.5 shadow-lg shadow-emerald-500/30 flex-shrink-0">
+                      <div className="w-full h-full bg-[#0D1B35] rounded-[14px] overflow-hidden flex items-center justify-center font-black text-white text-2xl">
+                        {teacherProfile.avatar ? <img src={teacherProfile.avatar} alt="" className="w-full h-full object-cover" /> : teacherProfile.name.charAt(0)}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h2 className="text-xl md:text-2xl font-black text-white">Tekrar hoş geldiniz, {teacherProfile.name.split(" ")[0]} Hocam! 👋</h2>
+                        <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-black text-[10px] px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" /> Yayına Hazır
+                        </span>
+                      </div>
+                      <p className="text-slate-300 text-xs font-semibold mt-1 flex items-center gap-2 flex-wrap">
+                        <span>{new Date().toLocaleDateString("tr-TR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</span>
+                        <span>•</span>
+                        <span className={`font-black ${ teacherProfile.status === "İletişime Geçildi" ? "text-emerald-400" : "text-amber-400" }`}>
+                          {teacherProfile.status === "İletişime Geçildi" ? "✅ Onaylı Derslinex Eğitmeni" : "⏳ Başvuru Onay Bekliyor"}
+                        </span>
+                      </p>
+                    </div>
                   </div>
+
+                  {/* Teacher Quick Status */}
+                  <div className="w-full md:w-auto bg-white/5 border border-white/10 rounded-xl p-3.5 relative z-10 flex items-center gap-4">
+                    <div className="text-center">
+                      <span className="text-xs font-black text-amber-300 block">⭐ 5.0 Rating</span>
+                      <span className="text-[10px] text-slate-400 font-bold">12 Değerlendirme</span>
+                    </div>
+                    <div className="h-8 w-px bg-white/10" />
+                    <div className="text-center">
+                      <span className="text-xs font-black text-emerald-300 block">⏱️ 48+ Saat</span>
+                      <span className="text-[10px] text-slate-400 font-bold">Tamamlanan Ders</span>
+                    </div>
+                  </div>
+                </div>
 
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="relative overflow-hidden bg-gradient-to-br from-indigo-900/60 via-indigo-950/80 to-[#0B1329] border border-indigo-500/30 rounded-2xl p-4 shadow-xl shadow-indigo-950/80 hover:border-indigo-400/60 transition-all duration-300 group">
@@ -3542,16 +3572,44 @@ export default function ProfilPage() {
             <div className="flex flex-col xl:flex-row gap-6">
               {/* Left: Main Dashboard */}
               <div className="flex-1 space-y-6">
-                {/* Greeting */}
-                <div>
-                  <h2 className="text-2xl font-black text-white">Merhaba, {studentProfile?.name.split(" ")[0]}! 👋</h2>
-                  <p className="text-slate-400 text-sm mt-1">
-                    {new Date().toLocaleDateString("tr-TR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
-                    {" • "}
-                    <span className={`font-bold ${ studentProfile?.status === "İletişime Geçildi" ? "text-green-400" : "text-amber-400" }`}>
-                      {studentProfile?.status === "İletişime Geçildi" ? "✅ Aktif Hesap" : "⏳ Hesap Onay Bekliyor"}
-                    </span>
-                  </p>
+                {/* Student Hero Header Banner */}
+                <div className="student-hero-card bg-gradient-to-r from-indigo-900/80 via-purple-900/60 to-[#0D1B35] border border-indigo-500/30 rounded-2xl p-6 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -z-0 pointer-events-none" />
+                  
+                  <div className="flex items-center gap-4 relative z-10">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-0.5 shadow-lg shadow-indigo-500/30 flex-shrink-0">
+                      <div className="w-full h-full bg-[#0D1B35] rounded-[14px] overflow-hidden flex items-center justify-center font-black text-white text-2xl">
+                        {studentProfile?.avatar ? <img src={studentProfile.avatar} alt="" className="w-full h-full object-cover" /> : studentProfile?.name.charAt(0)}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h2 className="text-xl md:text-2xl font-black text-white">Hoş geldin, {studentProfile?.name.split(" ")[0]}! 👋</h2>
+                        <span className="bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-black text-[10px] px-2.5 py-0.5 rounded-full shadow-xs">
+                          🔥 7 Gün Çalışma Serisi
+                        </span>
+                      </div>
+                      <p className="text-slate-300 text-xs font-semibold mt-1 flex items-center gap-2 flex-wrap">
+                        <span>{new Date().toLocaleDateString("tr-TR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</span>
+                        <span>•</span>
+                        <span className={`font-black ${ studentProfile?.status === "İletişime Geçildi" ? "text-emerald-400" : "text-amber-400" }`}>
+                          {studentProfile?.status === "İletişime Geçildi" ? "🎓 Doğrulanmış Öğrenci" : "⏳ Onay Bekliyor"}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Level & XP Widget */}
+                  <div className="w-full md:w-auto bg-white/5 border border-white/10 rounded-xl p-3.5 relative z-10 min-w-[220px]">
+                    <div className="flex items-center justify-between text-xs font-black mb-1.5">
+                      <span className="text-amber-300 flex items-center gap-1">🏆 Seviye 3 Öğrenci</span>
+                      <span className="text-indigo-300 tabular-nums">850 / 1000 XP</span>
+                    </div>
+                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-amber-400 via-indigo-500 to-purple-400 rounded-full" style={{ width: "85%" }} />
+                    </div>
+                    <p className="text-[10px] text-slate-400 font-bold mt-1.5 text-right">Seviye 4'e son 150 XP 🚀</p>
+                  </div>
                 </div>
 
 
@@ -3604,6 +3662,24 @@ export default function ProfilPage() {
                       <span className="w-1.5 h-1.5 rounded-full bg-blue-400" /> Aktif sohbet
                     </p>
                   </div>
+                </div>
+
+                {/* Günün YKS / LGS İpucu */}
+                <div className="daily-tip-card bg-gradient-to-r from-purple-900/40 via-[#1E293B] to-indigo-900/40 border border-purple-500/20 rounded-2xl p-5 shadow-xl flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-xl flex-shrink-0">
+                      💡
+                    </div>
+                    <div>
+                      <h4 className="font-black text-white text-xs uppercase tracking-wider text-purple-300">Günün Sınav Stratejisi & Odak İpucu</h4>
+                      <p className="text-xs text-slate-300 font-semibold mt-0.5">
+                        "Yanlış yaptığın soruların çözüm videosunu izlemeden denemeyi bitmiş sayma. Yanlış soru defteri netini en hızlı artıran güçtür."
+                      </p>
+                    </div>
+                  </div>
+                  <button onClick={() => setDashboardTab("canli")} className="hidden md:flex bg-purple-600/30 hover:bg-purple-600/50 border border-purple-500/30 text-purple-300 font-black text-xs px-4 py-2 rounded-xl transition flex-shrink-0">
+                    Derslerime Git →
+                  </button>
                 </div>
 
                 {/* Özet */}
