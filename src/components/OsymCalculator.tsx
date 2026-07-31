@@ -317,7 +317,8 @@ export function OsymCalculator() {
           </div>
 
           {/* Results Summary */}
-          <div className="space-y-4 bg-gradient-to-br from-indigo-950/60 via-[#0D1B35] to-[#1E293B] p-5 rounded-2xl border border-indigo-500/30 shadow-xl flex flex-col justify-between">
+          <div className="osym-result-card space-y-4 bg-[#0D1B35] p-5 rounded-2xl border border-indigo-500/30 shadow-xl flex flex-col justify-between">
+
             <div>
               <h4 className="font-black text-white text-sm flex items-center gap-2 mb-4">
                 <span>🏆</span> Tahmini ÖSYM Sonuçlarınız
@@ -435,7 +436,8 @@ export function OsymCalculator() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-purple-950/60 via-[#0D1B35] to-[#1E293B] p-6 rounded-2xl border border-purple-500/30 flex flex-col justify-between">
+          <div className="osym-result-card bg-[#0D1B35] p-6 rounded-2xl border border-purple-500/30 flex flex-col justify-between">
+
             <div>
               <h4 className="font-black text-white text-sm flex items-center gap-2 mb-4">
                 <span>🏆</span> LGS Puan & Yüzdelik Dilim Simülasyonu
