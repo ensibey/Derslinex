@@ -2,6 +2,15 @@
 
 import React, { useState } from "react";
 
+function clampNet(valStr: string, max: number, min: number = 0): string {
+  if (valStr === "" || valStr === undefined || valStr === null) return "";
+  let num = parseFloat(valStr);
+  if (isNaN(num)) return "";
+  if (num < min) num = min;
+  if (num > max) num = max;
+  return String(num);
+}
+
 export function OsymCalculator() {
   const [examType, setExamType] = useState<"YKS" | "LGS">("YKS");
   const [obp, setObp] = useState<string>("85");
@@ -28,36 +37,59 @@ export function OsymCalculator() {
   const [lgsDin, setLgsDin] = useState("10");
   const [lgsIngilizce, setLgsIngilizce] = useState("9");
 
-  // Calculations
-  const obpVal = parseFloat(obp || "0");
+  // Clamped Calculations for YKS
+  const obpVal = Math.min(100, Math.max(50, parseFloat(obp || "0")));
   const obpEkPuan = obpVal * 0.6; // ÖSYM OBP ek puanı = OBP * 0.6
 
-  // TYT Net & Score
-  const totalTytNet =
-    parseFloat(tytTurkce || "0") +
-    parseFloat(tytSosyal || "0") +
-    parseFloat(tytMat || "0") +
-    parseFloat(tytFen || "0");
+  const tytTurkceVal = Math.min(40, Math.max(0, parseFloat(tytTurkce || "0")));
+  const tytSosyalVal = Math.min(20, Math.max(0, parseFloat(tytSosyal || "0")));
+  const tytMatVal = Math.min(40, Math.max(0, parseFloat(tytMat || "0")));
+  const tytFenVal = Math.min(20, Math.max(0, parseFloat(tytFen || "0")));
+
+  const totalTytNet = Math.min(120, tytTurkceVal + tytSosyalVal + tytMatVal + tytFenVal);
   const tytRawScore = 100 + totalTytNet * 3.3;
   const tytYerlestirmePuan = Math.min(500, tytRawScore + obpEkPuan);
 
-  // AYT Sayısal
-  const aytSayNet =
-    parseFloat(aytMat || "0") +
-    parseFloat(aytFizik || "0") +
-    parseFloat(aytKimya || "0") +
-    parseFloat(aytBiyoloji || "0");
+  const aytMatVal = Math.min(40, Math.max(0, parseFloat(aytMat || "0")));
+  const aytFizikVal = Math.min(14, Math.max(0, parseFloat(aytFizik || "0")));
+  const aytKimyaVal = Math.min(13, Math.max(0, parseFloat(aytKimya || "0")));
+  const aytBiyolojiVal = Math.min(13, Math.max(0, parseFloat(aytBiyoloji || "0")));
+
+  const aytSayNet = Math.min(80, aytMatVal + aytFizikVal + aytKimyaVal + aytBiyolojiVal);
   const aytSayRawScore = 100 + (totalTytNet * 1.3 + aytSayNet * 3.0);
   const aytSayYerlestirme = Math.min(500, aytSayRawScore + obpEkPuan);
 
-  // AYT Eşit Ağırlık
-  const aytEaNet =
-    parseFloat(aytMat || "0") +
-    parseFloat(aytEdebiyat || "0") +
-    parseFloat(aytTarih1 || "0") +
-    parseFloat(aytCografya1 || "0");
+  const aytEdebiyatVal = Math.min(24, Math.max(0, parseFloat(aytEdebiyat || "0")));
+  const aytTarih1Val = Math.min(10, Math.max(0, parseFloat(aytTarih1 || "0")));
+  const aytCografya1Val = Math.min(6, Math.max(0, parseFloat(aytCografya1 || "0")));
+
+  const aytEaNet = Math.min(80, aytMatVal + aytEdebiyatVal + aytTarih1Val + aytCografya1Val);
   const aytEaRawScore = 100 + (totalTytNet * 1.3 + aytEaNet * 3.1);
   const aytEaYerlestirme = Math.min(500, aytEaRawScore + obpEkPuan);
+
+  // Clamped Calculations for LGS
+  const lgsTurkceVal = Math.min(20, Math.max(0, parseFloat(lgsTurkce || "0")));
+  const lgsMatVal = Math.min(20, Math.max(0, parseFloat(lgsMat || "0")));
+  const lgsFenVal = Math.min(20, Math.max(0, parseFloat(lgsFen || "0")));
+  const lgsInkilapVal = Math.min(10, Math.max(0, parseFloat(lgsInkilap || "0")));
+  const lgsDinVal = Math.min(10, Math.max(0, parseFloat(lgsDin || "0")));
+  const lgsIngilizceVal = Math.min(10, Math.max(0, parseFloat(lgsIngilizce || "0")));
+
+  const totalLgsNet = Math.min(
+    90,
+    lgsTurkceVal + lgsMatVal + lgsFenVal + lgsInkilapVal + lgsDinVal + lgsIngilizceVal
+  );
+
+  const lgsScore = Math.min(
+    500,
+    100 +
+      lgsTurkceVal * 4.3 +
+      lgsMatVal * 4.3 +
+      lgsFenVal * 4.1 +
+      lgsInkilapVal * 1.6 +
+      lgsDinVal * 1.6 +
+      lgsIngilizceVal * 1.6
+  );
 
   // Estimated Rankings
   const getSayRank = (score: number) => {
@@ -75,25 +107,6 @@ export function OsymCalculator() {
     if (score >= 280) return "110.000 — 180.000";
     return "220.000+";
   };
-
-  // LGS Calculation
-  const totalLgsNet =
-    parseFloat(lgsTurkce || "0") +
-    parseFloat(lgsMat || "0") +
-    parseFloat(lgsFen || "0") +
-    parseFloat(lgsInkilap || "0") +
-    parseFloat(lgsDin || "0") +
-    parseFloat(lgsIngilizce || "0");
-  const lgsScore = Math.min(
-    500,
-    100 +
-      parseFloat(lgsTurkce || "0") * 4.3 +
-      parseFloat(lgsMat || "0") * 4.3 +
-      parseFloat(lgsFen || "0") * 4.1 +
-      parseFloat(lgsInkilap || "0") * 1.6 +
-      parseFloat(lgsDin || "0") * 1.6 +
-      parseFloat(lgsIngilizce || "0") * 1.6
-  );
 
   const getLgsYuzdelik = (score: number) => {
     if (score >= 480) return "%0.15 — %0.8";
@@ -152,9 +165,12 @@ export function OsymCalculator() {
               </label>
               <input
                 type="number"
+                min={50}
+                max={100}
+                step="1"
                 value={obp}
-                onChange={(e) => setObp(e.target.value)}
-                className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-black"
+                onChange={(e) => setObp(clampNet(e.target.value, 100, 50))}
+                className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-black focus:outline-none focus:border-indigo-500"
               />
               <span className="text-[9px] text-indigo-400 font-bold block mt-1">
                 Ek OBP Puanı: +{obpEkPuan.toFixed(1)} Puan
@@ -163,46 +179,58 @@ export function OsymCalculator() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Türkçe (40S)</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Türkçe (Max 40S)</label>
                 <input
                   type="number"
+                  min={0}
+                  max={40}
+                  step="0.25"
                   value={tytTurkce}
-                  onChange={(e) => setTytTurkce(e.target.value)}
-                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold"
+                  onChange={(e) => setTytTurkce(clampNet(e.target.value, 40))}
+                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Sosyal (20S)</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Sosyal (Max 20S)</label>
                 <input
                   type="number"
+                  min={0}
+                  max={20}
+                  step="0.25"
                   value={tytSosyal}
-                  onChange={(e) => setTytSosyal(e.target.value)}
-                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold"
+                  onChange={(e) => setTytSosyal(clampNet(e.target.value, 20))}
+                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Matematik (40S)</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Matematik (Max 40S)</label>
                 <input
                   type="number"
+                  min={0}
+                  max={40}
+                  step="0.25"
                   value={tytMat}
-                  onChange={(e) => setTytMat(e.target.value)}
-                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold"
+                  onChange={(e) => setTytMat(clampNet(e.target.value, 40))}
+                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Fen (20S)</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Fen (Max 20S)</label>
                 <input
                   type="number"
+                  min={0}
+                  max={20}
+                  step="0.25"
                   value={tytFen}
-                  onChange={(e) => setTytFen(e.target.value)}
-                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold"
+                  onChange={(e) => setTytFen(clampNet(e.target.value, 20))}
+                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500"
                 />
               </div>
             </div>
 
             <div className="p-3 bg-indigo-600/20 border border-indigo-500/30 rounded-xl">
               <span className="text-[10px] font-black text-indigo-300 uppercase block">TYT TOPLAM NET</span>
-              <span className="text-xl font-black text-white tabular-nums">{totalTytNet.toFixed(1)} Net</span>
+              <span className="text-xl font-black text-white tabular-nums">{totalTytNet.toFixed(1)} Net / 120 Net</span>
             </div>
           </div>
 
@@ -214,57 +242,75 @@ export function OsymCalculator() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">AYT Mat (40S)</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">AYT Mat (Max 40S)</label>
                 <input
                   type="number"
+                  min={0}
+                  max={40}
+                  step="0.25"
                   value={aytMat}
-                  onChange={(e) => setAytMat(e.target.value)}
-                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold"
+                  onChange={(e) => setAytMat(clampNet(e.target.value, 40))}
+                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Fizik (14S)</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Fizik (Max 14S)</label>
                 <input
                   type="number"
+                  min={0}
+                  max={14}
+                  step="0.25"
                   value={aytFizik}
-                  onChange={(e) => setAytFizik(e.target.value)}
-                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold"
+                  onChange={(e) => setAytFizik(clampNet(e.target.value, 14))}
+                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Kimya (13S)</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Kimya (Max 13S)</label>
                 <input
                   type="number"
+                  min={0}
+                  max={13}
+                  step="0.25"
                   value={aytKimya}
-                  onChange={(e) => setAytKimya(e.target.value)}
-                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold"
+                  onChange={(e) => setAytKimya(clampNet(e.target.value, 13))}
+                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Biyoloji (13S)</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Biyoloji (Max 13S)</label>
                 <input
                   type="number"
+                  min={0}
+                  max={13}
+                  step="0.25"
                   value={aytBiyoloji}
-                  onChange={(e) => setAytBiyoloji(e.target.value)}
-                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold"
+                  onChange={(e) => setAytBiyoloji(clampNet(e.target.value, 13))}
+                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Edebiyat (24S)</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Edebiyat (Max 24S)</label>
                 <input
                   type="number"
+                  min={0}
+                  max={24}
+                  step="0.25"
                   value={aytEdebiyat}
-                  onChange={(e) => setAytEdebiyat(e.target.value)}
-                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold"
+                  onChange={(e) => setAytEdebiyat(clampNet(e.target.value, 24))}
+                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Tarih-1 (10S)</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Tarih-1 (Max 10S)</label>
                 <input
                   type="number"
+                  min={0}
+                  max={10}
+                  step="0.25"
                   value={aytTarih1}
-                  onChange={(e) => setAytTarih1(e.target.value)}
-                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold"
+                  onChange={(e) => setAytTarih1(clampNet(e.target.value, 10))}
+                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500"
                 />
               </div>
             </div>
@@ -315,57 +361,75 @@ export function OsymCalculator() {
             </h4>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Türkçe (20S)</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Türkçe (Max 20S)</label>
                 <input
                   type="number"
+                  min={0}
+                  max={20}
+                  step="0.25"
                   value={lgsTurkce}
-                  onChange={(e) => setLgsTurkce(e.target.value)}
-                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold"
+                  onChange={(e) => setLgsTurkce(clampNet(e.target.value, 20))}
+                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:border-purple-500"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Matematik (20S)</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Matematik (Max 20S)</label>
                 <input
                   type="number"
+                  min={0}
+                  max={20}
+                  step="0.25"
                   value={lgsMat}
-                  onChange={(e) => setLgsMat(e.target.value)}
-                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold"
+                  onChange={(e) => setLgsMat(clampNet(e.target.value, 20))}
+                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:border-purple-500"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Fen Bilimleri (20S)</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Fen Bilimleri (Max 20S)</label>
                 <input
                   type="number"
+                  min={0}
+                  max={20}
+                  step="0.25"
                   value={lgsFen}
-                  onChange={(e) => setLgsFen(e.target.value)}
-                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold"
+                  onChange={(e) => setLgsFen(clampNet(e.target.value, 20))}
+                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:border-purple-500"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">İnkılap (10S)</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">İnkılap (Max 10S)</label>
                 <input
                   type="number"
+                  min={0}
+                  max={10}
+                  step="0.25"
                   value={lgsInkilap}
-                  onChange={(e) => setLgsInkilap(e.target.value)}
-                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold"
+                  onChange={(e) => setLgsInkilap(clampNet(e.target.value, 10))}
+                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:border-purple-500"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Din Kültürü (10S)</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Din Kültürü (Max 10S)</label>
                 <input
                   type="number"
+                  min={0}
+                  max={10}
+                  step="0.25"
                   value={lgsDin}
-                  onChange={(e) => setLgsDin(e.target.value)}
-                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold"
+                  onChange={(e) => setLgsDin(clampNet(e.target.value, 10))}
+                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:border-purple-500"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">İngilizce (10S)</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">İngilizce (Max 10S)</label>
                 <input
                   type="number"
+                  min={0}
+                  max={10}
+                  step="0.25"
                   value={lgsIngilizce}
-                  onChange={(e) => setLgsIngilizce(e.target.value)}
-                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold"
+                  onChange={(e) => setLgsIngilizce(clampNet(e.target.value, 10))}
+                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:border-purple-500"
                 />
               </div>
             </div>

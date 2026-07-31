@@ -892,25 +892,40 @@ function StudentTrialTab({ studentId }: { studentId: number }) {
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div>
-              <label className="block text-xs font-black text-red-400 uppercase tracking-wider mb-1">Türkçe Net</label>
+              <label className="block text-xs font-black text-red-400 uppercase tracking-wider mb-1">Türkçe Net (Max 40)</label>
               <input
                 type="number"
+                min="0"
+                max={form.examType === "LGS" ? "20" : "40"}
                 step="0.25"
                 placeholder="0.00"
                 value={form.turkceNet}
-                onChange={(e) => setForm({ ...form, turkceNet: e.target.value })}
+                onChange={(e) => {
+                  const max = form.examType === "LGS" ? 20 : 40;
+                  let v = parseFloat(e.target.value);
+                  if (v < 0) e.target.value = "0";
+                  if (v > max) e.target.value = String(max);
+                  setForm({ ...form, turkceNet: e.target.value });
+                }}
                 className="w-full bg-[#0D1B35] border border-white/10 text-white px-3 py-2 rounded-xl text-sm font-bold focus:outline-none focus:border-red-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-black text-amber-400 uppercase tracking-wider mb-1">Sosyal Net</label>
+              <label className="block text-xs font-black text-amber-400 uppercase tracking-wider mb-1">Sosyal / İnkılap Net</label>
               <input
                 type="number"
+                min="0"
+                max="20"
                 step="0.25"
                 placeholder="0.00"
                 value={form.sosyalNet}
-                onChange={(e) => setForm({ ...form, sosyalNet: e.target.value })}
+                onChange={(e) => {
+                  let v = parseFloat(e.target.value);
+                  if (v < 0) e.target.value = "0";
+                  if (v > 20) e.target.value = "20";
+                  setForm({ ...form, sosyalNet: e.target.value });
+                }}
                 className="w-full bg-[#0D1B35] border border-white/10 text-white px-3 py-2 rounded-xl text-sm font-bold focus:outline-none focus:border-amber-500"
               />
             </div>
@@ -919,10 +934,18 @@ function StudentTrialTab({ studentId }: { studentId: number }) {
               <label className="block text-xs font-black text-blue-400 uppercase tracking-wider mb-1">Matematik Net</label>
               <input
                 type="number"
+                min="0"
+                max={form.examType === "LGS" ? "20" : "40"}
                 step="0.25"
                 placeholder="0.00"
                 value={form.matematikNet}
-                onChange={(e) => setForm({ ...form, matematikNet: e.target.value })}
+                onChange={(e) => {
+                  const max = form.examType === "LGS" ? 20 : 40;
+                  let v = parseFloat(e.target.value);
+                  if (v < 0) e.target.value = "0";
+                  if (v > max) e.target.value = String(max);
+                  setForm({ ...form, matematikNet: e.target.value });
+                }}
                 className="w-full bg-[#0D1B35] border border-white/10 text-white px-3 py-2 rounded-xl text-sm font-bold focus:outline-none focus:border-blue-500"
               />
             </div>
@@ -931,14 +954,22 @@ function StudentTrialTab({ studentId }: { studentId: number }) {
               <label className="block text-xs font-black text-emerald-400 uppercase tracking-wider mb-1">Fen Net</label>
               <input
                 type="number"
+                min="0"
+                max="20"
                 step="0.25"
                 placeholder="0.00"
                 value={form.fenNet}
-                onChange={(e) => setForm({ ...form, fenNet: e.target.value })}
+                onChange={(e) => {
+                  let v = parseFloat(e.target.value);
+                  if (v < 0) e.target.value = "0";
+                  if (v > 20) e.target.value = "20";
+                  setForm({ ...form, fenNet: e.target.value });
+                }}
                 className="w-full bg-[#0D1B35] border border-white/10 text-white px-3 py-2 rounded-xl text-sm font-bold focus:outline-none focus:border-emerald-500"
               />
             </div>
           </div>
+
 
           <div className="flex justify-end gap-3 pt-2">
             <button
