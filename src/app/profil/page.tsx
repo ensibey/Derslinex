@@ -1735,6 +1735,134 @@ function TeacherRewardsTab({ teacherId }: { teacherId: number }) {
   );
 }
 
+// ─── Student Exams Tab Component ───────────────────────────────────────────────
+function StudentExamsTab({ studentId }: { studentId: number }) {
+  const [exams, setExams] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/student/exams", {
+      headers: { "x-student-id": String(studentId) },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) setExams(data.exams || []);
+      })
+      .finally(() => setLoading(false));
+  }, [studentId]);
+
+  if (loading) return <div className="py-12 text-center text-slate-500 font-semibold">Online deneme sınavları yükleniyor...</div>;
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-gradient-to-r from-indigo-900/40 via-purple-900/40 to-slate-900 border border-indigo-500/30 rounded-2xl p-6 relative overflow-hidden shadow-xl">
+        <div className="relative z-10 space-y-1">
+          <div className="inline-flex items-center gap-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 font-black text-xs px-3 py-1 rounded-full">
+            🎯 Online Deneme Sınavları
+          </div>
+          <h2 className="text-xl font-black text-white">Gerçek Sınav Provası & Canlı Kamera Gözetmenliği</h2>
+          <p className="text-xs text-slate-300 max-w-xl">
+            Soru havuzumuzdan hazırlanan Türkiye geneli online deneme sınavlarına katılın, sürenizi ve net performansınızı anlık ölçün.
+          </p>
+        </div>
+      </div>
+
+      {exams.length === 0 ? (
+        <div className="bg-[#1E293B] rounded-2xl border border-white/5 p-12 text-center space-y-3">
+          <span className="text-4xl block">📝</span>
+          <h3 className="text-base font-black text-white">Aktif Online Deneme Bulunmuyor</h3>
+          <p className="text-xs text-slate-400">Hedef sınav türünüze uygun yeni bir deneme sınavı tanımlandığında burada listelenecektir.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {exams.map((ex) => {
+            const attempt = ex.myAttempt;
+            const isCompleted = attempt?.status === "SUBMITTED";
+            const now = new Date();
+            const start = new Date(ex.startTime);
+            const end = new Date(ex.endTime);
+
+            const isUpcoming = now < start;
+            const isEnded = now > end;
+            const isActive = !isUpcoming && !isEnded;
+
+            return (
+              <div key={ex.id} className="bg-[#1E293B] border border-white/10 rounded-2xl p-5 space-y-4 shadow-xl">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="bg-indigo-600 text-white font-black text-[10px] px-2.5 py-0.5 rounded-full">
+                      {ex.examType}
+                    </span>
+                    <span className="bg-white/10 text-slate-300 font-bold text-[10px] px-2.5 py-0.5 rounded-full">
+                      🎯 {ex.targetTag}
+                    </span>
+                    {ex.isCameraRequired && (
+                      <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold text-[10px] px-2.5 py-0.5 rounded-full">
+                        🎥 Kamera Şartlı
+                      </span>
+                    )}
+                  </div>
+                  <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
+                    isCompleted ? "bg-emerald-500/20 text-emerald-400" :
+                    isActive ? "bg-red-500/20 text-red-400 animate-pulse" :
+                    isUpcoming ? "bg-blue-500/20 text-blue-400" : "bg-gray-500/20 text-gray-400"
+                  }`}>
+                    {isCompleted ? "✅ Tamamlandı" : isActive ? "🔴 CANLI DENEME" : isUpcoming ? "📅 Planlandı" : "⏹️ Süre Doldu"}
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="font-black text-white text-base">{ex.title}</h3>
+                  {ex.description && <p className="text-xs text-slate-400 mt-1 line-clamp-2">{ex.description}</p>}
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 bg-[#0D1B35] p-3 rounded-xl text-center text-xs">
+                  <div>
+                    <span className="text-[10px] text-slate-400 font-bold block">Soru Sayısı</span>
+                    <span className="font-black text-indigo-300 text-sm">{ex.questionCount} Soru</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 font-bold block">Sınav Süresi</span>
+                    <span className="font-black text-amber-300 text-sm">{ex.durationMinutes} Dakika</span>
+                  </div>
+                </div>
+
+                <div className="text-[11px] text-slate-400 font-semibold space-y-0.5">
+                  <div>🕐 Başlangıç: <strong className="text-slate-200">{new Date(ex.startTime).toLocaleString("tr-TR")}</strong></div>
+                  <div>⏳ Bitiş: <strong className="text-slate-200">{new Date(ex.endTime).toLocaleString("tr-TR")}</strong></div>
+                </div>
+
+                <div className="border-t border-white/10 pt-3">
+                  {isCompleted ? (
+                    <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-center">
+                      <span className="text-xs font-black text-emerald-400 block">Sınav Tamamlandı Karneniz:</span>
+                      <span className="text-xl font-black text-white block mt-0.5">{attempt.totalNet} NET</span>
+                    </div>
+                  ) : isActive ? (
+                    <Link href={`/deneme/${ex.id}`}>
+                      <button className="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-xs py-3 rounded-xl transition shadow-lg animate-pulse flex items-center justify-center gap-2">
+                        🚀 Online Sınava Başla
+                      </button>
+                    </Link>
+                  ) : isUpcoming ? (
+                    <button disabled className="w-full bg-slate-700 text-slate-400 font-black text-xs py-3 rounded-xl cursor-not-allowed">
+                      Sınav Saatinde Aktifleşecek
+                    </button>
+                  ) : (
+                    <button disabled className="w-full bg-slate-800 text-slate-500 font-black text-xs py-3 rounded-xl cursor-not-allowed">
+                      Sınav Süresi Sona Erdi
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Interfaces ────────────────────────────────────────────────────────────────
 interface Student { id: number; name: string; phone: string; email: string; status: string; avatar?: string | null; targetTag?: string | null; }
 interface Teacher { id: number; name: string; phone: string; email: string; branch: string; status: string; egitim?: string | null; ozgecmis?: string | null; linkedin?: string | null; youtube?: string | null; avatar?: string | null; }
@@ -1744,6 +1872,7 @@ interface Feedback { id: number; studentName: string; studentEmail: string | nul
 const STUDENT_NAV = [
   { id: "panel",         icon: "🏠", label: "Genel Görünüm" },
   { id: "canli",         icon: "🎥", label: "Canlı Derslerim" },
+  { id: "onlinedeneme",  icon: "🎯", label: "Online Deneme Sınavları" },
   { id: "sorucozum",     icon: "📝", label: "Soru Bankası & Test Çöz" },
   { id: "yanlissorular", icon: "📕", label: "Yanlış Soru Defterim" },
   { id: "denemenet",     icon: "📊", label: "Deneme Net Takibi" },
@@ -1811,7 +1940,7 @@ export default function ProfilPage() {
     solutionText: "",
   });
 
-  const [dashboardTab, setDashboardTab] = useState<"panel" | "duzenle" | "dersler" | "bloglar" | "faq" | "mesajlar" | "canli" | "degerlendirme" | "gorevler" | "sorular" | "sorucozum" | "denemenet" | "konutakip" | "liderlik" | "yanlissorular" | "pomodoro" | "puanhesapla" | "kutuphane">("panel");
+  const [dashboardTab, setDashboardTab] = useState<"panel" | "duzenle" | "dersler" | "bloglar" | "faq" | "mesajlar" | "canli" | "degerlendirme" | "gorevler" | "sorular" | "sorucozum" | "denemenet" | "konutakip" | "liderlik" | "yanlissorular" | "pomodoro" | "puanhesapla" | "kutuphane" | "onlinedeneme">("panel");
   const [chatRooms, setChatRooms] = useState<any[]>([]);
   const [activeRoomId, setActiveRoomId] = useState<number | null>(null);
   const [activeRoomMessages, setActiveRoomMessages] = useState<any[]>([]);
@@ -3858,6 +3987,11 @@ export default function ProfilPage() {
             <div className="max-w-3xl">
               <StudentSessionsTab userId={studentProfile.id} />
             </div>
+          )}
+
+          {/* ─── ONLINE DENEME SINAVLARI ─── */}
+          {dashboardTab === "onlinedeneme" && studentProfile && (
+            <StudentExamsTab studentId={studentProfile.id} />
           )}
 
           {/* ─── MESAJLAR ─── */}

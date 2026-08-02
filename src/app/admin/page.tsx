@@ -105,7 +105,7 @@ function BrandLogoHeader({ subBadge = "ADMİN PANELİ" }: { subBadge?: string })
 }
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<"teachers" | "students" | "lessons" | "blogs" | "feedbacks" | "sessions" | "tasks" | "questions" | "contact">("teachers");
+  const [activeTab, setActiveTab] = useState<"teachers" | "students" | "lessons" | "blogs" | "feedbacks" | "sessions" | "tasks" | "questions" | "contact" | "exams">("teachers");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
@@ -119,6 +119,31 @@ export default function AdminPage() {
   const [systemMetrics, setSystemMetrics] = useState<any>(null);
   const [editingQuestionId, setEditingQuestionId] = useState<number | null>(null);
   const [editQuestionForm, setEditQuestionForm] = useState<any>({});
+
+  // Exam Management States
+  const [exams, setExams] = useState<any[]>([]);
+  const [approvedQuestionsPool, setApprovedQuestionsPool] = useState<any[]>([]);
+  const [examModalOpen, setExamModalOpen] = useState(false);
+  const [examCreating, setExamCreating] = useState(false);
+  const [examForm, setExamForm] = useState({
+    title: "",
+    description: "",
+    examType: "TYT",
+    targetTag: "TÜMÜ",
+    startTime: "",
+    endTime: "",
+    durationMinutes: 135,
+    isCameraRequired: true,
+  });
+
+  const [selectedQuestionItems, setSelectedQuestionItems] = useState<any[]>([]);
+  const [pickerModalOpen, setPickerModalOpen] = useState(false);
+  const [pickerSubjectFilter, setPickerSubjectFilter] = useState("TÜMÜ");
+  const [pickerSearchText, setPickerSearchText] = useState("");
+
+  const [previewExamModal, setPreviewExamModal] = useState<any | null>(null);
+  const [proctorExamModal, setProctorExamModal] = useState<any | null>(null);
+  const [proctorAttempts, setProctorAttempts] = useState<any[]>([]);
 
   // Task Create Form
   const [taskForm, setTaskForm] = useState({
@@ -168,7 +193,7 @@ export default function AdminPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [uRes, fRes, lRes, bRes, sessRes, taskRes, qRes, cRes, mRes] = await Promise.all([
+      const [uRes, fRes, lRes, bRes, sessRes, taskRes, qRes, cRes, mRes, exRes] = await Promise.all([
         adminFetch("/api/admin/users"),
         adminFetch("/api/gorus"),
         adminFetch("/api/admin/lessons"),
@@ -178,8 +203,8 @@ export default function AdminPage() {
         adminFetch("/api/admin/questions"),
         adminFetch("/api/admin/contact"),
         adminFetch("/api/admin/status"),
+        adminFetch("/api/admin/exams"),
       ]);
-
 
       const uData = await uRes.json();
       const fData = await fRes.json();
@@ -190,12 +215,12 @@ export default function AdminPage() {
       const qData = await qRes.json();
       const cData = await cRes.json();
       const mData = await mRes.json();
+      const exData = await exRes.json();
 
       if (uData.success) {
         if (uData.teachers) setTeachers(uData.teachers);
         if (uData.students) setStudents(uData.students);
       }
-
       if (fData.success) setFeedbacks(fData.feedbacks || []);
       if (lData.success) setLessons(lData.lessons || []);
       if (bData.success) setBlogs(bData.posts || []);
@@ -204,6 +229,10 @@ export default function AdminPage() {
       if (qData.success) setQuestionsList(qData.questions || []);
       if (cData.success) setContactMessages(cData.messages || []);
       if (mData.success) setSystemMetrics(mData.metrics || null);
+      if (exData.success) {
+        setExams(exData.exams || []);
+        setApprovedQuestionsPool(exData.approvedQuestions || []);
+      }
     } catch (e) {
       console.error("Data fetch error", e);
     } finally {
@@ -218,6 +247,86 @@ export default function AdminPage() {
   const showMsg = (text: string, type: "success" | "error") => {
     setMessage({ text, type });
     setTimeout(() => setMessage(null), 5000);
+  };
+
+  const handleCreateExam = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!examForm.title || !examForm.startTime || !examForm.endTime) {
+      showMsg("Lütfen tüm zorunlu alanları doldurun.", "error");
+      return;
+    }
+    if (selectedQuestionItems.length === 0) {
+      showMsg("Lütfen sınava en az 1 soru ekleyin.", "error");
+      return;
+    }
+
+    setExamCreating(true);
+    try {
+      const res = await adminFetch("/api/admin/exams", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...examForm,
+          questionItems: selectedQuestionItems.map((item, index) => ({
+            questionId: item.question.id,
+            sectionName: item.sectionName || "Genel",
+            orderNo: index + 1,
+          })),
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showMsg("Deneme sınavı başarıyla oluşturuldu ve yayınlandı!", "success");
+        setExamModalOpen(false);
+        setExamForm({
+          title: "",
+          description: "",
+          examType: "TYT",
+          targetTag: "TÜMÜ",
+          startTime: "",
+          endTime: "",
+          durationMinutes: 135,
+          isCameraRequired: true,
+        });
+        setSelectedQuestionItems([]);
+        fetchData();
+      } else {
+        showMsg(data.error || "Sınav oluşturulamadı.", "error");
+      }
+    } catch {
+      showMsg("Bağlantı hatası", "error");
+    } finally {
+      setExamCreating(false);
+    }
+  };
+
+  const handleDeleteExam = async (examId: number) => {
+    if (!window.confirm("Bu deneme sınavını silmek istediğinize emin misiniz?")) return;
+    try {
+      const res = await adminFetch(`/api/admin/exams/${examId}`, { method: "DELETE" });
+      const data = await res.json();
+      if (data.success) {
+        showMsg("Sınav silindi.", "success");
+        fetchData();
+      } else {
+        showMsg(data.error || "Sınav silinemedi.", "error");
+      }
+    } catch {
+      showMsg("Bağlantı hatası", "error");
+    }
+  };
+
+  const handleOpenProctoring = async (exam: any) => {
+    setProctorExamModal(exam);
+    try {
+      const res = await adminFetch(`/api/admin/exams/${exam.id}/proctoring`);
+      const data = await res.json();
+      if (data.success) {
+        setProctorAttempts(data.attempts || []);
+      }
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const handleUpdateStatus = async (id: number, type: "teacher" | "student", currentStatus: string) => {
@@ -359,6 +468,7 @@ export default function AdminPage() {
         {/* Sidebar Nav */}
         <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
           {[
+            { key: "exams", label: "Deneme Sınavları", count: exams.length, icon: "🎯" },
             { key: "teachers", label: "Öğretmenler", count: teachers.length, icon: "👨‍🏫" },
             { key: "students", label: "Öğrenciler", count: students.length, icon: "🎓" },
             { key: "contact", label: "İletişim Mesajları", count: contactMessages.length, icon: "📬" },
@@ -494,6 +604,129 @@ export default function AdminPage() {
 
           {/* Main Content Box */}
           <div className="bg-[#1E293B] rounded-3xl border border-white/5 overflow-hidden shadow-2xl">
+
+            {/* EXAMS TAB */}
+            {activeTab === "exams" && (
+              <div className="p-4 sm:p-6 space-y-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/10 pb-5">
+                  <div>
+                    <h2 className="text-lg font-black text-white flex items-center gap-2">
+                      🎯 Online Deneme Sınavı Yönetimi
+                    </h2>
+                    <p className="text-xs text-slate-400 font-semibold mt-1">
+                      Soru havuzundan soru seçerek yeni denemeler oluşturun, süresini ve kamerasını ayarlayın, canlı gözetmenlikle öğrencileri izleyin.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setExamForm({
+                        title: "",
+                        description: "",
+                        examType: "TYT",
+                        targetTag: "TÜMÜ",
+                        startTime: new Date().toISOString().slice(0, 16),
+                        endTime: new Date(Date.now() + 86400000).toISOString().slice(0, 16),
+                        durationMinutes: 135,
+                        isCameraRequired: true,
+                      });
+                      setSelectedQuestionItems([]);
+                      setExamModalOpen(true);
+                    }}
+                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-xs px-5 py-3 rounded-xl transition shadow-lg flex items-center gap-2 flex-shrink-0"
+                  >
+                    ✨ Yeni Deneme Sınavı Oluştur
+                  </button>
+                </div>
+
+                {/* Exam Cards Grid */}
+                {exams.length === 0 ? (
+                  <div className="text-center py-16 bg-[#0D1B35] rounded-2xl border border-white/5 space-y-3">
+                    <span className="text-4xl block">📝</span>
+                    <h3 className="text-base font-black text-white">Henüz Oluşturulmuş Deneme Sınavı Yok</h3>
+                    <p className="text-xs text-slate-400 max-w-md mx-auto">
+                      "Yeni Deneme Sınavı Oluştur" butonuna tıklayarak soru havuzundaki sorulardan anında Türkiye geneli online deneme hazırlayabilirsiniz.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {exams.map((ex) => {
+                      const isCamera = ex.isCameraRequired;
+                      const qCount = ex.examQuestions?.length || 0;
+                      const attemptCount = ex._count?.attempts || 0;
+
+                      return (
+                        <div key={ex.id} className="bg-[#0D1B35] border border-white/10 rounded-2xl p-5 space-y-4 hover:border-indigo-500/40 transition">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                                <span className="bg-indigo-600 text-white font-black text-[10px] px-2.5 py-0.5 rounded-full">
+                                  {ex.examType}
+                                </span>
+                                <span className="bg-white/10 text-slate-300 font-bold text-[10px] px-2.5 py-0.5 rounded-full">
+                                  🎯 Tag: {ex.targetTag}
+                                </span>
+                                {isCamera ? (
+                                  <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold text-[10px] px-2.5 py-0.5 rounded-full">
+                                    🎥 Kamera Şartlı
+                                  </span>
+                                ) : (
+                                  <span className="bg-slate-500/20 text-slate-400 font-bold text-[10px] px-2.5 py-0.5 rounded-full">
+                                    📷 Kamerasız
+                                  </span>
+                                )}
+                              </div>
+                              <h3 className="text-white font-black text-base">{ex.title}</h3>
+                              {ex.description && <p className="text-xs text-slate-400 mt-1 line-clamp-2">{ex.description}</p>}
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-2 bg-white/5 p-3 rounded-xl text-center text-xs">
+                            <div>
+                              <span className="text-[10px] text-slate-400 font-bold block">Soru Sayısı</span>
+                              <span className="font-black text-indigo-300 text-sm">{qCount} Soru</span>
+                            </div>
+                            <div>
+                              <span className="text-[10px] text-slate-400 font-bold block">Sınav Süresi</span>
+                              <span className="font-black text-amber-300 text-sm">{ex.durationMinutes} Dk</span>
+                            </div>
+                            <div>
+                              <span className="text-[10px] text-slate-400 font-bold block">Katılan Öğrenci</span>
+                              <span className="font-black text-emerald-300 text-sm">{attemptCount} Kişi</span>
+                            </div>
+                          </div>
+
+                          <div className="text-[11px] text-slate-400 font-semibold space-y-0.5 border-t border-white/5 pt-3">
+                            <div>🕐 Başlangıç: <strong className="text-slate-200">{new Date(ex.startTime).toLocaleString("tr-TR")}</strong></div>
+                            <div>⏳ Bitiş: <strong className="text-slate-200">{new Date(ex.endTime).toLocaleString("tr-TR")}</strong></div>
+                          </div>
+
+                          <div className="flex items-center gap-2 pt-2 border-t border-white/10">
+                            <button
+                              onClick={() => setPreviewExamModal(ex)}
+                              className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 font-black text-xs py-2 rounded-xl transition"
+                            >
+                              👁️ Ön Gösterim
+                            </button>
+                            <button
+                              onClick={() => handleOpenProctoring(ex)}
+                              className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs py-2 rounded-xl transition shadow-md flex items-center justify-center gap-1"
+                            >
+                              🎥 Canlı Gözetmenlik ({attemptCount})
+                            </button>
+                            <button
+                              onClick={() => handleDeleteExam(ex.id)}
+                              className="bg-red-600/80 hover:bg-red-600 text-white font-black text-xs px-3 py-2 rounded-xl transition"
+                            >
+                              Sil
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* TEACHERS TAB */}
             {activeTab === "teachers" && (
@@ -1372,6 +1605,438 @@ export default function AdminPage() {
           </div>
         </main>
       </div>
+
+      {/* ─── YENİ DENEME SINAVI OLUŞTURMA MODALI ─── */}
+      {examModalOpen && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-[#131B2E] border border-white/10 rounded-3xl max-w-3xl w-full p-6 sm:p-8 space-y-6 shadow-2xl my-8">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <h3 className="text-white font-black text-lg flex items-center gap-2">
+                🎯 Yeni Online Deneme Sınavı Hazırla
+              </h3>
+              <button onClick={() => setExamModalOpen(false)} className="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+            </div>
+
+            <form onSubmit={handleCreateExam} className="space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Sınav Başlığı *</label>
+                  <input
+                    type="text" required
+                    placeholder="Örn: 2026 Türkiye Geneli TYT Deneme Sınavı - 1"
+                    value={examForm.title}
+                    onChange={(e) => setExamForm({ ...examForm, title: e.target.value })}
+                    className="w-full bg-[#0D1B35] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Sınav Türü</label>
+                  <select
+                    value={examForm.examType}
+                    onChange={(e) => setExamForm({ ...examForm, examType: e.target.value })}
+                    className="w-full bg-[#0D1B35] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold focus:outline-none focus:border-indigo-500"
+                  >
+                    <option value="TYT">TYT (Temel Yeterlilik)</option>
+                    <option value="AYT">AYT (Alan Yeterlilik)</option>
+                    <option value="YKS">YKS (TYT+AYT)</option>
+                    <option value="LGS">LGS (Lise Giriş)</option>
+                    <option value="KPSS">KPSS</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-black text-indigo-400 uppercase tracking-wider mb-2">🎯 Hedef Öğrenci Tagı</label>
+                  <select
+                    value={examForm.targetTag}
+                    onChange={(e) => setExamForm({ ...examForm, targetTag: e.target.value })}
+                    className="w-full bg-[#0D1B35] border border-indigo-500/40 text-white px-4 py-3 rounded-xl text-sm font-bold focus:outline-none"
+                  >
+                    <option value="TÜMÜ">TÜMÜ (Tüm Öğrenciler)</option>
+                    <option value="TYT">TYT Öğrencileri</option>
+                    <option value="AYT">AYT Öğrencileri</option>
+                    <option value="YKS">YKS Öğrencileri</option>
+                    <option value="LGS">LGS Öğrencileri</option>
+                    <option value="KPSS">KPSS Öğrencileri</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Sınav Süresi (Dakika) *</label>
+                  <input
+                    type="number" required min={5} max={300}
+                    value={examForm.durationMinutes}
+                    onChange={(e) => setExamForm({ ...examForm, durationMinutes: parseInt(e.target.value) || 135 })}
+                    className="w-full bg-[#0D1B35] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold focus:outline-none"
+                  />
+                </div>
+                <div className="flex items-end pb-2">
+                  <label className="flex items-center gap-2 cursor-pointer bg-[#0D1B35] border border-white/10 p-3 rounded-xl w-full">
+                    <input
+                      type="checkbox"
+                      checked={examForm.isCameraRequired}
+                      onChange={(e) => setExamForm({ ...examForm, isCameraRequired: e.target.checked })}
+                      className="w-4 h-4 rounded text-indigo-600 accent-indigo-600"
+                    />
+                    <span className="text-xs font-black text-white">🎥 Canlı Kamera Şartlı</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Başlangıç Tarihi & Saati *</label>
+                  <input
+                    type="datetime-local" required
+                    value={examForm.startTime}
+                    onChange={(e) => setExamForm({ ...examForm, startTime: e.target.value })}
+                    className="w-full bg-[#0D1B35] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Bitiş Tarihi & Saati *</label>
+                  <input
+                    type="datetime-local" required
+                    value={examForm.endTime}
+                    onChange={(e) => setExamForm({ ...examForm, endTime: e.target.value })}
+                    className="w-full bg-[#0D1B35] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Sınav Açıklaması / Talimatlar</label>
+                <textarea
+                  rows={2}
+                  placeholder="Öğrencilerin sınav öncesi okuyacağı kurallar ve açıklamalar..."
+                  value={examForm.description}
+                  onChange={(e) => setExamForm({ ...examForm, description: e.target.value })}
+                  className="w-full bg-[#0D1B35] border border-white/10 text-white px-4 py-2.5 rounded-xl text-sm font-semibold focus:outline-none"
+                />
+              </div>
+
+              {/* Selected Questions Section */}
+              <div className="bg-[#0D1B35] border border-white/10 rounded-2xl p-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-black text-white text-sm">📝 Sınav Soru Akışı ({selectedQuestionItems.length} Soru)</h4>
+                    <p className="text-[11px] text-slate-400">Soru havuzundaki onaylı sorulardan ekleyin.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setPickerModalOpen(true)}
+                    className="bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow-md"
+                  >
+                    ➕ Soru Havuzundan Seç
+                  </button>
+                </div>
+
+                {selectedQuestionItems.length === 0 ? (
+                  <p className="text-center py-6 text-xs text-slate-500 font-bold border border-dashed border-white/10 rounded-xl">
+                    Henüz soru seçilmedi. Lütfen "Soru Havuzundan Seç" butonunu kullanarak soruları ekleyin.
+                  </p>
+                ) : (
+                  <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                    {selectedQuestionItems.map((item, idx) => (
+                      <div key={item.question.id} className="bg-[#131B2E] border border-white/10 rounded-xl p-3 flex items-center justify-between gap-3 text-xs">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <span className="w-6 h-6 rounded-lg bg-indigo-600 text-white font-black text-xs flex items-center justify-center flex-shrink-0">
+                            {idx + 1}
+                          </span>
+                          <div className="min-w-0">
+                            <span className="font-black text-white block truncate">{item.question.questionText}</span>
+                            <span className="text-[10px] text-slate-400 font-semibold">
+                              {item.question.subject} • {item.question.difficulty} • {item.question.points} Puan
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <select
+                            value={item.sectionName}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setSelectedQuestionItems((prev) =>
+                                prev.map((q, i) => (i === idx ? { ...q, sectionName: val } : q))
+                              );
+                            }}
+                            className="bg-[#0D1B35] border border-white/10 text-xs text-slate-300 rounded-lg px-2 py-1 focus:outline-none font-bold"
+                          >
+                            <option value="Türkçe">Türkçe</option>
+                            <option value="Temel Matematik">Temel Matematik</option>
+                            <option value="Sosyal Bilgiler">Sosyal Bilgiler</option>
+                            <option value="Fen Bilimleri">Fen Bilimleri</option>
+                            <option value="Genel">Genel</option>
+                          </select>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedQuestionItems((prev) => prev.filter((_, i) => i !== idx))}
+                            className="text-red-400 hover:text-red-300 font-black text-xs px-2 py-1"
+                          >
+                            Kaldır
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setExamModalOpen(false)}
+                  className="bg-white/5 hover:bg-white/10 text-slate-300 font-black text-xs px-6 py-3 rounded-xl transition border border-white/10"
+                >
+                  İptal
+                </button>
+                <button
+                  type="submit"
+                  disabled={examCreating}
+                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs px-8 py-3 rounded-xl transition shadow-lg"
+                >
+                  {examCreating ? "Oluşturuluyor..." : "Sınavı Yayınla 🚀"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── SORU HAVUZUNDAN SORU SEÇİCİ MODAL ─── */}
+      {pickerModalOpen && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-[#131B2E] border border-white/10 rounded-3xl max-w-4xl w-full p-6 sm:p-8 space-y-6 shadow-2xl my-8">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div>
+                <h3 className="text-white font-black text-lg flex items-center gap-2">
+                  📝 Onaylı Soru Havuzu ({approvedQuestionsPool.length} Soru)
+                </h3>
+                <p className="text-xs text-slate-400">Sınava eklemek istediğiniz soruları seçin.</p>
+              </div>
+              <button onClick={() => setPickerModalOpen(false)} className="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+            </div>
+
+            {/* Filter Bar */}
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <input
+                type="text"
+                placeholder="Soru metni veya konu ara..."
+                value={pickerSearchText}
+                onChange={(e) => setPickerSearchText(e.target.value)}
+                className="w-full sm:flex-1 bg-[#0D1B35] border border-white/10 text-white px-4 py-2.5 rounded-xl text-xs font-bold focus:outline-none"
+              />
+              <select
+                value={pickerSubjectFilter}
+                onChange={(e) => setPickerSubjectFilter(e.target.value)}
+                className="w-full sm:w-auto bg-[#0D1B35] border border-white/10 text-white px-4 py-2.5 rounded-xl text-xs font-bold focus:outline-none"
+              >
+                <option value="TÜMÜ">Tüm Dersler</option>
+                <option value="Matematik">Matematik</option>
+                <option value="Türkçe">Türkçe</option>
+                <option value="Fizik">Fizik</option>
+                <option value="Kimya">Kimya</option>
+                <option value="Biyoloji">Biyoloji</option>
+                <option value="Tarih">Tarih</option>
+                <option value="Coğrafya">Coğrafya</option>
+                <option value="Felsefe">Felsefe</option>
+                <option value="Din Kültürü">Din Kültürü</option>
+              </select>
+            </div>
+
+            {/* Questions Pool Grid */}
+            <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
+              {approvedQuestionsPool
+                .filter((q) => {
+                  const matchesSubj = pickerSubjectFilter === "TÜMÜ" || q.subject === pickerSubjectFilter;
+                  const matchesText = !pickerSearchText || q.questionText.toLowerCase().includes(pickerSearchText.toLowerCase()) || (q.topic && q.topic.toLowerCase().includes(pickerSearchText.toLowerCase()));
+                  return matchesSubj && matchesText;
+                })
+                .map((q) => {
+                  const isAlreadySelected = selectedQuestionItems.some((item) => item.question.id === q.id);
+                  let defaultSec = "Genel";
+                  if (q.subject.includes("Türkçe") || q.subject.includes("Edebiyat")) defaultSec = "Türkçe";
+                  else if (q.subject.includes("Matematik") || q.subject.includes("Geometri")) defaultSec = "Temel Matematik";
+                  else if (q.subject.includes("Fizik") || q.subject.includes("Kimya") || q.subject.includes("Biyoloji")) defaultSec = "Fen Bilimleri";
+                  else if (q.subject.includes("Tarih") || q.subject.includes("Coğrafya") || q.subject.includes("Felsefe") || q.subject.includes("Din")) defaultSec = "Sosyal Bilgiler";
+
+                  return (
+                    <div key={q.id} className={`bg-[#0D1B35] border rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition ${isAlreadySelected ? "border-emerald-500/40 bg-emerald-500/5" : "border-white/10 hover:border-indigo-500/40"}`}>
+                      <div className="space-y-1 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="bg-indigo-600 text-white font-black text-[10px] px-2 py-0.5 rounded-full">{q.subject}</span>
+                          <span className="bg-white/10 text-slate-300 font-bold text-[10px] px-2 py-0.5 rounded-full">{q.difficulty}</span>
+                          {q.teacher && <span className="text-[10px] text-slate-400">Yazar: {q.teacher.name}</span>}
+                        </div>
+                        <p className="text-white text-xs font-bold line-clamp-2">{q.questionText}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (isAlreadySelected) {
+                            setSelectedQuestionItems((prev) => prev.filter((item) => item.question.id !== q.id));
+                          } else {
+                            setSelectedQuestionItems((prev) => [
+                              ...prev,
+                              { question: q, sectionName: defaultSec, orderNo: prev.length + 1 },
+                            ]);
+                          }
+                        }}
+                        className={`text-xs font-black px-4 py-2 rounded-xl transition flex-shrink-0 ${
+                          isAlreadySelected
+                            ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 hover:bg-emerald-500/30"
+                            : "bg-indigo-600 hover:bg-indigo-500 text-white"
+                        }`}
+                      >
+                        {isAlreadySelected ? "✓ Eklendi (Çıkar)" : "＋ Sınava Ekle"}
+                      </button>
+                    </div>
+                  );
+                })}
+            </div>
+
+            <div className="flex justify-end pt-2 border-t border-white/10">
+              <button
+                type="button"
+                onClick={() => setPickerModalOpen(false)}
+                className="bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs px-6 py-2.5 rounded-xl transition"
+              >
+                Tamam ({selectedQuestionItems.length} Soru Seçili)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── SINAV ÖN GÖSTERİM MODALI ─── */}
+      {previewExamModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-[#131B2E] border border-white/10 rounded-3xl max-w-3xl w-full p-6 sm:p-8 space-y-6 shadow-2xl my-8">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div>
+                <h3 className="text-white font-black text-lg flex items-center gap-2">
+                  👁️ Sınav Ön Gösterimi
+                </h3>
+                <p className="text-xs text-slate-400">{previewExamModal.title}</p>
+              </div>
+              <button onClick={() => setPreviewExamModal(null)} className="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+            </div>
+
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
+              {previewExamModal.examQuestions?.map((eq: any, idx: number) => (
+                <div key={eq.id} className="bg-[#0D1B35] border border-white/10 rounded-2xl p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="bg-indigo-600 text-white font-black text-xs px-3 py-1 rounded-xl">
+                      Soru {idx + 1} — {eq.sectionName}
+                    </span>
+                    <span className="text-xs text-indigo-400 font-bold">Doğru Cevap: {eq.question.correctOption}</span>
+                  </div>
+                  <p className="text-white text-sm font-bold whitespace-pre-wrap">{eq.question.questionText}</p>
+                  {eq.question.imageUrl && <img src={eq.question.imageUrl} alt="" className="max-h-48 object-contain rounded-xl my-2" />}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-semibold text-slate-300">
+                    <div className={eq.question.correctOption === "A" ? "text-emerald-400 font-bold" : ""}>A) {eq.question.optionA}</div>
+                    <div className={eq.question.correctOption === "B" ? "text-emerald-400 font-bold" : ""}>B) {eq.question.optionB}</div>
+                    <div className={eq.question.correctOption === "C" ? "text-emerald-400 font-bold" : ""}>C) {eq.question.optionC}</div>
+                    <div className={eq.question.correctOption === "D" ? "text-emerald-400 font-bold" : ""}>D) {eq.question.optionD}</div>
+                    {eq.question.optionE && <div className={eq.question.correctOption === "E" ? "text-emerald-400 font-bold" : ""}>E) {eq.question.optionE}</div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex justify-end pt-2 border-t border-white/10">
+              <button
+                type="button"
+                onClick={() => setPreviewExamModal(null)}
+                className="bg-white/5 hover:bg-white/10 text-white font-black text-xs px-6 py-2.5 rounded-xl border border-white/10"
+              >
+                Kapat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── CANLI GÖZETMENLİK & KAMERA İZLEME MODALI (PROCTORING GRID) ─── */}
+      {proctorExamModal && (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-[#131B2E] border border-white/10 rounded-3xl max-w-5xl w-full p-6 sm:p-8 space-y-6 shadow-2xl my-8">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div>
+                <h3 className="text-white font-black text-lg flex items-center gap-2">
+                  🎥 Canlı Kamera Gözetmenliği Paneli
+                </h3>
+                <p className="text-xs text-emerald-400 font-semibold mt-0.5">
+                  {proctorExamModal.title} — Aktif Sınava Giren Öğrenciler
+                </p>
+              </div>
+              <button onClick={() => setProctorExamModal(null)} className="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+            </div>
+
+            {/* Proctoring Grid */}
+            {proctorAttempts.length === 0 ? (
+              <div className="text-center py-16 bg-[#0D1B35] rounded-2xl border border-white/5 space-y-2">
+                <span className="text-3xl block">📹</span>
+                <p className="text-white font-black text-sm">Şu Anda Sınavda Aktif Öğrenci Bulunmuyor</p>
+                <p className="text-xs text-slate-400">Sınav saatinde öğrenciler giriş yaptıkça canlı kamera akışları burada görünecektir.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[65vh] overflow-y-auto pr-1">
+                {proctorAttempts.map((att) => {
+                  const s = att.student;
+                  const isSubmitted = att.status === "SUBMITTED";
+                  const warningCount = att.focusWarnings || 0;
+
+                  return (
+                    <div key={att.id} className="bg-[#0D1B35] border border-white/10 rounded-2xl p-4 space-y-3 relative overflow-hidden">
+                      {/* Video Simulated Frame */}
+                      <div className="w-full h-40 bg-black rounded-xl border border-white/10 overflow-hidden relative flex items-center justify-center">
+                        {s.avatar ? (
+                          <img src={s.avatar} alt="" className="w-full h-full object-cover opacity-80" />
+                        ) : (
+                          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-black text-xl">
+                            {s.name.charAt(0)}
+                          </div>
+                        )}
+                        <div className="absolute top-2 left-2 flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-md text-[10px] font-black text-emerald-400 border border-emerald-500/30">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          CANLI KAMERA
+                        </div>
+                        {warningCount > 0 && (
+                          <div className="absolute bottom-2 left-2 bg-red-500/80 text-white text-[10px] font-black px-2 py-0.5 rounded-md animate-pulse">
+                            ⚠️ {warningCount} Sekme Değişimi
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <h4 className="font-black text-white text-sm">{s.name}</h4>
+                        <p className="text-[10px] text-slate-400">{s.email}</p>
+                      </div>
+
+                      <div className="flex items-center justify-between text-[11px] font-semibold border-t border-white/5 pt-2">
+                        <span className="text-slate-400">Durum:</span>
+                        <span className={`font-black ${isSubmitted ? "text-emerald-400" : "text-amber-400"}`}>
+                          {isSubmitted ? `✅ Tamamlandı (${att.totalNet} Net)` : "✍️ Sınavı Çözüyor"}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            <div className="flex justify-end pt-2 border-t border-white/10">
+              <button
+                type="button"
+                onClick={() => setProctorExamModal(null)}
+                className="bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs px-6 py-2.5 rounded-xl transition"
+              >
+                Gözetmenliği Kapat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

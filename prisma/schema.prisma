@@ -22,6 +22,7 @@ model Student {
   feedbacks    SessionFeedback[]    @relation("StudentFeedback")
   quizResults  StudentQuizResult[]
   attempts     StudentQuestionAttempt[]
+  examAttempts StudentExamAttempt[]
 }
 
 model Teacher {
@@ -83,6 +84,7 @@ model Question {
   rejectionReason  String?
   createdAt        DateTime @default(now())
   attempts         StudentQuestionAttempt[]
+  examQuestions    ExamQuestion[]
 
   @@index([subject, topic, difficulty])
   @@index([status])
@@ -305,5 +307,76 @@ model StudentTopicProgress {
   @@unique([studentId, subject, topic])
   @@index([studentId])
 }
+
+// ─── ONLINE DENEME SINAVI & KAMERA GÖZETMENLİK MODELLERİ ───────────────────────
+model Exam {
+  id               Int                  @id @default(autoincrement())
+  title            String
+  description      String?
+  examType         String               @default("TYT") // "TYT", "AYT", "LGS", "YKS", "KPSS"
+  targetTag        String               @default("TÜMÜ") // "TÜMÜ", "TYT", "AYT", "LGS", "KPSS"
+  startTime        DateTime
+  endTime          DateTime
+  durationMinutes  Int                  @default(135)
+  status           String               @default("DRAFT") // "DRAFT", "PUBLISHED", "ACTIVE", "ENDED"
+  isCameraRequired Boolean              @default(true)
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  examQuestions    ExamQuestion[]
+  attempts         StudentExamAttempt[]
+}
+
+model ExamQuestion {
+  id           Int      @id @default(autoincrement())
+  examId       Int
+  exam         Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  questionId   Int
+  question     Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  orderNo      Int      @default(1)
+  sectionName  String   @default("Genel") // "Türkçe", "Sosyal Bilgiler", "Temel Matematik", "Fen Bilimleri"
+  customPoints Float?
+
+  @@index([examId])
+  @@index([questionId])
+}
+
+model StudentExamAttempt {
+  id             Int                 @id @default(autoincrement())
+  examId         Int
+  exam           Exam                @relation(fields: [examId], references: [id], onDelete: Cascade)
+  studentId      Int
+  student        Student             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  proctorRoomUrl String?             // Daily.co proctor room URL for live camera stream
+  hasCamera      Boolean             @default(false)
+  focusWarnings  Int                 @default(0) // Number of tab switches (focus loss)
+  startedAt      DateTime            @default(now())
+  completedAt    DateTime?
+  turkceNet      Float               @default(0)
+  sosyalNet      Float               @default(0)
+  matematikNet   Float               @default(0)
+  fenNet         Float               @default(0)
+  totalNet       Float               @default(0)
+  totalScore     Float               @default(0)
+  status         String              @default("IN_PROGRESS") // "IN_PROGRESS", "SUBMITTED", "TIMED_OUT"
+  answers        StudentExamAnswer[]
+
+  @@unique([examId, studentId])
+  @@index([studentId])
+}
+
+model StudentExamAnswer {
+  id             Int                @id @default(autoincrement())
+  attemptId      Int
+  attempt        StudentExamAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId     Int
+  selectedOption String?            // "A", "B", "C", "D", "E" or null
+  isFlagged      Boolean            @default(false)
+  isCorrect      Boolean?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  @@unique([attemptId, questionId])
+}
+
 
 
