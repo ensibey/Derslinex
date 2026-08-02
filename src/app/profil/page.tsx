@@ -1755,18 +1755,6 @@ function StudentExamsTab({ studentId }: { studentId: number }) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-r from-indigo-900/40 via-purple-900/40 to-slate-900 border border-indigo-500/30 rounded-2xl p-6 relative overflow-hidden shadow-xl">
-        <div className="relative z-10 space-y-1">
-          <div className="inline-flex items-center gap-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 font-black text-xs px-3 py-1 rounded-full">
-            🎯 Online Deneme Sınavları
-          </div>
-          <h2 className="text-xl font-black text-white">Gerçek Sınav Provası & Canlı Kamera Gözetmenliği</h2>
-          <p className="text-xs text-slate-300 max-w-xl">
-            Soru havuzumuzdan hazırlanan Türkiye geneli online deneme sınavlarına katılın, sürenizi ve net performansınızı anlık ölçün.
-          </p>
-        </div>
-      </div>
-
       {exams.length === 0 ? (
         <div className="bg-[#1E293B] rounded-2xl border border-white/5 p-12 text-center space-y-3">
           <span className="text-4xl block">📝</span>
