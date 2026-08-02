@@ -2178,6 +2178,29 @@ export default function ProfilPage() {
     ? (pastSessions.filter((s) => s.myFeedback).reduce((acc: number, s: any) => acc + (s.myFeedback?.rating || 0), 0) / pastSessions.filter((s) => s.myFeedback).length).toFixed(1)
     : null;
 
+  // Dynamic Student XP & Level Calculation
+  const studentXP = (studentSessions.length * 50) + (pastSessions.length * 100) + (studentFeedbacks.length * 30);
+  let studentLevel = 1;
+  let levelTitle = "Seviye 1 (Başlangıç)";
+  let targetXP = 250;
+
+  if (studentXP >= 1000) {
+    studentLevel = 4;
+    levelTitle = "Seviye 4 (Derece Adayı)";
+    targetXP = 2000;
+  } else if (studentXP >= 500) {
+    studentLevel = 3;
+    levelTitle = "Seviye 3 (Gelişen)";
+    targetXP = 1000;
+  } else if (studentXP >= 250) {
+    studentLevel = 2;
+    levelTitle = "Seviye 2 (Çırak)";
+    targetXP = 500;
+  }
+
+  const neededXP = Math.max(0, targetXP - studentXP);
+  const xpPercent = Math.min(100, Math.max(5, Math.round((studentXP / targetXP) * 100)));
+
   // ─── AUTH FORM ─────────────────────────────────────────────────────────────────
   if (!studentProfile && !teacherProfile) {
     return (
@@ -3586,7 +3609,7 @@ export default function ProfilPage() {
                       <div className="flex items-center gap-2 flex-wrap">
                         <h2 className="text-xl md:text-2xl font-black text-white">Hoş geldin, {studentProfile?.name.split(" ")[0]}! 👋</h2>
                         <span className="bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-black text-[10px] px-2.5 py-0.5 rounded-full shadow-xs">
-                          🔥 7 Gün Çalışma Serisi
+                          {pastSessions.length > 0 ? `🔥 ${pastSessions.length} Ders Serisi` : "🌱 Yeni Öğrenci"}
                         </span>
                       </div>
                       <p className="text-slate-300 text-xs font-semibold mt-1 flex items-center gap-2 flex-wrap">
@@ -3601,14 +3624,16 @@ export default function ProfilPage() {
 
                   {/* Level & XP Widget */}
                   <div className="w-full md:w-auto bg-white/5 border border-white/10 rounded-xl p-3.5 relative z-10 min-w-[220px]">
-                    <div className="flex items-center justify-between text-xs font-black mb-1.5">
-                      <span className="text-amber-300 flex items-center gap-1">🏆 Seviye 3 Öğrenci</span>
-                      <span className="text-indigo-300 tabular-nums">850 / 1000 XP</span>
+                    <div className="flex items-center justify-between text-xs font-black mb-1.5 gap-2">
+                      <span className="text-amber-300 flex items-center gap-1">🏆 {levelTitle}</span>
+                      <span className="text-indigo-300 tabular-nums">{studentXP} / {targetXP} XP</span>
                     </div>
                     <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-amber-400 via-indigo-500 to-purple-400 rounded-full" style={{ width: "85%" }} />
+                      <div className="h-full bg-gradient-to-r from-amber-400 via-indigo-500 to-purple-400 rounded-full transition-all duration-500" style={{ width: `${xpPercent}%` }} />
                     </div>
-                    <p className="text-[10px] text-slate-400 font-bold mt-1.5 text-right">Seviye 4'e son 150 XP 🚀</p>
+                    <p className="text-[10px] text-slate-400 font-bold mt-1.5 text-right">
+                      {neededXP > 0 ? `Seviye ${studentLevel + 1}'e son ${neededXP} XP 🚀` : "Maksimum Seviye! 🌟"}
+                    </p>
                   </div>
                 </div>
 
