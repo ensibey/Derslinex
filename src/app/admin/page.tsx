@@ -19,6 +19,7 @@ interface Student {
   email: string;
   status: string;
   isBanned: boolean;
+  targetTag?: string | null;
   createdAt: string;
 }
 
@@ -143,6 +144,26 @@ export default function AdminPage() {
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
+  const [studentTagFilter, setStudentTagFilter] = useState<string>("TÜMÜ");
+
+  const handleUpdateStudentTag = async (id: number, newTag: string) => {
+    try {
+      const res = await adminFetch("/api/admin/users", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, type: "student", action: "targetTag", value: newTag }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showMsg("Öğrenci tagı güncellendi.", "success");
+        fetchData();
+      } else {
+        showMsg(data.error || "Tag güncellenemedi.", "error");
+      }
+    } catch {
+      showMsg("Bağlantı hatası", "error");
+    }
+  };
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -576,80 +597,143 @@ export default function AdminPage() {
             )}
 
             {/* STUDENTS TAB */}
-            {activeTab === "students" && (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse text-xs sm:text-sm">
-                  <thead>
-                    <tr className="bg-[#0D1B35] border-b border-white/10 text-slate-400 font-black uppercase text-[11px]">
-                      <th className="p-4 sm:p-5">Adı Soyadı</th>
-                      <th className="p-4 sm:p-5">İletişim</th>
-                      <th className="p-4 sm:p-5">Durum / Ban</th>
-                      <th className="p-4 sm:p-5 text-right">İşlemler</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5 font-semibold text-slate-300">
-                    {students.length === 0 ? (
-                      <tr>
-                        <td colSpan={4} className="p-10 text-center text-slate-500">
-                          Henüz kayıtlı öğrenci bulunmuyor.
-                        </td>
-                      </tr>
-                    ) : (
-                      students.map((s) => (
-                        <tr key={s.id} className={`hover:bg-white/5 transition-colors ${s.isBanned ? "bg-red-500/10" : ""}`}>
-                          <td className="p-4 sm:p-5 font-black text-white">
-                            <div>{s.name}</div>
-                            <span className="text-[10px] text-slate-500 font-semibold block mt-0.5">
-                              Kayıt: {new Date(s.createdAt).toLocaleDateString("tr-TR")}
-                            </span>
-                          </td>
-                          <td className="p-4 sm:p-5 space-y-0.5 text-xs text-slate-400">
-                            <div>📞 {s.phone}</div>
-                            <div>✉️ {s.email}</div>
-                          </td>
-                          <td className="p-4 sm:p-5 space-y-1.5">
-                            <div>
-                              <span className={`inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold border ${ s.status === "İletişime Geçildi" ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : "bg-amber-500/20 text-amber-400 border-amber-500/30" }`}>
-                                {s.status}
-                              </span>
-                            </div>
-                            {s.isBanned && (
-                              <div>
-                                <span className="inline-block text-[10px] bg-red-500/20 text-red-400 border border-red-500/30 px-2.5 py-0.5 rounded-full font-bold">
-                                  ⛔ Yasaklı
-                                </span>
-                              </div>
-                            )}
-                          </td>
-                          <td className="p-4 sm:p-5 text-right">
-                            <div className="flex items-center justify-end gap-2 flex-wrap">
-                              <button
-                                onClick={() => handleUpdateStatus(s.id, "student", s.status)}
-                                className={`text-xs px-3 py-1.5 rounded-xl border font-black transition ${ s.status === "İletişime Geçildi" ? "bg-white/5 hover:bg-white/10 text-slate-300 border-white/10" : "bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500" }`}
-                              >
-                                {s.status === "İletişime Geçildi" ? "Beklemeye Al" : "İletişime Geçildi İşaretle"}
-                              </button>
-                              <button
-                                onClick={() => handleBanToggle(s.id, "student", s.isBanned)}
-                                className={`text-xs px-3 py-1.5 rounded-xl border font-black transition ${ s.isBanned ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : "bg-red-500/20 text-red-400 border-red-500/30" }`}
-                              >
-                                {s.isBanned ? "Engeli Kaldır" : "Engelle"}
-                              </button>
-                              <button
-                                onClick={() => handleDeleteUser(s.id, "student")}
-                                className="text-xs px-3 py-1.5 rounded-xl font-black bg-red-600/80 hover:bg-red-600 text-white transition"
-                              >
-                                Sil
-                              </button>
-                            </div>
-                          </td>
+            {activeTab === "students" && (() => {
+              const filteredStudents = studentTagFilter === "TÜMÜ" 
+                ? students 
+                : students.filter((s) => (s.targetTag || "TYT") === studentTagFilter);
+
+              return (
+                <div className="space-y-4">
+                  {/* Tag Filter Bar */}
+                  <div className="bg-[#1E293B] border border-white/10 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-xl">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs font-black text-slate-300 flex items-center gap-1">
+                        🎯 Sınav Tagı Filtresi:
+                      </span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {["TÜMÜ", "TYT", "AYT", "YKS", "LGS", "KPSS"].map((tag) => (
+                          <button
+                            key={tag}
+                            onClick={() => setStudentTagFilter(tag)}
+                            className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
+                              studentTagFilter === tag
+                                ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md border border-indigo-400/40"
+                                : "bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/10"
+                            }`}
+                          >
+                            {tag} {tag !== "TÜMÜ" && `(${students.filter(s => (s.targetTag || "TYT") === tag).length})`}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <span className="text-xs text-slate-400 font-semibold">
+                      Gösterilen: <strong className="text-white font-black">{filteredStudents.length}</strong> / {students.length} Öğrenci
+                    </span>
+                  </div>
+
+                  <div className="overflow-x-auto rounded-2xl border border-white/10">
+                    <table className="w-full text-left border-collapse text-xs sm:text-sm">
+                      <thead>
+                        <tr className="bg-[#0D1B35] border-b border-white/10 text-slate-400 font-black uppercase text-[11px]">
+                          <th className="p-4 sm:p-5">Adı Soyadı</th>
+                          <th className="p-4 sm:p-5">Sınav Tagı</th>
+                          <th className="p-4 sm:p-5">İletişim</th>
+                          <th className="p-4 sm:p-5">Durum / Ban</th>
+                          <th className="p-4 sm:p-5 text-right">İşlemler</th>
                         </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                      </thead>
+                      <tbody className="divide-y divide-white/5 font-semibold text-slate-300">
+                        {filteredStudents.length === 0 ? (
+                          <tr>
+                            <td colSpan={5} className="p-10 text-center text-slate-500">
+                              Seçili tag filtresine uygun öğrenci bulunmuyor.
+                            </td>
+                          </tr>
+                        ) : (
+                          filteredStudents.map((s) => {
+                            const tag = s.targetTag || "TYT";
+                            let tagStyle = "bg-blue-500/20 text-blue-400 border-blue-500/30";
+                            if (tag === "AYT") tagStyle = "bg-purple-500/20 text-purple-400 border-purple-500/30";
+                            else if (tag === "YKS") tagStyle = "bg-indigo-500/20 text-indigo-400 border-indigo-500/30";
+                            else if (tag === "LGS") tagStyle = "bg-emerald-500/20 text-emerald-400 border-emerald-500/30";
+                            else if (tag === "KPSS") tagStyle = "bg-amber-500/20 text-amber-400 border-amber-500/30";
+
+                            return (
+                              <tr key={s.id} className={`hover:bg-white/5 transition-colors ${s.isBanned ? "bg-red-500/10" : ""}`}>
+                                <td className="p-4 sm:p-5 font-black text-white">
+                                  <div>{s.name}</div>
+                                  <span className="text-[10px] text-slate-500 font-semibold block mt-0.5">
+                                    Kayıt: {new Date(s.createdAt).toLocaleDateString("tr-TR")}
+                                  </span>
+                                </td>
+                                <td className="p-4 sm:p-5">
+                                  <div className="flex items-center gap-2">
+                                    <span className={`inline-block text-xs font-black px-2.5 py-1 rounded-xl border ${tagStyle}`}>
+                                      🎯 {tag}
+                                    </span>
+                                    <select
+                                      value={tag}
+                                      onChange={(e) => handleUpdateStudentTag(s.id, e.target.value)}
+                                      className="bg-[#0D1B35] border border-white/10 text-xs text-slate-300 rounded-lg px-2 py-1 focus:outline-none focus:border-indigo-500 font-bold"
+                                    >
+                                      <option value="TYT">TYT</option>
+                                      <option value="AYT">AYT</option>
+                                      <option value="YKS">YKS</option>
+                                      <option value="LGS">LGS</option>
+                                      <option value="KPSS">KPSS</option>
+                                    </select>
+                                  </div>
+                                </td>
+                                <td className="p-4 sm:p-5 space-y-0.5 text-xs text-slate-400">
+                                  <div>📞 {s.phone}</div>
+                                  <div>✉️ {s.email}</div>
+                                </td>
+                                <td className="p-4 sm:p-5 space-y-1.5">
+                                  <div>
+                                    <span className={`inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold border ${ s.status === "İletişime Geçildi" ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : "bg-amber-500/20 text-amber-400 border-amber-500/30" }`}>
+                                      {s.status}
+                                    </span>
+                                  </div>
+                                  {s.isBanned && (
+                                    <div>
+                                      <span className="inline-block text-[10px] bg-red-500/20 text-red-400 border border-red-500/30 px-2.5 py-0.5 rounded-full font-bold">
+                                        ⛔ Yasaklı
+                                      </span>
+                                    </div>
+                                  )}
+                                </td>
+                                <td className="p-4 sm:p-5 text-right">
+                                  <div className="flex items-center justify-end gap-2 flex-wrap">
+                                    <button
+                                      onClick={() => handleUpdateStatus(s.id, "student", s.status)}
+                                      className={`text-xs px-3 py-1.5 rounded-xl border font-black transition ${ s.status === "İletişime Geçildi" ? "bg-white/5 hover:bg-white/10 text-slate-300 border-white/10" : "bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500" }`}
+                                    >
+                                      {s.status === "İletişime Geçildi" ? "Beklemeye Al" : "İletişime Geçildi İşaretle"}
+                                    </button>
+                                    <button
+                                      onClick={() => handleBanToggle(s.id, "student", s.isBanned)}
+                                      className={`text-xs px-3 py-1.5 rounded-xl border font-black transition ${ s.isBanned ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : "bg-red-500/20 text-red-400 border-red-500/30" }`}
+                                    >
+                                      {s.isBanned ? "Engeli Kaldır" : "Engelle"}
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteUser(s.id, "student")}
+                                      className="text-xs px-3 py-1.5 rounded-xl font-black bg-red-600/80 hover:bg-red-600 text-white transition"
+                                    >
+                                      Sil
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* QUESTIONS TAB */}
             {activeTab === "questions" && (

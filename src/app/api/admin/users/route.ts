@@ -16,6 +16,7 @@ export async function GET(request: Request) {
         phone: true,
         email: true,
         avatar: true,
+        targetTag: true,
         status: true,
         isBanned: true,
         createdAt: true,
@@ -73,6 +74,11 @@ export async function PUT(request: Request) {
         await prisma.student.update({
           where: { id: userId },
           data: { isBanned: Boolean(value) },
+        });
+      } else if (action === "targetTag") {
+        await prisma.student.update({
+          where: { id: userId },
+          data: { targetTag: value },
         });
       }
     } else if (userRole === "teacher") {

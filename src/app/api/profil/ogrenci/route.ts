@@ -24,6 +24,7 @@ export async function GET(request: Request) {
           phone: true,
           email: true,
           avatar: true,
+          targetTag: true,
           status: true,
           isBanned: true,
           createdAt: true,
@@ -40,6 +41,7 @@ export async function GET(request: Request) {
         phone: true,
         email: true,
         avatar: true,
+        targetTag: true,
         status: true,
         isBanned: true,
         createdAt: true,
@@ -62,7 +64,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, phone, email, avatar } = body;
+    const { name, phone, email, avatar, targetTag } = body;
 
     if (!name || !phone || !email) {
       return NextResponse.json({ success: false, error: "Tüm alanlar zorunludur" }, { status: 400 });
@@ -83,13 +85,14 @@ export async function POST(request: Request) {
 
     const student = await prisma.student.update({
       where: { id: existing.id },
-      data: { name, phone, avatar },
+      data: { name, phone, avatar, targetTag },
       select: {
         id: true,
         name: true,
         phone: true,
         email: true,
         avatar: true,
+        targetTag: true,
         status: true,
         isBanned: true,
         createdAt: true,

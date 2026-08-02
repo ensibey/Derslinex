@@ -1736,7 +1736,7 @@ function TeacherRewardsTab({ teacherId }: { teacherId: number }) {
 }
 
 // ─── Interfaces ────────────────────────────────────────────────────────────────
-interface Student { id: number; name: string; phone: string; email: string; status: string; avatar?: string | null; }
+interface Student { id: number; name: string; phone: string; email: string; status: string; avatar?: string | null; targetTag?: string | null; }
 interface Teacher { id: number; name: string; phone: string; email: string; branch: string; status: string; egitim?: string | null; ozgecmis?: string | null; linkedin?: string | null; youtube?: string | null; avatar?: string | null; }
 interface Feedback { id: number; studentName: string; studentEmail: string | null; teacherId: number; teacherName: string; content: string; rating: number; createdAt: string; }
 
@@ -1764,10 +1764,10 @@ export default function ProfilPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const [studentForm, setStudentForm] = useState({ name: "", phone: "", email: "", password: "" });
+  const [studentForm, setStudentForm] = useState({ name: "", phone: "", email: "", password: "", targetTag: "TYT" });
   const [studentProfile, setStudentProfile] = useState<Student | null>(null);
   const [editingStudent, setEditingStudent] = useState(false);
-  const [studentEditForm, setStudentEditForm] = useState({ name: "", phone: "", avatar: "" });
+  const [studentEditForm, setStudentEditForm] = useState({ name: "", phone: "", avatar: "", targetTag: "TYT" });
 
   const [teacherForm, setTeacherForm] = useState({ name: "", phone: "", email: "", password: "", branch: "" });
   const [teacherProfile, setTeacherProfile] = useState<Teacher | null>(null);
@@ -1873,7 +1873,7 @@ export default function ProfilPage() {
       const parsedUser = JSON.parse(savedUser);
       if (savedRole === "student") {
         setStudentProfile(parsedUser);
-        setStudentEditForm({ name: parsedUser.name, phone: parsedUser.phone, avatar: parsedUser.avatar || "" });
+        setStudentEditForm({ name: parsedUser.name, phone: parsedUser.phone, avatar: parsedUser.avatar || "", targetTag: parsedUser.targetTag || "TYT" });
         setRole("student");
         fetchStudentSessions(parsedUser.id);
       } else {
@@ -2002,7 +2002,7 @@ export default function ProfilPage() {
       if (data.success) {
         const student = data.student;
         setStudentProfile(student);
-        setStudentEditForm({ name: student.name, phone: student.phone, avatar: student.avatar || "" });
+        setStudentEditForm({ name: student.name, phone: student.phone, avatar: student.avatar || "", targetTag: student.targetTag || "TYT" });
         const storage = rememberMe ? localStorage : sessionStorage;
         storage.setItem("derslinex_role", "student"); storage.setItem("derslinex_user", JSON.stringify(student));
         fetchStudentSessions(student.id);
@@ -2014,10 +2014,11 @@ export default function ProfilPage() {
   const handleStudentUpdate = async (e: React.FormEvent) => {
     e.preventDefault(); if (!studentProfile) return; setLoading(true);
     try {
-      const res = await fetch("/api/profil/ogrenci", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: studentProfile.email, name: studentEditForm.name, phone: studentEditForm.phone, avatar: studentEditForm.avatar }) });
+      const res = await fetch("/api/profil/ogrenci", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: studentProfile.email, name: studentEditForm.name, phone: studentEditForm.phone, avatar: studentEditForm.avatar, targetTag: studentEditForm.targetTag }) });
       const data = await res.json();
       if (data.success) {
         const updated = data.student; setStudentProfile(updated);
+        setStudentEditForm({ name: updated.name, phone: updated.phone, avatar: updated.avatar || "", targetTag: updated.targetTag || "TYT" });
         const storage = localStorage.getItem("derslinex_role") ? localStorage : sessionStorage;
         storage.setItem("derslinex_user", JSON.stringify(updated));
         window.dispatchEvent(new Event("derslinex_auth_change"));
@@ -2299,28 +2300,49 @@ export default function ProfilPage() {
             {role === "student" ? (
               <form onSubmit={handleStudentAuth} className="space-y-4">
                 {authMode === "register" && (
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Adı Soyadı</label>
-                      <input
-                        type="text" required
-                        value={studentForm.name}
-                        onChange={(e) => setStudentForm({ ...studentForm, name: e.target.value })}
-                        className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
-                        placeholder="Ad Soyad"
-                      />
+                  <>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Adı Soyadı</label>
+                        <input
+                          type="text" required
+                          value={studentForm.name}
+                          onChange={(e) => setStudentForm({ ...studentForm, name: e.target.value })}
+                          className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                          placeholder="Ad Soyad"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Telefon</label>
+                        <input
+                          type="text" required
+                          placeholder="05xx xxx xx xx"
+                          value={studentForm.phone}
+                          onChange={(e) => setStudentForm({ ...studentForm, phone: e.target.value })}
+                          className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                        />
+                      </div>
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Telefon</label>
-                      <input
-                        type="text" required
-                        placeholder="05xx xxx xx xx"
-                        value={studentForm.phone}
-                        onChange={(e) => setStudentForm({ ...studentForm, phone: e.target.value })}
-                        className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
-                      />
+                      <label className="block text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">🎯 Hedef Sınav Tagı</label>
+                      <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                        {["TYT", "AYT", "YKS", "LGS", "KPSS"].map((tag) => (
+                          <button
+                            type="button"
+                            key={tag}
+                            onClick={() => setStudentForm({ ...studentForm, targetTag: tag })}
+                            className={`py-2 rounded-xl text-xs font-black border transition-all ${
+                              studentForm.targetTag === tag
+                                ? "bg-indigo-600 border-indigo-400 text-white shadow-md shadow-indigo-600/30"
+                                : "bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10"
+                            }`}
+                          >
+                            {tag}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  </>
                 )}
                 <div>
                   <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">E-posta Adresi</label>
@@ -3611,6 +3633,9 @@ export default function ProfilPage() {
                         <span className="bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-black text-[10px] px-2.5 py-0.5 rounded-full shadow-xs">
                           {pastSessions.length > 0 ? `🔥 ${pastSessions.length} Ders Serisi` : "🌱 Yeni Öğrenci"}
                         </span>
+                        <span className="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 font-black text-[10px] px-2.5 py-0.5 rounded-full shadow-xs">
+                          🎯 Hedef: {studentProfile?.targetTag || "TYT"}
+                        </span>
                       </div>
                       <p className="text-slate-300 text-xs font-semibold mt-1 flex items-center gap-2 flex-wrap">
                         <span>{new Date().toLocaleDateString("tr-TR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</span>
@@ -4027,6 +4052,25 @@ export default function ProfilPage() {
                   <div>
                     <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Telefon</label>
                     <input type="text" value={studentEditForm.phone} onChange={(e) => setStudentEditForm({ ...studentEditForm, phone: e.target.value })} required className="w-full bg-[#0D1B35] border border-white/10 text-white px-4 py-2.5 rounded-xl text-sm font-bold focus:outline-none focus:border-indigo-500" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black text-indigo-400 uppercase tracking-wider mb-2">🎯 Hedef Sınav Tagı</label>
+                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                      {["TYT", "AYT", "YKS", "LGS", "KPSS"].map((tag) => (
+                        <button
+                          type="button"
+                          key={tag}
+                          onClick={() => setStudentEditForm({ ...studentEditForm, targetTag: tag })}
+                          className={`py-2 rounded-xl text-xs font-black border transition-all ${
+                            studentEditForm.targetTag === tag
+                              ? "bg-indigo-600 border-indigo-400 text-white shadow-md shadow-indigo-600/30"
+                              : "bg-[#0D1B35] border-white/10 text-slate-400 hover:text-white hover:bg-white/10"
+                          }`}
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   <div className="flex gap-3">
                     <button type="submit" disabled={loading} className="bg-indigo-600 hover:bg-indigo-500 text-white font-black px-8 py-3 rounded-xl text-xs transition">{loading ? "Kaydediliyor..." : "Değişiklikleri Kaydet"}</button>

@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, phone, email, password } = body;
+    const { name, phone, email, password, targetTag } = body;
 
     if (!name || !phone || !email || !password) {
       return NextResponse.json({ success: false, error: "Tüm alanlar zorunludur" }, { status: 400 });
@@ -36,6 +36,7 @@ export async function POST(request: Request) {
         phone,
         email,
         password: hashPassword(password),
+        targetTag: targetTag || "TYT",
         status: "Beklemede",
       },
     });
