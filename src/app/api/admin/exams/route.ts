@@ -1,14 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-
-function verifyAdminAuth(request: Request) {
-  const adminKey = request.headers.get("x-admin-key");
-  const expectedKey = process.env.NEXT_PUBLIC_ADMIN_SECRET || "derslinex_admin_secret_2026";
-  if (adminKey !== expectedKey) {
-    return NextResponse.json({ success: false, error: "Yetkisiz erişim. Geçersiz Admin Anahtarı." }, { status: 401 });
-  }
-  return null;
-}
+import { verifyAdminAuth } from "@/lib/adminAuth";
 
 // GET: List all exams and approved question pool stats
 export async function GET(request: Request) {

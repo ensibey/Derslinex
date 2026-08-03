@@ -547,7 +547,11 @@ export default function LiveSessionPage() {
     try {
       const res = await fetch(`/api/sessions/${sessionId}/join`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": String(user.id),
+          "x-user-role": userRole,
+        },
         body: JSON.stringify({ userId: user.id, role: userRole, userName: user.name }),
       });
 

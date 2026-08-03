@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
 import crypto from "crypto";
 import { getAuthUser } from "@/lib/auth-middleware";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
-const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".pdf"];
-const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
+const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 // POST /api/upload
+// NOTE: On Vercel serverless, filesystem is read-only.
+// We return a base64 data URL that the client can use directly.
+// For production, swap this with Vercel Blob, Cloudflare R2, or S3.
 export async function POST(request: Request) {
   try {
     const user = await getAuthUser(request);
@@ -29,13 +30,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Dosya seçilmedi." }, { status: 400 });
     }
 
-    // Limit size to 10MB
-    if (file.size > 10 * 1024 * 1024) {
-      return NextResponse.json({ success: false, error: "Dosya boyutu maksimum 10MB olabilir." }, { status: 400 });
+    // Limit size to 3MB (base64 data URLs get large)
+    if (file.size > 3 * 1024 * 1024) {
+      return NextResponse.json({ success: false, error: "Dosya boyutu maksimum 3MB olabilir." }, { status: 400 });
     }
 
-    const rawExt = path.extname(file.name).toLowerCase();
-    if (!ALLOWED_EXTENSIONS.includes(rawExt)) {
+    const rawExt = file.name.includes(".") ? "." + file.name.split(".").pop()!.toLowerCase() : "";
+    if (rawExt && !ALLOWED_EXTENSIONS.includes(rawExt)) {
       return NextResponse.json(
         { success: false, error: `Geçersiz dosya uzantısı. İzin verilenler: ${ALLOWED_EXTENSIONS.join(", ")}` },
         { status: 400 }
@@ -44,32 +45,24 @@ export async function POST(request: Request) {
 
     if (file.type && !ALLOWED_MIME_TYPES.includes(file.type)) {
       return NextResponse.json(
-        { success: false, error: "Geçersiz dosya türü. Yalnızca görsel veya PDF yüklenebilir." },
+        { success: false, error: "Geçersiz dosya türü. Yalnızca görsel (JPG, PNG, WEBP, GIF) yüklenebilir." },
         { status: 400 }
       );
     }
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+    const base64 = buffer.toString("base64");
+    const mimeType = file.type || "image/jpeg";
+    const dataUrl = `data:${mimeType};base64,${base64}`;
 
-    // Create unique filename
-    const filename = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}${rawExt}`;
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
-
-    try {
-      await mkdir(uploadsDir, { recursive: true });
-    } catch {
-      // Ignore directory exists error
-    }
-
-    const filePath = path.join(uploadsDir, filename);
-    await writeFile(filePath, buffer);
-
-    const fileUrl = `/uploads/${filename}`;
+    // Generate a unique identifier for tracking
+    const fileId = `${Date.now()}-${crypto.randomBytes(4).toString("hex")}`;
 
     return NextResponse.json({
       success: true,
-      url: fileUrl,
+      url: dataUrl,
+      fileId,
       fileName: file.name,
       size: file.size,
     });

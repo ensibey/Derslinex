@@ -3024,15 +3024,48 @@ export default function ProfilPage() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-1.5">Soru Görseli / Grafik URL (Opsiyonel)</label>
-                      <input
-                        type="url"
-                        placeholder="https://..."
-                        value={questionForm.imageUrl}
-                        onChange={(e) => setQuestionForm({ ...questionForm, imageUrl: e.target.value })}
-                        className="w-full bg-[#0D1B35] border border-white/10 text-white px-4 py-2.5 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500 placeholder:text-slate-600"
-                      />
+                      <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-1.5">Soru Görseli / Grafik (Opsiyonel)</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="url"
+                          placeholder="https://... (URL girin ya da dosya yükleyin)"
+                          value={questionForm.imageUrl}
+                          onChange={(e) => setQuestionForm({ ...questionForm, imageUrl: e.target.value })}
+                          className="flex-1 bg-[#0D1B35] border border-white/10 text-white px-4 py-2.5 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500 placeholder:text-slate-600"
+                        />
+                        <label className="cursor-pointer flex items-center gap-1.5 bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/30 text-indigo-300 font-black text-xs px-3 py-2 rounded-xl transition whitespace-nowrap">
+                          📁 Yükle
+                          <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            try {
+                              const fd = new FormData();
+                              fd.append("file", file);
+                              const res = await fetch("/api/upload", {
+                                method: "POST",
+                                headers: { "x-user-id": String(teacherProfile.id), "x-user-role": "teacher" },
+                                body: fd,
+                              });
+                              const data = await res.json();
+                              if (data.success && data.url) {
+                                setQuestionForm({ ...questionForm, imageUrl: data.url });
+                              }
+                            } catch { /* fallback: use FileReader */ 
+                              const reader = new FileReader();
+                              reader.onloadend = () => setQuestionForm({ ...questionForm, imageUrl: reader.result as string });
+                              reader.readAsDataURL(file);
+                            }
+                          }} />
+                        </label>
+                      </div>
+                      {questionForm.imageUrl && (
+                        <div className="mt-2 relative">
+                          <img src={questionForm.imageUrl} alt="Önizleme" className="max-h-32 rounded-lg border border-white/10 object-contain" />
+                          <button type="button" onClick={() => setQuestionForm({ ...questionForm, imageUrl: "" })} className="absolute top-1 right-1 bg-red-600/80 text-white rounded-full w-5 h-5 text-xs font-black flex items-center justify-center">✕</button>
+                        </div>
+                      )}
                     </div>
+
 
                     {/* Options A-E */}
                     <div className="grid sm:grid-cols-2 gap-3">

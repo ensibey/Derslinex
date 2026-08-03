@@ -14,6 +14,15 @@ export async function POST(
     const { examId } = await context.params;
     const numericExamId = parseInt(examId);
 
+    // Check ban status
+    const student = await prisma.student.findUnique({ where: { id: studentId } });
+    if (!student) {
+      return NextResponse.json({ success: false, error: "Öğrenci bulunamadı." }, { status: 404 });
+    }
+    if (student.isBanned) {
+      return NextResponse.json({ success: false, error: "Hesabınız engellenmiş olduğundan sınava katılamazsınız." }, { status: 403 });
+    }
+
     const body = await request.json().catch(() => ({}));
     const hasCamera = Boolean(body.hasCamera);
 
