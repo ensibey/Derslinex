@@ -4,6 +4,76 @@ import React, { useState, useEffect, useRef, useCallback, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+function QuestionDrawingOverlay({ onClose }: { onClose: () => void }) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    canvas.width = canvas.parentElement?.clientWidth || 700;
+    canvas.height = canvas.parentElement?.clientHeight || 400;
+  }, []);
+
+  const startDraw = (e: any) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    setIsDrawing(true);
+  };
+
+  const draw = (e: any) => {
+    if (!isDrawing) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    ctx.strokeStyle = "#F59E0B";
+    ctx.lineWidth = 3.5;
+    ctx.lineCap = "round";
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  };
+
+  const stopDraw = () => setIsDrawing(false);
+
+  const clearDraw = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
+  return (
+    <div className="absolute inset-0 z-20 pointer-events-auto flex flex-col justify-between p-2">
+      <div className="flex justify-end gap-2 z-30 bg-[#0A0F1D]/85 backdrop-blur-xs p-1.5 rounded-xl border border-white/10 w-fit ml-auto shadow-md">
+        <button type="button" onClick={clearDraw} className="bg-red-500/20 text-red-300 text-[10px] font-black px-2.5 py-1 rounded-lg">🗑️ Temizle</button>
+        <button type="button" onClick={onClose} className="bg-white/10 text-white text-[10px] font-black px-2.5 py-1 rounded-lg">✕ Çizimi Kapat</button>
+      </div>
+      <canvas
+        ref={canvasRef}
+        onMouseDown={startDraw}
+        onMouseMove={draw}
+        onMouseUp={stopDraw}
+        onMouseLeave={stopDraw}
+        onTouchStart={startDraw}
+        onTouchMove={draw}
+        onTouchEnd={stopDraw}
+        className="w-full h-full cursor-crosshair touch-none"
+      />
+    </div>
+  );
+}
+
 export default function StudentOnlineExamPage({
   params,
 }: {
@@ -26,12 +96,46 @@ export default function StudentOnlineExamPage({
   const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [resultData, setResultData] = useState<any>(null);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  // New UX State: Palette Filter, Offline status, Pre-exam checklist, Font scale, Drawing overlay
+  const [paletteFilter, setPaletteFilter] = useState<"all" | "answered" | "flagged" | "empty">("all");
+  const [isOnline, setIsOnline] = useState(true);
+  const [showChecklist, setShowChecklist] = useState(true);
+  const [fontSizeScale, setFontSizeScale] = useState<number>(1);
+  const [isDrawingOverlay, setIsDrawingOverlay] = useState(false);
 
   // Proctoring & Camera state
   const [cameraActive, setCameraActive] = useState(false);
   const [focusWarnings, setFocusWarnings] = useState(0);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
+
+  // Network Status Monitor
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      setToastMsg("🟢 İnternet bağlantısı sağlandı. Cevaplarınız senkronize.");
+    };
+    const handleOffline = () => {
+      setIsOnline(false);
+      setToastMsg("⚠️ İnternet bağlantınız koptu! Cevaplarınız cihaza güvenle kaydediliyor.");
+    };
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+  // Sync answers with LocalStorage fallback
+  useEffect(() => {
+    if (!student || !examId || Object.keys(answers).length === 0) return;
+    try {
+      localStorage.setItem(`derslinex_answers_${examId}_${student.id}`, JSON.stringify(answers));
+    } catch {}
+  }, [answers, examId, student]);
 
   // Load student auth
   useEffect(() => {
@@ -87,8 +191,16 @@ export default function StudentOnlineExamPage({
           setExam(data.exam);
           setQuestions(data.questions || []);
           setAttempt(data.attempt);
+          const serverWarnings = data.attempt?.focusWarnings || 0;
+          let localWarnings = 0;
+          try {
+            const storedW = localStorage.getItem(`derslinex_focus_${examId}_${student.id}`);
+            if (storedW) localWarnings = parseInt(storedW) || 0;
+          } catch {}
+          const maxWarnings = Math.max(serverWarnings, localWarnings);
+          setFocusWarnings(maxWarnings);
 
-          // Populate existing answers
+          // Populate existing answers from server & local cache
           const initialAnswers: any = {};
           (data.questions || []).forEach((q: any) => {
             initialAnswers[q.id] = {
@@ -96,6 +208,22 @@ export default function StudentOnlineExamPage({
               isFlagged: Boolean(q.isFlagged),
             };
           });
+
+          // Fallback to local storage if user refreshed or lost connection
+          try {
+            const cachedLocal = localStorage.getItem(`derslinex_answers_${examId}_${student.id}`);
+            if (cachedLocal) {
+              const parsed = JSON.parse(cachedLocal);
+              Object.keys(parsed).forEach((qIdStr) => {
+                const qId = parseInt(qIdStr);
+                if (initialAnswers[qId] && parsed[qId]?.selectedOption) {
+                  initialAnswers[qId].selectedOption = parsed[qId].selectedOption;
+                  initialAnswers[qId].isFlagged = parsed[qId].isFlagged || initialAnswers[qId].isFlagged;
+                }
+              });
+            }
+          } catch {}
+
           setAnswers(initialAnswers);
 
           // Calculate remaining seconds
@@ -118,11 +246,20 @@ export default function StudentOnlineExamPage({
   // Tab switch / focus warning detector
   useEffect(() => {
     const handleBlur = () => {
-      setFocusWarnings((prev) => prev + 1);
+      setFocusWarnings((prev) => {
+        const next = prev + 1;
+        if (student && examId) {
+          try {
+            localStorage.setItem(`derslinex_focus_${examId}_${student.id}`, String(next));
+            sessionStorage.setItem(`derslinex_focus_${examId}_${student.id}`, String(next));
+          } catch {}
+        }
+        return next;
+      });
     };
     window.addEventListener("blur", handleBlur);
     return () => window.removeEventListener("blur", handleBlur);
-  }, []);
+  }, [student, examId]);
 
   // Submit Handler
   const handleSubmitExam = useCallback(async () => {
@@ -157,10 +294,10 @@ export default function StudentOnlineExamPage({
           mediaStreamRef.current.getTracks().forEach((t) => t.stop());
         }
       } else {
-        alert(data.error || "Sınav gönderilemedi.");
+        setToastMsg(data.error || "Sınav gönderilemedi.");
       }
     } catch {
-      alert("Bağlantı hatası oluştu.");
+      setToastMsg("Bağlantı hatası oluştu.");
     } finally {
       setIsSubmitting(false);
     }
@@ -277,6 +414,31 @@ export default function StudentOnlineExamPage({
             <p className="text-xs text-indigo-200">ÖSYM Standart Net Hesabı (4 Yanlış 1 Doğruyu Götürür)</p>
           </div>
 
+          {/* Konu Bazlı Yanlış & Başarı Analizi */}
+          {resultData.topicBreakdown && Object.keys(resultData.topicBreakdown).length > 0 && (
+            <div className="bg-[#0D1B35] border border-white/10 rounded-2xl p-5 space-y-3">
+              <h3 className="font-black text-xs uppercase tracking-wider text-indigo-400 flex items-center justify-between">
+                <span>🎯 Konu Bazlı Yanlış & Başarı Analizi</span>
+                <span className="text-[10px] text-slate-400">Özel Performans Kırılımı</span>
+              </h3>
+              <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1">
+                {Object.entries(resultData.topicBreakdown as Record<string, { correct: number; wrong: number; empty: number; total: number }>).map(([topic, stat]) => (
+                  <div key={topic} className="bg-[#131B2E] border border-white/5 rounded-xl p-3 flex items-center justify-between gap-3 text-xs">
+                    <div className="min-w-0 flex-1">
+                      <span className="font-bold text-white truncate block">{topic}</span>
+                      <span className="text-[10px] text-slate-400">Toplam {stat.total} Soru</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 font-black text-[10px] shrink-0">
+                      <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-lg">✓ {stat.correct} D</span>
+                      <span className="bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-lg">✕ {stat.wrong} Y</span>
+                      <span className="bg-slate-700 text-slate-300 px-2 py-0.5 rounded-lg">⚪ {stat.empty} B</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="flex justify-center pt-2">
             <Link href="/profil" className="w-full sm:w-auto text-center bg-indigo-600 hover:bg-indigo-500 text-white font-black px-8 py-3.5 rounded-xl text-xs transition shadow-lg">
               Profil Karneme Dön 🚀
@@ -291,7 +453,14 @@ export default function StudentOnlineExamPage({
   const currentAns = currentQ ? answers[currentQ.id] : null;
 
   return (
-    <div className="min-h-screen bg-[#0A0F1D] text-slate-200 flex flex-col select-none">
+    <div className="min-h-screen bg-[#0A0F1D] text-slate-200 flex flex-col select-none relative">
+      {/* Toast Notification */}
+      {toastMsg && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-red-600 text-white text-xs font-black px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-red-400">
+          <span>⚠️ {toastMsg}</span>
+          <button onClick={() => setToastMsg(null)} className="text-white/80 hover:text-white font-bold ml-2">✕</button>
+        </div>
+      )}
       {/* Top Exam Navigation Bar */}
       <header className="h-16 bg-[#131B2E] border-b border-white/10 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-30 shadow-lg">
         <div className="flex items-center gap-3">
@@ -353,7 +522,7 @@ export default function StudentOnlineExamPage({
           {currentQ ? (
             <div className="max-w-3xl mx-auto space-y-6">
               {/* Question Header & Badge */}
-              <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-4">
+              <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-4 flex-wrap">
                 <div className="flex items-center gap-2">
                   <span className="bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 font-black text-xs px-3 py-1 rounded-xl">
                     Soru {currentIndex + 1} / {questions.length}
@@ -365,28 +534,78 @@ export default function StudentOnlineExamPage({
                   )}
                 </div>
 
-                <button
-                  onClick={() => handleToggleFlag(currentQ.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black border transition ${
-                    currentAns?.isFlagged
-                      ? "bg-purple-600 border-purple-400 text-white"
-                      : "bg-white/5 hover:bg-white/10 text-slate-400 border-white/10"
-                  }`}
-                >
-                  🔖 {currentAns?.isFlagged ? "Bayraklandı" : "Sonraya Bırak"}
-                </button>
+                <div className="flex items-center gap-2">
+                  {/* Font Scaling Controls */}
+                  <div className="flex items-center gap-1 bg-[#0D1B35] border border-white/10 px-2.5 py-1 rounded-xl text-xs font-black">
+                    <button
+                      type="button"
+                      onClick={() => setFontSizeScale((prev) => Math.max(0.85, prev - 0.15))}
+                      className="px-1.5 py-0.5 rounded hover:bg-white/10 text-slate-300"
+                      title="Yazıları Küçült"
+                    >
+                      A-
+                    </button>
+                    <span className="text-[10px] text-indigo-400 font-bold px-1">
+                      {Math.round(fontSizeScale * 100)}%
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setFontSizeScale((prev) => Math.min(1.4, prev + 0.15))}
+                      className="px-1.5 py-0.5 rounded hover:bg-white/10 text-slate-300"
+                      title="Yazıları Büyüt"
+                    >
+                      A+
+                    </button>
+                  </div>
+
+                  {/* Drawing Overlay Toggle */}
+                  <button
+                    type="button"
+                    onClick={() => setIsDrawingOverlay((prev) => !prev)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black border transition ${
+                      isDrawingOverlay
+                        ? "bg-amber-600 border-amber-400 text-white shadow-lg"
+                        : "bg-white/5 hover:bg-white/10 text-slate-300 border-white/10"
+                    }`}
+                  >
+                    ✍️ {isDrawingOverlay ? "Çizim Açık" : "Soru Üzerine Çiz"}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleToggleFlag(currentQ.id)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black border transition ${
+                      currentAns?.isFlagged
+                        ? "bg-purple-600 border-purple-400 text-white"
+                        : "bg-white/5 hover:bg-white/10 text-slate-400 border-white/10"
+                    }`}
+                  >
+                    🔖 {currentAns?.isFlagged ? "Bayraklandı" : "Sonraya Bırak"}
+                  </button>
+                </div>
               </div>
 
-              {/* Question Image */}
-              {currentQ.imageUrl && (
-                <div className="bg-[#131B2E] border border-white/10 rounded-2xl p-4 overflow-hidden">
-                  <img src={currentQ.imageUrl} alt="Soru Görseli" className="max-h-72 object-contain mx-auto rounded-xl" />
-                </div>
-              )}
+              {/* Question Text Container with Drawing Overlay */}
+              <div className="relative bg-[#131B2E] border border-white/10 rounded-2xl p-6 shadow-sm overflow-hidden">
+                {isDrawingOverlay && (
+                  <QuestionDrawingOverlay onClose={() => setIsDrawingOverlay(false)} />
+                )}
 
-              {/* Question Text */}
-              <div className="bg-[#131B2E] border border-white/10 rounded-2xl p-6 text-white text-base sm:text-lg font-bold leading-relaxed shadow-sm whitespace-pre-wrap">
-                {currentQ.questionText}
+                {/* Question Image */}
+                {currentQ.imageUrl && (
+                  <div className="mb-4 overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={currentQ.imageUrl} alt="Soru Görseli" className="max-h-72 object-contain mx-auto rounded-xl" />
+                  </div>
+                )}
+
+                {/* Question Text with font scale */}
+                <div
+                  style={{ fontSize: `${fontSizeScale * 1.125}rem` }}
+                  className="text-white font-bold leading-relaxed whitespace-pre-wrap transition-all"
+                >
+                  {currentQ.questionText}
+                </div>
               </div>
 
               {/* Options List */}
@@ -458,6 +677,34 @@ export default function StudentOnlineExamPage({
               <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-white/10" /> Boş</div>
             </div>
 
+            {/* Palette Filter Tabs */}
+            <div className="grid grid-cols-4 gap-1 bg-[#0D1B35] p-1 rounded-xl border border-white/10 text-[10px] font-black text-center">
+              <button
+                onClick={() => setPaletteFilter("all")}
+                className={`py-1 rounded-lg transition ${paletteFilter === "all" ? "bg-indigo-600 text-white" : "text-slate-400 hover:text-white"}`}
+              >
+                Tümü
+              </button>
+              <button
+                onClick={() => setPaletteFilter("answered")}
+                className={`py-1 rounded-lg transition ${paletteFilter === "answered" ? "bg-emerald-600 text-white" : "text-slate-400 hover:text-white"}`}
+              >
+                Dolu
+              </button>
+              <button
+                onClick={() => setPaletteFilter("flagged")}
+                className={`py-1 rounded-lg transition ${paletteFilter === "flagged" ? "bg-purple-600 text-white" : "text-slate-400 hover:text-white"}`}
+              >
+                Bayrak
+              </button>
+              <button
+                onClick={() => setPaletteFilter("empty")}
+                className={`py-1 rounded-lg transition ${paletteFilter === "empty" ? "bg-slate-700 text-white" : "text-slate-400 hover:text-white"}`}
+              >
+                Boş
+              </button>
+            </div>
+
             {/* Question Grid Buttons */}
             <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-5 gap-2 pt-2">
               {questions.map((q, idx) => {
@@ -465,6 +712,10 @@ export default function StudentOnlineExamPage({
                 const isCurrent = idx === currentIndex;
                 const isAnswered = Boolean(ans?.selectedOption);
                 const isFlagged = Boolean(ans?.isFlagged);
+
+                if (paletteFilter === "answered" && !isAnswered) return null;
+                if (paletteFilter === "flagged" && !isFlagged) return null;
+                if (paletteFilter === "empty" && isAnswered) return null;
 
                 let btnBg = "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10";
                 if (isAnswered) btnBg = "bg-emerald-600 border-emerald-400 text-white shadow-xs";

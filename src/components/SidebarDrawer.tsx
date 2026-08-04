@@ -82,7 +82,8 @@ export default function SidebarDrawer() {
           </div>
           <button
             onClick={() => setIsOpen(false)}
-            className="w-10 h-10 rounded-xl bg-[#FAF8F5] border border-[#EFECE6] flex items-center justify-center text-lg font-black text-gray-600 hover:bg-gray-100 transition-colors"
+            className="w-10 h-10 rounded-xl bg-[#FAF8F5] border border-[#EFECE6] flex items-center justify-center text-lg font-black text-gray-600 hover:bg-gray-100 transition-colors focus-visible:ring-2 focus-visible:ring-[#1E3A8A]"
+            aria-label="Menüyü Kapat"
           >
             ✕
           </button>

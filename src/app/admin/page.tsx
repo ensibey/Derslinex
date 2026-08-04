@@ -3,11 +3,19 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 
-const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_SECRET || "derslinex_admin_secret_2026";
+function getAdminKey(): string {
+  if (typeof window !== "undefined") {
+    return sessionStorage.getItem("derslinex_admin_key") || "";
+  }
+  return "";
+}
 
 function adminFetch(url: string, options: RequestInit = {}) {
   const headers = new Headers(options.headers || {});
-  headers.set("x-admin-key", ADMIN_SECRET);
+  const key = getAdminKey();
+  if (key) {
+    headers.set("x-admin-key", key);
+  }
   return fetch(url, { ...options, headers });
 }
 
@@ -79,6 +87,7 @@ function BrandLogoHeader({ subBadge = "ADMİN PANELİ" }: { subBadge?: string })
       <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-600 p-0.5 shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition-transform flex-shrink-0">
         <div className="w-full h-full bg-[#0D1B35] rounded-[10px] flex items-center justify-center overflow-hidden relative">
           {!imgError ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
             <img
               src="/logo.png?v=9"
               alt="Derslinex Logo"
@@ -105,7 +114,7 @@ function BrandLogoHeader({ subBadge = "ADMİN PANELİ" }: { subBadge?: string })
 }
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<"teachers" | "students" | "lessons" | "blogs" | "feedbacks" | "sessions" | "tasks" | "questions" | "contact" | "exams">("teachers");
+  const [activeTab, setActiveTab] = useState<"teachers" | "students" | "lessons" | "blogs" | "feedbacks" | "sessions" | "tasks" | "questions" | "contact" | "exams" | "settings">("teachers");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
@@ -190,11 +199,21 @@ export default function AdminPage() {
     }
   };
 
+  const [authRequired, setAuthRequired] = useState(false);
+  const [keyInput, setKeyInput] = useState("");
+  const [keyError, setKeyError] = useState("");
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [uRes, fRes, lRes, bRes, sessRes, taskRes, qRes, cRes, mRes, exRes] = await Promise.all([
-        adminFetch("/api/admin/users"),
+      const uRes = await adminFetch("/api/admin/users");
+      if (uRes.status === 401) {
+        setAuthRequired(true);
+        setLoading(false);
+        return;
+      }
+
+      const [fRes, lRes, bRes, sessRes, taskRes, qRes, cRes, mRes, exRes] = await Promise.all([
         adminFetch("/api/gorus"),
         adminFetch("/api/admin/lessons"),
         adminFetch("/api/admin/blogs"),
@@ -218,9 +237,13 @@ export default function AdminPage() {
       const exData = await exRes.json();
 
       if (uData.success) {
+        setAuthRequired(false);
         if (uData.teachers) setTeachers(uData.teachers);
         if (uData.students) setStudents(uData.students);
+      } else if (uRes.status === 401) {
+        setAuthRequired(true);
       }
+
       if (fData.success) setFeedbacks(fData.feedbacks || []);
       if (lData.success) setLessons(lData.lessons || []);
       if (bData.success) setBlogs(bData.posts || []);
@@ -243,6 +266,17 @@ export default function AdminPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  const handleKeySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!keyInput.trim()) {
+      setKeyError("Lütfen admin anahtarını girin.");
+      return;
+    }
+    sessionStorage.setItem("derslinex_admin_key", keyInput.trim());
+    setKeyError("");
+    fetchData();
+  };
 
   const showMsg = (text: string, type: "success" | "error") => {
     setMessage({ text, type });
@@ -434,6 +468,47 @@ export default function AdminPage() {
 
   return (
     <div className="bg-mesh flex min-h-screen bg-[#0A1628] font-sans text-slate-100">
+      {/* Admin Auth Modal Overlay */}
+      {authRequired && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-[#0D1B35] border border-white/10 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
+            <div className="text-center space-y-2">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto text-2xl shadow-lg">
+                🔐
+              </div>
+              <h2 className="text-xl font-black text-white">Admin Girişi</h2>
+              <p className="text-xs text-slate-400">Yönetim paneline erişmek için Admin Gizli Anahtarınızı giriniz.</p>
+            </div>
+
+            <form onSubmit={handleKeySubmit} className="space-y-4">
+              <div>
+                <input
+                  type="password"
+                  placeholder="Admin Anahtarı (x-admin-key)"
+                  value={keyInput}
+                  onChange={(e) => setKeyInput(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 text-sm"
+                  autoFocus
+                />
+              </div>
+
+              {keyError && (
+                <p className="text-xs text-red-400 bg-red-500/10 p-2 rounded-lg text-center font-medium">
+                  {keyError}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black rounded-xl text-sm transition shadow-lg shadow-indigo-600/30"
+              >
+                Giriş Yap
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Overlay */}
       {sidebarOpen && <div className="fixed inset-0 bg-black/60 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />}
 
@@ -478,6 +553,7 @@ export default function AdminPage() {
             { key: "blogs", label: "Blog Yazıları", count: blogs.length, icon: "✍️" },
             { key: "sessions", label: "Canlı Dersler", count: liveSessions.length, icon: "🎥" },
             { key: "feedbacks", label: "Görüşler", count: feedbacks.length, icon: "💬" },
+            { key: "settings", label: "Sistem & Ayarlar", count: 2, icon: "⚙️" },
           ].map((t) => (
             <button
               key={t.key}
@@ -1067,6 +1143,7 @@ export default function AdminPage() {
                             </div>
                             {q.imageUrl && (
                               <div className="max-w-md my-2">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={q.imageUrl} alt="Soru Görseli" className="rounded-xl border border-white/10 max-h-60 object-contain" />
                               </div>
                             )}
@@ -1602,6 +1679,62 @@ export default function AdminPage() {
               </div>
             )}
 
+            {/* SETTINGS & DB ACTIONS TAB */}
+            {activeTab === "settings" && (
+              <div className="p-6 space-y-6">
+                <div className="bg-[#0D1B35] border border-white/10 rounded-2xl p-6 shadow-xl space-y-4">
+                  <h3 className="text-white font-black text-base flex items-center gap-2">
+                    ⚙️ Sistem Yönetimi & Veritabanı Araçları
+                  </h3>
+                  <p className="text-xs text-slate-400 font-medium">
+                    Veritabanındaki test verilerini temizlemek veya örnek deneme sınavları, sorular ve öğretmen verileri tohumlamak için aşağıdaki araçları kullanabilirsiniz.
+                  </p>
+
+                  <div className="flex flex-wrap gap-4 pt-2">
+                    <button
+                      onClick={async () => {
+                        if (!confirm("Tüm test canlı dersleri ve katılım kayıtlarını temizlemek istediğinize emin misiniz?")) return;
+                        try {
+                          const res = await adminFetch("/api/admin/clean-test-data", { method: "POST" });
+                          const data = await res.json();
+                          if (data.success) {
+                            showMsg("✅ " + data.message, "success");
+                            fetchData();
+                          } else {
+                            showMsg(data.error || "Temizleme başarısız", "error");
+                          }
+                        } catch {
+                          showMsg("Bağlantı hatası", "error");
+                        }
+                      }}
+                      className="bg-red-600/20 hover:bg-red-600/30 text-red-300 border border-red-500/30 font-black text-xs px-5 py-3 rounded-xl transition flex items-center gap-2"
+                    >
+                      🧹 Test Verilerini Temizle
+                    </button>
+
+                    <button
+                      onClick={async () => {
+                        try {
+                          const res = await adminFetch("/api/admin/seed", { method: "POST" });
+                          const data = await res.json();
+                          if (data.success) {
+                            showMsg("🌱 " + data.message, "success");
+                            fetchData();
+                          } else {
+                            showMsg(data.error || "Tohumlama başarısız", "error");
+                          }
+                        } catch {
+                          showMsg("Bağlantı hatası", "error");
+                        }
+                      }}
+                      className="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 font-black text-xs px-5 py-3 rounded-xl transition flex items-center gap-2"
+                    >
+                      🌱 Örnek Test Verilerini Yükle (Seed)
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </main>
       </div>
@@ -1931,6 +2064,7 @@ export default function AdminPage() {
                     <span className="text-xs text-indigo-400 font-bold">Doğru Cevap: {eq.question.correctOption}</span>
                   </div>
                   <p className="text-white text-sm font-bold whitespace-pre-wrap">{eq.question.questionText}</p>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   {eq.question.imageUrl && <img src={eq.question.imageUrl} alt="" className="max-h-48 object-contain rounded-xl my-2" />}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-semibold text-slate-300">
                     <div className={eq.question.correctOption === "A" ? "text-emerald-400 font-bold" : ""}>A) {eq.question.optionA}</div>
@@ -1991,6 +2125,7 @@ export default function AdminPage() {
                       {/* Video Simulated Frame */}
                       <div className="w-full h-40 bg-black rounded-xl border border-white/10 overflow-hidden relative flex items-center justify-center">
                         {s.avatar ? (
+                          /* eslint-disable-next-line @next/next/no-img-element */
                           <img src={s.avatar} alt="" className="w-full h-full object-cover opacity-80" />
                         ) : (
                           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-black text-xl">

@@ -2,12 +2,16 @@
 
 import React from "react";
 
+import { usePathname } from "next/navigation";
+
 interface MobileBottomDockProps {
   activeTab: string;
   onTabChange: (tabId: any) => void;
 }
 
 export default function MobileBottomDock({ activeTab, onTabChange }: MobileBottomDockProps) {
+  const pathname = usePathname();
+  if (pathname?.startsWith("/deneme/") || pathname?.startsWith("/ders/")) return null;
   const items = [
     { id: "panel", icon: "🏠", label: "Genel" },
     { id: "canli", icon: "🎥", label: "Canlı Ders" },

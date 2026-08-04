@@ -25,6 +25,7 @@ export const metadata: Metadata = {
   ],
   robots: { index: true, follow: true },
   verification: { google: "google5716913a2e6e8126" },
+  manifest: "/manifest.json",
   icons: {
     icon: [
       { url: "/logo.png?v=9", sizes: "192x192", type: "image/png" },

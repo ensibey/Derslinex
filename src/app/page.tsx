@@ -48,8 +48,41 @@ const stats = [
   { rakam: "4.8★", etiket: "Ortalama Puan" },
 ];
 
-export default function HomePage() {
-  const oneHocalar = hocalar.filter((h) => h.aktif).slice(0, 3);
+import { prisma } from "@/lib/db";
+
+export default async function HomePage() {
+  let dbApproved: any[] = [];
+  try {
+    const dbTeachers = await prisma.teacher.findMany({
+      where: { status: "İletişime Geçildi" },
+      take: 6,
+      orderBy: { points: "desc" }
+    });
+    dbApproved = dbTeachers.map((t) => ({
+      id: `db-${t.id}`,
+      slug: t.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+      isim: t.name,
+      unvan: "Eğitmen",
+      fotograf: t.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(t.name)}&eyebrows=default&mouth=smile`,
+      dersler: [t.branch],
+      yksTuru: ["TYT", "AYT Sayısal", "AYT EA"] as any[],
+      format: "online" as const,
+      konum: "Online / Türkiye Geneli",
+      deneyimYili: 5,
+      egitim: t.egitim || "Derslinex Onaylı Özel Ders Eğitmeni",
+      ozgecmis: t.ozgecmis || `${t.name}, Derslinex platformunda ${t.branch} dersleri vermektedir.`,
+      whatsapp: t.phone.replace(/[^0-9]/g, ""),
+      puan: 4.9,
+      ogrenciSayisi: 15,
+      points: t.points || 0,
+      aktif: true
+    }));
+  } catch (err) {
+    console.error("Ana sayfa DB öğretmen hatası:", err);
+  }
+
+  const oneHocalar = [...dbApproved, ...hocalar.filter((h) => h.aktif)].slice(0, 3);
+
 
   // Google SEO: Structured Data (JSON-LD) for EducationalOrganization & FAQPage
   const schemas = [
@@ -60,7 +93,7 @@ export default function HomePage() {
       "url": "https://derslinex.com",
       "logo": "https://derslinex.com/logo.png",
       "description": "YKS ve LGS sınav hazırlığı için Türkiye'nin en iyi öğretmenlerinden online özel ders ve birebir ders alın.",
-      "telephone": "+905342407519",
+      "telephone": "+905405512020",
       "address": {
         "@type": "PostalAddress",
         "addressCountry": "TR",

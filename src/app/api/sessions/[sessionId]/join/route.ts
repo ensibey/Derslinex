@@ -81,9 +81,10 @@ export async function POST(
 
     // Katılım zamanını kaydet
     if (isStudent) {
-      await prisma.sessionParticipant.update({
+      await prisma.sessionParticipant.upsert({
         where: { sessionId_studentId: { sessionId, studentId: userId } },
-        data: { joinedAt: new Date() },
+        create: { sessionId, studentId: userId, joinedAt: new Date() },
+        update: { joinedAt: new Date() },
       }).catch((e) => console.warn("Participant joinedAt update warning:", e));
     }
 

@@ -5,20 +5,24 @@ import { getAuthUser } from "@/lib/auth-middleware";
 // GET /api/student/wrong-questions?studentId=123
 export async function GET(request: Request) {
   try {
+    const authUser = await getAuthUser(request);
+    if (!authUser) {
+      return NextResponse.json({ success: false, error: "Yanlış sorularınızı görmek için oturum açmanız gerekmektedir." }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const studentIdStr = searchParams.get("studentId");
-    let studentId = parseInt(studentIdStr || "0");
+    const requestedStudentId = studentIdStr ? parseInt(studentIdStr) : authUser.id;
 
-    if (!studentId) {
-      const authUser = await getAuthUser(request);
-      if (authUser && authUser.role === "student") {
-        studentId = authUser.id;
-      }
+    if (isNaN(requestedStudentId)) {
+      return NextResponse.json({ success: false, error: "Geçersiz öğrenci ID" }, { status: 400 });
     }
 
-    if (!studentId) {
-      return NextResponse.json({ success: false, error: "Öğrenci ID zorunludur." }, { status: 400 });
+    if (authUser.role === "student" && authUser.id !== requestedStudentId) {
+      return NextResponse.json({ success: false, error: "Başka bir öğrencinin yanlış sorularına erişim yetkiniz yok." }, { status: 403 });
     }
+
+    const studentId = requestedStudentId;
 
     // Fetch attempts where isCorrect === false
     const wrongAttempts = await prisma.studentQuestionAttempt.findMany({

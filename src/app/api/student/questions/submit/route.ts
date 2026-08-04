@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getAuthUser } from "@/lib/auth-middleware";
 
 interface SubmittedAnswer {
   questionId: number;
@@ -9,14 +10,21 @@ interface SubmittedAnswer {
 // GET /api/student/questions/submit?studentId=123 - Fetch student's past quiz results
 export async function GET(request: Request) {
   try {
+    const authUser = await getAuthUser(request);
     const { searchParams } = new URL(request.url);
     const studentIdStr = searchParams.get("studentId");
 
-    if (!studentIdStr) {
-      return NextResponse.json({ success: false, error: "studentId parametresi gereklidir." }, { status: 400 });
+    if (!authUser) {
+      return NextResponse.json({ success: false, error: "Yetkisiz erişim. Oturum açmanız gerekmektedir." }, { status: 401 });
     }
 
-    const studentId = parseInt(studentIdStr);
+    const requestedStudentId = studentIdStr ? parseInt(studentIdStr) : authUser.id;
+
+    if (authUser.role === "student" && authUser.id !== requestedStudentId) {
+      return NextResponse.json({ success: false, error: "Başka bir öğrencinin sınav sonuçlarına erişim yetkiniz yok." }, { status: 403 });
+    }
+
+    const studentId = requestedStudentId;
 
     const quizResults = await prisma.studentQuizResult.findMany({
       where: { studentId },
@@ -50,16 +58,22 @@ export async function GET(request: Request) {
 // POST /api/student/questions/submit - Grade answers server-side & save result
 export async function POST(request: Request) {
   try {
+    const authUser = await getAuthUser(request);
+    if (!authUser || authUser.role !== "student") {
+      return NextResponse.json({ success: false, error: "Soru çözümü göndermek için öğrenci olarak oturum açmanız gerekmektedir." }, { status: 401 });
+    }
+
     const body = await request.json();
-    const { studentId, examType = "TYT", subject = "Genel", answers } = body as {
-      studentId: number;
+    const { examType = "TYT", subject = "Genel", answers } = body as {
       examType?: string;
       subject?: string;
       answers: SubmittedAnswer[];
     };
 
-    if (!studentId || !answers || !Array.isArray(answers) || answers.length === 0) {
-      return NextResponse.json({ success: false, error: "Geçersiz istek. Öğrenci ID ve cevaplar gereklidir." }, { status: 400 });
+    const studentId = authUser.id;
+
+    if (!answers || !Array.isArray(answers) || answers.length === 0) {
+      return NextResponse.json({ success: false, error: "Geçersiz istek. Cevaplar zorunludur." }, { status: 400 });
     }
 
     // Verify student exists

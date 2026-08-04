@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
@@ -11,6 +12,8 @@ import { OsymCalculator } from "@/components/OsymCalculator";
 import { VirtualStudyRooms } from "@/components/VirtualStudyRooms";
 import { ScratchpadModal } from "@/components/ScratchpadModal";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import DailyStreakWidget from "@/components/DailyStreakWidget";
+import { useToast } from "@/components/Toast";
 
 // ─── Yardımcı: Geri Sayım ─────────────────────────────────────────────────────
 function useCountdown(targetDate: string | Date | null) {
@@ -263,6 +266,7 @@ function StudentSessionsTab({ userId }: { userId: number }) {
 }
 
 function StudentQuizTab({ studentId }: { studentId?: number }) {
+  const { showToast } = useToast();
   const [questions, setQuestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -337,7 +341,7 @@ function StudentQuizTab({ studentId }: { studentId?: number }) {
 
   const handleSubmitQuiz = async () => {
     if (!studentId) {
-      alert("Lütfen önce giriş yapın.");
+      showToast("Lütfen önce giriş yapın.", "error");
       return;
     }
     if (questions.length === 0) return;
@@ -363,12 +367,13 @@ function StudentQuizTab({ studentId }: { studentId?: number }) {
       const data = await res.json();
       if (data.success) {
         setEvalResult(data.result);
+        showToast("Test başarıyla değerlendirildi!", "success");
       } else {
-        alert(data.error || "Değerlendirme sırasında bir hata oluştu.");
+        showToast(data.error || "Değerlendirme sırasında bir hata oluştu.", "error");
       }
     } catch (e) {
       console.error("Submit error", e);
-      alert("Sunucuya bağlanılamadı.");
+      showToast("Sunucuya bağlanılamadı.", "error");
     } finally {
       setSubmitting(false);
     }
@@ -1164,6 +1169,10 @@ function StudentTopicTab({ studentId }: { studentId: number }) {
     }
   };
 
+  const totalCompletedCount = Object.values(completedTopics).filter(Boolean).length;
+  const totalCurriculumTopics = 120;
+  const overallPercentage = Math.min(100, Math.round((totalCompletedCount / totalCurriculumTopics) * 100));
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -1175,6 +1184,33 @@ function StudentTopicTab({ studentId }: { studentId: number }) {
 
   return (
     <div className="space-y-6">
+      {/* Overall Curriculum Completion Percentage Hero Card */}
+      <div className="bg-gradient-to-r from-indigo-900/60 via-purple-900/60 to-slate-900 border border-indigo-500/40 rounded-3xl p-6 shadow-xl text-white space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-indigo-600/30 border border-indigo-400/40 flex items-center justify-center text-2xl">
+              🎯
+            </div>
+            <div>
+              <span className="text-xs font-black text-indigo-300 uppercase tracking-widest">GENEL MÜFREDAT BAŞARISI</span>
+              <h3 className="text-xl sm:text-2xl font-black text-white mt-0.5">
+                YKS / LGS Müfredatının %{overallPercentage}'ini Tamamladın! 🚀
+              </h3>
+            </div>
+          </div>
+          <div className="text-right bg-white/5 border border-white/10 px-4 py-2 rounded-2xl">
+            <span className="text-xs text-slate-400 font-bold block">Bitirilen Konu</span>
+            <span className="text-lg font-black text-emerald-400">{totalCompletedCount} Konu</span>
+          </div>
+        </div>
+
+        <div className="w-full bg-[#0D1B35] h-4 rounded-full overflow-hidden p-0.5 border border-white/10">
+          <div
+            className="bg-gradient-to-r from-emerald-500 via-teal-400 to-indigo-500 h-full rounded-full transition-all duration-700 shadow-lg shadow-emerald-500/20"
+            style={{ width: `${Math.max(5, overallPercentage)}%` }}
+          />
+        </div>
+      </div>
       {/* Header */}
       <div className="bg-[#1E293B] border border-white/10 p-6 rounded-2xl">
         <h3 className="text-xl font-black text-white flex items-center gap-2">
@@ -2101,7 +2137,12 @@ export default function ProfilPage() {
     setTimeout(() => setMessage(null), 5000);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch (err) {
+      console.error("Logout request error:", err);
+    }
     localStorage.removeItem("derslinex_role"); localStorage.removeItem("derslinex_user");
     sessionStorage.removeItem("derslinex_role"); sessionStorage.removeItem("derslinex_user");
     setStudentProfile(null); setTeacherProfile(null);
@@ -3881,6 +3922,9 @@ export default function ProfilPage() {
                     Derslerime Git →
                   </button>
                 </div>
+
+                {/* Günlük Çalışma Serisi (Streak 🔥) */}
+                {studentProfile && <DailyStreakWidget studentId={studentProfile.id} />}
 
                 {/* Özet */}
                 <div className="bg-[#1E293B] rounded-2xl p-5 border border-white/10 shadow-xl">

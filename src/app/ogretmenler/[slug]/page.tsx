@@ -167,7 +167,14 @@ export default async function HocaProfilPage({ params }: { params: Promise<{ slu
         "name": hoca.isim,
         "jobTitle": `${hoca.unvan} / ${hoca.egitim}`,
         "image": hoca.fotograf,
-        "description": hoca.ozgecmis
+        "description": hoca.ozgecmis,
+        "knowsAbout": hoca.dersler,
+        "alumniOf": hoca.egitim,
+        "worksFor": {
+          "@type": "EducationalOrganization",
+          "name": "Derslinex",
+          "url": "https://derslinex.com"
+        }
       }
     }
   ];

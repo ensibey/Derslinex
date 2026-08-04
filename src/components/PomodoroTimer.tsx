@@ -9,6 +9,12 @@ const AMBIENT_SOUNDS = [
   { id: "forest", name: "Orman & Doğa", icon: "🌲", freq: 180, type: "sawtooth" },
 ];
 
+const MODE_TIMES = {
+  work: 25 * 60,
+  shortBreak: 5 * 60,
+  longBreak: 15 * 60,
+};
+
 export function PomodoroTimer() {
   const [mode, setMode] = useState<"work" | "shortBreak" | "longBreak">("work");
   const [timeLeft, setTimeLeft] = useState(25 * 60);
@@ -20,33 +26,53 @@ export function PomodoroTimer() {
   const oscRef = useRef<OscillatorNode | null>(null);
   const gainRef = useRef<GainNode | null>(null);
 
-  const modeTimes = {
-    work: 25 * 60,
-    shortBreak: 5 * 60,
-    longBreak: 15 * 60,
-  };
-
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (isRunning && timeLeft > 0) {
       timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
     } else if (timeLeft === 0) {
       setIsRunning(false);
+      playChimeSound();
       if (mode === "work") {
         setCompletedSessions((prev) => prev + 1);
         setMode("shortBreak");
-        setTimeLeft(modeTimes.shortBreak);
+        setTimeLeft(MODE_TIMES.shortBreak);
       } else {
         setMode("work");
-        setTimeLeft(modeTimes.work);
+        setTimeLeft(MODE_TIMES.work);
       }
     }
     return () => clearInterval(timer);
   }, [isRunning, timeLeft, mode]);
 
+  const playChimeSound = () => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+      osc.frequency.setValueAtTime(880, ctx.currentTime + 0.15); // A5
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.8);
+    } catch {}
+  };
+
+  const handleStartToggle = () => {
+    if (!isRunning) {
+      playChimeSound(); // Unlock Web Audio API context on user gesture
+    }
+    setIsRunning(!isRunning);
+  };
+
   const switchMode = (newMode: "work" | "shortBreak" | "longBreak") => {
     setMode(newMode);
-    setTimeLeft(modeTimes[newMode]);
+    setTimeLeft(MODE_TIMES[newMode]);
     setIsRunning(false);
   };
 
@@ -109,7 +135,7 @@ export function PomodoroTimer() {
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
   const formattedTime = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-  const totalDuration = modeTimes[mode];
+  const totalDuration = MODE_TIMES[mode];
   const progressPercent = ((totalDuration - timeLeft) / totalDuration) * 100;
 
   return (
@@ -188,8 +214,9 @@ export function PomodoroTimer() {
         {/* Controls */}
         <div className="flex items-center gap-3 mt-6">
           <button
-            onClick={() => setIsRunning(!isRunning)}
-            className={`px-8 py-3 rounded-xl font-black text-sm transition shadow-lg flex items-center gap-2 ${
+            onClick={handleStartToggle}
+            aria-label={isRunning ? "Zamanlayıcıyı Duraklat" : "Zamanlayıcıyı Başlat"}
+            className={`px-8 py-3 rounded-xl font-black text-sm transition shadow-lg flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-indigo-500 ${
               isRunning
                 ? "bg-amber-600 hover:bg-amber-500 text-white"
                 : "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white"
@@ -199,7 +226,8 @@ export function PomodoroTimer() {
           </button>
           <button
             onClick={() => switchMode(mode)}
-            className="bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 font-black text-xs px-4 py-3 rounded-xl transition"
+            aria-label="Zamanlayıcıyı Sıfırla"
+            className="bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 font-black text-xs px-4 py-3 rounded-xl transition focus-visible:ring-2 focus-visible:ring-indigo-500"
           >
             🔄 Sıfırla
           </button>
@@ -208,7 +236,7 @@ export function PomodoroTimer() {
 
       {/* Ambient Sound Player */}
       <div className="border-t border-white/10 pt-4">
-        <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-3">
+        <span className="text-[10px] font-black uppercase tracking-wider text-slate-300 block mb-3">
           🎧 Arka Plan Odaklanma Müzikleri
         </span>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -218,14 +246,15 @@ export function PomodoroTimer() {
               <button
                 key={s.id}
                 onClick={() => toggleSound(s.id)}
-                className={`p-3 rounded-xl border text-left transition flex items-center justify-between ${
+                aria-label={`${s.name} ambiyans sesini ${isPlaying ? "kapat" : "aç"}`}
+                className={`p-3 rounded-xl border text-left transition flex items-center justify-between focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                   isPlaying
                     ? "bg-indigo-600/30 border-indigo-500/60 text-white font-black"
-                    : "bg-[#0D1B35] border-white/5 text-slate-400 hover:text-white hover:bg-white/5 font-semibold"
+                    : "bg-[#0D1B35] border-white/5 text-slate-300 hover:text-white hover:bg-white/5 font-semibold"
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-base">{s.icon}</span>
+                  <span className="text-base" aria-hidden="true">{s.icon}</span>
                   <span className="text-xs truncate">{s.name}</span>
                 </div>
                 {isPlaying && <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />}

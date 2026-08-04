@@ -140,21 +140,25 @@ model BlogPost {
 }
 
 model ChatRoom {
-  id          Int      @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   studentId   Int
   studentName String
   teacherId   Int
   teacherName String
-  createdAt   DateTime @default(now())
+  createdAt   DateTime      @default(now())
+  messages    ChatMessage[]
 }
 
 model ChatMessage {
   id         Int      @id @default(autoincrement())
   roomId     Int
+  room       ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
   senderId   Int
   senderRole String   // "student" or "teacher"
   content    String
   createdAt  DateTime @default(now())
+
+  @@index([roomId])
 }
 
 model TeacherFAQ {
@@ -189,7 +193,7 @@ model LiveSession {
   recordingUrl    String?
   status          SessionStatus        @default(SCHEDULED)
   teacherId       Int
-  teacher         Teacher              @relation(fields: [teacherId], references: [id])
+  teacher         Teacher              @relation(fields: [teacherId], references: [id], onDelete: Cascade)
   participants    SessionParticipant[]
   resources       SessionResource[]
   feedbacks       SessionFeedback[]
@@ -201,9 +205,9 @@ model LiveSession {
 model SessionParticipant {
   id          Int          @id @default(autoincrement())
   sessionId   Int
-  session     LiveSession  @relation(fields: [sessionId], references: [id])
+  session     LiveSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   studentId   Int
-  student     Student      @relation(fields: [studentId], references: [id])
+  student     Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
   joinedAt    DateTime?
   leftAt      DateTime?
   // True when student was present ≥ 50% of session duration
@@ -215,7 +219,7 @@ model SessionParticipant {
 model SessionResource {
   id        Int         @id @default(autoincrement())
   sessionId Int
-  session   LiveSession @relation(fields: [sessionId], references: [id])
+  session   LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   title     String
   fileUrl   String
   createdAt DateTime    @default(now())
@@ -224,11 +228,11 @@ model SessionResource {
 model SessionFeedback {
   id            Int         @id @default(autoincrement())
   sessionId     Int
-  session       LiveSession @relation(fields: [sessionId], references: [id])
+  session       LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   teacherId     Int
-  teacher       Teacher     @relation("TeacherFeedback", fields: [teacherId], references: [id])
+  teacher       Teacher     @relation("TeacherFeedback", fields: [teacherId], references: [id], onDelete: Cascade)
   studentId     Int
-  student       Student     @relation("StudentFeedback", fields: [studentId], references: [id])
+  student       Student     @relation("StudentFeedback", fields: [studentId], references: [id], onDelete: Cascade)
   rating        Int         // 1 – 5
   comment       String?
   homeworkGiven Boolean     @default(false)
@@ -362,6 +366,7 @@ model StudentExamAttempt {
 
   @@unique([examId, studentId])
   @@index([studentId])
+  @@index([examId, status])
 }
 
 model StudentExamAnswer {

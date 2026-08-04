@@ -18,6 +18,7 @@ export default function MobileNavBar() {
   };
 
   if (!mounted) return null;
+  if (pathname?.startsWith("/deneme/") || pathname?.startsWith("/ders/")) return null;
 
   const linkClass = (path: string) => {
     const isActive = pathname === path;

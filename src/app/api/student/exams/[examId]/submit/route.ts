@@ -1,16 +1,19 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getAuthUser } from "@/lib/auth-middleware";
 
 export async function POST(
   request: Request,
   context: { params: Promise<{ examId: string }> }
 ) {
   try {
+    const authUser = await getAuthUser(request);
     const studentIdHeader = request.headers.get("x-student-id");
-    if (!studentIdHeader) {
+    const studentId = authUser && authUser.role === "student" ? authUser.id : (process.env.NODE_ENV === "development" && studentIdHeader ? parseInt(studentIdHeader) : null);
+
+    if (!studentId) {
       return NextResponse.json({ success: false, error: "Öğrenci girişi gereklidir." }, { status: 401 });
     }
-    const studentId = parseInt(studentIdHeader);
     const { examId } = await context.params;
     const numericExamId = parseInt(examId);
 
@@ -50,6 +53,16 @@ export async function POST(
     let totalScoreCalculated = 0;
 
     const answerRecords: any[] = [];
+    const topicMap: Record<string, { correct: number; wrong: number; empty: number; total: number }> = {};
+
+    const resolveCategory = (sec: string, subj: string): "turkce" | "sosyal" | "mat" | "fen" => {
+      const text = `${sec || ""} ${subj || ""}`.toLowerCase();
+      if (/türkçe|turkce|edebiyat/.test(text)) return "turkce";
+      if (/sosyal|tarih|coğrafya|cografya|felsefe|din/.test(text)) return "sosyal";
+      if (/matematik|geometri/.test(text)) return "mat";
+      if (/fen|fizik|kimya|biyoloji/.test(text)) return "fen";
+      return "mat";
+    };
 
     for (const eq of exam.examQuestions) {
       const q = eq.question;
@@ -58,24 +71,34 @@ export async function POST(
       const isFlagged = Boolean(userAns?.isFlagged);
 
       let isCorrect: boolean | null = null;
+      const topicName = q.topic && q.topic.trim() ? q.topic.trim() : (q.subject || "Genel Konular");
+
+      if (!topicMap[topicName]) {
+        topicMap[topicName] = { correct: 0, wrong: 0, empty: 0, total: 0 };
+      }
+      topicMap[topicName].total++;
+
+      const cat = resolveCategory(eq.sectionName, q.subject);
 
       if (selectedOption) {
         if (selectedOption.trim().toUpperCase() === q.correctOption.trim().toUpperCase()) {
           isCorrect = true;
           totalScoreCalculated += (eq.customPoints || q.points);
-          if (eq.sectionName.includes("Türkçe")) turkceCorrect++;
-          else if (eq.sectionName.includes("Sosyal")) sosyalCorrect++;
-          else if (eq.sectionName.includes("Matematik")) matCorrect++;
-          else if (eq.sectionName.includes("Fen")) fenCorrect++;
-          else matCorrect++;
+          topicMap[topicName].correct++;
+          if (cat === "turkce") turkceCorrect++;
+          else if (cat === "sosyal") sosyalCorrect++;
+          else if (cat === "mat") matCorrect++;
+          else if (cat === "fen") fenCorrect++;
         } else {
           isCorrect = false;
-          if (eq.sectionName.includes("Türkçe")) turkceWrong++;
-          else if (eq.sectionName.includes("Sosyal")) sosyalWrong++;
-          else if (eq.sectionName.includes("Matematik")) matWrong++;
-          else if (eq.sectionName.includes("Fen")) fenWrong++;
-          else matWrong++;
+          topicMap[topicName].wrong++;
+          if (cat === "turkce") turkceWrong++;
+          else if (cat === "sosyal") sosyalWrong++;
+          else if (cat === "mat") matWrong++;
+          else if (cat === "fen") fenWrong++;
         }
+      } else {
+        topicMap[topicName].empty++;
       }
 
       answerRecords.push({
@@ -87,11 +110,16 @@ export async function POST(
     }
 
     // ÖSYM standard net calculation: 4 wrong removes 1 correct (net = correct - wrong / 4)
-    const turkceNet = Math.max(0, parseFloat((turkceCorrect - turkceWrong / 4).toFixed(2)));
-    const sosyalNet = Math.max(0, parseFloat((sosyalCorrect - sosyalWrong / 4).toFixed(2)));
-    const matematikNet = Math.max(0, parseFloat((matCorrect - matWrong / 4).toFixed(2)));
-    const fenNet = Math.max(0, parseFloat((fenCorrect - fenWrong / 4).toFixed(2)));
-    const totalNet = parseFloat((turkceNet + sosyalNet + matematikNet + fenNet).toFixed(2));
+    const rawTurkceNet = parseFloat((turkceCorrect - turkceWrong / 4).toFixed(2));
+    const rawSosyalNet = parseFloat((sosyalCorrect - sosyalWrong / 4).toFixed(2));
+    const rawMatematikNet = parseFloat((matCorrect - matWrong / 4).toFixed(2));
+    const rawFenNet = parseFloat((fenCorrect - fenWrong / 4).toFixed(2));
+
+    const turkceNet = Math.max(0, rawTurkceNet);
+    const sosyalNet = Math.max(0, rawSosyalNet);
+    const matematikNet = Math.max(0, rawMatematikNet);
+    const fenNet = Math.max(0, rawFenNet);
+    const totalNet = Math.max(0, parseFloat((rawTurkceNet + rawSosyalNet + rawMatematikNet + rawFenNet).toFixed(2)));
 
     // Transaction: Delete existing attempt answers, re-create, update attempt & create StudentTrialResult
     const updatedAttempt = await prisma.$transaction(async (tx: any) => {
@@ -158,6 +186,7 @@ export async function POST(
         sosyalCorrect, sosyalWrong,
         matCorrect, matWrong,
         fenCorrect, fenWrong,
+        topicBreakdown: topicMap,
         completedAt: updatedAttempt.completedAt,
       },
     });

@@ -96,9 +96,14 @@ function FeedbackModal({
                 </div>
                 <div>
                   <p className="font-black text-gray-900">{student.name}</p>
-                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${student.isAttended ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
-                    {student.isAttended ? "✅ Katıldı" : "❌ Katılmadı"}
-                  </span>
+                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${student.isAttended ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
+                      {student.isAttended ? "✅ Katıldı (%100 Katılım)" : "❌ Katılmadı / Devamsız"}
+                    </span>
+                    <span className="text-[10px] text-gray-500 font-bold bg-gray-100 px-2 py-0.5 rounded-full">
+                      ⏱️ Katılım Zamanı: {student.isAttended ? "0. Dk - Ders Sonu (Full)" : "Katılmadı"}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -159,26 +164,141 @@ function FeedbackModal({
   );
 }
 
-// ─── İnteraktif Dijital Beyaz Tahta Modalı ─────────────────────────────────────
-function WhiteboardModal({ onClose }: { onClose: () => void }) {
+interface WhiteboardModalProps {
+  sessionId: string;
+  isOwner: boolean;
+  role: "teacher" | "student" | null;
+  userName: string;
+  onClose: () => void;
+}
+
+function WhiteboardModal({ sessionId, isOwner, role, userName, onClose }: WhiteboardModalProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [color, setColor] = useState("#FFFFFF");
   const [lineWidth, setLineWidth] = useState(4);
   const [isEraser, setIsEraser] = useState(false);
+  const [lastDrawer, setLastDrawer] = useState<string>("Sistem");
+  const [syncStatus, setSyncStatus] = useState<"live" | "syncing">("live");
 
+  const lastUpdateRef = useRef<number>(0);
+  const isSelfDrawingRef = useRef<boolean>(false);
+
+  // Broadcast current canvas state to server
+  const broadcastCanvasState = useCallback(async () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    try {
+      const dataUrl = canvas.toDataURL();
+      const res = await fetch(`/api/sessions/${sessionId}/whiteboard`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          imageData: dataUrl,
+          isOpen: true,
+          drawerName: userName,
+        }),
+      });
+      const data = await res.json();
+      if (data.success && data.updatedAt) {
+        lastUpdateRef.current = data.updatedAt;
+      }
+    } catch (e) {
+      console.error("Whiteboard broadcast error:", e);
+    }
+  }, [sessionId, userName]);
+
+  // Broadcast whiteboard open state on mount
   useEffect(() => {
+    fetch(`/api/sessions/${sessionId}/whiteboard`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isOpen: true, drawerName: userName }),
+    }).catch(() => {});
+  }, [sessionId, userName]);
+
+  // Setup canvas resolution
+  const setupCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    canvas.width = window.innerWidth * 0.85;
-    canvas.height = window.innerHeight * 0.75;
+    const newWidth = Math.min(window.innerWidth * 0.9, 1100);
+    const newHeight = Math.min(window.innerHeight * 0.7, 650);
+
+    canvas.width = newWidth;
+    canvas.height = newHeight;
 
     ctx.fillStyle = "#0D1B35";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }, []);
+
+  useEffect(() => {
+    setupCanvas();
+  }, [setupCanvas]);
+
+  // Periodic polling listener for live canvas drawing sync
+  useEffect(() => {
+    let isCancelled = false;
+    const interval = setInterval(async () => {
+      if (isSelfDrawingRef.current) return;
+      try {
+        const res = await fetch(`/api/sessions/${sessionId}/whiteboard`);
+        const data = await res.json();
+        if (isCancelled) return;
+
+        if (data.success && data.imageData) {
+          if (data.updatedAt > lastUpdateRef.current) {
+            lastUpdateRef.current = data.updatedAt;
+            if (data.lastDrawer) setLastDrawer(data.lastDrawer);
+            setSyncStatus("syncing");
+
+            const canvas = canvasRef.current;
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) return;
+
+            const img = new Image();
+            img.onload = () => {
+              ctx.save();
+              ctx.globalCompositeOperation = "source-over";
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              ctx.fillStyle = "#0D1B35";
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+              ctx.restore();
+              setSyncStatus("live");
+            };
+            img.src = data.imageData;
+          }
+        }
+      } catch {
+        // ignore network glitches
+      }
+    }, 1000);
+
+    return () => {
+      isCancelled = true;
+      clearInterval(interval);
+    };
+  }, [sessionId]);
+
+  const getCoordinates = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY,
+    };
+  };
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -186,12 +306,10 @@ function WhiteboardModal({ onClose }: { onClose: () => void }) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
-
+    isSelfDrawingRef.current = true;
+    const { x, y } = getCoordinates(e);
     ctx.beginPath();
-    ctx.moveTo(clientX - rect.left, clientY - rect.top);
+    ctx.moveTo(x, y);
     setIsDrawing(true);
   };
 
@@ -202,21 +320,30 @@ function WhiteboardModal({ onClose }: { onClose: () => void }) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+    const { x, y } = getCoordinates(e);
 
-    ctx.strokeStyle = isEraser ? "#0D1B35" : color;
-    ctx.lineWidth = isEraser ? lineWidth * 4 : lineWidth;
+    ctx.save();
+    if (isEraser) {
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.lineWidth = lineWidth * 4;
+    } else {
+      ctx.globalCompositeOperation = "source-over";
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lineWidth;
+    }
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
 
-    ctx.lineTo(clientX - rect.left, clientY - rect.top);
+    ctx.lineTo(x, y);
     ctx.stroke();
+    ctx.restore();
   };
 
   const stopDrawing = () => {
+    if (!isDrawing) return;
     setIsDrawing(false);
+    isSelfDrawingRef.current = false;
+    broadcastCanvasState();
   };
 
   const clearCanvas = () => {
@@ -225,8 +352,12 @@ function WhiteboardModal({ onClose }: { onClose: () => void }) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    ctx.save();
+    ctx.globalCompositeOperation = "source-over";
     ctx.fillStyle = "#0D1B35";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+    broadcastCanvasState();
   };
 
   const downloadCanvas = () => {
@@ -238,27 +369,49 @@ function WhiteboardModal({ onClose }: { onClose: () => void }) {
     link.click();
   };
 
+  const handleCloseModal = async () => {
+    if (isOwner) {
+      await fetch(`/api/sessions/${sessionId}/whiteboard`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isOpen: false }),
+      }).catch(() => {});
+    }
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
       <div className="bg-[#0A1628] border border-indigo-500/30 rounded-3xl p-5 shadow-2xl space-y-4 max-w-5xl w-full">
         {/* Toolbar */}
         <div className="flex items-center justify-between flex-wrap gap-3 border-b border-white/10 pb-3">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <span className="text-white font-black text-base flex items-center gap-2">
-              🎨 İnteraktif Dijital Beyaz Tahta
+              🎨 Canlı Dijital Beyaz Tahta
             </span>
+            <span className="text-[10px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              {syncStatus === "syncing" ? "Senkronize Ediliyor..." : "CANLI YAYIN AKTİF"}
+            </span>
+            {lastDrawer && (
+              <span className="text-[10px] text-indigo-300 font-bold hidden sm:inline-block">
+                ✍️ Çizen: {lastDrawer}
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-3 flex-wrap">
             <button
               onClick={() => setIsEraser(false)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-black transition border ${ !isEraser ? "bg-indigo-600 text-white border-indigo-400" : "bg-[#1E293B] text-slate-400 border-white/10" }`}
+              aria-label="Kalem aracını seç"
+              className={`px-3 py-1.5 rounded-xl text-xs font-black transition border focus-visible:ring-2 focus-visible:ring-indigo-400 ${ !isEraser ? "bg-indigo-600 text-white border-indigo-400" : "bg-[#1E293B] text-slate-300 border-white/10" }`}
             >
               ✏️ Kalem
             </button>
             <button
               onClick={() => setIsEraser(true)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-black transition border ${ isEraser ? "bg-amber-600 text-white border-amber-400" : "bg-[#1E293B] text-slate-400 border-white/10" }`}
+              aria-label="Silgi aracını seç"
+              className={`px-3 py-1.5 rounded-xl text-xs font-black transition border focus-visible:ring-2 focus-visible:ring-amber-400 ${ isEraser ? "bg-amber-600 text-white border-amber-400" : "bg-[#1E293B] text-slate-300 border-white/10" }`}
             >
               🧹 Silgi
             </button>
@@ -270,6 +423,7 @@ function WhiteboardModal({ onClose }: { onClose: () => void }) {
                     key={c}
                     onClick={() => setColor(c)}
                     style={{ backgroundColor: c }}
+                    aria-label={`${c} rengini seç`}
                     className={`w-6 h-6 rounded-lg border-2 transition ${ color === c ? "scale-110 border-white" : "border-transparent opacity-80" }`}
                   />
                 ))}
@@ -284,27 +438,31 @@ function WhiteboardModal({ onClose }: { onClose: () => void }) {
                 max="20"
                 value={lineWidth}
                 onChange={(e) => setLineWidth(Number(e.target.value))}
+                aria-label="Çizgi kalınlığı"
                 className="w-20 accent-indigo-500"
               />
             </div>
 
             <button
               onClick={clearCanvas}
-              className="bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 text-xs font-black px-3 py-1.5 rounded-xl transition"
+              aria-label="Tüm tahtayı temizle"
+              className="bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 text-xs font-black px-3 py-1.5 rounded-xl transition focus-visible:ring-2 focus-visible:ring-red-400"
             >
               🗑️ Temizle
             </button>
 
             <button
               onClick={downloadCanvas}
-              className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-black px-3 py-1.5 rounded-xl transition"
+              aria-label="Tahtayı resim olarak indir"
+              className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-black px-3 py-1.5 rounded-xl transition focus-visible:ring-2 focus-visible:ring-emerald-400"
             >
               💾 Kaydet
             </button>
 
             <button
-              onClick={onClose}
-              className="bg-white/10 hover:bg-white/20 text-white font-black text-xs px-3 py-1.5 rounded-xl transition"
+              onClick={handleCloseModal}
+              aria-label="Tahtayı kapat"
+              className="bg-white/10 hover:bg-white/20 text-white font-black text-xs px-3 py-1.5 rounded-xl transition focus-visible:ring-2 focus-visible:ring-white"
             >
               ✕ Kapat
             </button>
@@ -518,7 +676,26 @@ export default function LiveSessionPage() {
   const [showResources, setShowResources] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
   const [notesText, setNotesText] = useState("");
+  const [networkQuality, setNetworkQuality] = useState<"good" | "fair" | "poor">("good");
   const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  useEffect(() => {
+    const handleNetworkCheck = () => {
+      const conn = (navigator as any).connection;
+      if (conn) {
+        if (conn.rtt > 300 || conn.downlink < 1.5) setNetworkQuality("poor");
+        else if (conn.rtt > 150) setNetworkQuality("fair");
+        else setNetworkQuality("good");
+      }
+    };
+    handleNetworkCheck();
+    window.addEventListener("online", handleNetworkCheck);
+    window.addEventListener("offline", handleNetworkCheck);
+    return () => {
+      window.removeEventListener("online", handleNetworkCheck);
+      window.removeEventListener("offline", handleNetworkCheck);
+    };
+  }, []);
 
   useEffect(() => {
     if (sessionId) {
@@ -577,6 +754,26 @@ export default function LiveSessionPage() {
     joinSession();
   }, [joinSession]);
 
+  // Auto sync whiteboard open/close state for students when teacher opens/closes it
+  useEffect(() => {
+    if (status !== "live" || !sessionId) return;
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/sessions/${sessionId}/whiteboard`);
+        const data = await res.json();
+        if (data.success) {
+          if (data.isOpen && !showWhiteboard) {
+            setShowWhiteboard(true);
+          } else if (!data.isOpen && showWhiteboard && !isOwner) {
+            setShowWhiteboard(false);
+          }
+        }
+      } catch {}
+    }, 1500);
+
+    return () => clearInterval(interval);
+  }, [sessionId, status, showWhiteboard, isOwner]);
+
   const handleEndSession = async () => {
     if (!userId) return;
     if (!confirm("Dersi bitirmek istediğinizden emin misiniz? Odadaki herkes çıkarılacak.")) return;
@@ -597,7 +794,6 @@ export default function LiveSessionPage() {
         router.push("/profil");
       }
     } catch {
-      alert("Ders bitirilirken bir hata oluştu.");
       router.push("/profil");
     }
   };
@@ -636,10 +832,19 @@ export default function LiveSessionPage() {
         <div className="flex items-center gap-3">
           <span className="text-white font-black text-lg">📚 Derslinex Canlı Ders</span>
           {status === "live" && (
-            <span className="flex items-center gap-1.5 bg-red-600/20 border border-red-500/40 text-red-400 text-xs font-black px-2.5 py-1 rounded-full">
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-              CANLI
-            </span>
+            <>
+              <span className="flex items-center gap-1.5 bg-red-600/20 border border-red-500/40 text-red-400 text-xs font-black px-2.5 py-1 rounded-full">
+                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                CANLI
+              </span>
+              <span className={`text-[10px] font-black px-2.5 py-1 rounded-full border hidden sm:inline-flex ${
+                networkQuality === "good" ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30" :
+                networkQuality === "fair" ? "bg-amber-500/20 text-amber-300 border-amber-500/30" :
+                "bg-red-500/20 text-red-300 border-red-500/30 animate-pulse"
+              }`}>
+                {networkQuality === "good" ? "📶 Ağ: Mükemmel" : networkQuality === "fair" ? "📶 Ağ: Orta" : "⚠️ Ağ Yavaş"}
+              </span>
+            </>
           )}
         </div>
         <div className="flex items-center gap-3">
@@ -711,9 +916,63 @@ export default function LiveSessionPage() {
             </div>
 
             <div className="flex-1 p-4 flex flex-col gap-3 overflow-hidden">
-              <span className="text-[10px] text-slate-400 font-bold">
-                * Aldığınız notlar otomatik olarak cihazınıza kaydedilir.
-              </span>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[10px] text-slate-400 font-bold">
+                  * Aldığınız notlar cihazınıza kaydedilir.
+                </span>
+
+                {/* Rich Formatting Toolbar */}
+                <div className="flex items-center gap-1 bg-[#0A1628] p-1 rounded-xl border border-white/10 text-xs font-black">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = notesText + " **Kalın Metin** ";
+                      setNotesText(next);
+                      localStorage.setItem(`derslinex_notes_${sessionId}`, next);
+                    }}
+                    className="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-white font-black"
+                    title="Kalın Yazı"
+                  >
+                    B
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = notesText + " *İtalik Metin* ";
+                      setNotesText(next);
+                      localStorage.setItem(`derslinex_notes_${sessionId}`, next);
+                    }}
+                    className="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-white italic font-bold"
+                    title="İtalik Yazı"
+                  >
+                    I
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = notesText + "\n- Madde: ";
+                      setNotesText(next);
+                      localStorage.setItem(`derslinex_notes_${sessionId}`, next);
+                    }}
+                    className="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-white font-bold"
+                    title="Madde Başlığı"
+                  >
+                    •
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = notesText + "\n📌 ÖNEMLİ: ";
+                      setNotesText(next);
+                      localStorage.setItem(`derslinex_notes_${sessionId}`, next);
+                    }}
+                    className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold"
+                    title="Önemli Etiketi"
+                  >
+                    📌
+                  </button>
+                </div>
+              </div>
 
               <textarea
                 value={notesText}
@@ -746,7 +1005,15 @@ export default function LiveSessionPage() {
       </div>
 
       {/* Dijital Beyaz Tahta Modalı */}
-      {showWhiteboard && <WhiteboardModal onClose={() => setShowWhiteboard(false)} />}
+      {showWhiteboard && (
+        <WhiteboardModal
+          sessionId={sessionId as string}
+          isOwner={isOwner}
+          role={role}
+          userName={role === "teacher" ? "Öğretmen" : "Öğrenci"}
+          onClose={() => setShowWhiteboard(false)}
+        />
+      )}
 
       {/* Ders Materyalleri Modalı */}
       {showResources && <ResourcesModal sessionId={sessionId} isOwner={isOwner} onClose={() => setShowResources(false)} />}

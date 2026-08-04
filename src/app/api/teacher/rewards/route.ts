@@ -5,19 +5,21 @@ import { getAuthUser } from "@/lib/auth-middleware";
 // GET /api/teacher/rewards?teacherId=123
 export async function GET(request: Request) {
   try {
+    const authUser = await getAuthUser(request);
     const { searchParams } = new URL(request.url);
     const teacherIdStr = searchParams.get("teacherId");
-    let teacherId = parseInt(teacherIdStr || "0");
+    let teacherId = teacherIdStr ? parseInt(teacherIdStr) : (authUser?.role === "teacher" ? authUser.id : 0);
 
-    if (!teacherId) {
-      const authUser = await getAuthUser(request);
-      if (authUser && authUser.role === "teacher") {
-        teacherId = authUser.id;
-      }
+    if (!teacherId && authUser?.role === "teacher") {
+      teacherId = authUser.id;
     }
 
-    if (!teacherId) {
-      return NextResponse.json({ success: false, error: "Öğretmen ID zorunludur." }, { status: 400 });
+    if (!teacherId || isNaN(teacherId)) {
+      return NextResponse.json({ success: false, error: "Geçersiz öğretmen ID" }, { status: 400 });
+    }
+
+    if (authUser && authUser.role === "teacher" && authUser.id !== teacherId) {
+      return NextResponse.json({ success: false, error: "Başka bir öğretmenin ödüllerine erişim yetkiniz yok." }, { status: 403 });
     }
 
     const [teacher, questionsCount, sessionsCount, resourcesCount, faqsCount] = await Promise.all([

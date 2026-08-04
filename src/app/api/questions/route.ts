@@ -12,8 +12,13 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: false, error: "Öğretmen ID zorunludur" }, { status: 400 });
     }
 
+    const parsedTeacherId = parseInt(teacherId);
+    if (isNaN(parsedTeacherId)) {
+      return NextResponse.json({ success: false, error: "Geçersiz öğretmen ID" }, { status: 400 });
+    }
+
     const questions = await prisma.question.findMany({
-      where: { teacherId: parseInt(teacherId) },
+      where: { teacherId: parsedTeacherId },
       orderBy: { createdAt: "desc" },
     });
 
@@ -28,9 +33,13 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const authUser = await getAuthUser(request);
+    if (!authUser || authUser.role !== "teacher") {
+      return NextResponse.json({ success: false, error: "Soru yüklemek için öğretmen oturumu gereklidir." }, { status: 401 });
+    }
+
+    const teacherId = authUser.id;
     const body = await request.json();
     const {
-      teacherId: bodyTeacherId,
       subject,
       examType,
       topic,
@@ -46,12 +55,6 @@ export async function POST(request: Request) {
       solutionText,
       points,
     } = body;
-
-    const teacherId = authUser && authUser.role === "teacher" ? authUser.id : (bodyTeacherId ? parseInt(bodyTeacherId) : null);
-
-    if (!teacherId) {
-      return NextResponse.json({ success: false, error: "Soru yüklemek için öğretmen oturumu gereklidir." }, { status: 401 });
-    }
 
     if (!teacherId || !subject || !questionText || !optionA || !optionB || !correctOption) {
       return NextResponse.json({ success: false, error: "Ders, soru metni, A/B şıkları ve doğru cevap zorunludur" }, { status: 400 });

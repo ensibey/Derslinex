@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { verifyAdminAuth } from "@/lib/adminAuth";
 
 /**
- * GET /api/admin/clean-test-data
+ * POST /api/admin/clean-test-data
  * Purges all dummy/test sessions, participants, resources, and feedbacks from DB.
  */
-export async function GET() {
+export async function POST(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
   try {
     // Delete all session related tables
     const feedbackCount = await prisma.sessionFeedback.deleteMany({});

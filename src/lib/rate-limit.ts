@@ -26,6 +26,16 @@ export function checkRateLimit(
   windowMs: number = 60_000 // 1 minute window
 ): { success: boolean; remaining: number; resetMs: number } {
   const now = Date.now();
+
+  // Guard against memory leaks if store grows too large
+  if (store.size > 5000) {
+    for (const [key, val] of store.entries()) {
+      if (val.resetAt <= now) {
+        store.delete(key);
+      }
+    }
+  }
+
   const entry = store.get(identifier);
 
   if (!entry || entry.resetAt <= now) {

@@ -122,7 +122,7 @@ export function VirtualStudyRooms() {
                 {room.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="text-[9px] font-bold bg-white/5 border border-white/10 text-slate-400 px-2.5 py-0.5 rounded-full"
+                    className="text-[9px] font-bold bg-white/5 border border-white/10 text-slate-300 px-2.5 py-0.5 rounded-full"
                   >
                     #{tag}
                   </span>
@@ -131,9 +131,11 @@ export function VirtualStudyRooms() {
 
               <button
                 onClick={() => handleJoinRoom(room)}
-                className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-2.5 rounded-xl text-xs transition shadow flex items-center justify-center gap-2"
+                aria-label={`${room.name} çalışma odasına katıl`}
+                className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-2.5 rounded-xl text-xs transition shadow flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-indigo-400"
               >
-                <span>🚀 Çalışma Odasına Katıl</span>
+                <span aria-hidden="true">🚀</span>
+                <span>Çalışma Odasına Katıl</span>
               </button>
             </div>
           ))}
@@ -143,7 +145,7 @@ export function VirtualStudyRooms() {
         <div className="space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-4 bg-[#0D1B35] p-4 rounded-2xl border border-indigo-500/30">
             <div className="flex items-center gap-3">
-              <span className="text-2xl">{activeRoom?.icon}</span>
+              <span className="text-2xl" aria-hidden="true">{activeRoom?.icon}</span>
               <div>
                 <h4 className="font-black text-white text-base">{activeRoom?.name}</h4>
                 <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1 mt-0.5">
@@ -157,7 +159,8 @@ export function VirtualStudyRooms() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setCamOn(!camOn)}
-                className={`px-3 py-2 rounded-xl text-xs font-black border transition flex items-center gap-1.5 ${
+                aria-label={camOn ? "Kamerayı Kapat" : "Kamerayı Aç"}
+                className={`px-3 py-2 rounded-xl text-xs font-black border transition flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                   camOn
                     ? "bg-emerald-600 text-white border-emerald-500"
                     : "bg-white/5 text-slate-300 border-white/10 hover:bg-white/10"
@@ -168,7 +171,8 @@ export function VirtualStudyRooms() {
 
               <button
                 onClick={() => setMicMuted(!micMuted)}
-                className={`px-3 py-2 rounded-xl text-xs font-black border transition flex items-center gap-1.5 ${
+                aria-label={micMuted ? "Mikrofonu Aç" : "Mikrofonu Sessize Al"}
+                className={`px-3 py-2 rounded-xl text-xs font-black border transition flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                   micMuted
                     ? "bg-red-500/20 text-red-400 border-red-500/30"
                     : "bg-emerald-600 text-white border-emerald-500"

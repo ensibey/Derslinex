@@ -1,11 +1,17 @@
 import crypto from "crypto";
 
+const DEV_FALLBACK_SECRET = "derslinex_default_dev_secret_key_2026_stable";
+
 function getJwtSecret(): string {
-  const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    return "derslinex_default_jwt_secret_key_2026_safe";
+  if (process.env.JWT_SECRET) {
+    return process.env.JWT_SECRET;
   }
-  return secret;
+  if (process.env.NODE_ENV === "production") {
+    console.error("CRITICAL: JWT_SECRET environment variable is missing in production!");
+  } else {
+    console.warn("WARNING: JWT_SECRET environment variable is missing. Using stable development fallback key.");
+  }
+  return DEV_FALLBACK_SECRET;
 }
 
 
@@ -49,7 +55,11 @@ export async function verifyToken(token: string) {
       .replace(/\+/g, "-")
       .replace(/\//g, "_");
 
-    if (expectedSignature !== signatureB64) return null;
+    const expSigBuf = Buffer.from(expectedSignature);
+    const sigBuf = Buffer.from(signatureB64);
+    if (expSigBuf.length !== sigBuf.length || !crypto.timingSafeEqual(expSigBuf, sigBuf)) {
+      return null;
+    }
 
     const payload = JSON.parse(Buffer.from(payloadB64, "base64").toString());
     if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null;

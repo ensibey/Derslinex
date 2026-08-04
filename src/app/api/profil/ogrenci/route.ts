@@ -6,6 +6,7 @@ import { getAuthUser } from "@/lib/auth-middleware";
 // GET: get student profile by email (or all if admin)
 export async function GET(request: Request) {
   try {
+    const authUser = await getAuthUser(request);
     const { searchParams } = new URL(request.url);
     const email = searchParams.get("email");
 
@@ -31,6 +32,14 @@ export async function GET(request: Request) {
         },
       });
       return NextResponse.json({ success: true, students });
+    }
+
+    if (!authUser) {
+      return NextResponse.json({ success: false, error: "Profil bilgilerini görmek için oturum açmalısınız." }, { status: 401 });
+    }
+
+    if (authUser.role === "student" && authUser.email !== email) {
+      return NextResponse.json({ success: false, error: "Başka bir öğrencinin profil bilgilerine erişim yetkiniz yok." }, { status: 403 });
     }
 
     const student = await prisma.student.findFirst({

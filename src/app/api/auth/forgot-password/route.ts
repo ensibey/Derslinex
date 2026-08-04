@@ -41,6 +41,11 @@ export async function POST(request: Request) {
     }
 
 
+    // Purge any existing reset tokens for this email
+    await prisma.passwordResetToken.deleteMany({
+      where: { email },
+    });
+
     // Generate token
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + 60 * 60_000); // 1 hour

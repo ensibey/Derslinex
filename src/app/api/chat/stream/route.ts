@@ -1,14 +1,42 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getAuthUser } from "@/lib/auth-middleware";
 
 // GET /api/chat/stream?roomId=123
 export async function GET(request: Request) {
+  const authUser = await getAuthUser(request);
+  if (!authUser) {
+    return NextResponse.json(
+      { success: false, error: "Sohbet yayınını izlemek için oturum açmalısınız." },
+      { status: 401 }
+    );
+  }
+
   const { searchParams } = new URL(request.url);
   const roomIdStr = searchParams.get("roomId");
   const roomId = parseInt(roomIdStr || "0");
 
-  if (!roomId) {
-    return NextResponse.json({ success: false, error: "roomId zorunludur." }, { status: 400 });
+  if (!roomId || isNaN(roomId)) {
+    return NextResponse.json({ success: false, error: "Geçersiz roomId zorunludur." }, { status: 400 });
+  }
+
+  // Verify membership: caller must be room student or teacher
+  const room = await prisma.chatRoom.findUnique({
+    where: { id: roomId },
+  });
+
+  if (!room) {
+    return NextResponse.json({ success: false, error: "Sohbet odası bulunamadı." }, { status: 404 });
+  }
+
+  const isStudentMember = authUser.role === "student" && room.studentId === authUser.id;
+  const isTeacherMember = authUser.role === "teacher" && room.teacherId === authUser.id;
+
+  if (!isStudentMember && !isTeacherMember) {
+    return NextResponse.json(
+      { success: false, error: "Bu sohbet odasına erişim yetkiniz yok." },
+      { status: 403 }
+    );
   }
 
   let lastMessageId = 0;

@@ -160,17 +160,19 @@ export function OsymCalculator() {
             </h4>
 
             <div>
-              <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">
+              <label htmlFor="obp-input" className="block text-[10px] font-black text-slate-300 uppercase mb-1">
                 Diploma Notu (OBP: 50 – 100)
               </label>
               <input
+                id="obp-input"
                 type="number"
                 min={50}
                 max={100}
                 step="1"
                 value={obp}
                 onChange={(e) => setObp(clampNet(e.target.value, 100, 50))}
-                className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-black focus:outline-none focus:border-indigo-500"
+                aria-label="Diploma Notu OBP"
+                className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-black focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               <span className="text-[9px] text-indigo-400 font-bold block mt-1">
                 Ek OBP Puanı: +{obpEkPuan.toFixed(1)} Puan
@@ -179,51 +181,59 @@ export function OsymCalculator() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Türkçe (Max 40S)</label>
+                <label htmlFor="tyt-turkce" className="block text-[10px] font-black text-slate-300 uppercase mb-1">Türkçe (Max 40S)</label>
                 <input
+                  id="tyt-turkce"
                   type="number"
                   min={0}
                   max={40}
                   step="0.25"
                   value={tytTurkce}
                   onChange={(e) => setTytTurkce(clampNet(e.target.value, 40))}
-                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500"
+                  aria-label="TYT Türkçe Net"
+                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Sosyal (Max 20S)</label>
+                <label htmlFor="tyt-sosyal" className="block text-[10px] font-black text-slate-300 uppercase mb-1">Sosyal (Max 20S)</label>
                 <input
+                  id="tyt-sosyal"
                   type="number"
                   min={0}
                   max={20}
                   step="0.25"
                   value={tytSosyal}
                   onChange={(e) => setTytSosyal(clampNet(e.target.value, 20))}
-                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500"
+                  aria-label="TYT Sosyal Net"
+                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Matematik (Max 40S)</label>
+                <label htmlFor="tyt-mat" className="block text-[10px] font-black text-slate-300 uppercase mb-1">Matematik (Max 40S)</label>
                 <input
+                  id="tyt-mat"
                   type="number"
                   min={0}
                   max={40}
                   step="0.25"
                   value={tytMat}
                   onChange={(e) => setTytMat(clampNet(e.target.value, 40))}
-                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500"
+                  aria-label="TYT Matematik Net"
+                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Fen (Max 20S)</label>
+                <label htmlFor="tyt-fen" className="block text-[10px] font-black text-slate-300 uppercase mb-1">Fen (Max 20S)</label>
                 <input
+                  id="tyt-fen"
                   type="number"
                   min={0}
                   max={20}
                   step="0.25"
                   value={tytFen}
                   onChange={(e) => setTytFen(clampNet(e.target.value, 20))}
-                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500"
+                  aria-label="TYT Fen Net"
+                  className="w-full bg-[#1E293B] border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
             </div>

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
+import { prisma } from "@/lib/db";
 import { getAuthUser } from "@/lib/auth-middleware";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
@@ -15,6 +16,18 @@ export async function POST(request: Request) {
     const user = await getAuthUser(request);
     if (!user) {
       return NextResponse.json({ success: false, error: "Yetkisiz erişim. Oturum açmanız gerekmektedir." }, { status: 401 });
+    }
+
+    if (user.role === "student") {
+      const student = await prisma.student.findUnique({ where: { id: user.id } });
+      if (student?.isBanned) {
+        return NextResponse.json({ success: false, error: "Hesabınız engellenmiştir. Dosya yükleyemezsiniz." }, { status: 403 });
+      }
+    } else if (user.role === "teacher") {
+      const teacher = await prisma.teacher.findUnique({ where: { id: user.id } });
+      if (teacher?.isBanned) {
+        return NextResponse.json({ success: false, error: "Hesabınız engellenmiştir. Dosya yükleyemezsiniz." }, { status: 403 });
+      }
     }
 
     const ip = getClientIp(request);

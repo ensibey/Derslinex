@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     }
 
     if (student.isBanned) {
-      return NextResponse.json({ success: false, error: "Hesabınız yasaklanmıştır. Lütfen yönetici ile iletişime geçin." }, { status: 430 });
+      return NextResponse.json({ success: false, error: "Hesabınız yasaklanmıştır. Lütfen yönetici ile iletişime geçin." }, { status: 403 });
     }
 
     // Remove password before returning

@@ -5,7 +5,8 @@
 
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY!);
+const resendApiKey = process.env.RESEND_API_KEY;
+const resend = resendApiKey ? new Resend(resendApiKey) : null;
 const FROM   = process.env.RESEND_FROM || "Derslinex <onboarding@resend.dev>";
 const SITE   = process.env.NEXT_PUBLIC_SITE_URL || "https://derslinex.com";
 
@@ -138,6 +139,11 @@ export async function sendSessionAssignedMail(
       </tr>
     </table>`;
 
+  if (!resend) {
+    console.warn("Mail gönderimi atlandı: RESEND_API_KEY tanımlanmamış.");
+    return;
+  }
+
   await resend.emails.send({
     from:    FROM,
     to:      toEmail,
@@ -151,6 +157,10 @@ export async function sendSessionReminderMail(
   toName: string,
   session: SessionInfo
 ): Promise<void> {
+  if (!resend) {
+    console.warn("Mail gönderimi atlandı: RESEND_API_KEY tanımlanmamış.");
+    return;
+  }
   const joinUrl = `${SITE}/ders/${session.id}`;
 
   const body = `
@@ -175,6 +185,10 @@ export async function sendSessionCancelledMail(
   toName: string,
   sessionTitle: string
 ): Promise<void> {
+  if (!resend) {
+    console.warn("Mail gönderimi atlandı: RESEND_API_KEY tanımlanmamış.");
+    return;
+  }
   const body = `
     <h2 style="color:#DC2626;font-size:20px;font-weight:900;margin:0 0 8px;">🚫 Canlı Ders İptal Edildi</h2>
     <p style="color:#374151;margin:0 0 24px;">Merhaba <strong>${toName}</strong>, <strong>${sessionTitle}</strong> başlıklı canlı dersiniz yönetici tarafından iptal edilmiştir.</p>
@@ -194,6 +208,10 @@ export async function sendPasswordResetMail(
   toEmail: string,
   resetUrl: string
 ): Promise<void> {
+  if (!resend) {
+    console.warn("Mail gönderimi atlandı: RESEND_API_KEY tanımlanmamış.");
+    return;
+  }
   const body = `
     <h2 style="color:#1E3A8A;font-size:20px;font-weight:900;margin:0 0 8px;">🔑 Şifre Sıfırlama Talebi</h2>
     <p style="color:#374151;margin:0 0 24px;">Hesabınız için şifre sıfırlama talebinde bulundunuz. Aşağıdaki butona tıklayarak yeni şifrenizi belirleyebilirsiniz.</p>

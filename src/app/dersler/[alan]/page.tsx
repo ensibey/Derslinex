@@ -7,6 +7,8 @@ import TeacherCard from "@/components/TeacherCard";
 import Image from "next/image";
 import { waLink } from "@/lib/utils";
 
+import { prisma } from "@/lib/db";
+
 export async function generateStaticParams() {
   return dersAlanlari.map((d) => ({ alan: d.slug }));
 }
@@ -26,9 +28,44 @@ export default async function DersAlaniPage({ params }: { params: Promise<{ alan
   const ders = getDersAlaniBySlug(resolvedParams.alan);
   if (!ders) notFound();
 
-  const ilgiliHocalar = hocalar.filter(
+  let dbTeachersList: any[] = [];
+  try {
+    const mainSubjectWord = ders.isim.toLowerCase().split(" ")[0];
+    const dbTeachers = await prisma.teacher.findMany({
+      where: {
+        status: "İletişime Geçildi",
+        branch: { contains: mainSubjectWord, mode: "insensitive" }
+      }
+    });
+    dbTeachersList = dbTeachers.map((t) => ({
+      id: `db-${t.id}`,
+      slug: t.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+      isim: t.name,
+      unvan: "Eğitmen",
+      fotograf: t.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(t.name)}&eyebrows=default&mouth=smile`,
+      dersler: [t.branch],
+      yksTuru: ["TYT", "AYT Sayısal", "AYT EA"] as any[],
+      format: "online" as const,
+      konum: "Online / Türkiye Geneli",
+      deneyimYili: 5,
+      egitim: t.egitim || "Derslinex Onaylı Özel Ders Eğitmeni",
+      ozgecmis: t.ozgecmis || `${t.name}, Derslinex platformunda ${t.branch} dersleri vermektedir.`,
+      whatsapp: t.phone.replace(/[^0-9]/g, ""),
+      puan: 4.9,
+      ogrenciSayisi: 15,
+      points: t.points || 0,
+      aktif: true
+    }));
+  } catch (err) {
+    console.error("Ders hocaları DB hatası:", err);
+  }
+
+  const staticHocalar = hocalar.filter(
     (h) => h.aktif && h.dersler.some((d) => d.toLowerCase().includes(ders.isim.toLowerCase().split(" ")[0]))
   );
+
+  const ilgiliHocalar = [...dbTeachersList, ...staticHocalar];
+
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

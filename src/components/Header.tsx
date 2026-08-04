@@ -76,8 +76,8 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Desktop Nav Links (xl screen: 1280px+) */}
-          <nav className="hidden xl:flex items-center gap-4 2xl:gap-6 flex-shrink">
+          {/* Desktop Nav Links (lg screen: 1024px+) */}
+          <nav className="hidden lg:flex items-center gap-3 xl:gap-4 2xl:gap-6 flex-shrink">
             {navLinks.map((l) => (
               <Link
                 key={l.href}
@@ -96,8 +96,9 @@ export default function Header() {
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 bg-[#B45309] hover:bg-[#92400E] text-white text-xs xl:text-sm font-bold px-3.5 py-2.5 xl:px-4 xl:py-2.5 rounded-xl transition-all duration-200 shadow-xs whitespace-nowrap"
+              aria-label="WhatsApp ile Ders Al"
             >
-              <svg className="w-3.5 h-3.5 xl:w-4 xl:h-4" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 xl:w-4 xl:h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
                 <path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.552 4.118 1.517 5.845L.057 23.547a.75.75 0 00.921.921l5.702-1.46A11.949 11.949 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.692-.504-5.23-1.385l-.374-.22-3.384.867.882-3.384-.22-.374A9.948 9.948 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
               </svg>
@@ -132,23 +133,24 @@ export default function Header() {
               <Link
                 href="/profil"
                 className="inline-flex items-center gap-1.5 bg-[#1E3A8A] hover:bg-[#152860] text-white text-xs xl:text-sm font-bold px-3.5 py-2.5 xl:px-4 xl:py-2.5 rounded-xl transition-all duration-200 shadow-xs hover:shadow-md group whitespace-nowrap flex-shrink-0"
+                aria-label="Giriş Yap veya Kayıt Ol"
               >
-                <span className="text-xs bg-white/20 group-hover:bg-white/30 rounded-lg p-0.5 transition-colors">👤</span>
+                <span className="text-xs bg-white/20 group-hover:bg-white/30 rounded-lg p-0.5 transition-colors" aria-hidden="true">👤</span>
                 <span>Giriş Yap / Kayıt</span>
               </Link>
             )}
           </div>
 
           {/* Mobile & Tablet menu trigger button */}
-          <div className="xl:hidden flex items-center gap-2">
+          <div className="lg:hidden flex items-center gap-2">
             <Link
               href="/profil"
               className="inline-flex items-center gap-1 bg-[#1E3A8A] text-white text-xs font-bold px-2.5 py-1.5 rounded-lg transition-all whitespace-nowrap"
+              aria-label="Profil Hesabım"
             >
-              <span>👤</span>
+              <span aria-hidden="true">👤</span>
               <span>{user ? user.name.split(" ")[0] : "Giriş"}</span>
             </Link>
-
 
             <button
               onClick={() => setMenuOpen(!menuOpen)}
@@ -173,18 +175,16 @@ export default function Header() {
       {menuOpen && (
         <div className="lg:hidden bg-[#FAF8F5] border-t border-[#EFECE6] shadow-lg">
           <div className="px-4 py-3 space-y-2">
-            {navLinks
-              .filter((l) => l.href !== "/dersler")
-              .map((l) => (
-                <Link
-                  key={l.href}
-                  href={l.href}
-                  onClick={() => setMenuOpen(false)}
-                  className="block px-3 py-2 text-[#1E3A8A] font-bold hover:bg-gray-100 rounded-lg text-sm"
-                >
-                  {l.label}
-                </Link>
-              ))}
+            {navLinks.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                onClick={() => setMenuOpen(false)}
+                className="block px-3 py-2 text-[#1E3A8A] font-bold hover:bg-gray-100 rounded-lg text-sm"
+              >
+                {l.label}
+              </Link>
+            ))}
 
             {/* Mobile Profile Trigger Link */}
             <Link

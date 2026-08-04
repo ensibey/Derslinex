@@ -9,12 +9,16 @@ import { sendSessionReminderMail } from "@/lib/mail";
  * Authorization: Bearer ${CRON_SECRET}
  */
 export async function GET(request: Request) {
-  // Güvenlik: sadece Vercel Cron veya bilinçli çağrılar geçebilir
   const authHeader = request.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
 
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!cronSecret) {
+    console.error("CRITICAL: CRON_SECRET is not configured in environment.");
+    return NextResponse.json({ error: "Sunucu cron yapılandırma hatası. CRON_SECRET tanımlı değil." }, { status: 500 });
+  }
+
+  if (!authHeader || authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: "Yetkisiz erişim" }, { status: 401 });
   }
 
   try {
