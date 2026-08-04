@@ -826,9 +826,9 @@ export default function LiveSessionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A1628] flex flex-col">
+    <div className="fixed inset-0 z-40 bg-[#0A1628] flex flex-col h-screen w-screen overflow-hidden">
       {/* Üst Bar */}
-      <div className="flex items-center justify-between px-5 py-3 bg-[#0F1F3D] border-b border-white/10">
+      <div className="flex items-center justify-between px-5 py-3 bg-[#0F1F3D] border-b border-white/10 shrink-0 h-16">
         <div className="flex items-center gap-3">
           <span className="text-white font-black text-lg">📚 Derslinex Canlı Ders</span>
           {status === "live" && (
@@ -890,17 +890,22 @@ export default function LiveSessionPage() {
         </div>
       </div>
 
-      {/* Main Video & Side Notes Split Layout */}
-      <div className="flex-1 flex overflow-hidden relative">
-        {status === "live" && roomUrl && (
+      {/* Main Video & Side Notes Split Layout - Full Height */}
+      <div className="flex-1 w-full h-[calc(100vh-64px)] flex overflow-hidden relative bg-[#050C16]">
+        {status === "live" && roomUrl ? (
           <iframe
             ref={iframeRef}
             src={roomUrl}
-            className="flex-1 w-full border-0 h-full"
+            className="flex-1 w-full h-full border-0 bg-black"
             allow="camera; microphone; fullscreen; speaker; display-capture; autoplay; clipboard-write"
             allowFullScreen
             title="Canlı Ders Odası"
           />
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center text-indigo-300 gap-3">
+            <div className="w-10 h-10 border-4 border-indigo-400 border-t-transparent rounded-full animate-spin" />
+            <p className="font-bold text-sm">Video odası oluşturuluyor...</p>
+          </div>
         )}
 
         {/* Collapsible Live Study Notes Side Drawer */}
