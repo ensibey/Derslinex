@@ -115,7 +115,7 @@ function BrandLogoHeader({ subBadge = "ADMİN PANELİ" }: { subBadge?: string })
 }
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<"usage" | "exams" | "teachers" | "students" | "lessons" | "blogs" | "feedbacks" | "sessions" | "tasks" | "questions" | "contact" | "settings">("usage");
+  const [activeTab, setActiveTab] = useState<"usage" | "exams" | "teachers" | "students" | "lessons" | "blogs" | "feedbacks" | "sessions" | "tasks" | "questions" | "contact" | "settings">("exams");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
@@ -575,7 +575,6 @@ export default function AdminPage() {
         {/* Sidebar Nav */}
         <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
           {[
-            { key: "usage", label: "Kota & Kullanım", count: "⚡ Canlı", icon: "📊" },
             { key: "exams", label: "Deneme Sınavları", count: exams.length, icon: "🎯" },
             { key: "teachers", label: "Öğretmenler", count: teachers.length, icon: "👨‍🏫" },
             { key: "students", label: "Öğrenciler", count: students.length, icon: "🎓" },
@@ -587,6 +586,7 @@ export default function AdminPage() {
             { key: "sessions", label: "Canlı Dersler", count: liveSessions.length, icon: "🎥" },
             { key: "feedbacks", label: "Görüşler", count: feedbacks.length, icon: "💬" },
             { key: "settings", label: "Sistem & Ayarlar", count: 2, icon: "⚙️" },
+            { key: "usage", label: "Kota & Kullanım", count: "⚡ Canlı", icon: "📊" },
           ].map((t) => (
             <button
               key={t.key}
