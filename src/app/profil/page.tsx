@@ -1982,6 +1982,23 @@ export default function ProfilPage() {
   const [loading, setLoading] = useState(false);
   const [dbTeachers, setDbTeachers] = useState<any[]>([]);
 
+  // Email Verification States
+  const [verificationPending, setVerificationPending] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState("");
+  const [verificationCodeInput, setVerificationCodeInput] = useState("");
+  const [verificationLoading, setVerificationLoading] = useState(false);
+  const [verificationCountdown, setVerificationCountdown] = useState(60);
+  const [canResendVerification, setCanResendVerification] = useState(false);
+
+  useEffect(() => {
+    if (verificationPending && verificationCountdown > 0 && !canResendVerification) {
+      const timer = setTimeout(() => setVerificationCountdown((prev) => prev - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (verificationCountdown === 0) {
+      setCanResendVerification(true);
+    }
+  }, [verificationPending, verificationCountdown, canResendVerification]);
+
   const fetchTeacherDashboardData = useCallback(async (teacherId: number) => {
     try {
       const [lRes, bRes, fRes, tTaskRes, qRes] = await Promise.all([
@@ -2158,6 +2175,14 @@ export default function ProfilPage() {
       const res = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const data = await res.json();
       if (data.success) {
+        if (data.requireVerification) {
+          setVerificationEmail(payload.email);
+          setVerificationPending(true);
+          setVerificationCountdown(60);
+          setCanResendVerification(false);
+          showMsg("✉️ Kayıt oluşturuldu! Lütfen e-postanıza gönderilen 6 haneli kodu giriniz.", "success");
+          return;
+        }
         const student = data.student;
         setStudentProfile(student);
         setStudentEditForm({ name: student.name, phone: student.phone, avatar: student.avatar || "", targetTag: student.targetTag || "TYT" });
@@ -2167,6 +2192,98 @@ export default function ProfilPage() {
         showMsg(authMode === "login" ? "Giriş başarılı!" : "Kayıt başarıyla oluşturuldu!", "success");
       } else { showMsg(data.error || "Giriş/Kayıt işlemi başarısız.", "error"); }
     } catch { showMsg("Bağlantı hatası oluştu.", "error"); } finally { setLoading(false); }
+  };
+
+  const handleTeacherAuth = async (e: React.FormEvent) => {
+    e.preventDefault(); setLoading(true);
+    try {
+      const endpoint = authMode === "login" ? "/api/auth/login/ogretmen" : "/api/auth/register/ogretmen";
+      const payload = authMode === "login" ? { email: teacherForm.email, password: teacherForm.password } : teacherForm;
+      const res = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (data.success) {
+        if (data.requireVerification) {
+          setVerificationEmail(payload.email);
+          setVerificationPending(true);
+          setVerificationCountdown(60);
+          setCanResendVerification(false);
+          showMsg("✉️ Kayıt oluşturuldu! Lütfen e-postanıza gönderilen 6 haneli kodu giriniz.", "success");
+          return;
+        }
+        const teacher = data.teacher; setTeacherProfile(teacher);
+        setTeacherEditForm({ name: teacher.name, phone: teacher.phone, branch: teacher.branch, egitim: teacher.egitim || "", ozgecmis: teacher.ozgecmis || "", linkedin: teacher.linkedin || "", youtube: teacher.youtube || "", avatar: teacher.avatar || "" });
+        const storage = rememberMe ? localStorage : sessionStorage;
+        storage.setItem("derslinex_role", "teacher"); storage.setItem("derslinex_user", JSON.stringify(teacher));
+        showMsg(authMode === "login" ? "Giriş başarılı!" : "Başvurunuz alındı ve kayıt oluşturuldu!", "success");
+        fetchDbTeachers(); fetchTeacherDashboardData(teacher.id);
+      } else { showMsg(data.error || "Giriş/Kayıt işlemi başarısız.", "error"); }
+    } catch { showMsg("Bağlantı hatası oluştu.", "error"); } finally { setLoading(false); }
+  };
+
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!verificationCodeInput || verificationCodeInput.trim().length < 6) {
+      showMsg("Lütfen 6 haneli onay kodunu giriniz.", "error");
+      return;
+    }
+    setVerificationLoading(true);
+    try {
+      const res = await fetch("/api/auth/verify-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: verificationEmail, code: verificationCodeInput.trim() }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        const user = data.user;
+        const userRole = data.role;
+        if (userRole === "student") {
+          setStudentProfile(user);
+          setStudentEditForm({ name: user.name, phone: user.phone, avatar: user.avatar || "", targetTag: user.targetTag || "TYT" });
+          setRole("student");
+          fetchStudentSessions(user.id);
+        } else {
+          setTeacherProfile(user);
+          setTeacherEditForm({ name: user.name, phone: user.phone, branch: user.branch, egitim: user.egitim || "", ozgecmis: user.ozgecmis || "", linkedin: user.linkedin || "", youtube: user.youtube || "", avatar: user.avatar || "" });
+          setRole("teacher");
+          fetchDbTeachers();
+          fetchTeacherDashboardData(user.id);
+        }
+        const storage = rememberMe ? localStorage : sessionStorage;
+        storage.setItem("derslinex_role", userRole);
+        storage.setItem("derslinex_user", JSON.stringify(user));
+        window.dispatchEvent(new Event("derslinex_auth_change"));
+        setVerificationPending(false);
+        showMsg("🎉 E-posta adresiniz doğrulandı! Hoş geldiniz.", "success");
+      } else {
+        showMsg(data.error || "Geçersiz onay kodu.", "error");
+      }
+    } catch {
+      showMsg("Bağlantı hatası.", "error");
+    } finally {
+      setVerificationLoading(false);
+    }
+  };
+
+  const handleResendVerificationCode = async () => {
+    if (!verificationEmail) return;
+    try {
+      const res = await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: verificationEmail }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setCanResendVerification(false);
+        setVerificationCountdown(60);
+        showMsg("✅ Yeni 6 haneli onay kodunuz e-posta adresinize gönderildi!", "success");
+      } else {
+        showMsg(data.error || "Kod gönderilemedi.", "error");
+      }
+    } catch {
+      showMsg("Bağlantı hatası.", "error");
+    }
   };
 
   const handleStudentUpdate = async (e: React.FormEvent) => {
@@ -2183,24 +2300,6 @@ export default function ProfilPage() {
         setEditingStudent(false); showMsg("Profil bilgileriniz başarıyla güncellendi!", "success");
       } else { showMsg(data.error || "Profil güncellenemedi.", "error"); }
     } catch { showMsg("Bağlantı hatası.", "error"); } finally { setLoading(false); }
-  };
-
-  const handleTeacherAuth = async (e: React.FormEvent) => {
-    e.preventDefault(); setLoading(true);
-    try {
-      const endpoint = authMode === "login" ? "/api/auth/login/ogretmen" : "/api/auth/register/ogretmen";
-      const payload = authMode === "login" ? { email: teacherForm.email, password: teacherForm.password } : teacherForm;
-      const res = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-      const data = await res.json();
-      if (data.success) {
-        const teacher = data.teacher; setTeacherProfile(teacher);
-        setTeacherEditForm({ name: teacher.name, phone: teacher.phone, branch: teacher.branch, egitim: teacher.egitim || "", ozgecmis: teacher.ozgecmis || "", linkedin: teacher.linkedin || "", youtube: teacher.youtube || "", avatar: teacher.avatar || "" });
-        const storage = rememberMe ? localStorage : sessionStorage;
-        storage.setItem("derslinex_role", "teacher"); storage.setItem("derslinex_user", JSON.stringify(teacher));
-        showMsg(authMode === "login" ? "Giriş başarılı!" : "Başvurunuz alındı ve kayıt oluşturuldu!", "success");
-        fetchDbTeachers(); fetchTeacherDashboardData(teacher.id);
-      } else { showMsg(data.error || "Giriş/Kayıt işlemi başarısız.", "error"); }
-    } catch { showMsg("Bağlantı hatası oluştu.", "error"); } finally { setLoading(false); }
   };
 
   const handleTeacherUpdate = async (e: React.FormEvent) => {
@@ -2402,233 +2501,307 @@ export default function ProfilPage() {
           {/* Glassmorphism Card */}
           <div className="bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-3xl p-7 shadow-2xl shadow-black/40">
 
-            {/* Role Tab Switcher */}
-            <div className="grid grid-cols-2 bg-white/[0.04] border border-white/8 p-1 rounded-2xl mb-6">
-              <button
-                onClick={() => { setRole("student"); setAuthMode("login"); }}
-                className={`py-2.5 px-4 text-xs sm:text-sm font-black rounded-xl transition-all duration-250 btn-press ${
-                  role === "student"
-                    ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-900/50"
-                    : "text-slate-400 hover:text-white hover:bg-white/5"
-                }`}
-              >🎓 Öğrenci</button>
-              <button
-                onClick={() => { setRole("teacher"); setAuthMode("login"); }}
-                className={`py-2.5 px-4 text-xs sm:text-sm font-black rounded-xl transition-all duration-250 btn-press ${
-                  role === "teacher"
-                    ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-900/50"
-                    : "text-slate-400 hover:text-white hover:bg-white/5"
-                }`}
-              >👨‍🏫 Öğretmen</button>
-            </div>
-
-            {/* Login / Register Toggle */}
-            <div className="flex items-center justify-center gap-1 mb-5">
-              <span className="text-xs text-slate-500 font-bold">
-                {authMode === "login" ? "Hesabınız yok mu?" : "Zaten üye misiniz?"}
-              </span>
-              <button
-                onClick={() => setAuthMode(authMode === "login" ? "register" : "login")}
-                className={`text-xs font-black underline ml-1 transition-colors ${
-                  role === "teacher" ? "text-emerald-400 hover:text-emerald-300" : "text-indigo-400 hover:text-indigo-300"
-                }`}
-              >
-                {authMode === "login" ? "Kayıt Olun" : "Giriş Yapın"}
-              </button>
-            </div>
-
-            {/* Form Header */}
-            <div className="flex items-center gap-3 mb-5 pb-5 border-b border-white/8">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${
-                role === "teacher"
-                  ? "bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30"
-                  : "bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30"
-              }`}>
-                {role === "student" ? "🎓" : "👨‍🏫"}
-              </div>
-              <div>
-                <h3 className="text-white font-black text-sm">
-                  {role === "student" ? "Öğrenci" : "Öğretmen"}{" "}
-                  {authMode === "login" ? "Giriş Paneli" : "Kayıt Paneli"}
-                </h3>
-              </div>
-            </div>
-
-            {/* Student Form */}
-            {role === "student" ? (
-              <form onSubmit={handleStudentAuth} className="space-y-4">
-                {authMode === "register" && (
-                  <>
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Adı Soyadı</label>
-                        <input
-                          type="text" required
-                          value={studentForm.name}
-                          onChange={(e) => setStudentForm({ ...studentForm, name: e.target.value })}
-                          className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
-                          placeholder="Ad Soyad"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Telefon</label>
-                        <input
-                          type="text" required
-                          placeholder="05xx xxx xx xx"
-                          value={studentForm.phone}
-                          onChange={(e) => setStudentForm({ ...studentForm, phone: e.target.value })}
-                          className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">🎯 Hedef Sınav Tagı</label>
-                      <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                        {["TYT", "AYT", "YKS", "LGS", "KPSS"].map((tag) => (
-                          <button
-                            type="button"
-                            key={tag}
-                            onClick={() => setStudentForm({ ...studentForm, targetTag: tag })}
-                            className={`py-2 rounded-xl text-xs font-black border transition-all ${
-                              studentForm.targetTag === tag
-                                ? "bg-indigo-600 border-indigo-400 text-white shadow-md shadow-indigo-600/30"
-                                : "bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10"
-                            }`}
-                          >
-                            {tag}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
-                <div>
-                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">E-posta Adresi</label>
-                  <input
-                    type="email" required
-                    value={studentForm.email}
-                    onChange={(e) => setStudentForm({ ...studentForm, email: e.target.value })}
-                    className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
-                    placeholder="ornek@email.com"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Şifre</label>
-                  <input
-                    type="password" required
-                    value={studentForm.password}
-                    onChange={(e) => setStudentForm({ ...studentForm, password: e.target.value })}
-                    className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
-                    placeholder="••••••••"
-                  />
-                </div>
-                <div className="flex items-center justify-between pt-1">
-                  <div className="flex items-center gap-2">
-                    <input type="checkbox" id="studentRemember" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 rounded accent-indigo-500" />
-                    <label htmlFor="studentRemember" className="text-xs text-slate-500 font-bold select-none cursor-pointer">Beni Hatırla</label>
+            {verificationPending ? (
+              <div className="space-y-6 animate-in fade-in duration-300">
+                <div className="text-center pb-4 border-b border-white/8">
+                  <div className="w-14 h-14 rounded-2xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-3xl mx-auto mb-3">
+                    ✉️
                   </div>
-                  {authMode === "login" && (
-                    <Link href="/sifremi-unuttum" className="text-xs text-indigo-400 font-black hover:text-indigo-300 transition-colors">
-                      Şifremi Unuttum?
-                    </Link>
-                  )}
+                  <h3 className="text-white font-black text-lg">E-Posta Doğrulama</h3>
+                  <p className="text-xs text-slate-400 font-medium mt-1.5 leading-relaxed">
+                    <span className="font-mono text-rose-400 font-bold">{verificationEmail}</span> adresinize 6 haneli bir onay kodu gönderdik.
+                  </p>
                 </div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="btn-press w-full bg-gradient-to-r from-indigo-600 via-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black py-3.5 rounded-xl text-sm transition-all duration-200 shadow-lg shadow-indigo-900/50 hover:shadow-indigo-500/30 hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed mt-2"
-                >
-                  {loading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      İşlem yapılıyor...
+
+                <form onSubmit={handleVerifyCode} className="space-y-4">
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest text-center mb-2">
+                      6 Haneli Onay Kodunuzu Giriniz
+                    </label>
+                    <input
+                      type="text"
+                      maxLength={7}
+                      required
+                      value={verificationCodeInput}
+                      onChange={(e) => setVerificationCodeInput(e.target.value)}
+                      placeholder="Örn: 749 216"
+                      className="input-glow w-full bg-white/[0.05] border border-white/10 text-center text-3xl font-mono font-black tracking-widest text-rose-400 px-4 py-4 rounded-2xl placeholder-slate-600 focus:outline-none focus:border-rose-500 transition"
+                    />
+                    <span className="text-[11px] text-slate-500 block text-center mt-2">
+                      Gelen kutunuzu (veya spam klasörünüzü) kontrol ediniz.
                     </span>
-                  ) : authMode === "login" ? "🚀 Giriş Yap" : "✨ Hesap Oluştur"}
-                </button>
-              </form>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={verificationLoading}
+                    className="btn-press w-full bg-gradient-to-r from-rose-600 via-rose-600 to-orange-600 hover:from-rose-500 hover:to-orange-500 text-white font-black py-3.5 rounded-xl text-sm transition shadow-lg shadow-rose-900/40 disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {verificationLoading ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Doğrulanıyor...
+                      </span>
+                    ) : (
+                      "🚀 Kodu Onayla & Hesabı Aç"
+                    )}
+                  </button>
+                </form>
+
+                <div className="pt-3 text-center space-y-2.5 border-t border-white/8">
+                  <button
+                    type="button"
+                    onClick={handleResendVerificationCode}
+                    disabled={!canResendVerification}
+                    className="text-xs font-bold text-rose-400 hover:text-rose-300 transition disabled:opacity-40"
+                  >
+                    {canResendVerification
+                      ? "🔄 Yeni Kod Gönder"
+                      : `⏳ Kodu tekrar göndermek için bekleyin (${verificationCountdown}s)`}
+                  </button>
+
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setVerificationPending(false)}
+                      className="text-xs text-slate-500 hover:text-slate-300 transition"
+                    >
+                      ← Bilgileri Değiştir / Geri Dön
+                    </button>
+                  </div>
+                </div>
+              </div>
             ) : (
-              <form onSubmit={handleTeacherAuth} className="space-y-4">
-                {authMode === "register" && (
-                  <>
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Adı Soyadı</label>
-                        <input
-                          type="text" required
-                          value={teacherForm.name}
-                          onChange={(e) => setTeacherForm({ ...teacherForm, name: e.target.value })}
-                          className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
-                          placeholder="Ad Soyad"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Telefon</label>
-                        <input
-                          type="text" required
-                          placeholder="05xx xxx xx xx"
-                          value={teacherForm.phone}
-                          onChange={(e) => setTeacherForm({ ...teacherForm, phone: e.target.value })}
-                          className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
-                        />
-                      </div>
-                    </div>
+              <>
+                {/* Role Tab Switcher */}
+                <div className="grid grid-cols-2 bg-white/[0.04] border border-white/8 p-1 rounded-2xl mb-6">
+                  <button
+                    onClick={() => { setRole("student"); setAuthMode("login"); }}
+                    className={`py-2.5 px-4 text-xs sm:text-sm font-black rounded-xl transition-all duration-250 btn-press ${
+                      role === "student"
+                        ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-900/50"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >🎓 Öğrenci</button>
+                  <button
+                    onClick={() => { setRole("teacher"); setAuthMode("login"); }}
+                    className={`py-2.5 px-4 text-xs sm:text-sm font-black rounded-xl transition-all duration-250 btn-press ${
+                      role === "teacher"
+                        ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-900/50"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >👨‍🏫 Öğretmen</button>
+                </div>
+
+                {/* Login / Register Toggle */}
+                <div className="flex items-center justify-center gap-1 mb-5">
+                  <span className="text-xs text-slate-500 font-bold">
+                    {authMode === "login" ? "Hesabınız yok mu?" : "Zaten üye misiniz?"}
+                  </span>
+                  <button
+                    onClick={() => setAuthMode(authMode === "login" ? "register" : "login")}
+                    className={`text-xs font-black underline ml-1 transition-colors ${
+                      role === "teacher" ? "text-emerald-400 hover:text-emerald-300" : "text-indigo-400 hover:text-indigo-300"
+                    }`}
+                  >
+                    {authMode === "login" ? "Kayıt Olun" : "Giriş Yapın"}
+                  </button>
+                </div>
+
+                {/* Form Header */}
+                <div className="flex items-center gap-3 mb-5 pb-5 border-b border-white/8">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${
+                    role === "teacher"
+                      ? "bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30"
+                      : "bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30"
+                  }`}>
+                    {role === "student" ? "🎓" : "👨‍🏫"}
+                  </div>
+                  <div>
+                    <h3 className="text-white font-black text-sm">
+                      {role === "student" ? "Öğrenci" : "Öğretmen"}{" "}
+                      {authMode === "login" ? "Giriş Paneli" : "Kayıt Paneli"}
+                    </h3>
+                  </div>
+                </div>
+
+                {/* Student Form */}
+                {role === "student" ? (
+                  <form onSubmit={handleStudentAuth} className="space-y-4">
+                    {authMode === "register" && (
+                      <>
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Adı Soyadı</label>
+                            <input
+                              type="text" required
+                              value={studentForm.name}
+                              onChange={(e) => setStudentForm({ ...studentForm, name: e.target.value })}
+                              className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                              placeholder="Ad Soyad"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Telefon</label>
+                            <input
+                              type="text" required
+                              placeholder="05xx xxx xx xx"
+                              value={studentForm.phone}
+                              onChange={(e) => setStudentForm({ ...studentForm, phone: e.target.value })}
+                              className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">🎯 Hedef Sınav Tagı</label>
+                          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                            {["TYT", "AYT", "YKS", "LGS", "KPSS"].map((tag) => (
+                              <button
+                                type="button"
+                                key={tag}
+                                onClick={() => setStudentForm({ ...studentForm, targetTag: tag })}
+                                className={`py-2 rounded-xl text-xs font-black border transition-all ${
+                                  studentForm.targetTag === tag
+                                    ? "bg-indigo-600 border-indigo-400 text-white shadow-md shadow-indigo-600/30"
+                                    : "bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10"
+                                }`}
+                              >
+                                {tag}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    )}
                     <div>
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Uzmanlık Branşınız</label>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">E-posta Adresi</label>
                       <input
-                        type="text" required
-                        placeholder="Matematik, Fizik, İngilizce vb."
-                        value={teacherForm.branch}
-                        onChange={(e) => setTeacherForm({ ...teacherForm, branch: e.target.value })}
+                        type="email" required
+                        value={studentForm.email}
+                        onChange={(e) => setStudentForm({ ...studentForm, email: e.target.value })}
                         className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                        placeholder="ornek@email.com"
                       />
                     </div>
-                  </>
-                )}
-                <div>
-                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">E-posta Adresi</label>
-                  <input
-                    type="email" required
-                    value={teacherForm.email}
-                    onChange={(e) => setTeacherForm({ ...teacherForm, email: e.target.value })}
-                    className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
-                    placeholder="ornek@email.com"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Şifre</label>
-                  <input
-                    type="password" required
-                    value={teacherForm.password}
-                    onChange={(e) => setTeacherForm({ ...teacherForm, password: e.target.value })}
-                    className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
-                    placeholder="••••••••"
-                  />
-                </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Şifre</label>
+                      <input
+                        type="password" required
+                        value={studentForm.password}
+                        onChange={(e) => setStudentForm({ ...studentForm, password: e.target.value })}
+                        className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                        placeholder="••••••••"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between pt-1">
+                      <div className="flex items-center gap-2">
+                        <input type="checkbox" id="studentRemember" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 rounded accent-indigo-500" />
+                        <label htmlFor="studentRemember" className="text-xs text-slate-500 font-bold select-none cursor-pointer">Beni Hatırla</label>
+                      </div>
+                      {authMode === "login" && (
+                        <Link href="/sifremi-unuttum" className="text-xs text-indigo-400 font-black hover:text-indigo-300 transition-colors">
+                          Şifremi Unuttum?
+                        </Link>
+                      )}
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="btn-press w-full bg-gradient-to-r from-indigo-600 via-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black py-3.5 rounded-xl text-sm transition-all duration-200 shadow-lg shadow-indigo-900/50 hover:shadow-indigo-500/30 hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+                    >
+                      {loading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          İşlem yapılıyor...
+                        </span>
+                      ) : authMode === "login" ? "🚀 Giriş Yap" : "✨ Hesap Oluştur"}
+                    </button>
+                  </form>
+                ) : (
+                  <form onSubmit={handleTeacherAuth} className="space-y-4">
+                    {authMode === "register" && (
+                      <>
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Adı Soyadı</label>
+                            <input
+                              type="text" required
+                              value={teacherForm.name}
+                              onChange={(e) => setTeacherForm({ ...teacherForm, name: e.target.value })}
+                              className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                              placeholder="Ad Soyad"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Telefon</label>
+                            <input
+                              type="text" required
+                              placeholder="05xx xxx xx xx"
+                              value={teacherForm.phone}
+                              onChange={(e) => setTeacherForm({ ...teacherForm, phone: e.target.value })}
+                              className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Uzmanlık Branşınız</label>
+                          <input
+                            type="text" required
+                            placeholder="Matematik, Fizik, İngilizce vb."
+                            value={teacherForm.branch}
+                            onChange={(e) => setTeacherForm({ ...teacherForm, branch: e.target.value })}
+                            className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                          />
+                        </div>
+                      </>
+                    )}
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">E-posta Adresi</label>
+                      <input
+                        type="email" required
+                        value={teacherForm.email}
+                        onChange={(e) => setTeacherForm({ ...teacherForm, email: e.target.value })}
+                        className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                        placeholder="ornek@email.com"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Şifre</label>
+                      <input
+                        type="password" required
+                        value={teacherForm.password}
+                        onChange={(e) => setTeacherForm({ ...teacherForm, password: e.target.value })}
+                        className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                        placeholder="••••••••"
+                      />
+                    </div>
 
-                <div className="flex items-center justify-between pt-1">
-                  <div className="flex items-center gap-2">
-                    <input type="checkbox" id="teacherRemember" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 rounded accent-emerald-500" />
-                    <label htmlFor="teacherRemember" className="text-xs text-slate-500 font-bold select-none cursor-pointer">Beni Hatırla</label>
-                  </div>
-                  {authMode === "login" && (
-                    <Link href="/sifremi-unuttum" className="text-xs text-emerald-400 font-black hover:text-emerald-300 transition-colors">
-                      Şifremi Unuttum?
-                    </Link>
-                  )}
-                </div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="btn-press w-full bg-gradient-to-r from-emerald-600 via-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black py-3.5 rounded-xl text-sm transition-all duration-200 shadow-lg shadow-emerald-900/50 hover:shadow-emerald-500/30 hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed mt-2"
-                >
-                  {loading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      İşlem yapılıyor...
-                    </span>
-                  ) : authMode === "login" ? "🚀 Giriş Yap" : "✨ Başvuru Yap & Kaydol"}
-                </button>
-              </form>
+                    <div className="flex items-center justify-between pt-1">
+                      <div className="flex items-center gap-2">
+                        <input type="checkbox" id="teacherRemember" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 rounded accent-emerald-500" />
+                        <label htmlFor="teacherRemember" className="text-xs text-slate-500 font-bold select-none cursor-pointer">Beni Hatırla</label>
+                      </div>
+                      {authMode === "login" && (
+                        <Link href="/sifremi-unuttum" className="text-xs text-emerald-400 font-black hover:text-emerald-300 transition-colors">
+                          Şifremi Unuttum?
+                        </Link>
+                      )}
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="btn-press w-full bg-gradient-to-r from-emerald-600 via-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black py-3.5 rounded-xl text-sm transition-all duration-200 shadow-lg shadow-emerald-900/50 hover:shadow-emerald-500/30 hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+                    >
+                      {loading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          İşlem yapılıyor...
+                        </span>
+                      ) : authMode === "login" ? "🚀 Giriş Yap" : "✨ Başvuru Yap & Kaydol"}
+                    </button>
+                  </form>
+                )}
+              </>
             )}
           </div>
 

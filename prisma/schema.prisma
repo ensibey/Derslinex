@@ -8,48 +8,50 @@ generator client {
 }
 
 model Student {
-  id           Int                  @id @default(autoincrement())
-  name         String
-  phone        String
-  email        String
-  password     String
-  avatar       String?
-  targetTag    String?              @default("TYT")
-  status       String               @default("Beklemede")
-  isBanned     Boolean              @default(false)
-  createdAt    DateTime             @default(now())
-  sessions     SessionParticipant[]
-  feedbacks    SessionFeedback[]    @relation("StudentFeedback")
-  quizResults  StudentQuizResult[]
-  attempts     StudentQuestionAttempt[]
-  examAttempts StudentExamAttempt[]
-  trialResults StudentTrialResult[]
-  topicProgress StudentTopicProgress[]
+  id              Int                  @id @default(autoincrement())
+  name            String
+  phone           String
+  email           String
+  password        String
+  avatar          String?
+  targetTag       String?              @default("TYT")
+  status          String               @default("Beklemede")
+  isEmailVerified Boolean              @default(false)
+  isBanned        Boolean              @default(false)
+  createdAt       DateTime             @default(now())
+  sessions        SessionParticipant[]
+  feedbacks       SessionFeedback[]    @relation("StudentFeedback")
+  quizResults     StudentQuizResult[]
+  attempts        StudentQuestionAttempt[]
+  examAttempts    StudentExamAttempt[]
+  trialResults    StudentTrialResult[]
+  topicProgress   StudentTopicProgress[]
 }
 
 model Teacher {
-  id           Int               @id @default(autoincrement())
-  name         String
-  phone        String
-  email        String
-  password     String
-  branch       String
-  egitim       String?
-  ozgecmis     String?
-  avatar       String?
-  status       String            @default("Beklemede")
-  isBanned     Boolean           @default(false)
-  points       Int               @default(0)
-  linkedin     String?
-  youtube      String?
-  createdAt    DateTime          @default(now())
-  liveSessions LiveSession[]
-  feedbacksGiven SessionFeedback[] @relation("TeacherFeedback")
-  tasks        TeacherTask[]
-  questions    Question[]
+  id              Int               @id @default(autoincrement())
+  name            String
+  phone           String
+  email           String
+  password        String
+  branch          String
+  egitim          String?
+  ozgecmis        String?
+  avatar          String?
+  status          String            @default("Beklemede")
+  isEmailVerified Boolean           @default(false)
+  isBanned        Boolean           @default(false)
+  points          Int               @default(0)
+  linkedin        String?
+  youtube         String?
+  createdAt       DateTime          @default(now())
+  liveSessions    LiveSession[]
+  feedbacksGiven  SessionFeedback[] @relation("TeacherFeedback")
+  tasks           TeacherTask[]
+  questions       Question[]
   studentFeedbacks Feedback[]
-  lessonOffers LessonOffer[]
-  faqs         TeacherFAQ[]
+  lessonOffers    LessonOffer[]
+  faqs            TeacherFAQ[]
 }
 
 model TeacherTask {
@@ -91,6 +93,20 @@ model Question {
 
   @@index([subject, topic, difficulty])
   @@index([status])
+}
+
+model EmailVerificationToken {
+  id        Int      @id @default(autoincrement())
+  email     String
+  code      String
+  token     String   @unique
+  role      String   @default("student")
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([token])
+  @@index([code])
 }
 
 model PasswordResetToken {
