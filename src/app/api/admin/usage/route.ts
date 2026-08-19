@@ -71,14 +71,13 @@ export async function GET(request: Request) {
         icon: "🚀",
         plan: "Starter / Web Service",
         metricName: "Çalışma Süresi & Trafik",
-        used: 100, // percentage or hours
+        used: 100,
         limit: 750,
         unit: "Saat/Ay",
         percentage: 13,
         bandwidthUsed: 0.85,
         bandwidthLimit: 100,
         bandwidthUnit: "GB",
-        cost: "$0.00",
         notes: "Frankfurt (EU Central) - Otomatik CI/CD bağlı ve %100 canlıda.",
       },
       {
@@ -90,11 +89,10 @@ export async function GET(request: Request) {
         plan: "Free Tier",
         metricName: "Veritabanı Depolama",
         used: estimatedDbSizeMB,
-        limit: 512, // 512 MB
+        limit: 512,
         unit: "MB",
         percentage: Math.max(1, Number(((estimatedDbSizeMB / 512) * 100).toFixed(1))),
         totalRecords: totalDbRecords,
-        cost: "$0.00",
         notes: `Toplam ${totalDbRecords.toLocaleString("tr-TR")} kayıt (${studentCount} öğrenci, ${teacherCount} öğretmen, ${questionCount} soru, ${chatMessageCount} mesaj).`,
       },
       {
@@ -112,7 +110,6 @@ export async function GET(request: Request) {
         activeSessions: liveSessions.filter(s => s.status === "LIVE").length,
         completedSessions: endedSessions,
         cameraExams: examAttemptsWithCamera,
-        cost: "$0.00",
         notes: `${endedSessions} tamamlanan canlı ders + ${examAttemptsWithCamera} kamera gözetmenli sınav yapıldı.`,
       },
       {
@@ -123,7 +120,7 @@ export async function GET(request: Request) {
         icon: "☁️",
         plan: "Standard Free Tier",
         metricName: "Ders Kayıt Depolaması",
-        used: Number((endedSessions * 0.12).toFixed(2)), // ~120MB per recorded session
+        used: Number((endedSessions * 0.12).toFixed(2)),
         limit: 10,
         unit: "GB",
         percentage: Math.max(0.5, Number((((endedSessions * 0.12) / 10) * 100).toFixed(1))),
@@ -133,8 +130,7 @@ export async function GET(request: Request) {
         readsLimit: 10000000,
         writesUsed: endedSessions,
         writesLimit: 1000000,
-        cost: "$0.00",
-        notes: "Egress (video izleme/indirme) bant genişliği sınırsız ve $0 ücretlidir.",
+        notes: "Egress (video izleme/indirme) bant genişliği sınırsız ve ücretsizdir.",
       },
       {
         id: "cloudinary",
@@ -149,7 +145,6 @@ export async function GET(request: Request) {
         unit: "GB / Kredi",
         percentage: Math.max(1, Number(((((questionsWithImages * 0.4 + teacherCount * 0.2) / 1000) / 25) * 100).toFixed(1))),
         totalImages: questionsWithImages + teacherCount,
-        cost: "$0.00",
         notes: `${questionsWithImages} soru görseli ve profil resimleri otomatik WebP/AVIF olarak dağıtılıyor.`,
       },
       {
@@ -165,7 +160,6 @@ export async function GET(request: Request) {
         unit: "E-posta",
         percentage: Math.max(1, Number((((Math.max(6, contactCount * 2 + studentCount + teacherCount)) / 3000) * 100).toFixed(1))),
         dailyLimit: 100,
-        cost: "$0.00",
         notes: "Şifre sıfırlama, ders hatırlatma mailleri ve sistem bildirimleri gönderiliyor.",
       },
       {
@@ -182,7 +176,6 @@ export async function GET(request: Request) {
         percentage: 0,
         sslStatus: "Full SSL Aktif",
         cachedRatio: "%68",
-        cost: "$0.00",
         notes: "derslinex.com ve www.derslinex.com Cloudflare DDoS ve SSL koruması altında.",
       }
     ];
@@ -191,7 +184,6 @@ export async function GET(request: Request) {
       success: true,
       data: {
         lastUpdated: new Date().toISOString(),
-        totalEstimatedCost: "$0.00",
         statusHealth: "Mükemmel (Tüm Servisler Yeşil)",
         services,
         summary: {

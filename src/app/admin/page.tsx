@@ -764,17 +764,17 @@ export default function AdminPage() {
 
                 {/* Top 4 Hero KPI Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="bg-gradient-to-br from-emerald-950/40 via-slate-900/90 to-emerald-900/20 border border-emerald-500/30 rounded-3xl p-5 shadow-xl relative overflow-hidden">
-                    <div className="absolute right-3 top-3 w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-2xl border border-emerald-500/20">
-                      💰
+                  <div className="bg-gradient-to-br from-purple-950/40 via-slate-900/90 to-purple-900/20 border border-purple-500/30 rounded-3xl p-5 shadow-xl relative overflow-hidden">
+                    <div className="absolute right-3 top-3 w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-2xl border border-purple-500/20">
+                      🚀
                     </div>
-                    <span className="text-[11px] font-black text-emerald-400 uppercase tracking-wider block">Aylık Toplam Maliyet</span>
+                    <span className="text-[11px] font-black text-purple-400 uppercase tracking-wider block">Render Web Servisi</span>
                     <div className="text-3xl font-black text-white mt-2 flex items-baseline gap-2">
-                      <span>$0.00</span>
-                      <span className="text-xs text-emerald-300 font-bold bg-emerald-500/20 px-2 py-0.5 rounded-full">100% Ücretsiz Plan</span>
+                      <span>200 OK</span>
+                      <span className="text-xs text-purple-300 font-bold bg-purple-500/20 px-2 py-0.5 rounded-full">Frankfurt Live</span>
                     </div>
                     <p className="text-[11px] text-slate-400 font-medium mt-2">
-                      Tüm servisler mevcut kotaların oldukça altında ve sıfır ek maliyetle çalışıyor.
+                      Otomatik GitHub CI/CD ile kesintisiz yayında.
                     </p>
                   </div>
 
@@ -1239,8 +1239,7 @@ export default function AdminPage() {
                           <th className="pb-3">Aylık Ücretsiz Limit</th>
                           <th className="pb-3">Mevcut Kullanım</th>
                           <th className="pb-3">Kalan Kota</th>
-                          <th className="pb-3">Doluluk Durumu</th>
-                          <th className="pb-3 text-right">Tahmini Maliyet</th>
+                          <th className="pb-3 text-right">Doluluk Durumu</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/5 font-medium">
@@ -1252,12 +1251,11 @@ export default function AdminPage() {
                           <td className="py-3.5 text-slate-300 font-bold">10 GB</td>
                           <td className="py-3.5 text-amber-300 font-mono font-bold">{((liveSessions.filter(s => s.status === "ENDED").length) * 0.12).toFixed(2)} GB</td>
                           <td className="py-3.5 text-emerald-400 font-mono font-bold">{(10 - ((liveSessions.filter(s => s.status === "ENDED").length) * 0.12)).toFixed(2)} GB</td>
-                          <td className="py-3.5">
+                          <td className="py-3.5 text-right">
                             <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-full text-[10px] font-black">
                               %1 Dolu (Güvenli)
                             </span>
                           </td>
-                          <td className="py-3.5 text-right font-black text-emerald-400">$0.00</td>
                         </tr>
 
                         <tr className="hover:bg-white/5 transition-colors">
@@ -1268,12 +1266,11 @@ export default function AdminPage() {
                           <td className="py-3.5 text-slate-300 font-bold">10.000 Dakika</td>
                           <td className="py-3.5 text-rose-300 font-mono font-bold">{usageData?.summary?.estimatedVideoMinutes || 0} Dk</td>
                           <td className="py-3.5 text-emerald-400 font-mono font-bold">{Math.max(0, 10000 - (usageData?.summary?.estimatedVideoMinutes || 0))} Dk</td>
-                          <td className="py-3.5">
+                          <td className="py-3.5 text-right">
                             <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-full text-[10px] font-black">
                               %1 Dolu (Güvenli)
                             </span>
                           </td>
-                          <td className="py-3.5 text-right font-black text-emerald-400">$0.00</td>
                         </tr>
 
                         <tr className="hover:bg-white/5 transition-colors">
@@ -1284,12 +1281,11 @@ export default function AdminPage() {
                           <td className="py-3.5 text-slate-300 font-bold">512 MB</td>
                           <td className="py-3.5 text-cyan-300 font-mono font-bold">{usageData?.summary?.estimatedDbSizeMB || 1.2} MB</td>
                           <td className="py-3.5 text-emerald-400 font-mono font-bold">{(512 - (usageData?.summary?.estimatedDbSizeMB || 1.2)).toFixed(1)} MB</td>
-                          <td className="py-3.5">
+                          <td className="py-3.5 text-right">
                             <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-full text-[10px] font-black">
                               %0.2 Dolu (Güvenli)
                             </span>
                           </td>
-                          <td className="py-3.5 text-right font-black text-emerald-400">$0.00</td>
                         </tr>
 
                         <tr className="hover:bg-white/5 transition-colors">
@@ -1300,12 +1296,11 @@ export default function AdminPage() {
                           <td className="py-3.5 text-slate-300 font-bold">750 Saat / Ay</td>
                           <td className="py-3.5 text-purple-300 font-mono font-bold">Kesintisiz Canlı</td>
                           <td className="py-3.5 text-emerald-400 font-mono font-bold">100 GB Bandwidth</td>
-                          <td className="py-3.5">
+                          <td className="py-3.5 text-right">
                             <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-full text-[10px] font-black">
                               %100 Canlıda (Güvenli)
                             </span>
                           </td>
-                          <td className="py-3.5 text-right font-black text-emerald-400">$0.00</td>
                         </tr>
 
                         <tr className="hover:bg-white/5 transition-colors">
@@ -1316,12 +1311,11 @@ export default function AdminPage() {
                           <td className="py-3.5 text-slate-300 font-bold">25 Kredi (~25 GB)</td>
                           <td className="py-3.5 text-blue-300 font-mono font-bold">~0.05 GB</td>
                           <td className="py-3.5 text-emerald-400 font-mono font-bold">~24.95 GB</td>
-                          <td className="py-3.5">
+                          <td className="py-3.5 text-right">
                             <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-full text-[10px] font-black">
                               %0.2 Dolu (Güvenli)
                             </span>
                           </td>
-                          <td className="py-3.5 text-right font-black text-emerald-400">$0.00</td>
                         </tr>
 
                         <tr className="hover:bg-white/5 transition-colors">
@@ -1332,12 +1326,11 @@ export default function AdminPage() {
                           <td className="py-3.5 text-slate-300 font-bold">3.000 Mail / Ay</td>
                           <td className="py-3.5 text-emerald-300 font-mono font-bold">{Math.max(6, contactMessages.length * 2 + students.length + teachers.length)} Mail</td>
                           <td className="py-3.5 text-emerald-400 font-mono font-bold">{3000 - Math.max(6, contactMessages.length * 2 + students.length + teachers.length)} Mail</td>
-                          <td className="py-3.5">
+                          <td className="py-3.5 text-right">
                             <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-full text-[10px] font-black">
                               %0.5 Dolu (Güvenli)
                             </span>
                           </td>
-                          <td className="py-3.5 text-right font-black text-emerald-400">$0.00</td>
                         </tr>
                       </tbody>
                     </table>
