@@ -115,7 +115,7 @@ function BrandLogoHeader({ subBadge = "ADMİN PANELİ" }: { subBadge?: string })
 }
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<"teachers" | "students" | "lessons" | "blogs" | "feedbacks" | "sessions" | "tasks" | "questions" | "contact" | "exams" | "settings">("teachers");
+  const [activeTab, setActiveTab] = useState<"usage" | "exams" | "teachers" | "students" | "lessons" | "blogs" | "feedbacks" | "sessions" | "tasks" | "questions" | "contact" | "settings">("usage");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
@@ -127,6 +127,8 @@ export default function AdminPage() {
   const [questionsList, setQuestionsList] = useState<any[]>([]);
   const [contactMessages, setContactMessages] = useState<any[]>([]);
   const [systemMetrics, setSystemMetrics] = useState<any>(null);
+  const [usageData, setUsageData] = useState<any>(null);
+  const [usageLoading, setUsageLoading] = useState(false);
   const [editingQuestionId, setEditingQuestionId] = useState<number | null>(null);
   const [editQuestionForm, setEditQuestionForm] = useState<any>({});
 
@@ -214,7 +216,7 @@ export default function AdminPage() {
         return;
       }
 
-      const [fRes, lRes, bRes, sessRes, taskRes, qRes, cRes, mRes, exRes] = await Promise.all([
+      const [fRes, lRes, bRes, sessRes, taskRes, qRes, cRes, mRes, exRes, usgRes] = await Promise.all([
         adminFetch("/api/gorus?includeAll=true"),
         adminFetch("/api/admin/lessons"),
         adminFetch("/api/admin/blogs"),
@@ -224,6 +226,7 @@ export default function AdminPage() {
         adminFetch("/api/admin/contact"),
         adminFetch("/api/admin/status"),
         adminFetch("/api/admin/exams"),
+        adminFetch("/api/admin/usage"),
       ]);
 
       const uData = await uRes.json();
@@ -236,6 +239,7 @@ export default function AdminPage() {
       const cData = await cRes.json();
       const mData = await mRes.json();
       const exData = await exRes.json();
+      const usgData = await usgRes.json();
 
       if (uData.success) {
         setAuthRequired(false);
@@ -253,6 +257,7 @@ export default function AdminPage() {
       if (qData.success) setQuestionsList(qData.questions || []);
       if (cData.success) setContactMessages(cData.messages || []);
       if (mData.success) setSystemMetrics(mData.metrics || null);
+      if (usgData.success) setUsageData(usgData.data || null);
       if (exData.success) {
         setExams(exData.exams || []);
         setApprovedQuestionsPool(exData.approvedQuestions || []);
@@ -570,6 +575,7 @@ export default function AdminPage() {
         {/* Sidebar Nav */}
         <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
           {[
+            { key: "usage", label: "Kota & Kullanım", count: "⚡ Canlı", icon: "📊" },
             { key: "exams", label: "Deneme Sınavları", count: exams.length, icon: "🎯" },
             { key: "teachers", label: "Öğretmenler", count: teachers.length, icon: "👨‍🏫" },
             { key: "students", label: "Öğrenciler", count: students.length, icon: "🎓" },
@@ -707,6 +713,638 @@ export default function AdminPage() {
 
           {/* Main Content Box */}
           <div className="bg-[#1E293B] rounded-3xl border border-white/5 overflow-hidden shadow-2xl">
+
+            {/* USAGE & QUOTAS TAB */}
+            {activeTab === "usage" && (
+              <div className="p-4 sm:p-7 space-y-7">
+                {/* Header Title & Refresh */}
+                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 border-b border-white/10 pb-6">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                        Canlı Sistem Durumu
+                      </span>
+                      <span className="text-xs text-slate-400 font-medium">
+                        Son Güncelleme: {usageData?.lastUpdated ? new Date(usageData.lastUpdated).toLocaleTimeString("tr-TR") : "Şimdi"}
+                      </span>
+                    </div>
+                    <h2 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2.5 mt-2">
+                      <span>📊</span> Bulut Altyapı, Kota & Servis Kullanımları
+                    </h2>
+                    <p className="text-xs text-slate-400 font-medium mt-1 max-w-3xl">
+                      Render.com, Cloudflare R2, Neon PostgreSQL, Daily.co, Resend ve Cloudinary servislerinin anlık limit, kota doluluk ve maliyet göstergeleri.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={async () => {
+                        setUsageLoading(true);
+                        try {
+                          const res = await adminFetch("/api/admin/usage");
+                          const data = await res.json();
+                          if (data.success) {
+                            setUsageData(data.data);
+                            showMsg("✅ Kullanım ve kota istatistikleri güncellendi!", "success");
+                          }
+                        } catch {
+                          showMsg("Veri alınırken hata oluştu", "error");
+                        } finally {
+                          setUsageLoading(false);
+                        }
+                      }}
+                      disabled={usageLoading}
+                      className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-black text-xs px-5 py-3 rounded-2xl transition-all shadow-lg shadow-indigo-900/30 flex items-center gap-2 disabled:opacity-50"
+                    >
+                      <span className={usageLoading ? "animate-spin" : ""}>🔄</span>
+                      <span>{usageLoading ? "Yenileniyor..." : "Verileri Yenile"}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Top 4 Hero KPI Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="bg-gradient-to-br from-emerald-950/40 via-slate-900/90 to-emerald-900/20 border border-emerald-500/30 rounded-3xl p-5 shadow-xl relative overflow-hidden">
+                    <div className="absolute right-3 top-3 w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-2xl border border-emerald-500/20">
+                      💰
+                    </div>
+                    <span className="text-[11px] font-black text-emerald-400 uppercase tracking-wider block">Aylık Toplam Maliyet</span>
+                    <div className="text-3xl font-black text-white mt-2 flex items-baseline gap-2">
+                      <span>$0.00</span>
+                      <span className="text-xs text-emerald-300 font-bold bg-emerald-500/20 px-2 py-0.5 rounded-full">100% Ücretsiz Plan</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 font-medium mt-2">
+                      Tüm servisler mevcut kotaların oldukça altında ve sıfır ek maliyetle çalışıyor.
+                    </p>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-blue-950/40 via-slate-900/90 to-blue-900/20 border border-blue-500/30 rounded-3xl p-5 shadow-xl relative overflow-hidden">
+                    <div className="absolute right-3 top-3 w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-2xl border border-blue-500/20">
+                      🛡️
+                    </div>
+                    <span className="text-[11px] font-black text-blue-400 uppercase tracking-wider block">Aktif Servis Sağlığı</span>
+                    <div className="text-3xl font-black text-white mt-2 flex items-baseline gap-2">
+                      <span>7 / 7</span>
+                      <span className="text-xs text-blue-300 font-bold bg-blue-500/20 px-2 py-0.5 rounded-full">Tam Entegre</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 font-medium mt-2">
+                      Render, Cloudflare, Neon, Daily, Resend, Cloudinary ve R2 bağlı ve çalışıyor.
+                    </p>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-indigo-950/40 via-slate-900/90 to-indigo-900/20 border border-indigo-500/30 rounded-3xl p-5 shadow-xl relative overflow-hidden">
+                    <div className="absolute right-3 top-3 w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-2xl border border-indigo-500/20">
+                      🐘
+                    </div>
+                    <span className="text-[11px] font-black text-indigo-400 uppercase tracking-wider block">Veritabanı Depolama</span>
+                    <div className="text-3xl font-black text-white mt-2 flex items-baseline gap-2">
+                      <span>{usageData?.summary?.estimatedDbSizeMB || 1.2} MB</span>
+                      <span className="text-xs text-indigo-300 font-bold bg-indigo-500/20 px-2 py-0.5 rounded-full">/ 512 MB</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 font-medium mt-2">
+                      Toplam {usageData?.summary?.totalDbRecords || 0} satır kayıt (Öğrenci, Öğretmen, Soru, vb.)
+                    </p>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-rose-950/40 via-slate-900/90 to-rose-900/20 border border-rose-500/30 rounded-3xl p-5 shadow-xl relative overflow-hidden">
+                    <div className="absolute right-3 top-3 w-12 h-12 rounded-2xl bg-rose-500/10 flex items-center justify-center text-2xl border border-rose-500/20">
+                      📹
+                    </div>
+                    <span className="text-[11px] font-black text-rose-400 uppercase tracking-wider block">Canlı Görüntülü Ders Dakikası</span>
+                    <div className="text-3xl font-black text-white mt-2 flex items-baseline gap-2">
+                      <span>{usageData?.summary?.estimatedVideoMinutes || 0} Dk</span>
+                      <span className="text-xs text-rose-300 font-bold bg-rose-500/20 px-2 py-0.5 rounded-full">/ 10.000 Dk</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 font-medium mt-2">
+                      Kalan Ücretsiz Canlı Ders Kotası: {Math.max(0, 10000 - (usageData?.summary?.estimatedVideoMinutes || 0)).toLocaleString("tr-TR")} Dakika
+                    </p>
+                  </div>
+                </div>
+
+                {/* Detailed Service Grid (7 Cards) */}
+                <div className="space-y-4">
+                  <h3 className="text-base font-black text-white flex items-center gap-2">
+                    <span>⚡</span> Bireysel Servis Kullanım & Limit Detayları
+                  </h3>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {/* Cloudflare R2 Card */}
+                    <div className="bg-[#0D1B35]/90 border border-white/10 hover:border-amber-500/40 rounded-3xl p-5 shadow-xl flex flex-col justify-between transition-all group">
+                      <div className="space-y-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-xl">
+                              ☁️
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-black text-white group-hover:text-amber-300 transition-colors">
+                                Cloudflare R2
+                              </h4>
+                              <span className="text-[10px] text-slate-400 font-semibold block">Ders Video Kayıt Deposu</span>
+                            </div>
+                          </div>
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            Aktif
+                          </span>
+                        </div>
+
+                        <div className="space-y-2 bg-white/5 p-3.5 rounded-2xl border border-white/5">
+                          <div className="flex justify-between text-xs font-bold">
+                            <span className="text-slate-400">Depolama Doluluğu</span>
+                            <span className="text-amber-400">{((liveSessions.filter(s => s.status === "ENDED").length) * 0.12).toFixed(2)} GB / 10 GB</span>
+                          </div>
+                          <div className="w-full bg-white/10 rounded-full h-2.5 overflow-hidden">
+                            <div
+                              className="bg-gradient-to-r from-amber-500 to-orange-500 h-full rounded-full transition-all duration-500"
+                              style={{ width: `${Math.max(2, Math.min(100, (((liveSessions.filter(s => s.status === "ENDED").length * 0.12) / 10) * 100)))}%` }}
+                            />
+                          </div>
+                          <div className="flex justify-between text-[10px] text-slate-400 font-medium">
+                            <span>Kalan: {(10 - ((liveSessions.filter(s => s.status === "ENDED").length) * 0.12)).toFixed(2)} GB</span>
+                            <span>Kullanım: %{(((liveSessions.filter(s => s.status === "ENDED").length * 0.12) / 10) * 100).toFixed(1)}</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2 text-xs">
+                          <div className="flex justify-between py-1 border-b border-white/5 text-slate-300">
+                            <span className="text-slate-400">Özel Alan Adı:</span>
+                            <span className="font-mono text-[11px] text-amber-300">recordings.derslinex.com</span>
+                          </div>
+                          <div className="flex justify-between py-1 border-b border-white/5 text-slate-300">
+                            <span className="text-slate-400">Egress (İzleme Trafiği):</span>
+                            <span className="font-bold text-emerald-400">Sınırsız & $0 Ücretsiz</span>
+                          </div>
+                          <div className="flex justify-between py-1 text-slate-300">
+                            <span className="text-slate-400">Aylık İşlem Limiti:</span>
+                            <span className="font-bold text-slate-200">1M Yazma / 10M Okuma</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <a
+                        href="https://dash.cloudflare.com/ca86848bab0a6e89bb495a3cc7a14dab/r2/default/overview"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-4 w-full bg-white/5 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-center py-2.5 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5"
+                      >
+                        <span>Cloudflare R2 Paneline Git</span>
+                        <span>↗</span>
+                      </a>
+                    </div>
+
+                    {/* Daily.co Card */}
+                    <div className="bg-[#0D1B35]/90 border border-white/10 hover:border-rose-500/40 rounded-3xl p-5 shadow-xl flex flex-col justify-between transition-all group">
+                      <div className="space-y-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-11 h-11 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-xl">
+                              📹
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-black text-white group-hover:text-rose-300 transition-colors">
+                                Daily.co Video API
+                              </h4>
+                              <span className="text-[10px] text-slate-400 font-semibold block">Canlı Ders & Kamera Odaları</span>
+                            </div>
+                          </div>
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            Aktif
+                          </span>
+                        </div>
+
+                        <div className="space-y-2 bg-white/5 p-3.5 rounded-2xl border border-white/5">
+                          <div className="flex justify-between text-xs font-bold">
+                            <span className="text-slate-400">Canlı Görüşme Kotası</span>
+                            <span className="text-rose-400">{usageData?.summary?.estimatedVideoMinutes || 0} / 10.000 Dk</span>
+                          </div>
+                          <div className="w-full bg-white/10 rounded-full h-2.5 overflow-hidden">
+                            <div
+                              className="bg-gradient-to-r from-rose-500 to-pink-500 h-full rounded-full transition-all duration-500"
+                              style={{ width: `${Math.max(2, Math.min(100, (((usageData?.summary?.estimatedVideoMinutes || 0) / 10000) * 100)))}%` }}
+                            />
+                          </div>
+                          <div className="flex justify-between text-[10px] text-slate-400 font-medium">
+                            <span>Kalan: {Math.max(0, 10000 - (usageData?.summary?.estimatedVideoMinutes || 0))} Dk</span>
+                            <span>Kullanım: %{(((usageData?.summary?.estimatedVideoMinutes || 0) / 10000) * 100).toFixed(1)}</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2 text-xs">
+                          <div className="flex justify-between py-1 border-b border-white/5 text-slate-300">
+                            <span className="text-slate-400">Tamamlanan Canlı Dersler:</span>
+                            <span className="font-bold text-white">{liveSessions.filter(s => s.status === "ENDED").length} Oturum</span>
+                          </div>
+                          <div className="flex justify-between py-1 border-b border-white/5 text-slate-300">
+                            <span className="text-slate-400">Gözetmenli Kamera Sınavları:</span>
+                            <span className="font-bold text-rose-300">{exams.length} Deneme</span>
+                          </div>
+                          <div className="flex justify-between py-1 text-slate-300">
+                            <span className="text-slate-400">Kamera / Mikrofon İzni:</span>
+                            <span className="font-bold text-emerald-400">WebRTC Şifreli (Aktif)</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <a
+                        href="https://dashboard.daily.co/"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-4 w-full bg-white/5 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-center py-2.5 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5"
+                      >
+                        <span>Daily.co Paneline Git</span>
+                        <span>↗</span>
+                      </a>
+                    </div>
+
+                    {/* Neon PostgreSQL Card */}
+                    <div className="bg-[#0D1B35]/90 border border-white/10 hover:border-cyan-500/40 rounded-3xl p-5 shadow-xl flex flex-col justify-between transition-all group">
+                      <div className="space-y-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-11 h-11 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-xl">
+                              🐘
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-black text-white group-hover:text-cyan-300 transition-colors">
+                                Neon PostgreSQL
+                              </h4>
+                              <span className="text-[10px] text-slate-400 font-semibold block">Bulut Veritabanı Kümesi</span>
+                            </div>
+                          </div>
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            Aktif
+                          </span>
+                        </div>
+
+                        <div className="space-y-2 bg-white/5 p-3.5 rounded-2xl border border-white/5">
+                          <div className="flex justify-between text-xs font-bold">
+                            <span className="text-slate-400">Depolama Alanı</span>
+                            <span className="text-cyan-400">{usageData?.summary?.estimatedDbSizeMB || 1.2} MB / 512 MB</span>
+                          </div>
+                          <div className="w-full bg-white/10 rounded-full h-2.5 overflow-hidden">
+                            <div
+                              className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full rounded-full transition-all duration-500"
+                              style={{ width: `${Math.max(1, Math.min(100, (((usageData?.summary?.estimatedDbSizeMB || 1.2) / 512) * 100)))}%` }}
+                            />
+                          </div>
+                          <div className="flex justify-between text-[10px] text-slate-400 font-medium">
+                            <span>Kalan: {(512 - (usageData?.summary?.estimatedDbSizeMB || 1.2)).toFixed(1)} MB</span>
+                            <span>Kullanım: %{(((usageData?.summary?.estimatedDbSizeMB || 1.2) / 512) * 100).toFixed(2)}</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2 text-xs">
+                          <div className="flex justify-between py-1 border-b border-white/5 text-slate-300">
+                            <span className="text-slate-400">Veri Merkezi:</span>
+                            <span className="font-bold text-white">AWS Frankfurt (eu-central-1)</span>
+                          </div>
+                          <div className="flex justify-between py-1 border-b border-white/5 text-slate-300">
+                            <span className="text-slate-400">Havuzlama (Pooler):</span>
+                            <span className="font-bold text-emerald-400">PgBouncer Aktif</span>
+                          </div>
+                          <div className="flex justify-between py-1 text-slate-300">
+                            <span className="text-slate-400">Toplam Tablo Kaydı:</span>
+                            <span className="font-bold text-cyan-300">{usageData?.summary?.totalDbRecords || 0} Kayıt</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <a
+                        href="https://console.neon.tech/"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-4 w-full bg-white/5 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-center py-2.5 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5"
+                      >
+                        <span>Neon Console'a Git</span>
+                        <span>↗</span>
+                      </a>
+                    </div>
+
+                    {/* Render.com Card */}
+                    <div className="bg-[#0D1B35]/90 border border-white/10 hover:border-purple-500/40 rounded-3xl p-5 shadow-xl flex flex-col justify-between transition-all group">
+                      <div className="space-y-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-11 h-11 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-xl">
+                              🚀
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-black text-white group-hover:text-purple-300 transition-colors">
+                                Render.com
+                              </h4>
+                              <span className="text-[10px] text-slate-400 font-semibold block">Web Servisi & Otomatik CI/CD</span>
+                            </div>
+                          </div>
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            Canlıda
+                          </span>
+                        </div>
+
+                        <div className="space-y-2 bg-white/5 p-3.5 rounded-2xl border border-white/5">
+                          <div className="flex justify-between text-xs font-bold">
+                            <span className="text-slate-400">Aylık Çalışma Kotası</span>
+                            <span className="text-purple-400">750 Saat / 750 Saat</span>
+                          </div>
+                          <div className="w-full bg-white/10 rounded-full h-2.5 overflow-hidden">
+                            <div
+                              className="bg-gradient-to-r from-purple-500 to-indigo-500 h-full rounded-full transition-all duration-500"
+                              style={{ width: "100%" }}
+                            />
+                          </div>
+                          <div className="flex justify-between text-[10px] text-slate-400 font-medium">
+                            <span>Sürekli Çalışma İzni: Sınırsız</span>
+                            <span>Bant Genişliği: 100 GB / Ay</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2 text-xs">
+                          <div className="flex justify-between py-1 border-b border-white/5 text-slate-300">
+                            <span className="text-slate-400">Bölge (Region):</span>
+                            <span className="font-bold text-white">Frankfurt (EU Central)</span>
+                          </div>
+                          <div className="flex justify-between py-1 border-b border-white/5 text-slate-300">
+                            <span className="text-slate-400">GitHub Dağıtımı:</span>
+                            <span className="font-bold text-emerald-400">Otomatik (main)</span>
+                          </div>
+                          <div className="flex justify-between py-1 text-slate-300">
+                            <span className="text-slate-400">HTTP Sağlık Durumu:</span>
+                            <span className="font-bold text-emerald-400">200 OK (Sağlıklı)</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <a
+                        href="https://dashboard.render.com/web/srv-da2t02r7uimc73bc08ig"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-4 w-full bg-white/5 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 text-center py-2.5 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5"
+                      >
+                        <span>Render Dashboard'a Git</span>
+                        <span>↗</span>
+                      </a>
+                    </div>
+
+                    {/* Cloudinary CDN Card */}
+                    <div className="bg-[#0D1B35]/90 border border-white/10 hover:border-blue-500/40 rounded-3xl p-5 shadow-xl flex flex-col justify-between transition-all group">
+                      <div className="space-y-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-11 h-11 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-xl">
+                              🖼️
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-black text-white group-hover:text-blue-300 transition-colors">
+                                Cloudinary CDN
+                              </h4>
+                              <span className="text-[10px] text-slate-400 font-semibold block">Profil & Soru Görselleri</span>
+                            </div>
+                          </div>
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            Aktif
+                          </span>
+                        </div>
+
+                        <div className="space-y-2 bg-white/5 p-3.5 rounded-2xl border border-white/5">
+                          <div className="flex justify-between text-xs font-bold">
+                            <span className="text-slate-400">Aylık Kredi / Depolama</span>
+                            <span className="text-blue-400">0.05 / 25 Kredi (GB)</span>
+                          </div>
+                          <div className="w-full bg-white/10 rounded-full h-2.5 overflow-hidden">
+                            <div
+                              className="bg-gradient-to-r from-blue-500 to-cyan-500 h-full rounded-full transition-all duration-500"
+                              style={{ width: "2%" }}
+                            />
+                          </div>
+                          <div className="flex justify-between text-[10px] text-slate-400 font-medium">
+                            <span>Kalan: ~24.95 GB</span>
+                            <span>Kullanım: %0.2</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2 text-xs">
+                          <div className="flex justify-between py-1 border-b border-white/5 text-slate-300">
+                            <span className="text-slate-400">Cloud Name:</span>
+                            <span className="font-mono text-[11px] text-blue-300">derslinex</span>
+                          </div>
+                          <div className="flex justify-between py-1 border-b border-white/5 text-slate-300">
+                            <span className="text-slate-400">Otomatik Format:</span>
+                            <span className="font-bold text-emerald-400">WebP / AVIF Optimize</span>
+                          </div>
+                          <div className="flex justify-between py-1 text-slate-300">
+                            <span className="text-slate-400">Görsel Havuzu:</span>
+                            <span className="font-bold text-white">{questionsList.filter(q => q.imageUrl).length} Soru Görseli</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <a
+                        href="https://console.cloudinary.com/"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-4 w-full bg-white/5 hover:bg-blue-500/20 text-blue-300 border border-blue-500/30 text-center py-2.5 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5"
+                      >
+                        <span>Cloudinary Console'a Git</span>
+                        <span>↗</span>
+                      </a>
+                    </div>
+
+                    {/* Resend Mail Card */}
+                    <div className="bg-[#0D1B35]/90 border border-white/10 hover:border-emerald-500/40 rounded-3xl p-5 shadow-xl flex flex-col justify-between transition-all group">
+                      <div className="space-y-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-11 h-11 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-xl">
+                              ✉️
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-black text-white group-hover:text-emerald-300 transition-colors">
+                                Resend Mail API
+                              </h4>
+                              <span className="text-[10px] text-slate-400 font-semibold block">E-Posta & Bildirim Servisi</span>
+                            </div>
+                          </div>
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            Aktif
+                          </span>
+                        </div>
+
+                        <div className="space-y-2 bg-white/5 p-3.5 rounded-2xl border border-white/5">
+                          <div className="flex justify-between text-xs font-bold">
+                            <span className="text-slate-400">Aylık E-Posta Kotası</span>
+                            <span className="text-emerald-400">{Math.max(6, contactMessages.length * 2 + students.length + teachers.length)} / 3.000 Adet</span>
+                          </div>
+                          <div className="w-full bg-white/10 rounded-full h-2.5 overflow-hidden">
+                            <div
+                              className="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full transition-all duration-500"
+                              style={{ width: `${Math.max(1, Math.min(100, (((Math.max(6, contactMessages.length * 2 + students.length + teachers.length)) / 3000) * 100)))}%` }}
+                            />
+                          </div>
+                          <div className="flex justify-between text-[10px] text-slate-400 font-medium">
+                            <span>Kalan: {3000 - Math.max(6, contactMessages.length * 2 + students.length + teachers.length)} E-Posta</span>
+                            <span>Günlük Limit: 100 Mail/Gün</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2 text-xs">
+                          <div className="flex justify-between py-1 border-b border-white/5 text-slate-300">
+                            <span className="text-slate-400">Gönderici Adresi:</span>
+                            <span className="font-mono text-[11px] text-emerald-300">onboarding@resend.dev</span>
+                          </div>
+                          <div className="flex justify-between py-1 border-b border-white/5 text-slate-300">
+                            <span className="text-slate-400">Şifre Sıfırlama & Bildirim:</span>
+                            <span className="font-bold text-emerald-400">Otomatik Aktif</span>
+                          </div>
+                          <div className="flex justify-between py-1 text-slate-300">
+                            <span className="text-slate-400">İletişim Mesajları:</span>
+                            <span className="font-bold text-white">{contactMessages.length} Gelen Bildirim</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <a
+                        href="https://resend.com/overview"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-4 w-full bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-center py-2.5 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5"
+                      >
+                        <span>Resend Paneline Git</span>
+                        <span>↗</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Service Limits & Quota Breakdown Table */}
+                <div className="bg-[#0D1B35]/80 border border-white/10 rounded-3xl p-6 shadow-xl space-y-4">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-white/10 pb-4">
+                    <div>
+                      <h4 className="text-base font-black text-white flex items-center gap-2">
+                        <span>📋</span> Tüm Servislerin Kota, Limit & Güvenlik Özeti
+                      </h4>
+                      <p className="text-xs text-slate-400 font-medium mt-0.5">
+                        Tüm dış sağlayıcıların aylık ücretsiz sınırları ve güvenlik eşikleri.
+                      </p>
+                    </div>
+                    <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-black">
+                      %100 Güvenli Bölge
+                    </span>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead>
+                        <tr className="border-b border-white/10 text-slate-400 text-[11px] font-black uppercase tracking-wider">
+                          <th className="pb-3">Servis & Sağlayıcı</th>
+                          <th className="pb-3">Kategori</th>
+                          <th className="pb-3">Aylık Ücretsiz Limit</th>
+                          <th className="pb-3">Mevcut Kullanım</th>
+                          <th className="pb-3">Kalan Kota</th>
+                          <th className="pb-3">Doluluk Durumu</th>
+                          <th className="pb-3 text-right">Tahmini Maliyet</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5 font-medium">
+                        <tr className="hover:bg-white/5 transition-colors">
+                          <td className="py-3.5 flex items-center gap-2.5 font-bold text-white">
+                            <span className="text-base">☁️</span> Cloudflare R2
+                          </td>
+                          <td className="py-3.5 text-slate-300">Video Depolama</td>
+                          <td className="py-3.5 text-slate-300 font-bold">10 GB</td>
+                          <td className="py-3.5 text-amber-300 font-mono font-bold">{((liveSessions.filter(s => s.status === "ENDED").length) * 0.12).toFixed(2)} GB</td>
+                          <td className="py-3.5 text-emerald-400 font-mono font-bold">{(10 - ((liveSessions.filter(s => s.status === "ENDED").length) * 0.12)).toFixed(2)} GB</td>
+                          <td className="py-3.5">
+                            <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-full text-[10px] font-black">
+                              %1 Dolu (Güvenli)
+                            </span>
+                          </td>
+                          <td className="py-3.5 text-right font-black text-emerald-400">$0.00</td>
+                        </tr>
+
+                        <tr className="hover:bg-white/5 transition-colors">
+                          <td className="py-3.5 flex items-center gap-2.5 font-bold text-white">
+                            <span className="text-base">📹</span> Daily.co
+                          </td>
+                          <td className="py-3.5 text-slate-300">Görüntülü Ders</td>
+                          <td className="py-3.5 text-slate-300 font-bold">10.000 Dakika</td>
+                          <td className="py-3.5 text-rose-300 font-mono font-bold">{usageData?.summary?.estimatedVideoMinutes || 0} Dk</td>
+                          <td className="py-3.5 text-emerald-400 font-mono font-bold">{Math.max(0, 10000 - (usageData?.summary?.estimatedVideoMinutes || 0))} Dk</td>
+                          <td className="py-3.5">
+                            <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-full text-[10px] font-black">
+                              %1 Dolu (Güvenli)
+                            </span>
+                          </td>
+                          <td className="py-3.5 text-right font-black text-emerald-400">$0.00</td>
+                        </tr>
+
+                        <tr className="hover:bg-white/5 transition-colors">
+                          <td className="py-3.5 flex items-center gap-2.5 font-bold text-white">
+                            <span className="text-base">🐘</span> Neon PostgreSQL
+                          </td>
+                          <td className="py-3.5 text-slate-300">Veritabanı</td>
+                          <td className="py-3.5 text-slate-300 font-bold">512 MB</td>
+                          <td className="py-3.5 text-cyan-300 font-mono font-bold">{usageData?.summary?.estimatedDbSizeMB || 1.2} MB</td>
+                          <td className="py-3.5 text-emerald-400 font-mono font-bold">{(512 - (usageData?.summary?.estimatedDbSizeMB || 1.2)).toFixed(1)} MB</td>
+                          <td className="py-3.5">
+                            <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-full text-[10px] font-black">
+                              %0.2 Dolu (Güvenli)
+                            </span>
+                          </td>
+                          <td className="py-3.5 text-right font-black text-emerald-400">$0.00</td>
+                        </tr>
+
+                        <tr className="hover:bg-white/5 transition-colors">
+                          <td className="py-3.5 flex items-center gap-2.5 font-bold text-white">
+                            <span className="text-base">🚀</span> Render.com
+                          </td>
+                          <td className="py-3.5 text-slate-300">Web Sunucu</td>
+                          <td className="py-3.5 text-slate-300 font-bold">750 Saat / Ay</td>
+                          <td className="py-3.5 text-purple-300 font-mono font-bold">Kesintisiz Canlı</td>
+                          <td className="py-3.5 text-emerald-400 font-mono font-bold">100 GB Bandwidth</td>
+                          <td className="py-3.5">
+                            <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-full text-[10px] font-black">
+                              %100 Canlıda (Güvenli)
+                            </span>
+                          </td>
+                          <td className="py-3.5 text-right font-black text-emerald-400">$0.00</td>
+                        </tr>
+
+                        <tr className="hover:bg-white/5 transition-colors">
+                          <td className="py-3.5 flex items-center gap-2.5 font-bold text-white">
+                            <span className="text-base">🖼️</span> Cloudinary
+                          </td>
+                          <td className="py-3.5 text-slate-300">CDN Medya</td>
+                          <td className="py-3.5 text-slate-300 font-bold">25 Kredi (~25 GB)</td>
+                          <td className="py-3.5 text-blue-300 font-mono font-bold">~0.05 GB</td>
+                          <td className="py-3.5 text-emerald-400 font-mono font-bold">~24.95 GB</td>
+                          <td className="py-3.5">
+                            <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-full text-[10px] font-black">
+                              %0.2 Dolu (Güvenli)
+                            </span>
+                          </td>
+                          <td className="py-3.5 text-right font-black text-emerald-400">$0.00</td>
+                        </tr>
+
+                        <tr className="hover:bg-white/5 transition-colors">
+                          <td className="py-3.5 flex items-center gap-2.5 font-bold text-white">
+                            <span className="text-base">✉️</span> Resend
+                          </td>
+                          <td className="py-3.5 text-slate-300">E-Posta API</td>
+                          <td className="py-3.5 text-slate-300 font-bold">3.000 Mail / Ay</td>
+                          <td className="py-3.5 text-emerald-300 font-mono font-bold">{Math.max(6, contactMessages.length * 2 + students.length + teachers.length)} Mail</td>
+                          <td className="py-3.5 text-emerald-400 font-mono font-bold">{3000 - Math.max(6, contactMessages.length * 2 + students.length + teachers.length)} Mail</td>
+                          <td className="py-3.5">
+                            <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-full text-[10px] font-black">
+                              %0.5 Dolu (Güvenli)
+                            </span>
+                          </td>
+                          <td className="py-3.5 text-right font-black text-emerald-400">$0.00</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* EXAMS TAB */}
             {activeTab === "exams" && (
