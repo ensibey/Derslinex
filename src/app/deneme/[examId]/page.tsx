@@ -277,20 +277,55 @@ export default function StudentOnlineExamPage({
     };
   }, [student, examId, showChecklist, resultData]);
 
-  // Anti-cheat keyboard shortcuts & context menu shield
+  // Anti-cheat keyboard shortcuts & screenshot prevention shield
+  const [screenBlackout, setScreenBlackout] = useState(false);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // PrintScreen / Screenshot shortcut detection
+      if (
+        e.key === "PrintScreen" ||
+        e.key === "Snapshot" ||
+        (e.key === "s" && e.shiftKey && (e.metaKey || e.ctrlKey)) || // Windows+Shift+S or Cmd+Shift+S
+        (e.key === "4" && e.shiftKey && e.metaKey) || // Cmd+Shift+4 (Mac)
+        (e.key === "3" && e.shiftKey && e.metaKey) // Cmd+Shift+3 (Mac)
+      ) {
+        setScreenBlackout(true);
+        setToastMsg("📸 Ekran görüntüsü alma girişimi engellendi ve pano temizlendi!");
+        try {
+          navigator.clipboard.writeText("Derslinex Sınav Güvenliği: Ekran görüntüsü alınamaz.").catch(() => {});
+        } catch {}
+        setTimeout(() => setScreenBlackout(false), 1500);
+      }
+
+      // DevTools & Copy shortcuts
       if (
         e.key === "F12" ||
-        (e.ctrlKey && (e.key === "u" || e.key === "U" || e.key === "c" || e.key === "C" || e.key === "v" || e.key === "V" || e.key === "s" || e.key === "S")) ||
-        (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "i" || e.key === "J" || e.key === "j" || e.key === "C" || e.key === "c"))
+        (e.ctrlKey && (e.key === "u" || e.key === "U" || e.key === "c" || e.key === "C" || e.key === "v" || e.key === "V" || e.key === "s" || e.key === "S" || e.key === "p" || e.key === "P")) ||
+        (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "i" || e.key === "J" || e.key === "j" || e.key === "C" || e.key === "c" || e.key === "S" || e.key === "s"))
       ) {
         e.preventDefault();
         setToastMsg("⚠️ Sınav güvenliği gereği bu kısayol kısıtlanmıştır.");
       }
     };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === "PrintScreen" || e.key === "Snapshot") {
+        setScreenBlackout(true);
+        setToastMsg("📸 Ekran görüntüsü engellendi!");
+        try {
+          navigator.clipboard.writeText("Derslinex: Ekran görüntüsü engellendi.").catch(() => {});
+        } catch {}
+        setTimeout(() => setScreenBlackout(false), 1500);
+      }
+    };
+
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
   }, []);
 
   // Submit Handler
@@ -617,6 +652,33 @@ export default function StudentOnlineExamPage({
       onCopy={(e) => { e.preventDefault(); setToastMsg("⚠️ Sınav esnasında metin kopyalama kısıtlanmıştır."); }}
       className="min-h-screen bg-[#0A0F1D] text-slate-200 flex flex-col select-none relative"
     >
+      {/* Anti-Print CSS Guard */}
+      <style dangerouslySetInnerHTML={{ __html: "@media print { body, html { display: none !important; } }" }} />
+
+      {/* Forensic Anti-Leak Dynamic Watermark Overlay */}
+      {student && (
+        <div className="pointer-events-none fixed inset-0 z-20 overflow-hidden opacity-[0.035] flex flex-wrap gap-16 p-6 select-none font-mono text-[11px] font-black text-white transform -rotate-12">
+          {Array.from({ length: 48 }).map((_, i) => (
+            <span key={i} className="whitespace-nowrap">
+              🎓 {student.name} • {student.email} • ID:{student.id} • DERSLINEX PROCTOR
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Screenshot Blackout Shield */}
+      {screenBlackout && (
+        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-100">
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/20 text-amber-400 text-3xl flex items-center justify-center mb-4">
+            📸
+          </div>
+          <h2 className="text-xl font-black text-white mb-2">EKRAN GÖRÜNTÜSÜ ALMA ENGELLENDİ</h2>
+          <p className="text-xs text-slate-400 max-w-sm">
+            Sınav güvenliği gereği ekran görüntüsü yakalama kısıtlanmış ve pano içeriği temizlenmiştir.
+          </p>
+        </div>
+      )}
+
       {/* Tab Switch & Focus Loss Red Alert Shield */}
       {showTabWarningModal && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
