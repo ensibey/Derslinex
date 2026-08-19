@@ -108,6 +108,8 @@ export default function StudentOnlineExamPage({
   // Proctoring & Camera state
   const [cameraActive, setCameraActive] = useState(false);
   const [focusWarnings, setFocusWarnings] = useState(0);
+  const [showTabWarningModal, setShowTabWarningModal] = useState(false);
+  const [checklistAgreed, setChecklistAgreed] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
 
@@ -158,9 +160,11 @@ export default function StudentOnlineExamPage({
         videoRef.current.srcObject = stream;
       }
       setCameraActive(true);
+      return true;
     } catch (err) {
       console.warn("Kamera erişimi verilemedi:", err);
       setCameraActive(false);
+      return false;
     }
   }, []);
 
@@ -231,21 +235,20 @@ export default function StudentOnlineExamPage({
           const startedSec = Math.floor((Date.now() - new Date(data.attempt.startedAt).getTime()) / 1000);
           const remain = Math.max(0, durationSec - startedSec);
           setRemainingSeconds(remain);
-
-          if (data.exam.isCameraRequired) {
-            startCamera();
-          }
         } else {
           setError(data.error || "Sınav başlatılamadı.");
         }
       })
       .catch(() => setError("Bağlantı hatası oluştu."))
       .finally(() => setLoading(false));
-  }, [student, examId, startCamera]);
+  }, [student, examId]);
 
   // Tab switch / focus warning detector
   useEffect(() => {
-    const handleBlur = () => {
+    if (showChecklist || resultData) return;
+
+    const handleFocusLoss = () => {
+      setShowTabWarningModal(true);
       setFocusWarnings((prev) => {
         const next = prev + 1;
         if (student && examId) {
@@ -259,9 +262,36 @@ export default function StudentOnlineExamPage({
         return next;
       });
     };
-    window.addEventListener("blur", handleBlur);
-    return () => window.removeEventListener("blur", handleBlur);
-  }, [student, examId]);
+
+    const handleVisibility = () => {
+      if (document.visibilityState === "hidden") {
+        handleFocusLoss();
+      }
+    };
+
+    window.addEventListener("blur", handleFocusLoss);
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      window.removeEventListener("blur", handleFocusLoss);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [student, examId, showChecklist, resultData]);
+
+  // Anti-cheat keyboard shortcuts & context menu shield
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && (e.key === "u" || e.key === "U" || e.key === "c" || e.key === "C" || e.key === "v" || e.key === "V" || e.key === "s" || e.key === "S")) ||
+        (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "i" || e.key === "J" || e.key === "j" || e.key === "C" || e.key === "c"))
+      ) {
+        e.preventDefault();
+        setToastMsg("⚠️ Sınav güvenliği gereği bu kısayol kısıtlanmıştır.");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // Submit Handler
   const handleSubmitExam = useCallback(async () => {
@@ -451,11 +481,176 @@ export default function StudentOnlineExamPage({
     );
   }
 
+  // Pre-Exam Hardware & Camera Test Checklist Screen
+  if (showChecklist && exam) {
+    return (
+      <div className="min-h-screen bg-[#0A0F1D] text-white p-4 sm:p-8 flex items-center justify-center relative overflow-hidden">
+        {/* Glow Background */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-xl w-full bg-[#131B2E]/95 border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative z-10 space-y-6">
+          {/* Header */}
+          <div className="text-center space-y-2 pb-4 border-b border-white/10">
+            <div className="inline-flex items-center gap-2 bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 font-black text-[11px] px-3.5 py-1.5 rounded-full uppercase tracking-wider">
+              🎯 Sınav Öncesi Donanım & Güvenlik Kontrolü
+            </div>
+            <h1 className="text-xl sm:text-2xl font-black text-white">{exam.title}</h1>
+            <p className="text-xs text-slate-400">
+              ⏱️ Sınav Süresi: <strong className="text-white">{exam.durationMinutes} Dakika</strong> · Toplam Soru: <strong className="text-white">{questions.length}</strong>
+            </p>
+          </div>
+
+          {/* Camera Test Box */}
+          {exam.isCameraRequired ? (
+            <div className="bg-[#0D1B35] border border-white/10 rounded-2xl p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black text-slate-300 flex items-center gap-2">
+                  📷 Kamera Gözetmenliği (Zorunlu)
+                </span>
+                <span className={`text-[10px] font-black px-2.5 py-1 rounded-lg border ${
+                  cameraActive
+                    ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                    : "bg-red-500/20 text-red-300 border-red-500/30 animate-pulse"
+                }`}>
+                  {cameraActive ? "🟢 Kamera Yayını Aktif" : "🔴 Kamera Kapalı / İzin Gerekli"}
+                </span>
+              </div>
+
+              {/* Live Preview Window */}
+              <div className="relative aspect-video w-full bg-black rounded-xl overflow-hidden border border-white/15 flex items-center justify-center">
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className={`w-full h-full object-cover ${!cameraActive ? "hidden" : ""}`}
+                />
+                {!cameraActive && (
+                  <div className="text-center p-6 space-y-3">
+                    <div className="text-3xl">📷</div>
+                    <p className="text-xs text-slate-400 max-w-xs mx-auto">
+                      Bu deneme sınavında kopya güvenliği için kamera gözetmenliği zorunludur. Lütfen kameranızı başlatıp izin veriniz.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={startCamera}
+                      className="bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs px-5 py-2.5 rounded-xl transition shadow-lg inline-flex items-center gap-2"
+                    >
+                      <span>📷 Kamerayı Başlat & İzin Ver</span>
+                    </button>
+                  </div>
+                )}
+                {cameraActive && (
+                  <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-xs text-[10px] text-emerald-300 font-bold px-2 py-1 rounded-md">
+                    ✓ Yüzünüz gözetmen tarafından net görünüyor
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-4 text-center">
+              <span className="text-xs text-emerald-300 font-bold">ℹ️ Bu deneme sınavında kamera gözetmenliği isteğe bağlıdır.</span>
+            </div>
+          )}
+
+          {/* Rules & Anti-Cheat Checklist */}
+          <div className="space-y-3 bg-[#0A0F1D] border border-white/5 rounded-2xl p-4">
+            <h4 className="text-xs font-black text-slate-300 uppercase tracking-wider">🔒 Sınav Güvenlik Kuralları</h4>
+            <div className="space-y-2.5 text-xs text-slate-300">
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={checklistAgreed}
+                  onChange={(e) => setChecklistAgreed(e.target.checked)}
+                  className="w-4 h-4 mt-0.5 rounded accent-indigo-500"
+                />
+                <span className="leading-relaxed select-none">
+                  Sınav esnasında <strong>başka sekme, pencere veya uygulamaya geçmeyeceğimi</strong>, sekme değişimlerinin gözetmen kayıtlarına uyarı olarak işleneceğini kabul ediyorum.
+                </span>
+              </label>
+            </div>
+          </div>
+
+          {/* Start Exam Button */}
+          <div>
+            <button
+              type="button"
+              disabled={(exam.isCameraRequired && !cameraActive) || !checklistAgreed}
+              onClick={async () => {
+                if (exam.isCameraRequired && !cameraActive) {
+                  const ok = await startCamera();
+                  if (!ok) return;
+                }
+                try {
+                  if (document.documentElement.requestFullscreen) {
+                    await document.documentElement.requestFullscreen();
+                  }
+                } catch {}
+                setShowChecklist(false);
+              }}
+              className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-black text-sm transition shadow-xl shadow-emerald-900/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              <span>🚀 Sınavı Tam Ekranda Başlat</span>
+            </button>
+            {exam.isCameraRequired && !cameraActive && (
+              <span className="text-[11px] text-amber-400 font-bold block text-center mt-2">
+                ⚠️ Sınava başlamak için lütfen yukarıdaki butondan kameranızı açınız.
+              </span>
+            )}
+            {!checklistAgreed && (exam.isCameraRequired ? cameraActive : true) && (
+              <span className="text-[11px] text-slate-400 font-bold block text-center mt-2">
+                Lütfen güvenlik kurallarını onaylayınız.
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const currentQ = questions[currentIndex];
   const currentAns = currentQ ? answers[currentQ.id] : null;
 
   return (
-    <div className="min-h-screen bg-[#0A0F1D] text-slate-200 flex flex-col select-none relative">
+    <div
+      onContextMenu={(e) => e.preventDefault()}
+      onCopy={(e) => { e.preventDefault(); setToastMsg("⚠️ Sınav esnasında metin kopyalama kısıtlanmıştır."); }}
+      className="min-h-screen bg-[#0A0F1D] text-slate-200 flex flex-col select-none relative"
+    >
+      {/* Tab Switch & Focus Loss Red Alert Shield */}
+      {showTabWarningModal && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-gradient-to-b from-red-950/90 to-[#131B2E] border-2 border-red-500 rounded-3xl p-6 sm:p-8 text-center space-y-5 shadow-2xl shadow-red-900/50 animate-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 rounded-2xl bg-red-500/20 border border-red-500/40 text-red-400 text-3xl flex items-center justify-center mx-auto">
+              🚨
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-xl font-black text-white">DİKKAT: Sınav Ekranından Ayrıldınız!</h2>
+              <p className="text-xs text-red-200 leading-relaxed">
+                Başka bir sekmeye veya uygulamaya geçiş yapıldığı tespit edildi. Bu durum <strong>gözetmen paneline ({focusWarnings}. Uyarı)</strong> olarak anlık kaydedildi.
+              </p>
+            </div>
+            <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/20 text-xs text-slate-300">
+              Lütfen sınavınızı tamamlayana kadar ekranınızı değiştirmeyiniz.
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setShowTabWarningModal(false);
+                try {
+                  if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen().catch(() => {});
+                  }
+                } catch {}
+              }}
+              className="w-full py-3.5 bg-red-600 hover:bg-red-500 text-white font-black text-xs rounded-xl transition shadow-lg shadow-red-900/50"
+            >
+              Tamam, Sınava Geri Dön ve Devam Et ➔
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Toast Notification */}
       {toastMsg && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-red-600 text-white text-xs font-black px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-red-400">
