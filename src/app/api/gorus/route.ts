@@ -3,24 +3,30 @@ import { prisma } from "@/lib/db";
 import { verifyAdminAuth } from "@/lib/adminAuth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
-// GET: get feedbacks (filtered by teacherId if provided)
+// GET: get feedbacks (filtered by teacherId if provided; public sees only APPROVED, admin sees all)
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const teacherId = searchParams.get("teacherId");
+    const includeAll = searchParams.get("includeAll") === "true";
 
-    let feedbacks;
+    const isAdmin = verifyAdminAuth(request) === null;
+
+    const whereClause: any = {};
+
     if (teacherId) {
-      feedbacks = await prisma.feedback.findMany({
-        where: { teacherId: parseInt(teacherId) },
-        orderBy: { createdAt: "desc" },
-      });
-    } else {
-      // Get all feedbacks for admin
-      feedbacks = await prisma.feedback.findMany({
-        orderBy: { createdAt: "desc" },
-      });
+      whereClause.teacherId = parseInt(teacherId);
     }
+
+    // Only admins requesting includeAll get non-APPROVED feedbacks
+    if (!isAdmin || !includeAll) {
+      whereClause.status = "APPROVED";
+    }
+
+    const feedbacks = await prisma.feedback.findMany({
+      where: whereClause,
+      orderBy: { createdAt: "desc" },
+    });
 
     return NextResponse.json({ success: true, feedbacks });
   } catch (error) {
@@ -29,7 +35,7 @@ export async function GET(request: Request) {
   }
 }
 
-// POST: submit a feedback/gorus
+// POST: submit a feedback/gorus (defaults to PENDING for admin approval)
 export async function POST(request: Request) {
   try {
     const ip = getClientIp(request);
@@ -53,12 +59,42 @@ export async function POST(request: Request) {
         teacherName,
         content,
         rating: rating ? parseInt(rating) : 5,
+        status: "PENDING",
       },
     });
 
-    return NextResponse.json({ success: true, feedback });
+    return NextResponse.json({
+      success: true,
+      feedback,
+      message: "Görüş ve puanlamanız alındı! Yönetici onayının ardından öğretmen profilinde yayınlanacaktır.",
+    });
   } catch (error) {
     console.error("Görüş POST Hatası:", error);
+    return NextResponse.json({ success: false, error: "Sunucu hatası" }, { status: 500 });
+  }
+}
+
+// PUT: approve or reject feedback/gorus (admin only)
+export async function PUT(request: Request) {
+  const authError = verifyAdminAuth(request);
+  if (authError) return authError;
+
+  try {
+    const body = await request.json();
+    const { id, status } = body;
+
+    if (!id || !status || !["APPROVED", "REJECTED", "PENDING"].includes(status)) {
+      return NextResponse.json({ success: false, error: "Geçersiz parametreler." }, { status: 400 });
+    }
+
+    const updated = await prisma.feedback.update({
+      where: { id: parseInt(id) },
+      data: { status },
+    });
+
+    return NextResponse.json({ success: true, feedback: updated });
+  } catch (error) {
+    console.error("Görüş PUT Hatası:", error);
     return NextResponse.json({ success: false, error: "Sunucu hatası" }, { status: 500 });
   }
 }
@@ -86,4 +122,5 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ success: false, error: "Sunucu hatası" }, { status: 500 });
   }
 }
+
 

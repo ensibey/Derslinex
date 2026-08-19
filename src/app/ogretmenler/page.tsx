@@ -25,7 +25,7 @@ function OgretmenlerContent() {
         const data = await res.json();
         if (data.success && data.teachers) {
           const approvedDb = data.teachers
-            .filter((t: any) => t.status === "İletişime Geçildi")
+            .filter((t: any) => t.status === "Onaylandı" || t.status === "APPROVED" || t.status === "İletişime Geçildi")
             .map((t: any) => ({
               id: `db-${t.id}`,
               slug: t.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),

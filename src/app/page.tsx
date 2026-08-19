@@ -54,7 +54,7 @@ export default async function HomePage() {
   let dbApproved: any[] = [];
   try {
     const dbTeachers = await prisma.teacher.findMany({
-      where: { status: "İletişime Geçildi" },
+      where: { OR: [{ status: "Onaylandı" }, { status: "APPROVED" }, { status: "İletişime Geçildi" }] },
       take: 6,
       orderBy: { points: "desc" }
     });

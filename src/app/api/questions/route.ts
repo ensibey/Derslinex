@@ -36,6 +36,9 @@ export async function POST(request: Request) {
     if (!authUser || authUser.role !== "teacher") {
       return NextResponse.json({ success: false, error: "Soru yüklemek için öğretmen oturumu gereklidir." }, { status: 401 });
     }
+    if (authUser.isBanned) {
+      return NextResponse.json({ success: false, error: "Hesabınız engellenmiştir. Soru yükleyemezsiniz." }, { status: 403 });
+    }
 
     const teacherId = authUser.id;
     const body = await request.json();

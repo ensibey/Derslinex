@@ -2325,7 +2325,7 @@ export default function ProfilPage() {
       else { const found = dbTeachers.find((h) => h.id.toString() === sId); teacherName = found ? found.name : "Öğretmen"; }
       const res = await fetch("/api/gorus", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ studentName: studentProfile.name, studentEmail: studentProfile.email, teacherId: sId.startsWith("static-") ? parseInt(sId.replace("static-", "")) * 1000 : parseInt(sId), teacherName, content: feedbackContent, rating: feedbackRating }) });
       const data = await res.json();
-      if (data.success) { showMsg("Görüşünüz / talebiniz başarıyla iletildi!", "success"); setFeedbackContent(""); fetchStudentFeedbacks(); }
+      if (data.success) { showMsg(data.message || "Görüş ve puanlamanız alındı! Yönetici onayının ardından öğretmen profilinde yayınlanacaktır.", "success"); setFeedbackContent(""); fetchStudentFeedbacks(); }
       else { showMsg(data.error || "Görüş gönderilemedi", "error"); }
     } catch { showMsg("Bir hata oluştu", "error"); } finally { setLoading(false); }
   };

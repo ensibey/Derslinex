@@ -253,6 +253,8 @@ export default function StudentOnlineExamPage({
             localStorage.setItem(`derslinex_focus_${examId}_${student.id}`, String(next));
             sessionStorage.setItem(`derslinex_focus_${examId}_${student.id}`, String(next));
           } catch {}
+          // Sync warning count instantly to server
+          fetch(`/api/student/exams/${examId}/warning`, { method: "POST" }).catch(() => {});
         }
         return next;
       });

@@ -15,14 +15,16 @@ export default function ClientLayoutWrapper({ children }: { children: React.Reac
     pathname?.startsWith("/admin") ||
     pathname?.startsWith("/sifremi-unuttum") ||
     pathname?.startsWith("/sifremi-sifirla") ||
-    pathname?.startsWith("/ders/");
+    pathname?.startsWith("/ders/") ||
+    pathname?.startsWith("/deneme/");
 
   if (isDashboardRoute) {
+    const isFullscreenRoute = pathname?.startsWith("/deneme/") || pathname?.startsWith("/ders/");
     return (
       <ToastProvider>
         <div className="min-h-screen bg-[#0F172A] text-slate-100 font-sans selection:bg-indigo-500 selection:text-white">
           <CommandPalette />
-          <main className="pb-20 md:pb-0">{children}</main>
+          <main className={isFullscreenRoute ? "" : "pb-20 md:pb-0"}>{children}</main>
         </div>
       </ToastProvider>
     );

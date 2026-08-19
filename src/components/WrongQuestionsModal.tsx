@@ -25,6 +25,27 @@ interface QuestionAttempt {
   };
 }
 
+function getVideoEmbedUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  try {
+    if (url.includes("youtube.com/watch")) {
+      const v = new URL(url).searchParams.get("v");
+      return v ? `https://www.youtube.com/embed/${v}` : url;
+    }
+    if (url.includes("youtu.be/")) {
+      const id = url.split("youtu.be/")[1]?.split("?")[0];
+      return id ? `https://www.youtube.com/embed/${id}` : url;
+    }
+    if (url.includes("vimeo.com/")) {
+      const id = url.split("vimeo.com/")[1]?.split("?")[0];
+      return id ? `https://player.vimeo.com/video/${id}` : url;
+    }
+    return url;
+  } catch {
+    return url;
+  }
+}
+
 export default function WrongQuestionsModal({
   studentId,
   onClose,
@@ -200,6 +221,23 @@ export default function WrongQuestionsModal({
                   <p className="text-xs text-slate-300 leading-relaxed">
                     {selectedAttempt.question.solutionText}
                   </p>
+                </div>
+              )}
+
+              {selectedAttempt.question.solutionVideoUrl && (
+                <div className="bg-indigo-950/40 border border-indigo-500/40 rounded-2xl p-4 space-y-3">
+                  <span className="text-[10px] font-black text-indigo-300 uppercase tracking-widest block">
+                    🎬 Video Çözüm
+                  </span>
+                  <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-black">
+                    <iframe
+                      src={getVideoEmbedUrl(selectedAttempt.question.solutionVideoUrl) || selectedAttempt.question.solutionVideoUrl}
+                      title="Video Çözümü"
+                      className="w-full h-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
                 </div>
               )}
             </div>

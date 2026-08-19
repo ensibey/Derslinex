@@ -23,6 +23,8 @@ model Student {
   quizResults  StudentQuizResult[]
   attempts     StudentQuestionAttempt[]
   examAttempts StudentExamAttempt[]
+  trialResults StudentTrialResult[]
+  topicProgress StudentTopicProgress[]
 }
 
 model Teacher {
@@ -47,6 +49,7 @@ model Teacher {
   questions    Question[]
   studentFeedbacks Feedback[]
   lessonOffers LessonOffer[]
+  faqs         TeacherFAQ[]
 }
 
 model TeacherTask {
@@ -110,9 +113,11 @@ model Feedback {
   teacherName  String
   content      String
   rating       Int      @default(5)
+  status       String   @default("PENDING") // PENDING, APPROVED, REJECTED
   createdAt    DateTime @default(now())
 
   @@index([teacherId])
+  @@index([status])
 }
 
 model LessonOffer {
@@ -164,9 +169,12 @@ model ChatMessage {
 model TeacherFAQ {
   id        Int      @id @default(autoincrement())
   teacherId Int
+  teacher   Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
   question  String
   answer    String
   createdAt DateTime @default(now())
+
+  @@index([teacherId])
 }
 
 // ─── Canlı Ders Sistemi Modelleri ─────────────────────────────────────────────
@@ -288,6 +296,7 @@ model ContactMessage {
 model StudentTrialResult {
   id           Int      @id @default(autoincrement())
   studentId    Int
+  student      Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
   title        String
   examType     String   @default("TYT")
   turkceNet    Float    @default(0)
@@ -303,6 +312,7 @@ model StudentTrialResult {
 model StudentTopicProgress {
   id          Int      @id @default(autoincrement())
   studentId   Int
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
   subject     String
   topic       String
   isCompleted Boolean  @default(false)

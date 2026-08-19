@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getAuthUser } from "@/lib/auth-middleware";
 
 export async function GET(request: Request) {
   try {
+    const authUser = await getAuthUser(request);
     const studentIdHeader = request.headers.get("x-student-id");
-    if (!studentIdHeader) {
+    const studentId = authUser?.id || (studentIdHeader ? parseInt(studentIdHeader) : null);
+
+    if (!studentId || isNaN(studentId)) {
       return NextResponse.json({ success: false, error: "Öğrenci girişi gereklidir." }, { status: 401 });
     }
-    const studentId = parseInt(studentIdHeader);
 
     const student = await prisma.student.findUnique({
       where: { id: studentId },

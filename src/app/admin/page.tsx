@@ -53,6 +53,7 @@ interface Feedback {
   teacherName: string;
   content: string;
   rating: number;
+  status?: string;
   createdAt: string;
 }
 
@@ -214,7 +215,7 @@ export default function AdminPage() {
       }
 
       const [fRes, lRes, bRes, sessRes, taskRes, qRes, cRes, mRes, exRes] = await Promise.all([
-        adminFetch("/api/gorus"),
+        adminFetch("/api/gorus?includeAll=true"),
         adminFetch("/api/admin/lessons"),
         adminFetch("/api/admin/blogs"),
         adminFetch("/api/admin/sessions"),
@@ -457,6 +458,32 @@ export default function AdminPage() {
       const data = await res.json();
       if (data.success) {
         showMsg(data.message || "Görüş silindi.", "success");
+        fetchData();
+      } else {
+        showMsg(data.error || "İşlem başarısız.", "error");
+      }
+    } catch {
+      showMsg("Bağlantı hatası", "error");
+    }
+  };
+
+  const handleUpdateFeedbackStatus = async (id: number, status: "APPROVED" | "REJECTED" | "PENDING") => {
+    try {
+      const res = await adminFetch("/api/gorus", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showMsg(
+          status === "APPROVED"
+            ? "Görüş ve puanlama onaylandı, öğretmenin profilinde yayınlandı!"
+            : status === "REJECTED"
+            ? "Görüş reddedildi."
+            : "Görüş durumu güncellendi.",
+          "success"
+        );
         fetchData();
       } else {
         showMsg(data.error || "İşlem başarısız.", "error");
@@ -1639,41 +1666,93 @@ export default function AdminPage() {
 
             {/* FEEDBACKS TAB */}
             {activeTab === "feedbacks" && (
-              <div className="p-6">
+              <div className="p-6 space-y-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/10 pb-5">
+                  <div>
+                    <h2 className="text-lg font-black text-white flex items-center gap-2">
+                      💬 Öğrenci Görüş & Puan Onay Merkezi
+                    </h2>
+                    <p className="text-xs text-slate-400 font-semibold mt-1">
+                      Öğrencilerin canlı ders sonrasında veya profil üzerinden öğretmenlere verdiği puanlama ve değerlendirmeleri onaylayın. Onaylanan puanlar öğretmenlerin profillerine yansır.
+                    </p>
+                  </div>
+                </div>
+
                 {feedbacks.length === 0 ? (
-                  <p className="text-center py-12 text-slate-500 font-semibold">
-                    Henüz öğrenciler tarafından yazılmış bir görüş veya talep bulunmamaktadır.
-                  </p>
+                  <div className="text-center py-12 bg-[#0D1B35] rounded-2xl border border-white/5 space-y-2">
+                    <span className="text-3xl block">💬</span>
+                    <p className="text-slate-400 font-semibold text-xs">
+                      Henüz öğrenciler tarafından yazılmış bir görüş veya puanlama bulunmamaktadır.
+                    </p>
+                  </div>
                 ) : (
                   <div className="grid sm:grid-cols-2 gap-4">
-                    {feedbacks.map((f) => (
-                      <div key={f.id} className="p-5 bg-[#0D1B35] border border-white/10 rounded-2xl relative shadow-xl space-y-3">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <span className="font-black text-sm text-white block">{f.studentName}</span>
-                            <span className="text-[10px] text-slate-400">{f.studentEmail || "E-posta Gizli"}</span>
+                    {feedbacks.map((f) => {
+                      const st = f.status || "PENDING";
+                      return (
+                        <div key={f.id} className="p-5 bg-[#0D1B35] border border-white/10 rounded-2xl relative shadow-xl space-y-3 hover:border-indigo-500/30 transition">
+                          <div className="flex justify-between items-start gap-2">
+                            <div>
+                              <span className="font-black text-sm text-white block">{f.studentName}</span>
+                              <span className="text-[10px] text-slate-400">{f.studentEmail || "E-posta Gizli"}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {st === "APPROVED" ? (
+                                <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-black text-[10px] px-2.5 py-0.5 rounded-full">
+                                  ✅ Onaylandı
+                                </span>
+                              ) : st === "REJECTED" ? (
+                                <span className="bg-red-500/20 text-red-400 border border-red-500/30 font-black text-[10px] px-2.5 py-0.5 rounded-full">
+                                  ❌ Reddedildi
+                                </span>
+                              ) : (
+                                <span className="bg-amber-500/20 text-amber-400 border border-amber-500/30 font-black text-[10px] px-2.5 py-0.5 rounded-full animate-pulse">
+                                  🟡 Onay Bekliyor
+                                </span>
+                              )}
+                              <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 font-black text-xs px-2 py-0.5 rounded-md">
+                                {f.rating} ★
+                              </span>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 font-black text-xs px-2 py-0.5 rounded-md">
-                              {f.rating} ★
-                            </span>
+
+                          <p className="text-slate-300 text-xs font-semibold leading-relaxed p-3 bg-[#1E293B] rounded-xl border border-white/5">
+                            "{f.content}"
+                          </p>
+
+                          <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/5 pt-3 text-[11px] font-bold">
+                            <span className="text-slate-400">Hedef Öğretmen: <strong className="text-indigo-400">{f.teacherName}</strong></span>
+                            <span className="text-slate-500">{new Date(f.createdAt).toLocaleDateString("tr-TR")}</span>
+                          </div>
+
+                          {/* Approval Actions */}
+                          <div className="flex items-center gap-2 pt-2 border-t border-white/10">
+                            {st !== "APPROVED" && (
+                              <button
+                                onClick={() => handleUpdateFeedbackStatus(f.id, "APPROVED")}
+                                className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs py-2 rounded-xl transition shadow-md flex items-center justify-center gap-1"
+                              >
+                                ✅ Onayla (Yayınla)
+                              </button>
+                            )}
+                            {st !== "REJECTED" && (
+                              <button
+                                onClick={() => handleUpdateFeedbackStatus(f.id, "REJECTED")}
+                                className="flex-1 bg-amber-600/30 hover:bg-amber-600/50 border border-amber-500/30 text-amber-300 font-bold text-xs py-2 rounded-xl transition flex items-center justify-center gap-1"
+                              >
+                                ❌ Reddet
+                              </button>
+                            )}
                             <button
                               onClick={() => handleDeleteFeedback(f.id)}
-                              className="text-xs text-red-400 hover:text-red-300 font-bold"
+                              className="bg-red-600/80 hover:bg-red-600 text-white font-black text-xs px-3 py-2 rounded-xl transition"
                             >
                               Sil
                             </button>
                           </div>
                         </div>
-                        <p className="text-slate-300 text-xs font-semibold leading-relaxed p-3 bg-[#1E293B] rounded-xl border border-white/5">
-                          "{f.content}"
-                        </p>
-                        <div className="flex justify-between items-center text-[10px] text-slate-400 font-bold border-t border-white/5 pt-2">
-                          <span>Hedef Öğretmen: <span className="text-indigo-400 font-black">{f.teacherName}</span></span>
-                          <span>{new Date(f.createdAt).toLocaleDateString("tr-TR")}</span>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>

@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: derslinex-app
+    env: node
+    region: frankfurt
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: ADMIN_SECRET
+        sync: false
+      - key: CRON_SECRET
+        sync: false
+      - key: DAILY_API_KEY
+        sync: false
+      - key: DAILY_API_BASE
+        value: https://api.daily.co/v1
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM
+        value: Derslinex <onboarding@resend.dev>
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false

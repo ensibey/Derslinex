@@ -85,6 +85,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Öğrenci bulunamadı." }, { status: 404 });
     }
 
+    if (student.isBanned) {
+      return NextResponse.json({ success: false, error: "Hesabınız engellenmiştir. İşlem yapamazsınız." }, { status: 403 });
+    }
+
     // Fetch all question IDs from database
     const questionIds = answers.map((a) => a.questionId);
     const dbQuestions = await prisma.question.findMany({

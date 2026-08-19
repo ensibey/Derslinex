@@ -99,7 +99,7 @@ export default async function HocaProfilPage({ params }: { params: Promise<{ slu
         orderBy: { createdAt: "asc" }
       }),
       prisma.feedback.findMany({
-        where: { teacherId: dbId }
+        where: { teacherId: dbId, status: "APPROVED" }
       })
     ]);
     
