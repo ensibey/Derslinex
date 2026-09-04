@@ -29,10 +29,6 @@ const faqItems = [
     cevap: "YKS (TYT, AYT Sayısal, AYT Eşit Ağırlık, AYT Sözel, YDT Dil) ve LGS (8. sınıf lise hazırlık) başta olmak üzere tüm ara sınıflar için özel ders alabilirsiniz.",
   },
   {
-    soru: "Özel Ders Borsası nasıl çalışır?",
-    cevap: "Öğrenci veya veliler istedikleri dersi, bütçeyi ve haftalık saati ilan olarak bırakır. Onaylı öğretmenlerimiz bu talepleri inceleyerek doğrudan teklif verir veya rehberlik ekibimiz en uygun eşleşmeyi sağlar.",
-  },
-  {
     soru: "Kamera gözetmenli online deneme sınavları ücretli mi?",
     cevap: "Derslinex platformunda belirli dönemlerde tüm öğrencilere açık ücretsiz Türkiye geneli deneme sınavları düzenlenir. Kupon kodlarınızı kullanarak da ücretsiz deneme hakkı kazanabilirsiniz.",
   },
@@ -342,46 +338,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ─── 5. ÖZEL DERS BORSASI TEASER BÖLÜMÜ ─── */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 sm:mt-24">
-        <div className="bg-white rounded-3xl p-8 sm:p-12 border border-[#EFECE6] shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="space-y-4 max-w-xl">
-            <div className="inline-flex items-center gap-2 bg-[#1E3A8A]/10 text-[#1E3A8A] px-3.5 py-1 rounded-full text-xs font-black uppercase">
-              <span>📈 YENİ HİZMET</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#1E3A8A]">
-              Özel Ders Borsası: İlan Ver, Eğitmenini Bul
-            </h2>
-            <p className="text-gray-600 text-sm sm:text-base leading-relaxed font-medium">
-              İhtiyacın olan dersi, haftalık saati ve bütçeni ilan olarak yayınla. Derslinex onaylı uzman eğitmenler doğrudan teklif versin.
-            </p>
-            <div className="flex flex-wrap gap-4 pt-2">
-              <Link
-                href="/ozel-ders-borsasi"
-                className="bg-[#1E3A8A] hover:bg-[#152860] text-white font-black text-sm px-6 py-3.5 rounded-xl shadow-md transition-all"
-              >
-                Borsadaki İlanları İncele →
-              </Link>
-              <Link
-                href="/ozel-ders-borsasi"
-                className="bg-[#B45309] hover:bg-[#92400E] text-white font-black text-sm px-6 py-3.5 rounded-xl shadow-md transition-all"
-              >
-                + Ücretsiz Ders Talebi Bırak
-              </Link>
-            </div>
-          </div>
-
-          <div className="bg-[#FAF8F5] border border-[#EFECE6] rounded-2xl p-6 w-full md:w-80 text-center space-y-3">
-            <span className="text-4xl">🤝</span>
-            <h4 className="text-sm font-black text-[#1E3A8A]">Hızlı & Şeffaf Eşleşme</h4>
-            <p className="text-xs text-gray-500 font-medium">
-              Komisyon veya aracı ücreti olmadan doğrudan veli ve öğretmen iletişimi.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── 6. DERS FORMATI (ONLINE / YÜZ YÜZE) ─── */}
+      {/* ─── 5. DERS FORMATI (ONLINE / YÜZ YÜZE) ─── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 sm:mt-24">
         <div className="text-center mb-12">
           <span className="text-[#B45309] text-xs font-black uppercase tracking-widest">ÇALIŞMA MODELİ</span>
@@ -516,7 +473,7 @@ export default async function HomePage() {
           </div>
           <h3 className="text-2xl sm:text-4xl font-black mb-3">Soruların mı var? Bize Ulaş!</h3>
           <p className="text-gray-200 text-sm sm:text-base mb-8 max-w-xl mx-auto font-medium">
-            Öğretmen seçimi, sınav hazırlık paketleri ve özel ders borsası hakkında detaylı bilgi için iletişim ekibimiz hizmetinizdedir.
+            Öğretmen seçimi, sınav hazırlık paketleri ve online özel dersler hakkında detaylı bilgi için iletişim ekibimiz hizmetinizdedir.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <a

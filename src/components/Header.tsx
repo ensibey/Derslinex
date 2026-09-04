@@ -5,12 +5,17 @@ import { useState, useEffect } from "react";
 import { waLink } from "@/lib/utils";
 import SidebarDrawer from "@/components/SidebarDrawer";
 
-const navLinks = [
+interface NavLinkItem {
+  href: string;
+  label: string;
+  badge?: string;
+}
+
+const navLinks: NavLinkItem[] = [
   { href: "/#nasil-calisir", label: "Nasıl Çalışır?" },
   { href: "/ogretmenler", label: "Öğretmenler" },
   { href: "/ozel-ders", label: "Özel Ders" },
   { href: "/yks-hazirlik", label: "Sınavlara Hazırlık" },
-  { href: "/ozel-ders-borsasi", label: "Özel Ders Borsası", badge: "YENİ" },
   { href: "/#firsat-kuponlari", label: "Fırsat Kuponları" },
   { href: "/hakkimizda", label: "Başarılarımız" },
 ];

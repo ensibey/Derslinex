@@ -151,10 +151,10 @@ export default function AdminPage() {
     },
     {
       id: 3,
-      title: "Özel Ders Borsası Eğitmen İlanları",
+      title: "LGS & YKS Yeni Nesil Deneme Paketleri",
       placement: "Ana Sayfa Teaser",
       imageUrl: "",
-      targetUrl: "/ozel-ders-borsasi",
+      targetUrl: "/#firsat-kuponlari",
       status: "Aktif",
       clicks: 64,
       impressions: 980,
