@@ -133,7 +133,7 @@ export default function AdminPage() {
       id: 1,
       title: "2026 YKS Hazırlık & Tanışma Programı",
       placement: "Üst Bant (Top Banner)",
-      imageUrl: "/hero-student-clean.jpg",
+      imageUrl: "/hero-student-clean.jpg?v=2",
       targetUrl: "/ogretmenler",
       status: "Aktif",
       clicks: 142,

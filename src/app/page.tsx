@@ -183,7 +183,7 @@ export default async function HomePage() {
               {/* Ana Görsel: Temiz Öğrenci ve Laptop Arka Planı (Üzerinde Çakışan Yazı veya Kart Yoktur) */}
               <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-gradient-to-br from-slate-100 to-slate-200">
                 <Image
-                  src="/hero-student-clean.jpg"
+                  src="/hero-student-clean.jpg?v=2"
                   alt="Derslinex Online Özel Ders ve Canlı Takip"
                   fill
                   className="object-cover object-center"
