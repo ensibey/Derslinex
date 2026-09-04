@@ -177,31 +177,34 @@ export default async function HomePage() {
           </div>
 
           {/* Sağ Kolon: Öğrenci, Laptop ve İnteraktif Kartlar (Image 2'deki Görsel Düzen) */}
+          {/* Sağ Kolon: Öğrenci, Laptop ve İnteraktif Kartlar (Temiz, Özgün Kodlanmış Görsel Düzen) */}
           <div className="lg:col-span-5 relative">
             <div className="relative mx-auto max-w-lg lg:max-w-none">
               
-              {/* Ana Görsel / Öğrenci Render Çerçevesi */}
+              {/* Ana Görsel: Temiz Öğrenci ve Laptop Arka Planı (Üzerinde Çakışan Yazı veya Kart Yoktur) */}
               <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-gradient-to-br from-slate-100 to-slate-200">
                 <Image
-                  src="/hero-student.jpg"
+                  src="/hero-student-clean.jpg"
                   alt="Derslinex Online Özel Ders ve Canlı Takip"
                   fill
-                  className="object-cover object-right"
+                  className="object-cover object-center"
                   priority
                 />
               </div>
 
-              {/* Floating Card 1: Haftalık Program (Sol Üst) */}
-              <div className="absolute -top-4 -left-4 bg-white/95 backdrop-blur-md rounded-2xl p-3.5 shadow-xl border border-gray-100 hidden sm:block">
+              {/* Floating Card 1: Haftalık Program (Sol / Üst Kısım) */}
+              <div className="absolute -top-5 left-2 sm:left-4 z-20 bg-white/95 backdrop-blur-md rounded-2xl p-3.5 shadow-xl border border-gray-100 hover:scale-102 transition-transform">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-base">📅</span>
+                  <span className="w-5 h-5 rounded-lg bg-orange-100 text-[#D94F00] flex items-center justify-center text-xs">📅</span>
                   <span className="text-xs font-black text-[#1E3A8A]">Haftalık Program</span>
                 </div>
-                <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500">
+                <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] font-bold text-gray-500">
                   {["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"].map((day, idx) => (
                     <div key={day} className="flex flex-col items-center gap-1">
-                      <span>{day}</span>
-                      <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] text-white font-black ${idx < 5 ? "bg-[#D94F00]" : "bg-gray-200 text-gray-600"}`}>
+                      <span className="text-[9px]">{day}</span>
+                      <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] text-white font-black shadow-xs ${
+                        idx < 5 ? "bg-[#E05600]" : "bg-gray-200 text-gray-500"
+                      }`}>
                         {idx < 5 ? "✓" : "·"}
                       </span>
                     </div>
@@ -209,43 +212,58 @@ export default async function HomePage() {
                 </div>
               </div>
 
-              {/* Floating Card 2: Deneme Analizi (Orta Sol) */}
-              <div className="absolute top-1/2 -left-6 -translate-y-1/2 bg-white/95 backdrop-blur-md rounded-2xl p-3.5 shadow-xl border border-gray-100 hidden sm:block">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-base">📊</span>
+              {/* Floating Card 2: Deneme Analizi (Sol / Orta Kısım) */}
+              <div className="absolute top-[48%] -left-4 sm:-left-8 -translate-y-1/2 z-20 bg-white/95 backdrop-blur-md rounded-2xl p-3.5 sm:p-4 shadow-xl border border-gray-100 hover:scale-102 transition-transform">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-5 h-5 rounded-lg bg-orange-100 text-[#D94F00] flex items-center justify-center text-xs">📊</span>
                   <span className="text-xs font-black text-[#1E3A8A]">Deneme Analizi</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full border-4 border-[#D94F00] border-t-indigo-600 border-r-emerald-500 flex items-center justify-center text-[10px] font-black text-[#1E3A8A]">
-                    %90
+                <div className="flex items-center gap-3 sm:gap-4">
+                  {/* Donut Chart SVG */}
+                  <div className="relative w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                      <circle cx="18" cy="18" r="14" fill="none" stroke="#F1F5F9" strokeWidth="4" />
+                      <circle cx="18" cy="18" r="14" fill="none" stroke="#1E3A8A" strokeWidth="4"
+                        strokeDasharray="63 100" strokeDashoffset="0" strokeLinecap="round" />
+                      <circle cx="18" cy="18" r="14" fill="none" stroke="#E05600" strokeWidth="4"
+                        strokeDasharray="16 100" strokeDashoffset="-63" strokeLinecap="round" />
+                      <circle cx="18" cy="18" r="14" fill="none" stroke="#94A3B8" strokeWidth="4"
+                        strokeDasharray="9 100" strokeDashoffset="-79" strokeLinecap="round" />
+                    </svg>
                   </div>
-                  <div className="text-[10px] font-bold space-y-0.5">
-                    <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#D94F00]" /> Doğru %72</div>
-                    <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-indigo-600" /> Yanlış %18</div>
-                    <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500" /> Boş %10</div>
+                  <div className="text-[10px] font-bold space-y-1">
+                    <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#1E3A8A]" /> <span className="text-gray-700">Doğru %72</span></div>
+                    <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#E05600]" /> <span className="text-gray-700">Yanlış %18</span></div>
+                    <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#94A3B8]" /> <span className="text-gray-700">Boş %10</span></div>
                   </div>
                 </div>
               </div>
 
-              {/* Floating Card 3: Gelişim Takibi (Sol Alt) */}
-              <div className="absolute -bottom-4 left-2 bg-white/95 backdrop-blur-md rounded-2xl p-3 shadow-xl border border-gray-100 hidden sm:block">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm">📈</span>
+              {/* Floating Card 3: Gelişim Takibi (Sol / Alt Kısım) */}
+              <div className="absolute -bottom-5 left-3 sm:left-6 z-20 bg-white/95 backdrop-blur-md rounded-2xl p-3 sm:p-3.5 shadow-xl border border-gray-100 hover:scale-102 transition-transform">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="w-5 h-5 rounded-lg bg-orange-100 text-[#D94F00] flex items-center justify-center text-xs">📈</span>
                   <span className="text-[11px] font-black text-[#1E3A8A]">Gelişim Takibi</span>
                 </div>
-                <div className="flex items-end gap-3 h-8 px-1">
-                  <div className="text-center">
-                    <div className="w-4 bg-orange-200 h-3 rounded-t mx-auto" />
-                    <span className="text-[8px] text-gray-400 font-bold">1. Hafta</span>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-4 bg-orange-400 h-5 rounded-t mx-auto" />
-                    <span className="text-[8px] text-gray-400 font-bold">4. Hafta</span>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-4 bg-[#D94F00] h-8 rounded-t mx-auto" />
-                    <span className="text-[8px] text-[#D94F00] font-black">7. Hafta</span>
-                  </div>
+                <div className="w-32 sm:w-36 h-10 relative flex items-end">
+                  <svg className="w-full h-full overflow-visible" viewBox="0 0 120 36">
+                    <defs>
+                      <linearGradient id="heroCurveGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#E05600" stopOpacity="0.25" />
+                        <stop offset="100%" stopColor="#E05600" stopOpacity="0.0" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M 10 28 Q 55 20 110 6 L 110 36 L 10 36 Z" fill="url(#heroCurveGrad)" />
+                    <path d="M 10 28 Q 55 20 110 6" fill="none" stroke="#E05600" strokeWidth="2.5" strokeLinecap="round" />
+                    <circle cx="10" cy="28" r="3" fill="#E05600" />
+                    <circle cx="60" cy="18" r="3" fill="#E05600" />
+                    <circle cx="110" cy="6" r="3.5" fill="#E05600" stroke="#FFFFFF" strokeWidth="1.5" />
+                  </svg>
+                </div>
+                <div className="flex justify-between text-[8px] font-bold text-gray-400 mt-1 px-1">
+                  <span>1. Hafta</span>
+                  <span>4. Hafta</span>
+                  <span className="text-[#E05600] font-black">7. Hafta</span>
                 </div>
               </div>
 
