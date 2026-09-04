@@ -1912,10 +1912,12 @@ const STUDENT_NAV = [
 
 // ─── Ana Sayfa ─────────────────────────────────────────────────────────────────
 export default function ProfilPage() {
-  const [role, setRole] = useState<"student" | "teacher">("student");
+  const [role, setRole] = useState<"student" | "teacher" | "admin">("student");
   const [authMode, setAuthMode] = useState<"login" | "register">("login");
   const [rememberMe, setRememberMe] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const [adminForm, setAdminForm] = useState({ name: "", email: "", password: "", securityKey: "" });
 
   const [studentForm, setStudentForm] = useState({ name: "", phone: "", email: "", password: "", targetTag: "TYT" });
   const [studentProfile, setStudentProfile] = useState<Student | null>(null);
@@ -2037,20 +2039,37 @@ export default function ProfilPage() {
 
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const r = params.get("role");
+      const m = params.get("mode");
+      if (r === "admin") setRole("admin");
+      else if (r === "teacher") setRole("teacher");
+      else if (r === "student") setRole("student");
+      if (m === "register" || m === "login") setAuthMode(m);
+    }
+
     const savedRole = localStorage.getItem("derslinex_role") || sessionStorage.getItem("derslinex_role");
     const savedUser = localStorage.getItem("derslinex_user") || sessionStorage.getItem("derslinex_user");
     if (savedRole && savedUser) {
-      const parsedUser = JSON.parse(savedUser);
-      if (savedRole === "student") {
-        setStudentProfile(parsedUser);
-        setStudentEditForm({ name: parsedUser.name, phone: parsedUser.phone, avatar: parsedUser.avatar || "", targetTag: parsedUser.targetTag || "TYT" });
-        setRole("student");
-        fetchStudentSessions(parsedUser.id);
-      } else {
-        setTeacherProfile(parsedUser);
-        setTeacherEditForm({ name: parsedUser.name, phone: parsedUser.phone, branch: parsedUser.branch, egitim: parsedUser.egitim || "", ozgecmis: parsedUser.ozgecmis || "", linkedin: parsedUser.linkedin || "", youtube: parsedUser.youtube || "", avatar: parsedUser.avatar || "" });
-        setRole("teacher");
-        fetchTeacherDashboardData(parsedUser.id);
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        if (savedRole === "admin") {
+          window.location.href = "/admin";
+          return;
+        } else if (savedRole === "student") {
+          setStudentProfile(parsedUser);
+          setStudentEditForm({ name: parsedUser.name, phone: parsedUser.phone, avatar: parsedUser.avatar || "", targetTag: parsedUser.targetTag || "TYT" });
+          setRole("student");
+          fetchStudentSessions(parsedUser.id);
+        } else if (savedRole === "teacher") {
+          setTeacherProfile(parsedUser);
+          setTeacherEditForm({ name: parsedUser.name, phone: parsedUser.phone, branch: parsedUser.branch, egitim: parsedUser.egitim || "", ozgecmis: parsedUser.ozgecmis || "", linkedin: parsedUser.linkedin || "", youtube: parsedUser.youtube || "", avatar: parsedUser.avatar || "" });
+          setRole("teacher");
+          fetchTeacherDashboardData(parsedUser.id);
+        }
+      } catch (e) {
+        console.error("User parse error:", e);
       }
     }
     fetchDbTeachers();
@@ -2218,6 +2237,52 @@ export default function ProfilPage() {
         fetchDbTeachers(); fetchTeacherDashboardData(teacher.id);
       } else { showMsg(data.error || "Giriş/Kayıt işlemi başarısız.", "error"); }
     } catch { showMsg("Bağlantı hatası oluştu.", "error"); } finally { setLoading(false); }
+  };
+
+  const handleAdminAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const endpoint = authMode === "login" ? "/api/auth/login/admin" : "/api/auth/register/admin";
+      const payload = authMode === "login"
+        ? { email: adminForm.email, password: adminForm.password }
+        : adminForm;
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (data.adminKey) {
+          sessionStorage.setItem("derslinex_admin_key", data.adminKey);
+          localStorage.setItem("derslinex_admin_key", data.adminKey);
+        }
+        localStorage.setItem("derslinex_role", "admin");
+        sessionStorage.setItem("derslinex_role", "admin");
+        if (data.user) {
+          localStorage.setItem("derslinex_user", JSON.stringify(data.user));
+          sessionStorage.setItem("derslinex_user", JSON.stringify(data.user));
+        }
+        window.dispatchEvent(new Event("derslinex_auth_change"));
+        showMsg(
+          authMode === "login"
+            ? "🛡️ Yönetici girişi başarılı! Admin paneline aktarılıyorsunuz..."
+            : "✨ Yönetici hesabı oluşturuldu! Admin paneline aktarılıyorsunuz...",
+          "success"
+        );
+        setTimeout(() => {
+          window.location.href = "/admin";
+        }, 800);
+      } else {
+        showMsg(data.error || "İşlem başarısız.", "error");
+      }
+    } catch {
+      showMsg("Bağlantı hatası oluştu.", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleVerifyCode = async (e: React.FormEvent) => {
@@ -2574,10 +2639,10 @@ export default function ProfilPage() {
             ) : (
               <>
                 {/* Role Tab Switcher */}
-                <div className="grid grid-cols-2 bg-white/[0.04] border border-white/8 p-1 rounded-2xl mb-6">
+                <div className="grid grid-cols-3 bg-white/[0.04] border border-white/8 p-1 rounded-2xl mb-6 gap-1">
                   <button
                     onClick={() => { setRole("student"); setAuthMode("login"); }}
-                    className={`py-2.5 px-4 text-xs sm:text-sm font-black rounded-xl transition-all duration-250 btn-press ${
+                    className={`py-2.5 px-2 text-xs sm:text-sm font-black rounded-xl transition-all duration-250 btn-press ${
                       role === "student"
                         ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-900/50"
                         : "text-slate-400 hover:text-white hover:bg-white/5"
@@ -2585,12 +2650,20 @@ export default function ProfilPage() {
                   >🎓 Öğrenci</button>
                   <button
                     onClick={() => { setRole("teacher"); setAuthMode("login"); }}
-                    className={`py-2.5 px-4 text-xs sm:text-sm font-black rounded-xl transition-all duration-250 btn-press ${
+                    className={`py-2.5 px-2 text-xs sm:text-sm font-black rounded-xl transition-all duration-250 btn-press ${
                       role === "teacher"
                         ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-900/50"
                         : "text-slate-400 hover:text-white hover:bg-white/5"
                     }`}
                   >👨‍🏫 Öğretmen</button>
+                  <button
+                    onClick={() => { setRole("admin"); setAuthMode("login"); }}
+                    className={`py-2.5 px-2 text-xs sm:text-sm font-black rounded-xl transition-all duration-250 btn-press ${
+                      role === "admin"
+                        ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg shadow-amber-900/50"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >🛡️ Yönetici</button>
                 </div>
 
                 {/* Login / Register Toggle */}
@@ -2601,6 +2674,7 @@ export default function ProfilPage() {
                   <button
                     onClick={() => setAuthMode(authMode === "login" ? "register" : "login")}
                     className={`text-xs font-black underline ml-1 transition-colors ${
+                      role === "admin" ? "text-amber-400 hover:text-amber-300" :
                       role === "teacher" ? "text-emerald-400 hover:text-emerald-300" : "text-indigo-400 hover:text-indigo-300"
                     }`}
                   >
@@ -2611,17 +2685,26 @@ export default function ProfilPage() {
                 {/* Form Header */}
                 <div className="flex items-center gap-3 mb-5 pb-5 border-b border-white/8">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${
-                    role === "teacher"
+                    role === "admin"
+                      ? "bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/30 text-amber-300"
+                      : role === "teacher"
                       ? "bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30"
                       : "bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30"
                   }`}>
-                    {role === "student" ? "🎓" : "👨‍🏫"}
+                    {role === "admin" ? "🛡️" : role === "teacher" ? "👨‍🏫" : "🎓"}
                   </div>
                   <div>
                     <h3 className="text-white font-black text-sm">
-                      {role === "student" ? "Öğrenci" : "Öğretmen"}{" "}
+                      {role === "admin" ? "Yönetici (Admin)" : role === "teacher" ? "Öğretmen" : "Öğrenci"}{" "}
                       {authMode === "login" ? "Giriş Paneli" : "Kayıt Paneli"}
                     </h3>
+                    {role === "admin" && (
+                      <p className="text-[11px] text-amber-300/80 font-medium mt-0.5">
+                        {authMode === "login"
+                          ? "Giriş yapıldığında doğrudan Admin Paneline yönlendirileceksiniz."
+                          : "Yeni yönetici hesabı oluşturmak için Master Güvenlik Anahtarı gereklidir."}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -2717,7 +2800,7 @@ export default function ProfilPage() {
                       ) : authMode === "login" ? "🚀 Giriş Yap" : "✨ Hesap Oluştur"}
                     </button>
                   </form>
-                ) : (
+                ) : role === "teacher" ? (
                   <form onSubmit={handleTeacherAuth} className="space-y-4">
                     {authMode === "register" && (
                       <>
@@ -2743,28 +2826,45 @@ export default function ProfilPage() {
                             />
                           </div>
                         </div>
-                        <div>
-                          <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Uzmanlık Branşınız</label>
-                          <input
-                            type="text" required
-                            placeholder="Matematik, Fizik, İngilizce vb."
-                            value={teacherForm.branch}
-                            onChange={(e) => setTeacherForm({ ...teacherForm, branch: e.target.value })}
-                            className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
-                          />
+
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Branş / Uzmanlık</label>
+                            <input
+                              type="text" required
+                              placeholder="Örn: Matematik, Fizik, Biyoloji"
+                              value={teacherForm.branch}
+                              onChange={(e) => setTeacherForm({ ...teacherForm, branch: e.target.value })}
+                              className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">E-Posta</label>
+                            <input
+                              type="email" required
+                              value={teacherForm.email}
+                              onChange={(e) => setTeacherForm({ ...teacherForm, email: e.target.value })}
+                              className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                              placeholder="ornek@ogretmen.com"
+                            />
+                          </div>
                         </div>
                       </>
                     )}
-                    <div>
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">E-posta Adresi</label>
-                      <input
-                        type="email" required
-                        value={teacherForm.email}
-                        onChange={(e) => setTeacherForm({ ...teacherForm, email: e.target.value })}
-                        className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
-                        placeholder="ornek@email.com"
-                      />
-                    </div>
+
+                    {authMode === "login" && (
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">E-Posta</label>
+                        <input
+                          type="email" required
+                          value={teacherForm.email}
+                          onChange={(e) => setTeacherForm({ ...teacherForm, email: e.target.value })}
+                          className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                          placeholder="ornek@ogretmen.com"
+                        />
+                      </div>
+                    )}
+
                     <div>
                       <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Şifre</label>
                       <input
@@ -2798,6 +2898,110 @@ export default function ProfilPage() {
                           İşlem yapılıyor...
                         </span>
                       ) : authMode === "login" ? "🚀 Giriş Yap" : "✨ Başvuru Yap & Kaydol"}
+                    </button>
+                  </form>
+                ) : (
+                  /* ─── YÖNETİCİ (ADMİN) FORMU ─── */
+                  <form onSubmit={handleAdminAuth} className="space-y-4">
+                    {authMode === "register" && (
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">
+                          Yönetici Adı Soyadı
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={adminForm.name}
+                          onChange={(e) => setAdminForm({ ...adminForm, name: e.target.value })}
+                          className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                          placeholder="Yönetici Adı Soyadı"
+                        />
+                      </div>
+                    )}
+
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">
+                        Yönetici E-Posta
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        value={adminForm.email}
+                        onChange={(e) => setAdminForm({ ...adminForm, email: e.target.value })}
+                        className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                        placeholder="admin@derslinex.com"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">
+                        Şifre
+                      </label>
+                      <input
+                        type="password"
+                        required
+                        value={adminForm.password}
+                        onChange={(e) => setAdminForm({ ...adminForm, password: e.target.value })}
+                        className="input-glow w-full bg-white/[0.05] border border-white/10 text-white px-4 py-3 rounded-xl text-sm font-bold placeholder-slate-600 focus:outline-none"
+                        placeholder="••••••••"
+                        minLength={8}
+                      />
+                    </div>
+
+                    {authMode === "register" && (
+                      <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl space-y-2">
+                        <label className="block text-[10px] font-black text-amber-400 uppercase tracking-widest">
+                          🛡️ Yönetici Doğrulama Anahtarı (Master Key)
+                        </label>
+                        <input
+                          type="password"
+                          required
+                          value={adminForm.securityKey}
+                          onChange={(e) => setAdminForm({ ...adminForm, securityKey: e.target.value })}
+                          className="input-glow w-full bg-white/[0.05] border border-amber-500/30 text-white px-4 py-2.5 rounded-xl text-sm font-bold placeholder-amber-200/40 focus:outline-none"
+                          placeholder="Admin Güvenlik Anahtarını Girin"
+                        />
+                        <p className="text-[10px] text-slate-400">
+                          Güvenlik gereği yetkisiz admin hesabı açılamaz. Sistem yöneticisi güvenlik anahtarı zorunludur.
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between pt-1">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="adminRemember"
+                          checked={rememberMe}
+                          onChange={(e) => setRememberMe(e.target.checked)}
+                          className="w-4 h-4 rounded accent-amber-500"
+                        />
+                        <label htmlFor="adminRemember" className="text-xs text-slate-500 font-bold select-none cursor-pointer">
+                          Beni Hatırla
+                        </label>
+                      </div>
+                      {authMode === "login" && (
+                        <Link href="/admin" className="text-xs text-amber-400 font-black hover:text-amber-300 transition-colors">
+                          Admin Anahtarı ile Giriş →
+                        </Link>
+                      )}
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="btn-press w-full bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 hover:from-amber-500 hover:to-orange-500 text-white font-black py-3.5 rounded-xl text-sm transition-all duration-200 shadow-lg shadow-amber-900/50 hover:shadow-amber-500/30 hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+                    >
+                      {loading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Doğrulanıyor...
+                        </span>
+                      ) : authMode === "login" ? (
+                        "🚀 Admin Paneline Giriş Yap"
+                      ) : (
+                        "✨ Yetkili Yönetici Hesabı Oluştur"
+                      )}
                     </button>
                   </form>
                 )}

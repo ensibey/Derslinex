@@ -193,19 +193,27 @@ export default function Header() {
             {/* 3. Giriş / Kayıt */}
             {user ? (
               <Link
-                href="/profil"
-                className="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 px-3 py-1 rounded-lg transition"
+                href={role === "admin" ? "/admin" : "/profil"}
+                className={`flex items-center gap-2 border px-3 py-1 rounded-lg transition ${
+                  role === "admin"
+                    ? "bg-amber-500/20 hover:bg-amber-500/30 border-amber-400/40 text-amber-200"
+                    : "bg-white/10 hover:bg-white/20 border border-white/20 text-white"
+                }`}
               >
-                <div className="w-5 h-5 rounded-full bg-[#B45309] text-white flex items-center justify-center text-[10px] font-black overflow-hidden">
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black overflow-hidden ${
+                  role === "admin" ? "bg-amber-600 text-white" : "bg-[#B45309] text-white"
+                }`}>
                   {user?.avatar ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={user.avatar} alt="" className="w-full h-full object-cover" />
+                  ) : role === "admin" ? (
+                    "🛡️"
                   ) : (
-                    user.name.charAt(0).toUpperCase()
+                    user.name?.charAt(0)?.toUpperCase() || "U"
                   )}
                 </div>
-                <span className="text-xs font-black text-white truncate max-w-[100px]">
-                  {user.name.split(" ")[0]} ({role === "teacher" ? "Öğretmen" : "Öğrenci"})
+                <span className="text-xs font-black truncate max-w-[110px]">
+                  {role === "admin" ? "🛡️ Admin" : `${user.name?.split(" ")[0] || "Kullanıcı"} (${role === "teacher" ? "Öğretmen" : "Öğrenci"})`}
                 </span>
               </Link>
             ) : (

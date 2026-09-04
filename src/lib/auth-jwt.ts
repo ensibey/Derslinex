@@ -23,7 +23,7 @@ function base64url(str: string) {
     .replace(/\//g, "_");
 }
 
-export async function signToken(payload: { id: number; email: string; role: "student" | "teacher" }) {
+export async function signToken(payload: { id: number; email: string; role: "student" | "teacher" | "admin" }) {
   const header = { alg: "HS256", typ: "JWT" };
   const exp = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7; // 7 days
   const fullPayload = { ...payload, exp, iat: Math.floor(Date.now() / 1000) };
@@ -42,7 +42,7 @@ export async function signToken(payload: { id: number; email: string; role: "stu
   return `${encodedHeader}.${encodedPayload}.${signature}`;
 }
 
-export async function verifyToken(token: string) {
+export function verifyTokenSync(token: string): { id: number; email: string; role: "student" | "teacher" | "admin" } | null {
   try {
     const [headerB64, payloadB64, signatureB64] = token.split(".");
     if (!headerB64 || !payloadB64 || !signatureB64) return null;
@@ -64,8 +64,12 @@ export async function verifyToken(token: string) {
     const payload = JSON.parse(Buffer.from(payloadB64, "base64").toString());
     if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null;
 
-    return payload as { id: number; email: string; role: "student" | "teacher" };
-  } catch (err) {
+    return payload as { id: number; email: string; role: "student" | "teacher" | "admin" };
+  } catch {
     return null;
   }
+}
+
+export async function verifyToken(token: string) {
+  return verifyTokenSync(token);
 }

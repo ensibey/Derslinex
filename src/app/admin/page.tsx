@@ -5,7 +5,7 @@ import Link from "next/link";
 
 function getAdminKey(): string {
   if (typeof window !== "undefined") {
-    return sessionStorage.getItem("derslinex_admin_key") || "";
+    return sessionStorage.getItem("derslinex_admin_key") || localStorage.getItem("derslinex_admin_key") || "";
   }
   return "";
 }
@@ -315,6 +315,10 @@ export default function AdminPage() {
   const [authRequired, setAuthRequired] = useState(false);
   const [keyInput, setKeyInput] = useState("");
   const [keyError, setKeyError] = useState("");
+  const [adminLoginEmail, setAdminLoginEmail] = useState("");
+  const [adminLoginPassword, setAdminLoginPassword] = useState("");
+  const [adminLoginLoading, setAdminLoginLoading] = useState(false);
+  const [adminLoginMode, setAdminLoginMode] = useState<"credentials" | "key">("credentials");
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -387,8 +391,43 @@ export default function AdminPage() {
       return;
     }
     sessionStorage.setItem("derslinex_admin_key", keyInput.trim());
+    localStorage.setItem("derslinex_admin_key", keyInput.trim());
     setKeyError("");
     fetchData();
+  };
+
+  const handleAdminCredentialsLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adminLoginEmail.trim() || !adminLoginPassword) {
+      setKeyError("Lütfen e-posta ve şifre giriniz.");
+      return;
+    }
+    setAdminLoginLoading(true);
+    setKeyError("");
+    try {
+      const res = await fetch("/api/auth/login/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: adminLoginEmail.trim(), password: adminLoginPassword }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (data.adminKey) {
+          sessionStorage.setItem("derslinex_admin_key", data.adminKey);
+          localStorage.setItem("derslinex_admin_key", data.adminKey);
+        }
+        localStorage.setItem("derslinex_role", "admin");
+        sessionStorage.setItem("derslinex_role", "admin");
+        setAuthRequired(false);
+        fetchData();
+      } else {
+        setKeyError(data.error || "Giriş başarısız.");
+      }
+    } catch {
+      setKeyError("Bağlantı hatası oluştu.");
+    } finally {
+      setAdminLoginLoading(false);
+    }
   };
 
   const showMsg = (text: string, type: "success" | "error") => {
@@ -612,38 +651,120 @@ export default function AdminPage() {
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-[#0D1B35] border border-white/10 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
             <div className="text-center space-y-2">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto text-2xl shadow-lg">
-                🔐
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-indigo-600 flex items-center justify-center mx-auto text-2xl shadow-lg">
+                🛡️
               </div>
-              <h2 className="text-xl font-black text-white">Admin Girişi</h2>
-              <p className="text-xs text-slate-400">Yönetim paneline erişmek için Admin Gizli Anahtarınızı giriniz.</p>
+              <h2 className="text-xl font-black text-white">Yönetici Doğrulaması</h2>
+              <p className="text-xs text-slate-400">Yönetim paneline erişmek için hesabınızla veya anahtarınızla giriş yapınız.</p>
             </div>
 
-            <form onSubmit={handleKeySubmit} className="space-y-4">
-              <div>
-                <input
-                  type="password"
-                  placeholder="Admin Anahtarı (x-admin-key)"
-                  value={keyInput}
-                  onChange={(e) => setKeyInput(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 text-sm"
-                  autoFocus
-                />
-              </div>
-
-              {keyError && (
-                <p className="text-xs text-red-400 bg-red-500/10 p-2 rounded-lg text-center font-medium">
-                  {keyError}
-                </p>
-              )}
-
+            {/* Mode Switcher */}
+            <div className="grid grid-cols-2 bg-white/5 border border-white/10 p-1 rounded-xl gap-1">
               <button
-                type="submit"
-                className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black rounded-xl text-sm transition shadow-lg shadow-indigo-600/30"
+                type="button"
+                onClick={() => { setAdminLoginMode("credentials"); setKeyError(""); }}
+                className={`py-2 text-xs font-bold rounded-lg transition ${
+                  adminLoginMode === "credentials"
+                    ? "bg-gradient-to-r from-amber-600 to-indigo-600 text-white shadow-sm"
+                    : "text-slate-400 hover:text-white"
+                }`}
               >
-                Giriş Yap
+                👤 E-Posta & Şifre
               </button>
-            </form>
+              <button
+                type="button"
+                onClick={() => { setAdminLoginMode("key"); setKeyError(""); }}
+                className={`py-2 text-xs font-bold rounded-lg transition ${
+                  adminLoginMode === "key"
+                    ? "bg-gradient-to-r from-amber-600 to-indigo-600 text-white shadow-sm"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                🔑 Gizli Anahtar
+              </button>
+            </div>
+
+            {adminLoginMode === "credentials" ? (
+              <form onSubmit={handleAdminCredentialsLogin} className="space-y-3">
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
+                    Yönetici E-Posta
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="admin@derslinex.com"
+                    value={adminLoginEmail}
+                    onChange={(e) => setAdminLoginEmail(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 text-sm"
+                    autoFocus
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
+                    Şifre
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    value={adminLoginPassword}
+                    onChange={(e) => setAdminLoginPassword(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 text-sm"
+                  />
+                </div>
+
+                {keyError && (
+                  <p className="text-xs text-red-400 bg-red-500/10 p-2 rounded-lg text-center font-medium">
+                    {keyError}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={adminLoginLoading}
+                  className="w-full py-3 bg-gradient-to-r from-amber-600 to-indigo-600 hover:from-amber-500 hover:to-indigo-500 text-white font-black rounded-xl text-sm transition shadow-lg shadow-amber-600/30 disabled:opacity-60"
+                >
+                  {adminLoginLoading ? "Doğrulanıyor..." : "Giriş Yap"}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleKeySubmit} className="space-y-3">
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
+                    Admin Anahtarı (x-admin-key)
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="Admin Anahtarı"
+                    value={keyInput}
+                    onChange={(e) => setKeyInput(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 text-sm"
+                    autoFocus
+                  />
+                </div>
+
+                {keyError && (
+                  <p className="text-xs text-red-400 bg-red-500/10 p-2 rounded-lg text-center font-medium">
+                    {keyError}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-gradient-to-r from-amber-600 to-indigo-600 hover:from-amber-500 hover:to-indigo-500 text-white font-black rounded-xl text-sm transition shadow-lg shadow-amber-600/30"
+                >
+                  Anahtar ile Doğrula
+                </button>
+              </form>
+            )}
+
+            <div className="pt-2 border-t border-white/5 text-center">
+              <Link
+                href="/profil?role=admin&mode=register"
+                className="text-xs text-amber-400 hover:text-amber-300 font-bold transition"
+              >
+                ✨ Yeni Yönetici Hesabı Oluştur →
+              </Link>
+            </div>
           </div>
         </div>
       )}

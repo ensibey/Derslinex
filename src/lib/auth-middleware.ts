@@ -5,7 +5,7 @@ import { prisma } from "@/lib/db";
 export interface AuthUser {
   id: number;
   email: string;
-  role: "student" | "teacher";
+  role: "student" | "teacher" | "admin";
   isBanned?: boolean;
 }
 
@@ -70,6 +70,8 @@ export async function getAuthUser(request: Request): Promise<AuthUser | null> {
       } else if (authUser.role === "teacher") {
         const tc = await prisma.teacher.findUnique({ where: { id: authUser.id }, select: { isBanned: true } });
         authUser.isBanned = tc?.isBanned ?? false;
+      } else if (authUser.role === "admin") {
+        authUser.isBanned = false;
       }
     }
 
