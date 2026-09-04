@@ -9,6 +9,9 @@ import PackagesSection from "@/components/PackagesSection";
 import { waLink } from "@/lib/utils";
 import { prisma } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Derslinex | Online Özel Ders & Sınavlara Hazırlık (YKS - LGS)",
   description:

@@ -14,6 +14,8 @@ function getYouTubeEmbedId(url: string | null) {
   return (match && match[2].length === 11) ? match[2] : null;
 }
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
