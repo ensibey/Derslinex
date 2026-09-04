@@ -131,10 +131,10 @@ export default function AdminPage() {
   const [adsList, setAdsList] = useState<any[]>([
     {
       id: 1,
-      title: "2026 YKS Bursluluk & Tanışma İndirimi",
+      title: "2026 YKS Hazırlık & Tanışma Programı",
       placement: "Üst Bant (Top Banner)",
-      imageUrl: "/hero-student.jpg",
-      targetUrl: "/#firsat-kuponlari",
+      imageUrl: "/hero-student-clean.jpg",
+      targetUrl: "/ogretmenler",
       status: "Aktif",
       clicks: 142,
       impressions: 2840,
@@ -151,10 +151,10 @@ export default function AdminPage() {
     },
     {
       id: 3,
-      title: "LGS & YKS Yeni Nesil Deneme Paketleri",
+      title: "LGS & YKS Yeni Nesil Soru Çözüm Paketleri",
       placement: "Ana Sayfa Teaser",
       imageUrl: "",
-      targetUrl: "/#firsat-kuponlari",
+      targetUrl: "/yks-hazirlik",
       status: "Aktif",
       clicks: 64,
       impressions: 980,
@@ -2621,7 +2621,7 @@ export default function AdminPage() {
                           <label className="block text-slate-300 font-bold mb-1">Hedef Yönlendirme Linki</label>
                           <input
                             type="text"
-                            placeholder="Örn: /deneme veya /#firsat-kuponlari"
+                            placeholder="Örn: /deneme veya /ogretmenler"
                             value={adForm.targetUrl}
                             onChange={(e) => setAdForm({ ...adForm, targetUrl: e.target.value })}
                             className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-bold"

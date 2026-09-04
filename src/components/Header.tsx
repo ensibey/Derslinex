@@ -16,7 +16,6 @@ const navLinks: NavLinkItem[] = [
   { href: "/ogretmenler", label: "Öğretmenler" },
   { href: "/ozel-ders", label: "Özel Ders" },
   { href: "/yks-hazirlik", label: "Sınavlara Hazırlık" },
-  { href: "/#firsat-kuponlari", label: "Fırsat Kuponları" },
   { href: "/hakkimizda", label: "Başarılarımız" },
 ];
 

@@ -5,7 +5,6 @@ import TeacherCard from "@/components/TeacherCard";
 import FAQ from "@/components/FAQ";
 import AdvantageSlider from "@/components/AdvantageSlider";
 import SubjectSearchWidget from "@/components/SubjectSearchWidget";
-import CouponSection from "@/components/CouponSection";
 import { waLink } from "@/lib/utils";
 import { prisma } from "@/lib/db";
 
@@ -30,7 +29,7 @@ const faqItems = [
   },
   {
     soru: "Kamera gözetmenli online deneme sınavları ücretli mi?",
-    cevap: "Derslinex platformunda belirli dönemlerde tüm öğrencilere açık ücretsiz Türkiye geneli deneme sınavları düzenlenir. Kupon kodlarınızı kullanarak da ücretsiz deneme hakkı kazanabilirsiniz.",
+    cevap: "Derslinex platformunda belirli dönemlerde tüm öğrencilere açık ücretsiz Türkiye geneli deneme sınavları düzenlenir.",
   },
 ];
 
@@ -316,10 +315,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ─── 3. FIRSAT KUPONLARI & BURSLAR (BAŞA ALINDI, LOGOLU) ─── */}
-      <CouponSection />
-
-      {/* ─── 4. ÇALIŞMAK İSTEDİĞİN ALAN (YKS & LGS YENİDEN DÜZENLENDİ) ─── */}
+      {/* ─── 3. ÇALIŞMAK İSTEDİĞİN ALAN (YKS & LGS YENİDEN DÜZENLENDİ) ─── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14 sm:mt-20">
         <div className="text-center mb-8">
           <span className="text-[#B45309] text-xs font-black uppercase tracking-widest">
