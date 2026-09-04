@@ -1,6 +1,5 @@
 "use client";
 import { useSearchParams } from "next/navigation";
-import { hocalar } from "@/data/hocalar";
 import TeacherCard from "@/components/TeacherCard";
 import { waLink } from "@/lib/utils";
 import React, { Suspense } from "react";
@@ -17,9 +16,9 @@ function OgretmenlerContent() {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    // Load static and dynamic teachers
+    // Load real approved teachers from DB
     const loadTeachers = async () => {
-      let list = [...hocalar];
+      let list: any[] = [];
       try {
         const res = await fetch("/api/profil/ogretmen");
         const data = await res.json();

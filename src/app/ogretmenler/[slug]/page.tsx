@@ -17,7 +17,14 @@ function getYouTubeEmbedId(url: string | null) {
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  return hocalar.map((h) => ({ slug: h.slug }));
+  try {
+    const teachers = await prisma.teacher.findMany({
+      where: { OR: [{ status: "İletişime Geçildi" }, { status: "Onaylandı" }, { status: "APPROVED" }] }
+    });
+    return teachers.map((t) => ({ slug: t.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") }));
+  } catch {
+    return [];
+  }
 }
 
 async function getHocaOrDb(slug: string) {
@@ -26,7 +33,7 @@ async function getHocaOrDb(slug: string) {
 
   // Query database
   const dbTeachers = await prisma.teacher.findMany({
-    where: { status: "İletişime Geçildi" }
+    where: { OR: [{ status: "İletişime Geçildi" }, { status: "Onaylandı" }, { status: "APPROVED" }] }
   });
 
   const matched = dbTeachers.find(

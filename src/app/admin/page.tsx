@@ -115,7 +115,7 @@ function BrandLogoHeader({ subBadge = "ADMİN PANELİ" }: { subBadge?: string })
 }
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<"usage" | "exams" | "teachers" | "students" | "lessons" | "blogs" | "feedbacks" | "sessions" | "tasks" | "questions" | "contact" | "settings">("exams");
+  const [activeTab, setActiveTab] = useState<"usage" | "exams" | "teachers" | "students" | "lessons" | "blogs" | "feedbacks" | "sessions" | "tasks" | "questions" | "contact" | "ads" | "publishers" | "settings">("exams");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
@@ -126,6 +126,97 @@ export default function AdminPage() {
   const [adminTasks, setAdminTasks] = useState<any[]>([]);
   const [questionsList, setQuestionsList] = useState<any[]>([]);
   const [contactMessages, setContactMessages] = useState<any[]>([]);
+
+  // Ads / Promotional Banners State
+  const [adsList, setAdsList] = useState<any[]>([
+    {
+      id: 1,
+      title: "2026 YKS Bursluluk & Tanışma İndirimi",
+      placement: "Üst Bant (Top Banner)",
+      imageUrl: "/hero-student.jpg",
+      targetUrl: "/#firsat-kuponlari",
+      status: "Aktif",
+      clicks: 142,
+      impressions: 2840,
+    },
+    {
+      id: 2,
+      title: "Online Canlı Deneme Sınavı Kampanyası",
+      placement: "Açılır Pop-up",
+      imageUrl: "",
+      targetUrl: "/deneme",
+      status: "Aktif",
+      clicks: 89,
+      impressions: 1250,
+    },
+    {
+      id: 3,
+      title: "Özel Ders Borsası Eğitmen İlanları",
+      placement: "Ana Sayfa Teaser",
+      imageUrl: "",
+      targetUrl: "/ozel-ders-borsasi",
+      status: "Aktif",
+      clicks: 64,
+      impressions: 980,
+    }
+  ]);
+  const [adModalOpen, setAdModalOpen] = useState(false);
+  const [adForm, setAdForm] = useState({
+    title: "",
+    placement: "Üst Bant (Top Banner)",
+    imageUrl: "",
+    targetUrl: "",
+    status: "Aktif"
+  });
+
+  // Publishers State
+  const [publishersList, setPublishersList] = useState<any[]>([
+    {
+      id: 1,
+      name: "Bilgi Sarmal Yayınları",
+      contact: "Ahmet Yetkili (0532 123 45 67)",
+      status: "Aktif Anlaşmalı",
+      examCount: 4,
+      notes: "TYT ve AYT Türkiye Geneli deneme serisi telif ortaklığı.",
+      logoUrl: ""
+    },
+    {
+      id: 2,
+      name: "3D Yayınları",
+      contact: "Mehmet Bey (0542 987 65 43)",
+      status: "Aktif Anlaşmalı",
+      examCount: 3,
+      notes: "Simülasyon denemeleri ve video çözüm entegrasyonu.",
+      logoUrl: ""
+    },
+    {
+      id: 3,
+      name: "Karekök Eğitim Yayınları",
+      contact: "Zeynep Hanım (0555 444 33 22)",
+      status: "Görüşülüyor",
+      examCount: 1,
+      notes: "Matematik ve Geometri soru bankası dijital havuz lisansı.",
+      logoUrl: ""
+    },
+    {
+      id: 4,
+      name: "Hız Yayınları",
+      contact: "Ali Bey (0505 111 22 33)",
+      status: "Aktif Anlaşmalı",
+      examCount: 2,
+      notes: "LGS 8. sınıf yeni nesil soru ve deneme tedarikçisi.",
+      logoUrl: ""
+    }
+  ]);
+  const [publisherModalOpen, setPublisherModalOpen] = useState(false);
+  const [publisherForm, setPublisherForm] = useState({
+    name: "",
+    contact: "",
+    status: "Aktif Anlaşmalı",
+    examCount: 0,
+    notes: "",
+    logoUrl: ""
+  });
   const [systemMetrics, setSystemMetrics] = useState<any>(null);
   const [usageData, setUsageData] = useState<any>(null);
   const [usageLoading, setUsageLoading] = useState(false);
@@ -585,6 +676,8 @@ export default function AdminPage() {
             { key: "blogs", label: "Blog Yazıları", count: blogs.length, icon: "✍️" },
             { key: "sessions", label: "Canlı Dersler", count: liveSessions.length, icon: "🎥" },
             { key: "feedbacks", label: "Görüşler", count: feedbacks.length, icon: "💬" },
+            { key: "ads", label: "Reklam & İlan Girişi", count: adsList.length, icon: "📢" },
+            { key: "publishers", label: "Yayınevi Paneli", count: publishersList.length, icon: "🏢" },
             { key: "settings", label: "Sistem & Ayarlar", count: 2, icon: "⚙️" },
             { key: "usage", label: "Kota & Kullanım", count: "⚡ Canlı", icon: "📊" },
           ].map((t) => (
@@ -2384,6 +2477,354 @@ export default function AdminPage() {
                         </div>
                       );
                     })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* REKLAM & İLAN GİRİŞİ YÖNETİM TABI */}
+            {activeTab === "ads" && (
+              <div className="p-6 space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#0D1B35] p-6 rounded-2xl border border-white/10 shadow-xl">
+                  <div>
+                    <h3 className="text-white font-black text-lg flex items-center gap-2">
+                      📢 Reklam & İlan Girişi Yönetimi
+                    </h3>
+                    <p className="text-xs text-slate-400 font-medium mt-1">
+                      Sitedeki üst bant (announcement ribbon), ana sayfa teaser ve pop-up reklamlarını buradan yönetebilirsiniz.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setAdModalOpen(true)}
+                    className="bg-gradient-to-r from-rose-600 to-orange-600 text-white font-black text-xs px-5 py-3 rounded-xl shadow-lg transition hover:scale-102 flex items-center gap-2 whitespace-nowrap"
+                  >
+                    <span>➕ Yeni Reklam Ekle</span>
+                  </button>
+                </div>
+
+                {/* Ads Stats */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="bg-[#0D1B35] border border-white/10 rounded-xl p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center text-xl font-black">
+                      📢
+                    </div>
+                    <div>
+                      <div className="text-lg font-black text-white">{adsList.length}</div>
+                      <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Tanımlı Kampanya</div>
+                    </div>
+                  </div>
+                  <div className="bg-[#0D1B35] border border-white/10 rounded-xl p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl font-black">
+                      👁️
+                    </div>
+                    <div>
+                      <div className="text-lg font-black text-white">
+                        {adsList.reduce((acc, a) => acc + (a.impressions || 0), 0).toLocaleString("tr-TR")}
+                      </div>
+                      <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Toplam Gösterim</div>
+                    </div>
+                  </div>
+                  <div className="bg-[#0D1B35] border border-white/10 rounded-xl p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl font-black">
+                      🖱️
+                    </div>
+                    <div>
+                      <div className="text-lg font-black text-white">
+                        {adsList.reduce((acc, a) => acc + (a.clicks || 0), 0).toLocaleString("tr-TR")}
+                      </div>
+                      <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Toplam Tıklama</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Ads List Grid */}
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {adsList.map((ad) => (
+                    <div key={ad.id} className="bg-[#0D1B35] border border-white/10 rounded-2xl p-5 shadow-lg flex flex-col justify-between space-y-4">
+                      <div>
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-white/10 text-slate-300">
+                            {ad.placement}
+                          </span>
+                          <button
+                            onClick={() => {
+                              setAdsList(adsList.map((x) => x.id === ad.id ? { ...x, status: x.status === "Aktif" ? "Pasif" : "Aktif" } : x));
+                            }}
+                            className={`text-[10px] font-black px-2.5 py-0.5 rounded-full transition ${
+                              ad.status === "Aktif" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-slate-500/20 text-slate-400 border border-slate-500/30"
+                            }`}
+                          >
+                            ● {ad.status}
+                          </button>
+                        </div>
+                        <h4 className="text-white font-black text-sm leading-snug">{ad.title}</h4>
+                        <div className="text-[11px] text-slate-400 mt-2 truncate">
+                          Hedef: <span className="text-indigo-400 font-mono">{ad.targetUrl}</span>
+                        </div>
+                      </div>
+
+                      <div className="pt-3 border-t border-white/5 flex items-center justify-between text-xs">
+                        <div className="text-[11px] text-slate-400">
+                          <strong className="text-white">{ad.clicks}</strong> tık / <strong className="text-white">{ad.impressions}</strong> gör.
+                        </div>
+                        <button
+                          onClick={() => {
+                            if (confirm("Bu reklamı silmek istediğinize emin misiniz?")) {
+                              setAdsList(adsList.filter((x) => x.id !== ad.id));
+                            }
+                          }}
+                          className="text-red-400 hover:text-red-300 font-bold text-[11px]"
+                        >
+                          Sil
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* New Ad Modal */}
+                {adModalOpen && (
+                  <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+                    <div className="bg-[#0D1B35] border border-white/15 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-white font-black text-base">➕ Yeni Reklam / İlan Ekle</h3>
+                        <button onClick={() => setAdModalOpen(false)} className="text-slate-400 hover:text-white">✕</button>
+                      </div>
+
+                      <div className="space-y-3 text-xs">
+                        <div>
+                          <label className="block text-slate-300 font-bold mb-1">Kampanya / Reklam Başlığı</label>
+                          <input
+                            type="text"
+                            placeholder="Örn: 2026 YKS Bursluluk Kampanyası"
+                            value={adForm.title}
+                            onChange={(e) => setAdForm({ ...adForm, title: e.target.value })}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-bold"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-300 font-bold mb-1">Reklam Konumu (Yerleşim)</label>
+                          <select
+                            value={adForm.placement}
+                            onChange={(e) => setAdForm({ ...adForm, placement: e.target.value })}
+                            className="w-full bg-[#131B2E] border border-white/10 rounded-xl px-3 py-2 text-white font-bold"
+                          >
+                            <option value="Üst Bant (Top Banner)">Üst Bant (Top Banner)</option>
+                            <option value="Hero Alanı">Hero Alanı</option>
+                            <option value="Açılır Pop-up">Açılır Pop-up</option>
+                            <option value="Ana Sayfa Teaser">Ana Sayfa Teaser</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-300 font-bold mb-1">Hedef Yönlendirme Linki</label>
+                          <input
+                            type="text"
+                            placeholder="Örn: /deneme veya /#firsat-kuponlari"
+                            value={adForm.targetUrl}
+                            onChange={(e) => setAdForm({ ...adForm, targetUrl: e.target.value })}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-bold"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-300 font-bold mb-1">Görsel URL (İsteğe Bağlı)</label>
+                          <input
+                            type="text"
+                            placeholder="Örn: /hero-student.jpg veya harici URL"
+                            value={adForm.imageUrl}
+                            onChange={(e) => setAdForm({ ...adForm, imageUrl: e.target.value })}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-bold"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex gap-3 pt-3">
+                        <button
+                          onClick={() => setAdModalOpen(false)}
+                          className="flex-1 py-2.5 bg-white/5 hover:bg-white/10 text-slate-300 font-bold rounded-xl transition"
+                        >
+                          Vazgeç
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (!adForm.title) return alert("Lütfen başlık girin");
+                            const newAd = {
+                              id: Date.now(),
+                              title: adForm.title,
+                              placement: adForm.placement,
+                              imageUrl: adForm.imageUrl,
+                              targetUrl: adForm.targetUrl || "/",
+                              status: adForm.status,
+                              clicks: 0,
+                              impressions: 0
+                            };
+                            setAdsList([newAd, ...adsList]);
+                            setAdModalOpen(false);
+                            setAdForm({ title: "", placement: "Üst Bant (Top Banner)", imageUrl: "", targetUrl: "", status: "Aktif" });
+                          }}
+                          className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-xl transition shadow-lg"
+                        >
+                          Kaydet & Yayınla
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* YAYINEVİ VE YÖNETİCİ PANELİ TABI */}
+            {activeTab === "publishers" && (
+              <div className="p-6 space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#0D1B35] p-6 rounded-2xl border border-white/10 shadow-xl">
+                  <div>
+                    <h3 className="text-white font-black text-lg flex items-center gap-2">
+                      🏢 Yayınevi ve Yayın Ortakları Paneli
+                    </h3>
+                    <p className="text-xs text-slate-400 font-medium mt-1">
+                      Online deneme sınavı soru tedarikçileri, anlaşmalı yayınevleri ve telif ortaklarını buradan takip edebilirsiniz.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setPublisherModalOpen(true)}
+                    className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-black text-xs px-5 py-3 rounded-xl shadow-lg transition hover:scale-102 flex items-center gap-2 whitespace-nowrap"
+                  >
+                    <span>➕ Yeni Yayınevi Ekle</span>
+                  </button>
+                </div>
+
+                {/* Publishers Grid */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  {publishersList.map((pub) => (
+                    <div key={pub.id} className="bg-[#0D1B35] border border-white/10 rounded-2xl p-5 shadow-lg space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-lg font-black">
+                            📚
+                          </div>
+                          <div>
+                            <h4 className="text-white font-black text-sm">{pub.name}</h4>
+                            <span className="text-[10px] text-slate-400 font-bold">{pub.contact}</span>
+                          </div>
+                        </div>
+                        <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
+                          pub.status === "Aktif Anlaşmalı" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                        }`}>
+                          {pub.status}
+                        </span>
+                      </div>
+
+                      <p className="text-xs text-slate-300 bg-white/5 p-3 rounded-xl border border-white/5 font-medium">
+                        {pub.notes}
+                      </p>
+
+                      <div className="flex items-center justify-between text-xs pt-2 border-t border-white/5">
+                        <span className="text-slate-400">
+                          Entegre Deneme Sayısı: <strong className="text-white">{pub.examCount}</strong>
+                        </span>
+                        <button
+                          onClick={() => {
+                            if (confirm("Bu yayınevini listeden kaldırmak istiyor musunuz?")) {
+                              setPublishersList(publishersList.filter((x) => x.id !== pub.id));
+                            }
+                          }}
+                          className="text-red-400 hover:text-red-300 font-bold text-[11px]"
+                        >
+                          Sil
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* New Publisher Modal */}
+                {publisherModalOpen && (
+                  <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+                    <div className="bg-[#0D1B35] border border-white/15 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-white font-black text-base">➕ Yeni Yayınevi Ekle</h3>
+                        <button onClick={() => setPublisherModalOpen(false)} className="text-slate-400 hover:text-white">✕</button>
+                      </div>
+
+                      <div className="space-y-3 text-xs">
+                        <div>
+                          <label className="block text-slate-300 font-bold mb-1">Yayınevi Adı</label>
+                          <input
+                            type="text"
+                            placeholder="Örn: Limit Yayınları"
+                            value={publisherForm.name}
+                            onChange={(e) => setPublisherForm({ ...publisherForm, name: e.target.value })}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-bold"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-300 font-bold mb-1">Yetkili / İletişim Bilgisi</label>
+                          <input
+                            type="text"
+                            placeholder="Örn: Ayşe Hanım (0500 000 00 00)"
+                            value={publisherForm.contact}
+                            onChange={(e) => setPublisherForm({ ...publisherForm, contact: e.target.value })}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-bold"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-300 font-bold mb-1">Anlaşma Durumu</label>
+                          <select
+                            value={publisherForm.status}
+                            onChange={(e) => setPublisherForm({ ...publisherForm, status: e.target.value })}
+                            className="w-full bg-[#131B2E] border border-white/10 rounded-xl px-3 py-2 text-white font-bold"
+                          >
+                            <option value="Aktif Anlaşmalı">Aktif Anlaşmalı</option>
+                            <option value="Görüşülüyor">Görüşülüyor</option>
+                            <option value="Deneme Tedarikçisi">Deneme Tedarikçisi</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-300 font-bold mb-1">Ortaklık Notları</label>
+                          <textarea
+                            rows={2}
+                            placeholder="Telif kapsamı, soru havuzu, deneme detayları..."
+                            value={publisherForm.notes}
+                            onChange={(e) => setPublisherForm({ ...publisherForm, notes: e.target.value })}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-bold"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex gap-3 pt-3">
+                        <button
+                          onClick={() => setPublisherModalOpen(false)}
+                          className="flex-1 py-2.5 bg-white/5 hover:bg-white/10 text-slate-300 font-bold rounded-xl transition"
+                        >
+                          Vazgeç
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (!publisherForm.name) return alert("Lütfen yayınevi adını girin");
+                            const newPub = {
+                              id: Date.now(),
+                              name: publisherForm.name,
+                              contact: publisherForm.contact,
+                              status: publisherForm.status,
+                              examCount: 0,
+                              notes: publisherForm.notes,
+                              logoUrl: ""
+                            };
+                            setPublishersList([newPub, ...publishersList]);
+                            setPublisherModalOpen(false);
+                            setPublisherForm({ name: "", contact: "", status: "Aktif Anlaşmalı", examCount: 0, notes: "", logoUrl: "" });
+                          }}
+                          className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl transition shadow-lg"
+                        >
+                          Yayınevini Ekle
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
