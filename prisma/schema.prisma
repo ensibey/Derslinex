@@ -409,5 +409,25 @@ model StudentExamAnswer {
   @@unique([attemptId, questionId])
 }
 
+// ─── DERS PAKETLERİ MODELLERİ ──────────────────────────────────────────────────
+model LessonPackage {
+  id              Int      @id @default(autoincrement())
+  title           String
+  subtitle        String?
+  targetExam      String   @default("YKS") // "YKS", "LGS", "TÜMÜ"
+  hours           Int      @default(20)
+  price           Float
+  discountedPrice Float?
+  badge           String?  // "Popüler", "En Çok Tercih Edilen", "Avantajlı Paket"
+  features        String   // Comma-separated or JSON list of features
+  isPopular       Boolean  @default(false)
+  isActive        Boolean  @default(true)
+  orderNo         Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([targetExam, isActive])
+}
+
 
 

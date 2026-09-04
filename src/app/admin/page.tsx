@@ -115,7 +115,7 @@ function BrandLogoHeader({ subBadge = "ADMİN PANELİ" }: { subBadge?: string })
 }
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<"usage" | "exams" | "teachers" | "students" | "lessons" | "blogs" | "feedbacks" | "sessions" | "tasks" | "questions" | "contact" | "ads" | "publishers" | "settings">("exams");
+  const [activeTab, setActiveTab] = useState<"usage" | "exams" | "teachers" | "students" | "lessons" | "blogs" | "feedbacks" | "sessions" | "tasks" | "questions" | "contact" | "ads" | "publishers" | "packages" | "settings">("exams");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
@@ -217,6 +217,25 @@ export default function AdminPage() {
     notes: "",
     logoUrl: ""
   });
+
+  // Packages State
+  const [adminPackages, setAdminPackages] = useState<any[]>([]);
+  const [packageModalOpen, setPackageModalOpen] = useState(false);
+  const [editingPackageId, setEditingPackageId] = useState<number | null>(null);
+  const [packageForm, setPackageForm] = useState({
+    title: "",
+    subtitle: "",
+    targetExam: "YKS",
+    hours: 20,
+    price: 10000,
+    discountedPrice: "" as any,
+    badge: "Popüler",
+    features: "Haftalık 2 saat canlı birebir ders,Kişiye özel çalışma planı,Deneme sınavları,7/24 WhatsApp desteği",
+    isPopular: false,
+    isActive: true,
+    orderNo: 1,
+  });
+
   const [systemMetrics, setSystemMetrics] = useState<any>(null);
   const [usageData, setUsageData] = useState<any>(null);
   const [usageLoading, setUsageLoading] = useState(false);
@@ -300,24 +319,19 @@ export default function AdminPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const uRes = await adminFetch("/api/admin/users");
-      if (uRes.status === 401) {
-        setAuthRequired(true);
-        setLoading(false);
-        return;
-      }
-
-      const [fRes, lRes, bRes, sessRes, taskRes, qRes, cRes, mRes, exRes, usgRes] = await Promise.all([
-        adminFetch("/api/gorus?includeAll=true"),
+      const [uRes, fRes, lRes, bRes, sessRes, taskRes, qRes, cRes, mRes, exRes, usgRes, pkgRes] = await Promise.all([
+        adminFetch("/api/admin/users"),
+        adminFetch("/api/admin/feedbacks"),
         adminFetch("/api/admin/lessons"),
         adminFetch("/api/admin/blogs"),
         adminFetch("/api/admin/sessions"),
         adminFetch("/api/admin/tasks"),
         adminFetch("/api/admin/questions"),
         adminFetch("/api/admin/contact"),
-        adminFetch("/api/admin/status"),
+        adminFetch("/api/admin/stats"),
         adminFetch("/api/admin/exams"),
         adminFetch("/api/admin/usage"),
+        adminFetch("/api/admin/packages"),
       ]);
 
       const uData = await uRes.json();
@@ -331,6 +345,7 @@ export default function AdminPage() {
       const mData = await mRes.json();
       const exData = await exRes.json();
       const usgData = await usgRes.json();
+      const pkgData = await pkgRes.json();
 
       if (uData.success) {
         setAuthRequired(false);
@@ -349,6 +364,7 @@ export default function AdminPage() {
       if (cData.success) setContactMessages(cData.messages || []);
       if (mData.success) setSystemMetrics(mData.metrics || null);
       if (usgData.success) setUsageData(usgData.data || null);
+      if (pkgData.success) setAdminPackages(pkgData.packages || []);
       if (exData.success) {
         setExams(exData.exams || []);
         setApprovedQuestionsPool(exData.approvedQuestions || []);
@@ -676,6 +692,7 @@ export default function AdminPage() {
             { key: "blogs", label: "Blog Yazıları", count: blogs.length, icon: "✍️" },
             { key: "sessions", label: "Canlı Dersler", count: liveSessions.length, icon: "🎥" },
             { key: "feedbacks", label: "Görüşler", count: feedbacks.length, icon: "💬" },
+            { key: "packages", label: "Ders Paketleri", count: adminPackages.length, icon: "📦" },
             { key: "ads", label: "Reklam & İlan Girişi", count: adsList.length, icon: "📢" },
             { key: "publishers", label: "Yayınevi Paneli", count: publishersList.length, icon: "🏢" },
             { key: "settings", label: "Sistem & Ayarlar", count: 2, icon: "⚙️" },
@@ -2822,6 +2839,382 @@ export default function AdminPage() {
                           className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl transition shadow-lg"
                         >
                           Yayınevini Ekle
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* DERS PAKETLERİ YÖNETİMİ TABI */}
+            {activeTab === "packages" && (
+              <div className="p-6 space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#0D1B35] p-6 rounded-2xl border border-white/10 shadow-xl">
+                  <div>
+                    <h3 className="text-white font-black text-lg flex items-center gap-2">
+                      📦 Ders Paketleri Yönetimi
+                    </h3>
+                    <p className="text-xs text-slate-400 font-medium mt-1">
+                      Ana sayfadaki hazır ders paketlerini ekleyebilir, fiyatları, saatleri ve paket özelliklerini anlık güncelleyebilirsiniz.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setEditingPackageId(null);
+                      setPackageForm({
+                        title: "",
+                        subtitle: "",
+                        targetExam: "YKS",
+                        hours: 20,
+                        price: 10000,
+                        discountedPrice: "",
+                        badge: "Popüler Paket",
+                        features: "Haftalık 2 saat canlı birebir ders,Kişiye özel çalışma planı,Deneme sınavları,7/24 WhatsApp desteği",
+                        isPopular: false,
+                        isActive: true,
+                        orderNo: adminPackages.length + 1,
+                      });
+                      setPackageModalOpen(true);
+                    }}
+                    className="bg-gradient-to-r from-orange-600 to-amber-600 text-white font-black text-xs px-5 py-3 rounded-xl shadow-lg transition hover:scale-102 flex items-center gap-2 whitespace-nowrap"
+                  >
+                    <span>➕ Yeni Paket Ekle</span>
+                  </button>
+                </div>
+
+                {/* Packages Stats */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="bg-[#0D1B35] border border-white/10 rounded-xl p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center text-xl font-black">
+                      📦
+                    </div>
+                    <div>
+                      <div className="text-lg font-black text-white">{adminPackages.length}</div>
+                      <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Tanımlı Paket</div>
+                    </div>
+                  </div>
+                  <div className="bg-[#0D1B35] border border-white/10 rounded-xl p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl font-black">
+                      🟢
+                    </div>
+                    <div>
+                      <div className="text-lg font-black text-white">
+                        {adminPackages.filter((p) => p.isActive).length}
+                      </div>
+                      <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Yayında / Aktif</div>
+                    </div>
+                  </div>
+                  <div className="bg-[#0D1B35] border border-white/10 rounded-xl p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center text-xl font-black">
+                      ⏱️
+                    </div>
+                    <div>
+                      <div className="text-lg font-black text-white">
+                        {adminPackages.reduce((acc, p) => acc + (p.hours || 0), 0)} Saat
+                      </div>
+                      <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Toplam Paket Saati</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Packages List Grid */}
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {adminPackages.map((pkg) => {
+                    const features = pkg.features ? pkg.features.split(",").map((f: string) => f.trim()).filter(Boolean) : [];
+                    return (
+                      <div key={pkg.id} className="bg-[#0D1B35] border border-white/10 rounded-2xl p-5 shadow-lg flex flex-col justify-between space-y-4">
+                        <div>
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-white/10 text-slate-300">
+                              {pkg.targetExam} · {pkg.hours} Saat
+                            </span>
+                            <button
+                              onClick={async () => {
+                                try {
+                                  const res = await adminFetch("/api/admin/packages", {
+                                    method: "PUT",
+                                    body: JSON.stringify({ ...pkg, isActive: !pkg.isActive })
+                                  });
+                                  const data = await res.json();
+                                  if (data.success) {
+                                    showMsg("Paket durumu güncellendi", "success");
+                                    fetchData();
+                                  }
+                                } catch {
+                                  showMsg("İşlem başarısız", "error");
+                                }
+                              }}
+                              className={`text-[10px] font-black px-2.5 py-0.5 rounded-full transition ${
+                                pkg.isActive ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-slate-500/20 text-slate-400 border border-slate-500/30"
+                              }`}
+                            >
+                              ● {pkg.isActive ? "Aktif" : "Pasif"}
+                            </button>
+                          </div>
+
+                          <h4 className="text-white font-black text-base leading-snug">{pkg.title}</h4>
+                          {pkg.subtitle && (
+                            <p className="text-xs text-slate-400 mt-1 font-medium">{pkg.subtitle}</p>
+                          )}
+
+                          <div className="bg-white/5 p-3 rounded-xl border border-white/5 mt-3">
+                            <div className="flex items-baseline gap-2">
+                              <span className="text-xl font-black text-amber-400">
+                                {(pkg.discountedPrice || pkg.price).toLocaleString("tr-TR")} ₺
+                              </span>
+                              {pkg.discountedPrice && (
+                                <span className="text-xs text-slate-400 line-through font-bold">
+                                  {pkg.price.toLocaleString("tr-TR")} ₺
+                                </span>
+                              )}
+                            </div>
+                            {pkg.badge && (
+                              <span className="inline-block text-[9px] font-black text-orange-300 uppercase mt-1">
+                                ★ {pkg.badge}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="space-y-1 mt-3">
+                            {features.slice(0, 3).map((f: string, i: number) => (
+                              <div key={i} className="text-[11px] text-slate-300 flex items-center gap-1.5">
+                                <span className="text-emerald-400 font-bold">✓</span>
+                                <span className="truncate">{f}</span>
+                              </div>
+                            ))}
+                            {features.length > 3 && (
+                              <span className="text-[10px] text-slate-500 font-bold block">
+                                +{features.length - 3} özellik daha
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="pt-3 border-t border-white/5 flex items-center justify-between text-xs">
+                          <button
+                            onClick={() => {
+                              setEditingPackageId(pkg.id);
+                              setPackageForm({
+                                title: pkg.title,
+                                subtitle: pkg.subtitle || "",
+                                targetExam: pkg.targetExam || "YKS",
+                                hours: pkg.hours || 20,
+                                price: pkg.price || 10000,
+                                discountedPrice: pkg.discountedPrice || "",
+                                badge: pkg.badge || "",
+                                features: pkg.features || "",
+                                isPopular: pkg.isPopular || false,
+                                isActive: pkg.isActive !== undefined ? pkg.isActive : true,
+                                orderNo: pkg.orderNo || 1,
+                              });
+                              setPackageModalOpen(true);
+                            }}
+                            className="text-indigo-400 hover:text-indigo-300 font-bold text-xs"
+                          >
+                            Düzenle ✏️
+                          </button>
+
+                          <button
+                            onClick={async () => {
+                              if (!confirm(`'${pkg.title}' paketini silmek istediğinize emin misiniz?`)) return;
+                              try {
+                                const res = await adminFetch(`/api/admin/packages?id=${pkg.id}`, { method: "DELETE" });
+                                const data = await res.json();
+                                if (data.success) {
+                                  showMsg("Paket silindi", "success");
+                                  fetchData();
+                                } else {
+                                  showMsg(data.error || "Silme başarısız", "error");
+                                }
+                              } catch {
+                                showMsg("Bağlantı hatası", "error");
+                              }
+                            }}
+                            className="text-red-400 hover:text-red-300 font-bold text-xs"
+                          >
+                            Sil 🗑️
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Package Create / Edit Modal */}
+                {packageModalOpen && (
+                  <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+                    <div className="bg-[#0D1B35] border border-white/15 rounded-3xl max-w-lg w-full p-6 sm:p-7 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-white font-black text-base">
+                          {editingPackageId ? "✏️ Paketi Düzenle" : "➕ Yeni Ders Paketi Ekle"}
+                        </h3>
+                        <button onClick={() => setPackageModalOpen(false)} className="text-slate-400 hover:text-white">✕</button>
+                      </div>
+
+                      <div className="space-y-3 text-xs">
+                        <div>
+                          <label className="block text-slate-300 font-bold mb-1">Paket Başlığı *</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="Örn: TYT & AYT Sayısal Derece Paketi"
+                            value={packageForm.title}
+                            onChange={(e) => setPackageForm({ ...packageForm, title: e.target.value })}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-bold"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-300 font-bold mb-1">Alt Başlık / Açıklama</label>
+                          <input
+                            type="text"
+                            placeholder="Örn: 30 saat canlı ders, denemeler ve ödev takibi"
+                            value={packageForm.subtitle}
+                            onChange={(e) => setPackageForm({ ...packageForm, subtitle: e.target.value })}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-bold"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-slate-300 font-bold mb-1">Hedef Sınav</label>
+                            <select
+                              value={packageForm.targetExam}
+                              onChange={(e) => setPackageForm({ ...packageForm, targetExam: e.target.value })}
+                              className="w-full bg-[#131B2E] border border-white/10 rounded-xl px-3 py-2 text-white font-bold"
+                            >
+                              <option value="YKS">YKS (TYT-AYT)</option>
+                              <option value="LGS">LGS (8. Sınıf)</option>
+                              <option value="TÜMÜ">Tüm Sınavlar</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-slate-300 font-bold mb-1">Toplam Ders Saati</label>
+                            <input
+                              type="number"
+                              placeholder="20"
+                              value={packageForm.hours}
+                              onChange={(e) => setPackageForm({ ...packageForm, hours: parseInt(e.target.value) || 0 })}
+                              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-bold"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-slate-300 font-bold mb-1">Fiyat (TL) *</label>
+                            <input
+                              type="number"
+                              placeholder="10000"
+                              value={packageForm.price}
+                              onChange={(e) => setPackageForm({ ...packageForm, price: parseFloat(e.target.value) || 0 })}
+                              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-bold"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-slate-300 font-bold mb-1">İndirimli Fiyat (TL, İsteğe Bağlı)</label>
+                            <input
+                              type="number"
+                              placeholder="8500"
+                              value={packageForm.discountedPrice}
+                              onChange={(e) => setPackageForm({ ...packageForm, discountedPrice: e.target.value })}
+                              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-bold"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-slate-300 font-bold mb-1">Rozet / Etiket</label>
+                            <input
+                              type="text"
+                              placeholder="Örn: En Çok Tercih Edilen"
+                              value={packageForm.badge}
+                              onChange={(e) => setPackageForm({ ...packageForm, badge: e.target.value })}
+                              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-bold"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-slate-300 font-bold mb-1">Sıralama No</label>
+                            <input
+                              type="number"
+                              value={packageForm.orderNo}
+                              onChange={(e) => setPackageForm({ ...packageForm, orderNo: parseInt(e.target.value) || 0 })}
+                              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-bold"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-300 font-bold mb-1">Özellikler (Virgülle ayırarak yazın)</label>
+                          <textarea
+                            rows={3}
+                            placeholder="Haftalık 2 saat canlı ders, Kişiye özel çalışma planı, Deneme sınavları..."
+                            value={packageForm.features}
+                            onChange={(e) => setPackageForm({ ...packageForm, features: e.target.value })}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-bold"
+                          />
+                        </div>
+
+                        <div className="flex items-center gap-6 pt-2">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={packageForm.isPopular}
+                              onChange={(e) => setPackageForm({ ...packageForm, isPopular: e.target.checked })}
+                              className="w-4 h-4 rounded text-orange-600"
+                            />
+                            <span className="text-slate-300 font-bold">Popüler Paket Olarak Öne Çıkar</span>
+                          </label>
+
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={packageForm.isActive}
+                              onChange={(e) => setPackageForm({ ...packageForm, isActive: e.target.checked })}
+                              className="w-4 h-4 rounded text-emerald-600"
+                            />
+                            <span className="text-slate-300 font-bold">Yayında / Aktif</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-3 pt-3">
+                        <button
+                          onClick={() => setPackageModalOpen(false)}
+                          className="flex-1 py-2.5 bg-white/5 hover:bg-white/10 text-slate-300 font-bold rounded-xl transition"
+                        >
+                          Vazgeç
+                        </button>
+                        <button
+                          onClick={async () => {
+                            if (!packageForm.title || !packageForm.price) return alert("Lütfen başlık ve fiyat girin");
+                            try {
+                              const method = editingPackageId ? "PUT" : "POST";
+                              const payload = editingPackageId ? { ...packageForm, id: editingPackageId } : packageForm;
+                              const res = await adminFetch("/api/admin/packages", {
+                                method,
+                                body: JSON.stringify(payload)
+                              });
+                              const data = await res.json();
+                              if (data.success) {
+                                showMsg(editingPackageId ? "Paket güncellendi" : "Yeni paket eklendi", "success");
+                                setPackageModalOpen(false);
+                                fetchData();
+                              } else {
+                                showMsg(data.error || "İşlem başarısız", "error");
+                              }
+                            } catch {
+                              showMsg("Bağlantı hatası", "error");
+                            }
+                          }}
+                          className="flex-1 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-black rounded-xl transition shadow-lg"
+                        >
+                          {editingPackageId ? "Değişiklikleri Kaydet" : "Paketi Ekle"}
                         </button>
                       </div>
                     </div>

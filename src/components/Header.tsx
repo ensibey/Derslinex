@@ -14,6 +14,7 @@ interface NavLinkItem {
 const navLinks: NavLinkItem[] = [
   { href: "/#nasil-calisir", label: "Nasıl Çalışır?" },
   { href: "/ogretmenler", label: "Öğretmenler" },
+  { href: "/#ders-paketleri", label: "Ders Paketleri", badge: "Avantajlı" },
   { href: "/ozel-ders", label: "Özel Ders" },
   { href: "/yks-hazirlik", label: "Sınavlara Hazırlık" },
   { href: "/hakkimizda", label: "Başarılarımız" },
