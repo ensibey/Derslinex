@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     } else {
       // Fallback superadmin check if DB has no admin yet or matching primary admin email
       if (
-        (trimmedEmail === "admin@derslinex.com" || trimmedEmail === "hakanenis58@gmail.com") &&
+        trimmedEmail === "admin@derslinex.com" &&
         (password === adminSecret || password === "DerslinexAdmin2026!")
       ) {
         isValid = true;
