@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import KapaliPage from "../kapali/page";
 
 function getAdminKey(): string {
   if (typeof window !== "undefined") {
@@ -115,6 +116,8 @@ function BrandLogoHeader({ subBadge = "ADMİN PANELİ" }: { subBadge?: string })
 }
 
 export default function AdminPage() {
+  return <KapaliPage />;
+  // Site kapalıyken admin paneli erişime kapatıldı
   const [activeTab, setActiveTab] = useState<"usage" | "exams" | "teachers" | "students" | "lessons" | "blogs" | "feedbacks" | "sessions" | "tasks" | "questions" | "contact" | "ads" | "publishers" | "packages" | "settings">("exams");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [teachers, setTeachers] = useState<Teacher[]>([]);

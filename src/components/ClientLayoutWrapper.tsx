@@ -11,9 +11,9 @@ import { ToastProvider } from "@/components/Toast";
 export default function ClientLayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  // Site Kapatılmıştır Modu (Admin hariç tüm kullanıcılara sade kapatıldı ekranı)
+  // Site Kapatılmıştır Modu (Admin dahil tüm kullanıcılara sadece kapatıldı ekranı)
   const isSiteClosed = true;
-  if (isSiteClosed && !pathname?.startsWith("/admin")) {
+  if (isSiteClosed) {
     return <main className="min-h-screen bg-[#070C18] text-white">{children}</main>;
   }
 
