@@ -37,11 +37,7 @@ const faqItems = [
   },
 ];
 
-import KapaliPage from "./kapali/page";
-
 export default async function HomePage() {
-  return <KapaliPage />;
-  // Eski içerik kapalı modunda devre dışı bırakıldı
   let dbApproved: any[] = [];
   try {
     const dbTeachers = await prisma.teacher.findMany({
